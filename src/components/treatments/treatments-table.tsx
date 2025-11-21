@@ -1,10 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Treatment, TREATMENT_STATUS_LABELS, TREATMENT_TYPE_LABELS, TREATMENT_TARGET_LABELS } from '@/lib/types/treatment';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
-import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface TreatmentsTableProps {
@@ -12,6 +11,8 @@ interface TreatmentsTableProps {
 }
 
 export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
+  const router = useRouter();
+
   if (treatments.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
@@ -62,7 +63,11 @@ export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
         </TableHeader>
         <TableBody>
           {treatments.map((treatment) => (
-            <TableRow key={treatment.id}>
+            <TableRow
+              key={treatment.id}
+              className="cursor-pointer hover:bg-accent/50"
+              onClick={() => router.push(`/treatments/${treatment.id}`)}
+            >
               <TableCell className="font-medium">
                 <div className="space-y-1">
                   <div>{treatment.productName}</div>
@@ -96,11 +101,7 @@ export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
                 {treatment.cost ? `${treatment.cost.toLocaleString()} DA` : '-'}
               </TableCell>
               <TableCell className="text-right">
-                <Link href={`/treatments/${treatment.id}`}>
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <Eye className="h-4 w-4 text-muted-foreground" />
               </TableCell>
             </TableRow>
           ))}

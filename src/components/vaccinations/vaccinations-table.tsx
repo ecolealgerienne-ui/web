@@ -1,10 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Vaccination, VACCINATION_STATUS_LABELS, VACCINATION_TARGET_LABELS } from '@/lib/types/vaccination';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
-import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface VaccinationsTableProps {
@@ -12,6 +11,8 @@ interface VaccinationsTableProps {
 }
 
 export function VaccinationsTable({ vaccinations }: VaccinationsTableProps) {
+  const router = useRouter();
+
   if (vaccinations.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
@@ -45,7 +46,11 @@ export function VaccinationsTable({ vaccinations }: VaccinationsTableProps) {
         </TableHeader>
         <TableBody>
           {vaccinations.map((vaccination) => (
-            <TableRow key={vaccination.id}>
+            <TableRow
+              key={vaccination.id}
+              className="cursor-pointer hover:bg-accent/50"
+              onClick={() => router.push(`/vaccinations/${vaccination.id}`)}
+            >
               <TableCell className="font-medium">
                 <div className="space-y-1">
                   <div>{vaccination.vaccineName}</div>
@@ -69,11 +74,7 @@ export function VaccinationsTable({ vaccinations }: VaccinationsTableProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <Link href={`/vaccinations/${vaccination.id}`}>
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <Eye className="h-4 w-4 text-muted-foreground" />
               </TableCell>
             </TableRow>
           ))}

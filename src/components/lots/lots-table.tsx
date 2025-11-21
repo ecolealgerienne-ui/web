@@ -1,10 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Lot, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
-import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -19,6 +18,8 @@ interface LotsTableProps {
 }
 
 export function LotsTable({ lots }: LotsTableProps) {
+  const router = useRouter();
+
   if (lots.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
@@ -76,7 +77,11 @@ export function LotsTable({ lots }: LotsTableProps) {
         </TableHeader>
         <TableBody>
           {lots.map((lot) => (
-            <TableRow key={lot.id}>
+            <TableRow
+              key={lot.id}
+              className="cursor-pointer hover:bg-accent/50"
+              onClick={() => router.push(`/lots/${lot.id}`)}
+            >
               <TableCell className="font-medium">
                 <div className="space-y-1">
                   <div>{lot.name}</div>
@@ -139,11 +144,7 @@ export function LotsTable({ lots }: LotsTableProps) {
                 )}
               </TableCell>
               <TableCell className="text-right">
-                <Link href={`/lots/${lot.id}`}>
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <Eye className="h-4 w-4 text-muted-foreground" />
               </TableCell>
             </TableRow>
           ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
 import {
   Table,
@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Animal } from "@/lib/types/animal";
 import {
   calculateAge,
@@ -25,6 +24,8 @@ interface AnimalsTableProps {
 }
 
 export function AnimalsTable({ animals }: AnimalsTableProps) {
+  const router = useRouter();
+
   const getStatusVariant = (status: Animal["status"]) => {
     switch (status) {
       case "active":
@@ -64,7 +65,11 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
             </TableRow>
           ) : (
             animals.map((animal) => (
-              <TableRow key={animal.id}>
+              <TableRow
+                key={animal.id}
+                className="cursor-pointer hover:bg-accent/50"
+                onClick={() => router.push(`/animals/${animal.id}`)}
+              >
                 <TableCell className="font-mono text-sm">
                   <div className="flex flex-col">
                     <span className="font-medium">{animal.eid}</span>
@@ -103,12 +108,7 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Link href={`/animals/${animal.id}`}>
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
-                      <span className="sr-only">Voir détail</span>
-                    </Button>
-                  </Link>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
                 </TableCell>
               </TableRow>
             ))
