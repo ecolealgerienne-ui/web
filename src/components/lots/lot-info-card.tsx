@@ -33,9 +33,9 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
       <CardContent className="space-y-4">
         {/* Type et Statut */}
         <div className="flex items-center gap-2">
-          <Badge variant="outline">{LOT_TYPE_LABELS[lot.type]}</Badge>
-          <Badge variant="secondary">{LOT_STATUS_LABELS[lot.status]}</Badge>
-          {lot.completed && <Badge variant="default">Complété</Badge>}
+          <Badge className="border border-border bg-background">{LOT_TYPE_LABELS[lot.type]}</Badge>
+          <Badge variant="default">{LOT_STATUS_LABELS[lot.status]}</Badge>
+          {lot.completed && <Badge variant="success">Complété</Badge>}
         </div>
 
         {/* Description */}
@@ -133,7 +133,7 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
               })}
             </p>
             {new Date(lot.withdrawalEndDate) > new Date() && (
-              <Badge variant="outline" className="text-orange-600">
+              <Badge variant="warning">
                 Délai en cours
               </Badge>
             )}

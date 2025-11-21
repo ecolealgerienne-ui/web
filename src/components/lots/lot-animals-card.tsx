@@ -143,7 +143,7 @@ export function LotAnimalsCard({ lotId }: LotAnimalsCardProps) {
                       {animal.currentEid || '-'}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
+                      <Badge className="border border-border bg-background">
                         {getSpeciesLabel(animal.speciesId)}
                       </Badge>
                     </TableCell>

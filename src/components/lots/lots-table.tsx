@@ -27,14 +27,14 @@ export function LotsTable({ lots }: LotsTableProps) {
     );
   }
 
-  const getStatusVariant = (status: Lot['status']) => {
+  const getStatusVariant = (status: Lot['status']): 'default' | 'destructive' | 'warning' | 'success' => {
     switch (status) {
       case 'open':
-        return 'default';
+        return 'success';
       case 'closed':
-        return 'secondary';
+        return 'default';
       case 'archived':
-        return 'outline';
+        return 'warning';
       default:
         return 'default';
     }
@@ -43,17 +43,17 @@ export function LotsTable({ lots }: LotsTableProps) {
   const getTypeColor = (type: Lot['type']) => {
     switch (type) {
       case 'treatment':
-        return 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400';
+        return 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400 border-blue-200 dark:border-blue-800';
       case 'vaccination':
-        return 'text-purple-600 bg-purple-50 dark:bg-purple-950 dark:text-purple-400';
+        return 'text-purple-600 bg-purple-50 dark:bg-purple-950 dark:text-purple-400 border-purple-200 dark:border-purple-800';
       case 'sale':
-        return 'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400';
+        return 'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 border-green-200 dark:border-green-800';
       case 'slaughter':
-        return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400';
+        return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400 border-red-200 dark:border-red-800';
       case 'purchase':
-        return 'text-orange-600 bg-orange-50 dark:bg-orange-950 dark:text-orange-400';
+        return 'text-orange-600 bg-orange-50 dark:bg-orange-950 dark:text-orange-400 border-orange-200 dark:border-orange-800';
       case 'breeding':
-        return 'text-pink-600 bg-pink-50 dark:bg-pink-950 dark:text-pink-400';
+        return 'text-pink-600 bg-pink-50 dark:bg-pink-950 dark:text-pink-400 border-pink-200 dark:border-pink-800';
       default:
         return '';
     }
@@ -88,7 +88,7 @@ export function LotsTable({ lots }: LotsTableProps) {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline" className={getTypeColor(lot.type)}>
+                <Badge className={getTypeColor(lot.type)}>
                   {LOT_TYPE_LABELS[lot.type]}
                 </Badge>
               </TableCell>
