@@ -10,20 +10,29 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslations } from "@/lib/i18n";
 
 interface ChartEvolutionProps {
   data: Array<{ month: string; animals: number }>;
 }
 
 export function ChartEvolution({ data }: ChartEvolutionProps) {
+  const t = useTranslations('dashboard');
+
+  // Translate month names
+  const translatedData = data.map(item => ({
+    ...item,
+    month: t(`months.${item.month}` as any)
+  }));
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Évolution du Cheptel (6 mois)</CardTitle>
+        <CardTitle className="text-lg">{t('chart.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+          <LineChart data={translatedData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey="month"

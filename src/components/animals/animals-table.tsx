@@ -18,6 +18,7 @@ import {
   sexLabels,
   statusLabels,
 } from "@/lib/data/animals.mock";
+import { useTranslations } from "@/lib/i18n";
 
 interface AnimalsTableProps {
   animals: Animal[];
@@ -25,6 +26,7 @@ interface AnimalsTableProps {
 
 export function AnimalsTable({ animals }: AnimalsTableProps) {
   const router = useRouter();
+  const t = useTranslations('animals');
 
   const getStatusVariant = (status: Animal["status"]) => {
     switch (status) {
@@ -45,22 +47,22 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>EID / ID</TableHead>
-            <TableHead>Nom</TableHead>
-            <TableHead>Espèce</TableHead>
-            <TableHead>Race</TableHead>
-            <TableHead>Sexe</TableHead>
-            <TableHead>Âge</TableHead>
-            <TableHead>Poids</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('table.headers.eid')}</TableHead>
+            <TableHead>{t('table.headers.name')}</TableHead>
+            <TableHead>{t('table.headers.species')}</TableHead>
+            <TableHead>{t('table.headers.breed')}</TableHead>
+            <TableHead>{t('table.headers.sex')}</TableHead>
+            <TableHead>{t('table.headers.age')}</TableHead>
+            <TableHead>{t('table.headers.weight')}</TableHead>
+            <TableHead>{t('table.headers.status')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {animals.length === 0 ? (
             <TableRow>
               <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                Aucun animal trouvé
+                {t('table.empty')}
               </TableCell>
             </TableRow>
           ) : (

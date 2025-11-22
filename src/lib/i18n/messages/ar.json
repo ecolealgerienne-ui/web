@@ -154,6 +154,17 @@
     },
     "activities": {
       "title": "الأنشطة الأخيرة"
+    },
+    "chart": {
+      "title": "تطور القطيع (6 أشهر)"
+    },
+    "months": {
+      "june": "يونيو",
+      "july": "يوليو",
+      "august": "أغسطس",
+      "september": "سبتمبر",
+      "october": "أكتوبر",
+      "november": "نوفمبر"
     }
   },
   "animals": {
@@ -165,6 +176,41 @@
       "sheep": "الأغنام",
       "goats": "الماعز",
       "cattle": "الأبقار"
+    },
+    "filters": {
+      "searchPlaceholder": "البحث عبر EID أو الاسم أو المعرف الداخلي...",
+      "allSpecies": "جميع الأنواع",
+      "allSex": "جميع الجنسين",
+      "allStatus": "جميع الحالات",
+      "species": {
+        "sheep": "الأغنام",
+        "goat": "الماعز",
+        "cattle": "الأبقار"
+      },
+      "sex": {
+        "male": "الذكور",
+        "female": "الإناث"
+      },
+      "status": {
+        "active": "نشط",
+        "sold": "مباع",
+        "dead": "متوفى",
+        "slaughtered": "مذبوح"
+      }
+    },
+    "table": {
+      "headers": {
+        "eid": "EID / المعرف",
+        "name": "الاسم",
+        "species": "النوع",
+        "breed": "السلالة",
+        "sex": "الجنس",
+        "age": "العمر",
+        "weight": "الوزن",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      },
+      "empty": "لم يتم العثور على أي حيوان"
     }
   },
   "lots": {
@@ -176,6 +222,29 @@
       "open": "المجموعات المفتوحة",
       "closed": "المجموعات المغلقة",
       "totalAnimals": "الحيوانات المعنية"
+    },
+    "filters": {
+      "searchLabel": "بحث",
+      "searchPlaceholder": "الاسم، الوصف، المنتج...",
+      "typeLabel": "نوع المجموعة",
+      "statusLabel": "الحالة",
+      "allTypes": "جميع الأنواع",
+      "allStatus": "جميع الحالات"
+    },
+    "table": {
+      "headers": {
+        "name": "الاسم",
+        "type": "النوع",
+        "status": "الحالة",
+        "animals": "الحيوانات",
+        "date": "التاريخ",
+        "productActivity": "المنتج/النشاط",
+        "amount": "المبلغ",
+        "actions": "الإجراءات"
+      },
+      "empty": "لم يتم العثور على أي مجموعة",
+      "buyer": "المشتري",
+      "seller": "البائع"
     }
   },
   "vaccinations": {
@@ -187,6 +256,25 @@
       "scheduled": "المجدولة",
       "completed": "المنجزة",
       "overdue": "المتأخرة"
+    },
+    "filters": {
+      "searchLabel": "بحث",
+      "searchPlaceholder": "اللقاح، المرض، الطبيب البيطري...",
+      "statusLabel": "الحالة",
+      "targetLabel": "الهدف",
+      "allStatus": "جميع الحالات",
+      "allTargets": "جميع الأهداف"
+    },
+    "table": {
+      "headers": {
+        "vaccine": "اللقاح",
+        "target": "الهدف",
+        "scheduledDate": "التاريخ المحدد",
+        "veterinarian": "الطبيب البيطري",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      },
+      "empty": "لم يتم العثور على أي تطعيم"
     }
   },
   "treatments": {
@@ -199,7 +287,30 @@
       "completed": "المنجزة",
       "totalCost": "التكلفة الإجمالية"
     },
-    "currency": "دج"
+    "currency": "دج",
+    "filters": {
+      "searchLabel": "بحث",
+      "searchPlaceholder": "المنتج، السبب...",
+      "statusLabel": "الحالة",
+      "typeLabel": "النوع",
+      "targetLabel": "الهدف",
+      "allStatus": "جميع الحالات",
+      "allTypes": "جميع الأنواع",
+      "allTargets": "جميع الأهداف"
+    },
+    "table": {
+      "headers": {
+        "product": "المنتج",
+        "type": "النوع",
+        "target": "الهدف",
+        "reason": "السبب",
+        "date": "التاريخ",
+        "status": "الحالة",
+        "cost": "التكلفة",
+        "actions": "الإجراءات"
+      },
+      "empty": "لم يتم العثور على أي علاج"
+    }
   },
   "reports": {
     "title": "التقارير",

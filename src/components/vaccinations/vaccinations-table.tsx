@@ -5,6 +5,7 @@ import { Vaccination, VACCINATION_STATUS_LABELS, VACCINATION_TARGET_LABELS } fro
 import { Badge } from '@/components/ui/badge';
 import { Eye } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useTranslations } from '@/lib/i18n';
 
 interface VaccinationsTableProps {
   vaccinations: Vaccination[];
@@ -12,11 +13,12 @@ interface VaccinationsTableProps {
 
 export function VaccinationsTable({ vaccinations }: VaccinationsTableProps) {
   const router = useRouter();
+  const t = useTranslations('vaccinations');
 
   if (vaccinations.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
-        <p className="text-muted-foreground">Aucune vaccination trouvée</p>
+        <p className="text-muted-foreground">{t('table.empty')}</p>
       </div>
     );
   }
@@ -36,12 +38,12 @@ export function VaccinationsTable({ vaccinations }: VaccinationsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Vaccin</TableHead>
-            <TableHead>Cible</TableHead>
-            <TableHead>Date prévue</TableHead>
-            <TableHead>Vétérinaire</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('table.headers.vaccine')}</TableHead>
+            <TableHead>{t('table.headers.target')}</TableHead>
+            <TableHead>{t('table.headers.scheduledDate')}</TableHead>
+            <TableHead>{t('table.headers.veterinarian')}</TableHead>
+            <TableHead>{t('table.headers.status')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -15,12 +15,12 @@ export const mockDashboardStats = {
 };
 
 export const mockChartData = [
-  { month: "Juin", animals: 1150 },
-  { month: "Juillet", animals: 1180 },
-  { month: "Août", animals: 1195 },
-  { month: "Septembre", animals: 1210 },
-  { month: "Octobre", animals: 1230 },
-  { month: "Novembre", animals: 1247 },
+  { month: "june", animals: 1150 },
+  { month: "july", animals: 1180 },
+  { month: "august", animals: 1195 },
+  { month: "september", animals: 1210 },
+  { month: "october", animals: 1230 },
+  { month: "november", animals: 1247 },
 ];
 
 export const mockAlerts = [

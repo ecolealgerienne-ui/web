@@ -5,6 +5,7 @@ import { Treatment, TREATMENT_STATUS_LABELS, TREATMENT_TYPE_LABELS, TREATMENT_TA
 import { Badge } from '@/components/ui/badge';
 import { Eye } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useTranslations } from '@/lib/i18n';
 
 interface TreatmentsTableProps {
   treatments: Treatment[];
@@ -12,11 +13,12 @@ interface TreatmentsTableProps {
 
 export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
   const router = useRouter();
+  const t = useTranslations('treatments');
 
   if (treatments.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
-        <p className="text-muted-foreground">Aucun traitement trouvé</p>
+        <p className="text-muted-foreground">{t('table.empty')}</p>
       </div>
     );
   }
@@ -51,14 +53,14 @@ export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Produit</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Cible</TableHead>
-            <TableHead>Raison</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Coût</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('table.headers.product')}</TableHead>
+            <TableHead>{t('table.headers.type')}</TableHead>
+            <TableHead>{t('table.headers.target')}</TableHead>
+            <TableHead>{t('table.headers.reason')}</TableHead>
+            <TableHead>{t('table.headers.date')}</TableHead>
+            <TableHead>{t('table.headers.status')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.cost')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

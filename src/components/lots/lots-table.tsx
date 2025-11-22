@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useTranslations } from '@/lib/i18n';
 
 interface LotsTableProps {
   lots: Lot[];
@@ -19,11 +20,12 @@ interface LotsTableProps {
 
 export function LotsTable({ lots }: LotsTableProps) {
   const router = useRouter();
+  const t = useTranslations('lots');
 
   if (lots.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
-        <p className="text-muted-foreground">Aucun lot trouvé</p>
+        <p className="text-muted-foreground">{t('table.empty')}</p>
       </div>
     );
   }
@@ -65,14 +67,14 @@ export function LotsTable({ lots }: LotsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nom</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Animaux</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Produit/Activité</TableHead>
-            <TableHead className="text-right">Montant</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('table.headers.name')}</TableHead>
+            <TableHead>{t('table.headers.type')}</TableHead>
+            <TableHead>{t('table.headers.status')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.animals')}</TableHead>
+            <TableHead>{t('table.headers.date')}</TableHead>
+            <TableHead>{t('table.headers.productActivity')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.amount')}</TableHead>
+            <TableHead className="text-right">{t('table.headers.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -120,12 +122,12 @@ export function LotsTable({ lots }: LotsTableProps) {
                   )}
                   {lot.buyerName && (
                     <div className="text-xs text-muted-foreground">
-                      Acheteur: {lot.buyerName}
+                      {t('table.buyer')}: {lot.buyerName}
                     </div>
                   )}
                   {lot.sellerName && (
                     <div className="text-xs text-muted-foreground">
-                      Vendeur: {lot.sellerName}
+                      {t('table.seller')}: {lot.sellerName}
                     </div>
                   )}
                   {!lot.productName &&

@@ -154,6 +154,17 @@
     },
     "activities": {
       "title": "Activités Récentes"
+    },
+    "chart": {
+      "title": "Évolution du Cheptel (6 mois)"
+    },
+    "months": {
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre"
     }
   },
   "animals": {
@@ -165,6 +176,41 @@
       "sheep": "Moutons",
       "goats": "Chèvres",
       "cattle": "Bovins"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher par EID, nom, ID interne...",
+      "allSpecies": "Toutes espèces",
+      "allSex": "Tous sexes",
+      "allStatus": "Tous statuts",
+      "species": {
+        "sheep": "Moutons",
+        "goat": "Chèvres",
+        "cattle": "Bovins"
+      },
+      "sex": {
+        "male": "Mâles",
+        "female": "Femelles"
+      },
+      "status": {
+        "active": "Actifs",
+        "sold": "Vendus",
+        "dead": "Décédés",
+        "slaughtered": "Abattus"
+      }
+    },
+    "table": {
+      "headers": {
+        "eid": "EID / ID",
+        "name": "Nom",
+        "species": "Espèce",
+        "breed": "Race",
+        "sex": "Sexe",
+        "age": "Âge",
+        "weight": "Poids",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "empty": "Aucun animal trouvé"
     }
   },
   "lots": {
@@ -176,6 +222,29 @@
       "open": "Lots ouverts",
       "closed": "Lots fermés",
       "totalAnimals": "Animaux concernés"
+    },
+    "filters": {
+      "searchLabel": "Recherche",
+      "searchPlaceholder": "Nom, description, produit...",
+      "typeLabel": "Type de lot",
+      "statusLabel": "Statut",
+      "allTypes": "Tous les types",
+      "allStatus": "Tous les statuts"
+    },
+    "table": {
+      "headers": {
+        "name": "Nom",
+        "type": "Type",
+        "status": "Statut",
+        "animals": "Animaux",
+        "date": "Date",
+        "activity": "Produit/Activité",
+        "amount": "Montant",
+        "actions": "Actions"
+      },
+      "empty": "Aucun lot trouvé",
+      "buyer": "Acheteur",
+      "seller": "Vendeur"
     }
   },
   "vaccinations": {
@@ -187,6 +256,25 @@
       "scheduled": "Programmées",
       "completed": "Effectuées",
       "overdue": "En retard"
+    },
+    "filters": {
+      "searchLabel": "Recherche",
+      "searchPlaceholder": "Vaccin, maladie, vétérinaire...",
+      "statusLabel": "Statut",
+      "targetLabel": "Cible",
+      "allStatus": "Tous les statuts",
+      "allTargets": "Toutes les cibles"
+    },
+    "table": {
+      "headers": {
+        "vaccine": "Vaccin",
+        "target": "Cible",
+        "scheduledDate": "Date prévue",
+        "veterinarian": "Vétérinaire",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "empty": "Aucune vaccination trouvée"
     }
   },
   "treatments": {
@@ -199,7 +287,30 @@
       "completed": "Terminés",
       "totalCost": "Coût total"
     },
-    "currency": "DA"
+    "currency": "DA",
+    "filters": {
+      "searchLabel": "Recherche",
+      "searchPlaceholder": "Produit, raison...",
+      "statusLabel": "Statut",
+      "typeLabel": "Type",
+      "targetLabel": "Cible",
+      "allStatus": "Tous les statuts",
+      "allTypes": "Tous les types",
+      "allTargets": "Toutes les cibles"
+    },
+    "table": {
+      "headers": {
+        "product": "Produit",
+        "type": "Type",
+        "target": "Cible",
+        "reason": "Raison",
+        "date": "Date",
+        "status": "Statut",
+        "cost": "Coût",
+        "actions": "Actions"
+      },
+      "empty": "Aucun traitement trouvé"
+    }
   },
   "reports": {
     "title": "Rapports",

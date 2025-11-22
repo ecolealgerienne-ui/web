@@ -154,6 +154,17 @@
     },
     "activities": {
       "title": "Recent Activities"
+    },
+    "chart": {
+      "title": "Herd Evolution (6 months)"
+    },
+    "months": {
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November"
     }
   },
   "animals": {
@@ -165,6 +176,41 @@
       "sheep": "Sheep",
       "goats": "Goats",
       "cattle": "Cattle"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by EID, name, internal ID...",
+      "allSpecies": "All species",
+      "allSex": "All sexes",
+      "allStatus": "All statuses",
+      "species": {
+        "sheep": "Sheep",
+        "goat": "Goats",
+        "cattle": "Cattle"
+      },
+      "sex": {
+        "male": "Males",
+        "female": "Females"
+      },
+      "status": {
+        "active": "Active",
+        "sold": "Sold",
+        "dead": "Dead",
+        "slaughtered": "Slaughtered"
+      }
+    },
+    "table": {
+      "headers": {
+        "eid": "EID / ID",
+        "name": "Name",
+        "species": "Species",
+        "breed": "Breed",
+        "sex": "Sex",
+        "age": "Age",
+        "weight": "Weight",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "empty": "No animals found"
     }
   },
   "lots": {
@@ -176,6 +222,29 @@
       "open": "Open lots",
       "closed": "Closed lots",
       "totalAnimals": "Animals involved"
+    },
+    "filters": {
+      "searchLabel": "Search",
+      "searchPlaceholder": "Name, description, product...",
+      "typeLabel": "Lot type",
+      "statusLabel": "Status",
+      "allTypes": "All types",
+      "allStatus": "All statuses"
+    },
+    "table": {
+      "headers": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "animals": "Animals",
+        "date": "Date",
+        "activity": "Product/Activity",
+        "amount": "Amount",
+        "actions": "Actions"
+      },
+      "empty": "No lots found",
+      "buyer": "Buyer",
+      "seller": "Seller"
     }
   },
   "vaccinations": {
@@ -187,6 +256,25 @@
       "scheduled": "Scheduled",
       "completed": "Completed",
       "overdue": "Overdue"
+    },
+    "filters": {
+      "searchLabel": "Search",
+      "searchPlaceholder": "Vaccine, disease, veterinarian...",
+      "statusLabel": "Status",
+      "targetLabel": "Target",
+      "allStatus": "All statuses",
+      "allTargets": "All targets"
+    },
+    "table": {
+      "headers": {
+        "vaccine": "Vaccine",
+        "target": "Target",
+        "scheduledDate": "Scheduled date",
+        "veterinarian": "Veterinarian",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "empty": "No vaccinations found"
     }
   },
   "treatments": {
@@ -199,7 +287,30 @@
       "completed": "Completed",
       "totalCost": "Total cost"
     },
-    "currency": "DA"
+    "currency": "DA",
+    "filters": {
+      "searchLabel": "Search",
+      "searchPlaceholder": "Product, reason...",
+      "statusLabel": "Status",
+      "typeLabel": "Type",
+      "targetLabel": "Target",
+      "allStatus": "All statuses",
+      "allTypes": "All types",
+      "allTargets": "All targets"
+    },
+    "table": {
+      "headers": {
+        "product": "Product",
+        "type": "Type",
+        "target": "Target",
+        "reason": "Reason",
+        "date": "Date",
+        "status": "Status",
+        "cost": "Cost",
+        "actions": "Actions"
+      },
+      "empty": "No treatments found"
+    }
   },
   "reports": {
     "title": "Reports",
