@@ -141,9 +141,9 @@ Write-Host "╚═════════════════════�
 Write-Host "🐄 Création des espèces..." -ForegroundColor Green
 
 $speciesData = @(
-    @{name="Bovin"; name_en="Cattle"; name_ar="أبقار"; description="Bovins d'élevage"},
-    @{name="Ovin"; name_en="Sheep"; name_ar="أغنام"; description="Ovins d'élevage"},
-    @{name="Caprin"; name_en="Goat"; name_ar="ماعز"; description="Caprins d'élevage"}
+    @{name="Bovin"; name_en="Cattle"; name_ar="Abqar"; description="Bovins d'élevage"},
+    @{name="Ovin"; name_en="Sheep"; name_ar="Aghnam"; description="Ovins d'élevage"},
+    @{name="Caprin"; name_en="Goat"; name_ar="Ma'iz"; description="Caprins d'élevage"}
 )
 
 foreach ($species in $speciesData) {
@@ -164,21 +164,21 @@ $caprineId = ($global:CreatedIds.Species | Where-Object { $_.name_en -eq "Goat" 
 
 $breedsData = @(
     # Bovins
-    @{name="Brune de l'Atlas"; name_en="Atlas Brown"; name_ar="بنية الأطلس"; speciesId=$bovineId; description="Race rustique des montagnes"},
-    @{name="Guelmoise"; name_en="Guelmoise"; name_ar="القالمية"; speciesId=$bovineId; description="Race laitière de l'Est algérien"},
-    @{name="Cheurfa"; name_en="Cheurfa"; name_ar="الشرفة"; speciesId=$bovineId; description="Race locale de l'Ouest"},
+    @{name="Brune de l'Atlas"; name_en="Atlas Brown"; name_ar="Boniya Al-Atlas"; speciesId=$bovineId; description="Race rustique des montagnes"},
+    @{name="Guelmoise"; name_en="Guelmoise"; name_ar="Al-Qalmiya"; speciesId=$bovineId; description="Race laitière de l'Est algérien"},
+    @{name="Cheurfa"; name_en="Cheurfa"; name_ar="Al-Sharfa"; speciesId=$bovineId; description="Race locale de l'Ouest"},
 
     # Ovins
-    @{name="Ouled Djellal"; name_en="Ouled Djellal"; name_ar="أولاد جلال"; speciesId=$ovineId; description="Race ovine la plus répandue en Algérie"},
-    @{name="Rembi"; name_en="Rembi"; name_ar="الرمبي"; speciesId=$ovineId; description="Race de l'Ouest algérien"},
-    @{name="D'Man"; name_en="D'Man"; name_ar="دمان"; speciesId=$ovineId; description="Race prolifique du Sahara"},
-    @{name="Barbarine"; name_en="Barbarine"; name_ar="البربرية"; speciesId=$ovineId; description="Race à queue grasse"},
+    @{name="Ouled Djellal"; name_en="Ouled Djellal"; name_ar="Awlad Djallal"; speciesId=$ovineId; description="Race ovine la plus répandue en Algérie"},
+    @{name="Rembi"; name_en="Rembi"; name_ar="Al-Rambi"; speciesId=$ovineId; description="Race de l'Ouest algérien"},
+    @{name="D'Man"; name_en="D'Man"; name_ar="Daman"; speciesId=$ovineId; description="Race prolifique du Sahara"},
+    @{name="Barbarine"; name_en="Barbarine"; name_ar="Al-Barbariya"; speciesId=$ovineId; description="Race à queue grasse"},
 
     # Caprins
-    @{name="Arabia"; name_en="Arabia"; name_ar="العربية"; speciesId=$caprineId; description="Race caprine laitière"},
-    @{name="Kabyle"; name_en="Kabyle"; name_ar="القبائلية"; speciesId=$caprineId; description="Chèvre de Kabylie"},
-    @{name="M'Zabite"; name_en="M'Zabite"; name_ar="المزابية"; speciesId=$caprineId; description="Race du M'Zab"},
-    @{name="Naine de Kabylie"; name_en="Kabyle Dwarf"; name_ar="القبائلية القزمة"; speciesId=$caprineId; description="Petite race locale"}
+    @{name="Arabia"; name_en="Arabia"; name_ar="Al-Arabiya"; speciesId=$caprineId; description="Race caprine laitière"},
+    @{name="Kabyle"; name_en="Kabyle"; name_ar="Al-Qaba'iliya"; speciesId=$caprineId; description="Chèvre de Kabylie"},
+    @{name="M'Zabite"; name_en="M'Zabite"; name_ar="Al-Mozabiya"; speciesId=$caprineId; description="Race du M'Zab"},
+    @{name="Naine de Kabylie"; name_en="Kabyle Dwarf"; name_ar="Al-Qaba'iliya Al-Qazma"; speciesId=$caprineId; description="Petite race locale"}
 )
 
 foreach ($breed in $breedsData) {
