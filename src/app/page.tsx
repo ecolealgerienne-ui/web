@@ -4,12 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Moon, Sun } from 'lucide-react'
 import { useTranslations } from '@/lib/i18n'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { useTheme } from 'next-themes'
 
 export default function HomePage() {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
+  const { theme, setTheme } = useTheme()
   const t = useTranslations('landing')
 
   if (isLoading) {
@@ -23,13 +26,27 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-primary" />
             <span className="text-xl font-bold">{t('brandName')}</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
             {isAuthenticated ? (
               <Button onClick={() => router.push('/dashboard')}>
                 {t('actions.dashboard')}
