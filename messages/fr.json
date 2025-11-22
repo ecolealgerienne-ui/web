@@ -401,6 +401,44 @@
       "notificationsInfo": "Recevez des alertes pour les vaccinations, traitements et événements importants"
     }
   },
+  "alertConfigurations": {
+    "title": "Configurations d'alertes",
+    "subtitle": "Gérez les règles et notifications automatiques",
+    "noAlertConfigurations": "Aucune configuration d'alerte trouvée",
+    "alertCount": "{count} configuration",
+    "alertCount_plural": "{count} configurations",
+    "days": "jours",
+    "filters": {
+      "allTypes": "Tous les types"
+    },
+    "types": {
+      "urgent": "Urgent",
+      "important": "Important",
+      "routine": "Routine"
+    },
+    "priorities": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "high": "Haute",
+      "critical": "Critique"
+    },
+    "fields": {
+      "titleKey": "Clé titre",
+      "messageKey": "Clé message",
+      "severity": "Sévérité",
+      "daysBeforeDue": "Jours avant échéance"
+    },
+    "actions": {
+      "enable": "Activer",
+      "disable": "Désactiver"
+    },
+    "messages": {
+      "loadError": "Impossible de charger les configurations",
+      "updated": "Configuration mise à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour",
+      "infoMessage": "Les configurations d'alertes définissent les notifications automatiques pour les événements importants"
+    }
+  },
   "settings": {
     "title": "Paramètres",
     "profile": {

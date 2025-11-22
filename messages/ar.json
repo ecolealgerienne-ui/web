@@ -401,6 +401,44 @@
       "notificationsInfo": "احصل على تنبيهات للتطعيمات والعلاجات والأحداث المهمة"
     }
   },
+  "alertConfigurations": {
+    "title": "تكوينات التنبيهات",
+    "subtitle": "إدارة القواعد والإشعارات التلقائية",
+    "noAlertConfigurations": "لم يتم العثور على تكوينات تنبيه",
+    "alertCount": "{count} تكوين",
+    "alertCount_plural": "{count} تكوينات",
+    "days": "أيام",
+    "filters": {
+      "allTypes": "جميع الأنواع"
+    },
+    "types": {
+      "urgent": "عاجل",
+      "important": "مهم",
+      "routine": "روتيني"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "critical": "حرجة"
+    },
+    "fields": {
+      "titleKey": "مفتاح العنوان",
+      "messageKey": "مفتاح الرسالة",
+      "severity": "الخطورة",
+      "daysBeforeDue": "أيام قبل الاستحقاق"
+    },
+    "actions": {
+      "enable": "تفعيل",
+      "disable": "تعطيل"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل التكوينات",
+      "updated": "تم تحديث التكوين بنجاح",
+      "updateError": "خطأ في تحديث التكوين",
+      "infoMessage": "تحدد تكوينات التنبيهات الإشعارات التلقائية للأحداث المهمة"
+    }
+  },
   "settings": {
     "title": "الإعدادات",
     "profile": {

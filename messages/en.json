@@ -243,5 +243,43 @@
       "updateError": "Error updating preferences",
       "notificationsInfo": "Receive alerts for vaccinations, treatments and important events"
     }
+  },
+  "alertConfigurations": {
+    "title": "Alert Configurations",
+    "subtitle": "Manage automatic rules and notifications",
+    "noAlertConfigurations": "No alert configurations found",
+    "alertCount": "{count} configuration",
+    "alertCount_plural": "{count} configurations",
+    "days": "days",
+    "filters": {
+      "allTypes": "All types"
+    },
+    "types": {
+      "urgent": "Urgent",
+      "important": "Important",
+      "routine": "Routine"
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "fields": {
+      "titleKey": "Title key",
+      "messageKey": "Message key",
+      "severity": "Severity",
+      "daysBeforeDue": "Days before due"
+    },
+    "actions": {
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "messages": {
+      "loadError": "Unable to load configurations",
+      "updated": "Configuration updated successfully",
+      "updateError": "Error updating configuration",
+      "infoMessage": "Alert configurations define automatic notifications for important events"
+    }
   }
 }
