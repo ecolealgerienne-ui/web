@@ -162,6 +162,76 @@
       "infoMessage": "Vaccines are administered reference data. You can create, edit or disable vaccines. Disabled vaccines remain in the database but are no longer visible by default."
     }
   },
+  "medicalProducts": {
+    "title": "Medical Products",
+    "subtitle": "Manage medications and veterinary products",
+    "newItem": "New product",
+    "editItem": "Edit product",
+    "deleteProduct": "Delete product",
+    "listTitle": "Medical products list",
+    "emptyMessage": "No medical products registered.",
+    "emptyAction": "Click \"New product\" to add one.",
+    "noProducts": "No products found for this filter.",
+    "productCount": "{count} product displayed",
+    "productCount_plural": "{count} products displayed",
+    "filters": {
+      "showInactive": "Show disabled products",
+      "category": "Category",
+      "type": "Type",
+      "searchPlaceholder": "Search for a product..."
+    },
+    "fields": {
+      "name": "Product name",
+      "commercialName": "Commercial name",
+      "category": "Category",
+      "activeIngredient": "Active ingredient",
+      "manufacturer": "Manufacturer",
+      "dosage": "Dosage",
+      "withdrawalPeriodMeat": "Meat withdrawal period (days)",
+      "withdrawalPeriodMilk": "Milk withdrawal period (hours)",
+      "currentStock": "Current stock",
+      "minStock": "Minimum stock",
+      "stockUnit": "Stock unit",
+      "unitPrice": "Unit price",
+      "type": "Type",
+      "targetSpecies": "Target species",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Antibiotic X",
+      "commercialName": "e.g.: CommerX",
+      "category": "e.g.: antibiotic",
+      "activeIngredient": "e.g.: Penicillin",
+      "manufacturer": "e.g.: PharmaCo",
+      "dosage": "e.g.: 100",
+      "withdrawalPeriodMeat": "e.g.: 28",
+      "withdrawalPeriodMilk": "e.g.: 72",
+      "currentStock": "e.g.: 50",
+      "minStock": "e.g.: 10",
+      "stockUnit": "e.g.: ml",
+      "unitPrice": "e.g.: 15.50",
+      "type": "e.g.: treatment",
+      "targetSpecies": "e.g.: cattle"
+    },
+    "messages": {
+      "created": "Product created successfully",
+      "updated": "Product updated successfully",
+      "deleted": "Product deleted successfully",
+      "createError": "Error creating product",
+      "updateError": "Error updating product",
+      "deleteError": "Error deleting product",
+      "confirmDelete": "Are you sure you want to delete the product {name}?",
+      "confirmDeleteDetails": "This action is irreversible. All associated data will be deleted.",
+      "infoMessage": "Medical products are managed at the farm level. Make sure to respect withdrawal periods before slaughter or milk collection."
+    },
+    "categories": {
+      "antibiotic": "Antibiotic",
+      "anti_inflammatory": "Anti-inflammatory",
+      "antiparasitic": "Antiparasitic",
+      "vitamin": "Vitamin",
+      "other": "Other"
+    }
+  },
   "diseases": {
     "title": "Diseases",
     "subtitle": "Manage known diseases",

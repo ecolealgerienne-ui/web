@@ -162,6 +162,76 @@
       "infoMessage": "اللقاحات هي بيانات مرجعية يديرها المسؤولون. يمكنك إنشاء أو تعديل أو تعطيل اللقاحات. اللقاحات المعطلة تبقى في قاعدة البيانات لكنها غير مرئية بشكل افتراضي."
     }
   },
+  "medicalProducts": {
+    "title": "المنتجات الطبية",
+    "subtitle": "إدارة الأدوية والمنتجات البيطرية",
+    "newItem": "منتج جديد",
+    "editItem": "تعديل المنتج",
+    "deleteProduct": "حذف المنتج",
+    "listTitle": "قائمة المنتجات الطبية",
+    "emptyMessage": "لا توجد منتجات طبية مسجلة.",
+    "emptyAction": "انقر على \"منتج جديد\" لإضافة واحد.",
+    "noProducts": "لم يتم العثور على منتجات لهذا الفلتر.",
+    "productCount": "تم عرض {count} منتج",
+    "productCount_plural": "تم عرض {count} منتجات",
+    "filters": {
+      "showInactive": "إظهار المنتجات المعطلة",
+      "category": "الفئة",
+      "type": "النوع",
+      "searchPlaceholder": "البحث عن منتج..."
+    },
+    "fields": {
+      "name": "اسم المنتج",
+      "commercialName": "الاسم التجاري",
+      "category": "الفئة",
+      "activeIngredient": "المادة الفعالة",
+      "manufacturer": "الشركة المصنعة",
+      "dosage": "الجرعة",
+      "withdrawalPeriodMeat": "فترة الانسحاب للحوم (أيام)",
+      "withdrawalPeriodMilk": "فترة الانسحاب للحليب (ساعات)",
+      "currentStock": "المخزون الحالي",
+      "minStock": "الحد الأدنى للمخزون",
+      "stockUnit": "وحدة المخزون",
+      "unitPrice": "سعر الوحدة",
+      "type": "النوع",
+      "targetSpecies": "الأنواع المستهدفة",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: مضاد حيوي X",
+      "commercialName": "مثال: كوميرX",
+      "category": "مثال: antibiotic",
+      "activeIngredient": "مثال: البنسلين",
+      "manufacturer": "مثال: PharmaCo",
+      "dosage": "مثال: 100",
+      "withdrawalPeriodMeat": "مثال: 28",
+      "withdrawalPeriodMilk": "مثال: 72",
+      "currentStock": "مثال: 50",
+      "minStock": "مثال: 10",
+      "stockUnit": "مثال: ml",
+      "unitPrice": "مثال: 15.50",
+      "type": "مثال: treatment",
+      "targetSpecies": "مثال: cattle"
+    },
+    "messages": {
+      "created": "تم إنشاء المنتج بنجاح",
+      "updated": "تم تعديل المنتج بنجاح",
+      "deleted": "تم حذف المنتج بنجاح",
+      "createError": "خطأ في إنشاء المنتج",
+      "updateError": "خطأ في تعديل المنتج",
+      "deleteError": "خطأ في حذف المنتج",
+      "confirmDelete": "هل أنت متأكد من حذف المنتج {name}؟",
+      "confirmDeleteDetails": "هذا الإجراء لا رجعة فيه. سيتم حذف جميع البيانات المرتبطة.",
+      "infoMessage": "يتم إدارة المنتجات الطبية على مستوى المزرعة. تأكد من احترام فترات الانسحاب قبل الذبح أو جمع الحليب."
+    },
+    "categories": {
+      "antibiotic": "مضاد حيوي",
+      "anti_inflammatory": "مضاد للالتهابات",
+      "antiparasitic": "مضاد للطفيليات",
+      "vitamin": "فيتامين",
+      "other": "أخرى"
+    }
+  },
   "diseases": {
     "title": "الأمراض",
     "subtitle": "إدارة الأمراض المعروفة",

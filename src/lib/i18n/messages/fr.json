@@ -162,6 +162,76 @@
       "infoMessage": "Les vaccins sont des données de référence administrées. Vous pouvez créer, modifier ou désactiver des vaccins. Les vaccins désactivés restent en base de données mais ne sont plus visibles par défaut."
     }
   },
+  "medicalProducts": {
+    "title": "Produits médicaux",
+    "subtitle": "Gestion des médicaments et produits vétérinaires",
+    "newItem": "Nouveau produit",
+    "editItem": "Modifier le produit",
+    "deleteProduct": "Supprimer le produit",
+    "listTitle": "Liste des produits médicaux",
+    "emptyMessage": "Aucun produit médical enregistré.",
+    "emptyAction": "Cliquez sur \"Nouveau produit\" pour en ajouter un.",
+    "noProducts": "Aucun produit trouvé pour ce filtre.",
+    "productCount": "{count} produit affiché",
+    "productCount_plural": "{count} produits affichés",
+    "filters": {
+      "showInactive": "Afficher les produits désactivés",
+      "category": "Catégorie",
+      "type": "Type",
+      "searchPlaceholder": "Rechercher un produit..."
+    },
+    "fields": {
+      "name": "Nom du produit",
+      "commercialName": "Nom commercial",
+      "category": "Catégorie",
+      "activeIngredient": "Principe actif",
+      "manufacturer": "Fabricant",
+      "dosage": "Dosage",
+      "withdrawalPeriodMeat": "Délai d'attente viande (jours)",
+      "withdrawalPeriodMilk": "Délai d'attente lait (heures)",
+      "currentStock": "Stock actuel",
+      "minStock": "Stock minimum",
+      "stockUnit": "Unité de stock",
+      "unitPrice": "Prix unitaire",
+      "type": "Type",
+      "targetSpecies": "Espèces cibles",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Antibiotique X",
+      "commercialName": "ex: CommerX",
+      "category": "ex: antibiotic",
+      "activeIngredient": "ex: Pénicilline",
+      "manufacturer": "ex: PharmaCo",
+      "dosage": "ex: 100",
+      "withdrawalPeriodMeat": "ex: 28",
+      "withdrawalPeriodMilk": "ex: 72",
+      "currentStock": "ex: 50",
+      "minStock": "ex: 10",
+      "stockUnit": "ex: ml",
+      "unitPrice": "ex: 15.50",
+      "type": "ex: treatment",
+      "targetSpecies": "ex: cattle"
+    },
+    "messages": {
+      "created": "Produit créé avec succès",
+      "updated": "Produit modifié avec succès",
+      "deleted": "Produit supprimé avec succès",
+      "createError": "Erreur lors de la création du produit",
+      "updateError": "Erreur lors de la modification du produit",
+      "deleteError": "Erreur lors de la suppression du produit",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer le produit {name} ?",
+      "confirmDeleteDetails": "Cette action est irréversible. Toutes les données associées seront supprimées.",
+      "infoMessage": "Les produits médicaux sont gérés au niveau de la ferme. Assurez-vous de respecter les délais d'attente avant abattage ou collecte du lait."
+    },
+    "categories": {
+      "antibiotic": "Antibiotique",
+      "anti_inflammatory": "Anti-inflammatoire",
+      "antiparasitic": "Antiparasitaire",
+      "vitamin": "Vitamine",
+      "other": "Autre"
+    }
+  },
   "diseases": {
     "title": "Maladies",
     "subtitle": "Gestion des maladies connues",
