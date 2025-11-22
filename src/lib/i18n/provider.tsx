@@ -2,7 +2,7 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode, useState, useEffect } from 'react';
-import { getPreferredLocale, type Locale } from './config';
+import { getPreferredLocale, isRTL, type Locale } from './config';
 
 interface I18nProviderProps {
   children: ReactNode;
@@ -20,6 +20,11 @@ export function I18nProvider({ children }: I18nProviderProps) {
     // Charger la locale préférée au démarrage
     const preferredLocale = getPreferredLocale();
     setLocale(preferredLocale);
+
+    // Appliquer la direction RTL si nécessaire
+    const direction = isRTL(preferredLocale) ? 'rtl' : 'ltr';
+    document.documentElement.setAttribute('dir', direction);
+    document.documentElement.setAttribute('lang', preferredLocale);
 
     // Charger les messages
     import(`./messages/${preferredLocale}.json`)
@@ -58,6 +63,11 @@ export function useLocale() {
       if (typeof window !== 'undefined') {
         localStorage.setItem('locale', newLocale);
       }
+
+      // Appliquer la direction RTL
+      const direction = isRTL(newLocale) ? 'rtl' : 'ltr';
+      document.documentElement.setAttribute('dir', direction);
+      document.documentElement.setAttribute('lang', newLocale);
 
       setLocaleState(newLocale);
 

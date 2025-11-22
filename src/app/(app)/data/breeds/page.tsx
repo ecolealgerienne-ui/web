@@ -11,7 +11,8 @@ import { BreedFormDialog } from '@/components/data/breed-form-dialog';
 import { Breed } from '@/lib/types/breed';
 import { breedsService } from '@/lib/services/breeds.service';
 import { useToast } from '@/contexts/toast-context';
-import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { useTranslations, useCommonTranslations, useLocale } from '@/lib/i18n';
+import { getBreedName } from '@/lib/utils/i18n-helpers';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ import {
 export default function BreedsPage() {
   const t = useTranslations('breeds');
   const tc = useCommonTranslations();
+  const { locale } = useLocale();
   const toast = useToast();
   const [selectedSpecies, setSelectedSpecies] = useState('');
   const [showInactive, setShowInactive] = useState(true);
@@ -195,21 +197,13 @@ export default function BreedsPage() {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="font-semibold text-lg flex-1">{breed.nameFr}</div>
+                    <div className="font-semibold text-lg flex-1">{getBreedName(breed, locale)}</div>
                     {breed.isActive === false && (
                       <Badge variant="secondary" className="text-xs">
                         {tc('status.disabled')}
                       </Badge>
                     )}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {breed.nameEn}
-                  </div>
-                  {breed.nameAr && (
-                    <div className="text-sm text-muted-foreground mt-1 text-right" dir="rtl">
-                      {breed.nameAr}
-                    </div>
-                  )}
                   {breed.description && (
                     <div className="text-sm text-muted-foreground mt-2">
                       {breed.description}
@@ -234,7 +228,7 @@ export default function BreedsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleDeleteClick(breed)}
-                      className="flex-1 text-destructive hover:text-destructive"
+                      className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/50 border-red-200 dark:border-red-800"
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
                       {tc('actions.delete')}
@@ -272,11 +266,11 @@ export default function BreedsPage() {
             <DialogTitle>{t('deleteBreed')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p>
-              {t('messages.confirmDelete', { name: deletingBreed?.nameFr || '' })}
+            <p className="font-medium">
+              {t('messages.confirmDelete', { name: deletingBreed ? getBreedName(deletingBreed, locale) : '' })}
             </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              {tc('messages.actionIrreversible')}
+            <p className="text-sm text-muted-foreground mt-3">
+              {t('messages.confirmDeleteDetails')}
             </p>
           </div>
           <DialogFooter>

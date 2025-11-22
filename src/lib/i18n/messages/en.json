@@ -96,12 +96,13 @@
     "messages": {
       "created": "Breed created successfully",
       "updated": "Breed updated successfully",
-      "deleted": "Breed deleted successfully",
+      "deleted": "Breed deactivated successfully (soft delete)",
       "createError": "Error creating breed",
       "updateError": "Error updating breed",
       "deleteError": "Error deleting breed",
-      "confirmDelete": "Are you sure you want to delete the breed {name}?",
-      "infoMessage": "Breeds are reference data managed by super admins. You can create, edit or delete breeds. Deleted breeds are no longer visible in the interface."
+      "confirmDelete": "Are you sure you want to deactivate the breed {name}?",
+      "confirmDeleteDetails": "This breed will be marked as inactive (soft delete). The data will not be physically deleted.",
+      "infoMessage": "Breeds are reference data managed by super admins. You can create, edit or deactivate breeds. Deactivated breeds remain in the database but are not visible by default."
     }
   },
   "errors": {
