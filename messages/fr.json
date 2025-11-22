@@ -439,6 +439,67 @@
       "infoMessage": "Les configurations d'alertes définissent les notifications automatiques pour les événements importants"
     }
   },
+  "farms": {
+    "title": "Fermes",
+    "subtitle": "Gérez les fermes et leurs informations",
+    "noFarms": "Aucune ferme trouvée",
+    "fields": {
+      "name": "Nom",
+      "location": "Localisation",
+      "ownerId": "ID Propriétaire",
+      "cheptelNumber": "Numéro de cheptel",
+      "groupId": "ID Groupe",
+      "groupName": "Nom du groupe",
+      "isDefault": "Ferme par défaut"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "group": "Groupe",
+      "preferences": "Préférences"
+    },
+    "placeholders": {
+      "name": "Ex: Ferme du Soleil",
+      "location": "Ex: Région de Batna",
+      "ownerId": "ID du propriétaire",
+      "cheptelNumber": "Ex: FR-123456",
+      "groupId": "ID du groupe",
+      "groupName": "Nom du groupe"
+    },
+    "badges": {
+      "default": "Par défaut"
+    },
+    "stats": {
+      "title": "Statistiques",
+      "totalAnimals": "Total animaux"
+    },
+    "filters": {
+      "search": "Rechercher par nom ou localisation..."
+    },
+    "actions": {
+      "add": "Ajouter une ferme",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "validation": {
+      "nameRequired": "Le nom est requis",
+      "locationRequired": "La localisation est requise",
+      "ownerIdRequired": "L'ID du propriétaire est requis"
+    },
+    "messages": {
+      "created": "Ferme créée avec succès",
+      "updated": "Ferme mise à jour avec succès",
+      "deleted": "Ferme supprimée avec succès",
+      "saveError": "Erreur lors de l'enregistrement de la ferme",
+      "deleteError": "Erreur lors de la suppression de la ferme",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer la ferme « {{name}} » ?",
+      "addDescription": "Ajoutez les informations de la nouvelle ferme",
+      "editDescription": "Modifiez les informations de la ferme"
+    }
+  },
   "settings": {
     "title": "Paramètres",
     "profile": {

@@ -281,5 +281,66 @@
       "updateError": "Error updating configuration",
       "infoMessage": "Alert configurations define automatic notifications for important events"
     }
+  },
+  "farms": {
+    "title": "Farms",
+    "subtitle": "Manage farms and their information",
+    "noFarms": "No farms found",
+    "fields": {
+      "name": "Name",
+      "location": "Location",
+      "ownerId": "Owner ID",
+      "cheptelNumber": "Herd number",
+      "groupId": "Group ID",
+      "groupName": "Group name",
+      "isDefault": "Default farm"
+    },
+    "sections": {
+      "general": "General information",
+      "group": "Group",
+      "preferences": "Preferences"
+    },
+    "placeholders": {
+      "name": "Ex: Sunny Farm",
+      "location": "Ex: Batna Region",
+      "ownerId": "Owner ID",
+      "cheptelNumber": "Ex: FR-123456",
+      "groupId": "Group ID",
+      "groupName": "Group name"
+    },
+    "badges": {
+      "default": "Default"
+    },
+    "stats": {
+      "title": "Statistics",
+      "totalAnimals": "Total animals"
+    },
+    "filters": {
+      "search": "Search by name or location..."
+    },
+    "actions": {
+      "add": "Add farm",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "locationRequired": "Location is required",
+      "ownerIdRequired": "Owner ID is required"
+    },
+    "messages": {
+      "created": "Farm created successfully",
+      "updated": "Farm updated successfully",
+      "deleted": "Farm deleted successfully",
+      "saveError": "Error saving farm",
+      "deleteError": "Error deleting farm",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete the farm \"{{name}}\"?",
+      "addDescription": "Add the information for the new farm",
+      "editDescription": "Edit the farm information"
+    }
   }
 }

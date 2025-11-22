@@ -21,6 +21,11 @@ const dataMenuItems = [
   { label: "Vaccins", href: "/data/vaccines" },
   { label: "Maladies", href: "/data/diseases" },
   { label: "Médicaments", href: "/data/medications" },
+  { label: "Vétérinaires", href: "/data/veterinarians" },
+  { label: "Campagnes", href: "/data/campaigns" },
+  { label: "Préférences", href: "/data/farm-preferences" },
+  { label: "Alertes", href: "/data/alert-configurations" },
+  { label: "Fermes", href: "/data/farms" },
 ];
 
 const bottomMenuItems = [

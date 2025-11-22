@@ -439,6 +439,67 @@
       "infoMessage": "تحدد تكوينات التنبيهات الإشعارات التلقائية للأحداث المهمة"
     }
   },
+  "farms": {
+    "title": "المزارع",
+    "subtitle": "إدارة المزارع ومعلوماتها",
+    "noFarms": "لم يتم العثور على مزارع",
+    "fields": {
+      "name": "الاسم",
+      "location": "الموقع",
+      "ownerId": "معرف المالك",
+      "cheptelNumber": "رقم القطيع",
+      "groupId": "معرف المجموعة",
+      "groupName": "اسم المجموعة",
+      "isDefault": "المزرعة الافتراضية"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "group": "المجموعة",
+      "preferences": "التفضيلات"
+    },
+    "placeholders": {
+      "name": "مثال: مزرعة الشمس",
+      "location": "مثال: منطقة باتنة",
+      "ownerId": "معرف المالك",
+      "cheptelNumber": "مثال: FR-123456",
+      "groupId": "معرف المجموعة",
+      "groupName": "اسم المجموعة"
+    },
+    "badges": {
+      "default": "افتراضي"
+    },
+    "stats": {
+      "title": "الإحصائيات",
+      "totalAnimals": "إجمالي الحيوانات"
+    },
+    "filters": {
+      "search": "البحث بالاسم أو الموقع..."
+    },
+    "actions": {
+      "add": "إضافة مزرعة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ..."
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "locationRequired": "الموقع مطلوب",
+      "ownerIdRequired": "معرف المالك مطلوب"
+    },
+    "messages": {
+      "created": "تم إنشاء المزرعة بنجاح",
+      "updated": "تم تحديث المزرعة بنجاح",
+      "deleted": "تم حذف المزرعة بنجاح",
+      "saveError": "خطأ في حفظ المزرعة",
+      "deleteError": "خطأ في حذف المزرعة",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{{name}}»؟",
+      "addDescription": "أضف معلومات المزرعة الجديدة",
+      "editDescription": "عدل معلومات المزرعة"
+    }
+  },
   "settings": {
     "title": "الإعدادات",
     "profile": {
