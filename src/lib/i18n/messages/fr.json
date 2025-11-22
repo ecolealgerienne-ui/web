@@ -434,5 +434,70 @@
       "addDescription": "Ajoutez les informations du nouvel animal",
       "editDescription": "Modifiez les informations de l'animal"
     }
+  },
+  "animalEvents": {
+    "title": "Événements des animaux",
+    "subtitle": "Enregistrez et suivez tous les événements de vos animaux",
+    "newEvent": "Nouvel événement",
+    "editEvent": "Modifier l'événement",
+    "deleteEvent": "Supprimer l'événement",
+    "noEvents": "Aucun événement trouvé",
+    "eventCount": "{count} événement",
+    "eventCount_plural": "{count} événements",
+    "filters": {
+      "allTypes": "Tous les types",
+      "search": "Rechercher..."
+    },
+    "types": {
+      "birth": "Naissance",
+      "death": "Décès",
+      "sale": "Vente",
+      "purchase": "Achat",
+      "transfer": "Transfert",
+      "health_check": "Contrôle santé",
+      "vaccination": "Vaccination",
+      "treatment": "Traitement",
+      "weighing": "Pesée",
+      "other": "Autre"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "eventType": "Type d'événement",
+      "eventDate": "Date",
+      "title": "Titre",
+      "description": "Description",
+      "performedBy": "Effectué par",
+      "veterinarianId": "Vétérinaire",
+      "cost": "Coût",
+      "relatedAnimalId": "Animal lié",
+      "location": "Emplacement",
+      "notes": "Notes",
+      "attachments": "Pièces jointes"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "details": "Détails",
+      "additional": "Informations supplémentaires"
+    },
+    "placeholders": {
+      "title": "Ex: Vaccination annuelle",
+      "description": "Description de l'événement...",
+      "performedBy": "Nom de la personne",
+      "location": "Ex: Étable 1",
+      "notes": "Notes additionnelles..."
+    },
+    "messages": {
+      "loadError": "Impossible de charger les événements",
+      "created": "Événement créé avec succès",
+      "updated": "Événement modifié avec succès",
+      "deleted": "Événement supprimé avec succès",
+      "createError": "Erreur lors de la création de l'événement",
+      "updateError": "Erreur lors de la modification de l'événement",
+      "deleteError": "Erreur lors de la suppression de l'événement",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cet événement ?",
+      "addDescription": "Ajoutez les informations du nouvel événement",
+      "editDescription": "Modifiez les informations de l'événement"
+    }
   }
 }

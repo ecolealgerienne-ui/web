@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -10,6 +10,7 @@ import { canAccessAdmin } from "@/lib/utils/permissions";
 const menuItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: Beef, label: "Animaux", href: "/animals" },
+  { icon: Calendar, label: "Événements", href: "/animal-events" },
   { icon: Package, label: "Lots", href: "/lots" },
   { icon: Syringe, label: "Vaccinations", href: "/vaccinations" },
   { icon: Pill, label: "Traitements", href: "/treatments" },

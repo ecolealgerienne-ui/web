@@ -434,5 +434,70 @@
       "addDescription": "أضف معلومات الحيوان الجديد",
       "editDescription": "عدل معلومات الحيوان"
     }
+  },
+  "animalEvents": {
+    "title": "أحداث الحيوانات",
+    "subtitle": "سجل وتتبع جميع أحداث حيواناتك",
+    "newEvent": "حدث جديد",
+    "editEvent": "تعديل الحدث",
+    "deleteEvent": "حذف الحدث",
+    "noEvents": "لم يتم العثور على أحداث",
+    "eventCount": "{count} حدث",
+    "eventCount_plural": "{count} أحداث",
+    "filters": {
+      "allTypes": "جميع الأنواع",
+      "search": "بحث..."
+    },
+    "types": {
+      "birth": "ولادة",
+      "death": "وفاة",
+      "sale": "بيع",
+      "purchase": "شراء",
+      "transfer": "نقل",
+      "health_check": "فحص صحي",
+      "vaccination": "تطعيم",
+      "treatment": "علاج",
+      "weighing": "وزن",
+      "other": "أخرى"
+    },
+    "fields": {
+      "animalId": "الحيوان",
+      "eventType": "نوع الحدث",
+      "eventDate": "التاريخ",
+      "title": "العنوان",
+      "description": "الوصف",
+      "performedBy": "أجراه",
+      "veterinarianId": "الطبيب البيطري",
+      "cost": "التكلفة",
+      "relatedAnimalId": "الحيوان المرتبط",
+      "location": "الموقع",
+      "notes": "ملاحظات",
+      "attachments": "المرفقات"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "details": "التفاصيل",
+      "additional": "معلومات إضافية"
+    },
+    "placeholders": {
+      "title": "مثال: التطعيم السنوي",
+      "description": "وصف الحدث...",
+      "performedBy": "اسم الشخص",
+      "location": "مثال: الحظيرة 1",
+      "notes": "ملاحظات إضافية..."
+    },
+    "messages": {
+      "loadError": "تعذر تحميل الأحداث",
+      "created": "تم إنشاء الحدث بنجاح",
+      "updated": "تم تحديث الحدث بنجاح",
+      "deleted": "تم حذف الحدث بنجاح",
+      "createError": "خطأ في إنشاء الحدث",
+      "updateError": "خطأ في تحديث الحدث",
+      "deleteError": "خطأ في حذف الحدث",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الحدث؟",
+      "addDescription": "أضف معلومات الحدث الجديد",
+      "editDescription": "عدل معلومات الحدث"
+    }
   }
 }
