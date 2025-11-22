@@ -1,0 +1,218 @@
+{
+  "common": {
+    "appName": "École Algérienne",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "yes": "Oui",
+    "no": "Non",
+    "backToHome": "Retour à l'accueil",
+    "tryAgain": "Réessayer",
+    "previousPage": "Page précédente"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "animals": "Animaux",
+    "lots": "Lots",
+    "vaccinations": "Vaccinations",
+    "treatments": "Traitements",
+    "reports": "Rapports",
+    "settings": "Paramètres"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "logout": "Déconnexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "loginWithKeycloak": "Se connecter avec Keycloak",
+    "devMode": "Mode DEV",
+    "prodMode": "Mode PROD",
+    "devModeInfo": "La sécurité est désactivée. Cliquez sur \"Se connecter\" pour accéder à l'application.",
+    "redirectMessage": "Vous serez redirigé vers la page de connexion sécurisée"
+  },
+  "home": {
+    "title": "Gestion complète de votre élevage",
+    "subtitle": "Suivez vos animaux, gérez les vaccinations, traitements et optimisez votre production avec une solution moderne et intuitive.",
+    "getStarted": "Commencer",
+    "accessDashboard": "Accéder au tableau de bord",
+    "whyChoose": "Pourquoi choisir notre solution ?",
+    "features": {
+      "animals": {
+        "title": "Suivi des animaux",
+        "description": "Enregistrez et suivez tous vos animaux avec leur historique complet"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Traitements",
+        "description": "Gérez les calendriers de vaccination et les traitements vétérinaires"
+      },
+      "reports": {
+        "title": "Rapports détaillés",
+        "description": "Analysez vos données avec des rapports complets et exportables"
+      },
+      "lots": {
+        "title": "Gestion des lots",
+        "description": "Organisez vos animaux par lots pour une meilleure gestion"
+      },
+      "traceability": {
+        "title": "Traçabilité complète",
+        "description": "Assurez la traçabilité de tous vos produits et animaux"
+      },
+      "multiUser": {
+        "title": "Multi-utilisateurs",
+        "description": "Collaborez avec votre équipe en toute sécurité"
+      }
+    },
+    "benefits": {
+      "modern": "Interface moderne et intuitive",
+      "accessible": "Accessible depuis n'importe quel appareil",
+      "secure": "Données sécurisées et conformes",
+      "support": "Support client réactif",
+      "updates": "Mises à jour régulières"
+    }
+  },
+  "errors": {
+    "404": {
+      "title": "Page non trouvée",
+      "message": "La page que vous recherchez n'existe pas ou a été déplacée.",
+      "support": "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le support."
+    },
+    "500": {
+      "title": "Quelque chose s'est mal passé",
+      "message": "Une erreur s'est produite lors du chargement de cette page.",
+      "persist": "Si le problème persiste, veuillez contacter le support technique."
+    },
+    "unexpected": {
+      "title": "Erreur inattendue",
+      "message": "Une erreur s'est produite. Nous en avons été informés et travaillons à résoudre le problème."
+    }
+  },
+  "animals": {
+    "title": "Gestion des animaux",
+    "add": "Ajouter un animal",
+    "edit": "Modifier l'animal",
+    "delete": "Supprimer l'animal",
+    "noData": "Aucun animal trouvé",
+    "fields": {
+      "eid": "EID / ID",
+      "name": "Nom",
+      "species": "Espèce",
+      "breed": "Race",
+      "sex": "Sexe",
+      "age": "Âge",
+      "weight": "Poids",
+      "status": "Statut",
+      "birthDate": "Date de naissance",
+      "currentWeight": "Poids actuel"
+    }
+  },
+  "lots": {
+    "title": "Gestion des lots",
+    "add": "Ajouter un lot",
+    "noData": "Aucun lot trouvé",
+    "fields": {
+      "name": "Nom",
+      "type": "Type",
+      "status": "Statut",
+      "animalCount": "Animaux",
+      "date": "Date",
+      "product": "Produit/Activité",
+      "amount": "Montant"
+    }
+  },
+  "vaccinations": {
+    "title": "Vaccinations",
+    "add": "Ajouter une vaccination",
+    "noData": "Aucune vaccination trouvée",
+    "fields": {
+      "vaccine": "Vaccin",
+      "target": "Cible",
+      "scheduledDate": "Date prévue",
+      "veterinarian": "Vétérinaire",
+      "status": "Statut"
+    }
+  },
+  "treatments": {
+    "title": "Traitements",
+    "add": "Ajouter un traitement",
+    "noData": "Aucun traitement trouvé",
+    "fields": {
+      "product": "Produit",
+      "type": "Type",
+      "target": "Cible",
+      "reason": "Raison",
+      "date": "Date",
+      "status": "Statut",
+      "cost": "Coût"
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "inventory": {
+      "title": "Inventaire du cheptel",
+      "description": "Liste complète des animaux avec statistiques par espèce, race et statut"
+    },
+    "health": {
+      "title": "Santé et soins",
+      "description": "Historique des vaccinations, traitements et consultations vétérinaires"
+    },
+    "production": {
+      "title": "Production",
+      "description": "Suivi de la production (lait, viande, laine) avec rendements"
+    },
+    "reproduction": {
+      "title": "Reproduction",
+      "description": "Suivi des naissances, gestations et performances de reproduction"
+    },
+    "movements": {
+      "title": "Mouvements",
+      "description": "Achats, ventes, transferts et mouvements du cheptel"
+    },
+    "traceability": {
+      "title": "Traçabilité",
+      "description": "Historique complet de chaque animal pour conformité réglementaire"
+    },
+    "financial": {
+      "title": "Financier",
+      "description": "Analyse des coûts, revenus et rentabilité par animal ou lot"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile": {
+      "title": "Profil",
+      "description": "Gérez vos informations personnelles"
+    },
+    "farm": {
+      "title": "Exploitation",
+      "description": "Informations sur votre ferme"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Préférences de notifications"
+    },
+    "language": {
+      "title": "Langue & Région",
+      "description": "Choisissez votre langue"
+    },
+    "security": {
+      "title": "Sécurité",
+      "description": "Mot de passe et sécurité"
+    },
+    "data": {
+      "title": "Données",
+      "description": "Import/Export de données"
+    }
+  },
+  "footer": {
+    "copyright": "© 2024 École Algérienne. Tous droits réservés."
+  }
+}

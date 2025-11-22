@@ -1,0 +1,115 @@
+{
+  "common": {
+    "actions": {
+      "add": "إضافة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "create": "إنشاء",
+      "update": "تحديث",
+      "close": "إغلاق",
+      "search": "بحث",
+      "filter": "تصفية",
+      "refresh": "تحديث",
+      "loading": "جاري التحميل...",
+      "saving": "جاري الحفظ...",
+      "deleting": "جاري الحذف..."
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "disabled": "معطل",
+      "enabled": "مفعل"
+    },
+    "messages": {
+      "success": "نجح",
+      "error": "خطأ",
+      "warning": "تحذير",
+      "info": "معلومة",
+      "noData": "لا توجد بيانات متاحة",
+      "loading": "جاري التحميل...",
+      "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+      "actionIrreversible": "هذا الإجراء لا رجعة فيه."
+    },
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "displayOrder": "ترتيب العرض",
+      "isActive": "نشط",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "required": "مطلوب"
+    }
+  },
+  "navigation": {
+    "menu": {
+      "dashboard": "لوحة القيادة",
+      "animals": "الحيوانات",
+      "data": "البيانات",
+      "settings": "الإعدادات"
+    },
+    "data": {
+      "title": "البيانات",
+      "breeds": "السلالات",
+      "vaccines": "اللقاحات",
+      "diseases": "الأمراض",
+      "medications": "الأدوية"
+    }
+  },
+  "breeds": {
+    "title": "السلالات",
+    "subtitle": "بيانات مرجعية - سلالات الحيوانات المتاحة",
+    "newBreed": "سلالة جديدة",
+    "editBreed": "تعديل السلالة",
+    "deleteBreed": "حذف السلالة",
+    "noBreeds": "لم يتم العثور على سلالات لهذا الفلتر.",
+    "breedCount": "{count} سلالة معروضة",
+    "breedCount_plural": "{count} سلالات معروضة",
+    "filters": {
+      "allSpecies": "جميع الأنواع",
+      "showInactive": "إظهار السلالات المعطلة"
+    },
+    "species": {
+      "label": "النوع",
+      "sheep": "الأغنام",
+      "goat": "الماعز",
+      "cattle": "الأبقار"
+    },
+    "fields": {
+      "id": "المعرف",
+      "speciesId": "النوع",
+      "nameFr": "الاسم (بالفرنسية)",
+      "nameEn": "الاسم (بالإنجليزية)",
+      "nameAr": "الاسم (بالعربية)",
+      "description": "الوصف (اختياري)",
+      "displayOrder": "ترتيب العرض",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "id": "مثال: ouled-djellal",
+      "nameFr": "مثال: Ouled Djellal",
+      "nameEn": "مثال: Ouled Djellal",
+      "nameAr": "أولاد جلال",
+      "description": "وصف السلالة"
+    },
+    "messages": {
+      "created": "تم إنشاء السلالة بنجاح",
+      "updated": "تم تعديل السلالة بنجاح",
+      "deleted": "تم حذف السلالة بنجاح",
+      "createError": "خطأ في إنشاء السلالة",
+      "updateError": "خطأ في تعديل السلالة",
+      "deleteError": "خطأ في حذف السلالة",
+      "confirmDelete": "هل أنت متأكد أنك تريد حذف السلالة {name}؟",
+      "infoMessage": "السلالات هي بيانات مرجعية يديرها المسؤولون الفائقون. يمكنك إنشاء أو تعديل أو حذف السلالات. السلالات المحذوفة لم تعد مرئية في الواجهة."
+    }
+  },
+  "errors": {
+    "generic": "حدث خطأ",
+    "networkError": "خطأ في الاتصال بالخادم",
+    "unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء",
+    "notFound": "لم يتم العثور على المورد",
+    "validationError": "خطأ في التحقق",
+    "requiredField": "هذا الحقل مطلوب"
+  }
+}
