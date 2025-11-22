@@ -133,7 +133,15 @@ class ApiClient {
 
     // Parser la réponse JSON
     try {
-      return await response.json()
+      const json = await response.json()
+
+      // Le backend NestJS retourne: { success, data, timestamp }
+      // Déballer automatiquement pour simplifier les services
+      if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
+        return json.data as T
+      }
+
+      return json as T
     } catch (error) {
       logger.error('Failed to parse API response', { url, error })
       throw new ApiError(500, 'Invalid JSON response', undefined, url)

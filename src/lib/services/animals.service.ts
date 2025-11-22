@@ -63,9 +63,21 @@ class AnimalsService {
       if (filters.lotId) params.append('lotId', filters.lotId)
       if (filters.search) params.append('search', filters.search)
 
-      const response = await apiClient.get<PaginatedResponse<Animal>>(
+      // Le backend retourne: { data: [], meta: {} } (déjà déballé par apiClient)
+      const backendResponse = await apiClient.get<{ data: Animal[], meta: any }>(
         `${this.basePath}?${params.toString()}`
       )
+
+      // Adapter le format de réponse: renommer "meta" en "pagination"
+      const response: PaginatedResponse<Animal> = {
+        data: backendResponse.data || [],
+        pagination: {
+          page: backendResponse.meta?.page || page,
+          limit: backendResponse.meta?.limit || limit,
+          total: backendResponse.meta?.total || 0,
+          totalPages: backendResponse.meta?.totalPages || 0,
+        }
+      }
 
       logger.info('Animals fetched successfully', {
         count: response.data.length,
