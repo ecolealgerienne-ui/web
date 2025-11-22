@@ -55,7 +55,7 @@ export function useAnimals(initialFilters: AnimalFilters = {}, initialPage = 1, 
     } finally {
       setLoading(false)
     }
-  }, [filters, page, initialLimit, toast])
+  }, [filters, page, initialLimit]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchAnimals()
@@ -101,7 +101,7 @@ export function useAnimal(id: string | null) {
     } finally {
       setLoading(false)
     }
-  }, [id, toast])
+  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchAnimal()
