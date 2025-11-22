@@ -21,19 +21,29 @@ class BreedsService {
       const url = speciesId ? `${this.basePath}?speciesId=${speciesId}` : this.basePath
       const response = await apiClient.get<any>(url)
 
-      // Le backend peut retourner soit un tableau directement, soit un objet
-      let breeds: Breed[] = []
+      // Le backend retourne une structure emboîtée avec des champs en snake_case
+      let rawBreeds: any[] = []
 
+      // Extraire le tableau de breeds (peut être doublement emboîté)
       if (Array.isArray(response)) {
-        breeds = response
-      } else if (response && Array.isArray(response.data)) {
-        breeds = response.data
-      } else if (response && response.data) {
-        // Cas où data n'est pas un tableau
-        breeds = []
-      } else {
-        breeds = []
+        rawBreeds = response
+      } else if (response?.data?.data && Array.isArray(response.data.data)) {
+        // Double emboîtement: {success, data: {success, data: [...]}}
+        rawBreeds = response.data.data
+      } else if (response?.data && Array.isArray(response.data)) {
+        rawBreeds = response.data
       }
+
+      // Mapper les champs snake_case vers camelCase
+      const breeds: Breed[] = rawBreeds.map((breed: any) => ({
+        id: breed.id,
+        name: breed.name_fr || breed.nameFr || breed.name || '',
+        nameFr: breed.name_fr || breed.nameFr || '',
+        nameEn: breed.name_en || breed.nameEn || '',
+        nameAr: breed.name_ar || breed.nameAr || '',
+        speciesId: breed.species_id || breed.speciesId || '',
+        description: breed.description,
+      }))
 
       logger.info('Breeds fetched successfully', { count: breeds.length, speciesId })
       return breeds
