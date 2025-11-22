@@ -1,12 +1,12 @@
 /**
- * Service API pour la gestion des races (READ ONLY)
+ * Service API pour la gestion des races (CRUD Admin)
  *
- * Les races sont des données de référence statiques fournies par le backend.
- * Pas de création/modification/suppression possible via l'API.
+ * Les races sont des données de référence administrées.
+ * CRUD complet disponible pour les super admins.
  */
 
 import { apiClient } from '@/lib/api/client'
-import { Breed } from '@/lib/types/breed'
+import { Breed, CreateBreedDto, UpdateBreedDto } from '@/lib/types/breed'
 import { logger } from '@/lib/utils/logger'
 
 class BreedsService {
@@ -49,6 +49,107 @@ class BreedsService {
       return breeds
     } catch (error) {
       logger.error('Failed to fetch breeds', { error, speciesId })
+      throw error
+    }
+  }
+
+  /**
+   * Crée une nouvelle race (Admin)
+   */
+  async create(data: CreateBreedDto): Promise<Breed> {
+    try {
+      // Convertir en snake_case pour le backend
+      const payload = {
+        id: data.id,
+        species_id: data.speciesId,
+        name_fr: data.nameFr,
+        name_en: data.nameEn,
+        name_ar: data.nameAr,
+        description: data.description,
+        display_order: data.displayOrder,
+        is_active: data.isActive ?? true,
+      }
+
+      const response = await apiClient.post<any>(this.basePath, payload)
+
+      // Extraire et mapper la réponse
+      let rawBreed: any = response
+      if (response?.data) {
+        rawBreed = response.data
+      }
+
+      const breed: Breed = {
+        id: rawBreed.id,
+        name: rawBreed.name_fr || rawBreed.nameFr || rawBreed.name || '',
+        nameFr: rawBreed.name_fr || rawBreed.nameFr || '',
+        nameEn: rawBreed.name_en || rawBreed.nameEn || '',
+        nameAr: rawBreed.name_ar || rawBreed.nameAr || '',
+        speciesId: rawBreed.species_id || rawBreed.speciesId || '',
+        description: rawBreed.description,
+        displayOrder: rawBreed.display_order || rawBreed.displayOrder,
+        isActive: rawBreed.is_active ?? rawBreed.isActive ?? true,
+      }
+
+      logger.info('Breed created successfully', { id: breed.id })
+      return breed
+    } catch (error) {
+      logger.error('Failed to create breed', { error, data })
+      throw error
+    }
+  }
+
+  /**
+   * Met à jour une race existante (Admin)
+   */
+  async update(id: string, data: UpdateBreedDto): Promise<Breed> {
+    try {
+      // Convertir en snake_case pour le backend
+      const payload: any = {}
+      if (data.speciesId !== undefined) payload.species_id = data.speciesId
+      if (data.nameFr !== undefined) payload.name_fr = data.nameFr
+      if (data.nameEn !== undefined) payload.name_en = data.nameEn
+      if (data.nameAr !== undefined) payload.name_ar = data.nameAr
+      if (data.description !== undefined) payload.description = data.description
+      if (data.displayOrder !== undefined) payload.display_order = data.displayOrder
+      if (data.isActive !== undefined) payload.is_active = data.isActive
+
+      const response = await apiClient.put<any>(`${this.basePath}/${id}`, payload)
+
+      // Extraire et mapper la réponse
+      let rawBreed: any = response
+      if (response?.data) {
+        rawBreed = response.data
+      }
+
+      const breed: Breed = {
+        id: rawBreed.id,
+        name: rawBreed.name_fr || rawBreed.nameFr || rawBreed.name || '',
+        nameFr: rawBreed.name_fr || rawBreed.nameFr || '',
+        nameEn: rawBreed.name_en || rawBreed.nameEn || '',
+        nameAr: rawBreed.name_ar || rawBreed.nameAr || '',
+        speciesId: rawBreed.species_id || rawBreed.speciesId || '',
+        description: rawBreed.description,
+        displayOrder: rawBreed.display_order || rawBreed.displayOrder,
+        isActive: rawBreed.is_active ?? rawBreed.isActive ?? true,
+      }
+
+      logger.info('Breed updated successfully', { id })
+      return breed
+    } catch (error) {
+      logger.error('Failed to update breed', { error, id, data })
+      throw error
+    }
+  }
+
+  /**
+   * Supprime une race (soft delete - Admin)
+   */
+  async delete(id: string): Promise<void> {
+    try {
+      await apiClient.delete(`${this.basePath}/${id}`)
+      logger.info('Breed deleted successfully', { id })
+    } catch (error) {
+      logger.error('Failed to delete breed', { error, id })
       throw error
     }
   }
