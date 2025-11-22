@@ -201,6 +201,267 @@
     },
     "currency": "DA"
   },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "Générez des rapports détaillés sur votre exploitation",
+    "settings": {
+      "title": "Paramètres généraux",
+      "description": "Sélectionnez la période pour tous les rapports",
+      "periodLabel": "Période",
+      "applyToAll": "Appliquer à tous"
+    },
+    "generate": "Générer",
+    "exportPdf": "Exporter PDF",
+    "periods": {
+      "week": "Cette semaine",
+      "month": "Ce mois",
+      "quarter": "Ce trimestre",
+      "year": "Cette année",
+      "custom": "Période personnalisée"
+    },
+    "categories": {
+      "health": "Santé & Bien-être",
+      "production": "Production & Performance",
+      "financial": "Finances & Réglementaire"
+    },
+    "types": {
+      "herdInventory": {
+        "name": "Inventaire du Cheptel",
+        "description": "État complet du cheptel par espèce, âge et statut"
+      },
+      "vaccinations": {
+        "name": "Registre de Vaccinations",
+        "description": "Historique des vaccinations et calendrier à venir"
+      },
+      "treatments": {
+        "name": "Registre des Traitements",
+        "description": "Historique des traitements et délais d'attente"
+      },
+      "movements": {
+        "name": "Mouvements d'Animaux",
+        "description": "Entrées, sorties, naissances et décès"
+      },
+      "growth": {
+        "name": "Croissance et Performance",
+        "description": "Évolution des poids et gains moyens quotidiens"
+      },
+      "health": {
+        "name": "Bilan Sanitaire",
+        "description": "Taux de morbidité, mortalité et incidents sanitaires"
+      },
+      "financial": {
+        "name": "Rapport Financier",
+        "description": "Coûts des soins vétérinaires et revenus"
+      }
+    }
+  },
+  "landing": {
+    "loading": "Chargement...",
+    "brandName": "École Algérienne",
+    "actions": {
+      "login": "Se connecter",
+      "dashboard": "Accéder au tableau de bord",
+      "start": "Commencer"
+    },
+    "hero": {
+      "title": "Gestion complète de votre élevage",
+      "subtitle": "Suivez vos animaux, gérez les vaccinations, traitements et optimisez votre production avec une solution moderne et intuitive."
+    },
+    "features": {
+      "animals": {
+        "title": "Suivi des animaux",
+        "description": "Enregistrez et suivez tous vos animaux avec leur historique complet",
+        "icon": "🐄"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Traitements",
+        "description": "Gérez les calendriers de vaccination et les traitements vétérinaires",
+        "icon": "💉"
+      },
+      "reports": {
+        "title": "Rapports détaillés",
+        "description": "Analysez vos données avec des rapports complets et exportables",
+        "icon": "📊"
+      },
+      "lots": {
+        "title": "Gestion des lots",
+        "description": "Organisez vos animaux par lots pour une meilleure gestion",
+        "icon": "📦"
+      },
+      "traceability": {
+        "title": "Traçabilité complète",
+        "description": "Assurez la traçabilité de tous vos produits et animaux",
+        "icon": "🔍"
+      },
+      "multiUser": {
+        "title": "Multi-utilisateurs",
+        "description": "Collaborez avec votre équipe en toute sécurité",
+        "icon": "👥"
+      }
+    },
+    "benefits": {
+      "title": "Pourquoi choisir notre solution ?",
+      "items": [
+        "Interface moderne et intuitive",
+        "Accessible depuis n'importe quel appareil",
+        "Données sécurisées et conformes",
+        "Support client réactif",
+        "Mises à jour régulières"
+      ]
+    },
+    "footer": "© 2024 École Algérienne. Tous droits réservés."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez vos préférences et la configuration de l'application",
+    "sections": {
+      "title": "Sections",
+      "profile": "Profil",
+      "farm": "Ferme",
+      "notifications": "Notifications",
+      "language": "Langue & Région",
+      "security": "Sécurité",
+      "data": "Données"
+    },
+    "profile": {
+      "title": "Profil utilisateur",
+      "description": "Gérez vos informations personnelles",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "role": "Rôle",
+      "roles": {
+        "owner": "Propriétaire",
+        "manager": "Gestionnaire",
+        "veterinarian": "Vétérinaire",
+        "worker": "Employé"
+      },
+      "saveChanges": "Enregistrer les modifications"
+    },
+    "farm": {
+      "title": "Informations de la ferme",
+      "description": "Configurez les détails de votre exploitation",
+      "farmName": "Nom de la ferme",
+      "farmId": "N° d'identification",
+      "surface": "Surface (hectares)",
+      "address": "Adresse",
+      "wilaya": "Wilaya",
+      "commune": "Commune",
+      "species": "Espèces élevées",
+      "addSpecies": "+ Ajouter",
+      "speciesTypes": {
+        "sheep": "Ovins",
+        "goat": "Caprins",
+        "cattle": "Bovins"
+      },
+      "wilayas": {
+        "select": "Sélectionner...",
+        "alger": "Alger",
+        "oran": "Oran",
+        "constantine": "Constantine",
+        "blida": "Blida",
+        "setif": "Sétif"
+      }
+    },
+    "notifications": {
+      "title": "Préférences de notifications",
+      "description": "Choisissez comment vous souhaitez être alerté",
+      "vaccinations": {
+        "title": "Vaccinations à venir",
+        "description": "Recevoir une alerte 7 jours avant"
+      },
+      "treatments": {
+        "title": "Traitements en cours",
+        "description": "Rappel quotidien pour les traitements"
+      },
+      "waitingPeriods": {
+        "title": "Délais d'attente",
+        "description": "Alerte fin de délai d'attente"
+      },
+      "births": {
+        "title": "Naissances",
+        "description": "Notification à chaque naissance"
+      },
+      "healthAlerts": {
+        "title": "Alertes sanitaires",
+        "description": "Notifications urgentes pour problèmes de santé"
+      },
+      "savePreferences": "Enregistrer les préférences"
+    },
+    "language": {
+      "title": "Langue & Région",
+      "description": "Personnalisez l'affichage selon vos préférences",
+      "interfaceLanguage": "Langue de l'interface",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date",
+      "currency": "Devise",
+      "darkMode": {
+        "title": "Thème sombre",
+        "description": "Activer le mode sombre"
+      },
+      "languages": {
+        "fr": "Français",
+        "ar": "العربية (Arabe)",
+        "en": "English"
+      },
+      "timezones": {
+        "africaAlgiers": "Afrique/Alger (GMT+1)"
+      },
+      "dateFormats": {
+        "ddmmyyyy": "JJ/MM/AAAA",
+        "mmddyyyy": "MM/JJ/AAAA",
+        "yyyymmdd": "AAAA-MM-JJ"
+      },
+      "currencies": {
+        "dzd": "Dinar Algérien (DA)",
+        "eur": "Euro (€)",
+        "usd": "Dollar US ($)"
+      }
+    },
+    "security": {
+      "title": "Sécurité",
+      "description": "Protégez votre compte et vos données",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "changePassword": "Changer le mot de passe",
+      "twoFactor": {
+        "title": "Authentification à deux facteurs",
+        "label": "2FA",
+        "description": "Ajouter une couche de sécurité supplémentaire",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "enable": "Activer 2FA"
+      },
+      "sessions": {
+        "title": "Sessions actives",
+        "current": "Navigateur actuel",
+        "active": "Active"
+      }
+    },
+    "data": {
+      "title": "Gestion des données",
+      "description": "Sauvegarde, export et suppression de données",
+      "backup": {
+        "title": "Sauvegarde automatique",
+        "lastBackup": "Dernière sauvegarde : Aujourd'hui à 03:00",
+        "enabled": "Activé",
+        "backupNow": "Sauvegarder maintenant"
+      },
+      "export": {
+        "title": "Exporter les données",
+        "description": "Téléchargez une copie complète de toutes vos données",
+        "excel": "Exporter en Excel",
+        "json": "Exporter en JSON"
+      },
+      "dangerZone": {
+        "title": "Zone de danger",
+        "description": "Les actions suivantes sont irréversibles",
+        "deleteAll": "Supprimer toutes les données"
+      }
+    }
+  },
   "errors": {
     "generic": "Une erreur est survenue",
     "networkError": "Erreur de connexion au serveur",

@@ -201,6 +201,267 @@
     },
     "currency": "DA"
   },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Generate detailed reports about your farm",
+    "settings": {
+      "title": "General settings",
+      "description": "Select the period for all reports",
+      "periodLabel": "Period",
+      "applyToAll": "Apply to all"
+    },
+    "generate": "Generate",
+    "exportPdf": "Export PDF",
+    "periods": {
+      "week": "This week",
+      "month": "This month",
+      "quarter": "This quarter",
+      "year": "This year",
+      "custom": "Custom period"
+    },
+    "categories": {
+      "health": "Health & Welfare",
+      "production": "Production & Performance",
+      "financial": "Financial & Regulatory"
+    },
+    "types": {
+      "herdInventory": {
+        "name": "Herd Inventory",
+        "description": "Complete herd status by species, age and status"
+      },
+      "vaccinations": {
+        "name": "Vaccination Registry",
+        "description": "Vaccination history and upcoming schedule"
+      },
+      "treatments": {
+        "name": "Treatment Registry",
+        "description": "Treatment history and withdrawal periods"
+      },
+      "movements": {
+        "name": "Animal Movements",
+        "description": "Arrivals, departures, births and deaths"
+      },
+      "growth": {
+        "name": "Growth and Performance",
+        "description": "Weight evolution and average daily gains"
+      },
+      "health": {
+        "name": "Health Report",
+        "description": "Morbidity, mortality rates and health incidents"
+      },
+      "financial": {
+        "name": "Financial Report",
+        "description": "Veterinary care costs and revenues"
+      }
+    }
+  },
+  "landing": {
+    "loading": "Loading...",
+    "brandName": "École Algérienne",
+    "actions": {
+      "login": "Sign in",
+      "dashboard": "Go to dashboard",
+      "start": "Get started"
+    },
+    "hero": {
+      "title": "Complete livestock management",
+      "subtitle": "Track your animals, manage vaccinations, treatments and optimize your production with a modern and intuitive solution."
+    },
+    "features": {
+      "animals": {
+        "title": "Animal tracking",
+        "description": "Register and track all your animals with their complete history",
+        "icon": "🐄"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Treatments",
+        "description": "Manage vaccination schedules and veterinary treatments",
+        "icon": "💉"
+      },
+      "reports": {
+        "title": "Detailed reports",
+        "description": "Analyze your data with complete and exportable reports",
+        "icon": "📊"
+      },
+      "lots": {
+        "title": "Lot management",
+        "description": "Organize your animals by lots for better management",
+        "icon": "📦"
+      },
+      "traceability": {
+        "title": "Complete traceability",
+        "description": "Ensure traceability of all your products and animals",
+        "icon": "🔍"
+      },
+      "multiUser": {
+        "title": "Multi-user",
+        "description": "Collaborate with your team securely",
+        "icon": "👥"
+      }
+    },
+    "benefits": {
+      "title": "Why choose our solution?",
+      "items": [
+        "Modern and intuitive interface",
+        "Accessible from any device",
+        "Secure and compliant data",
+        "Responsive customer support",
+        "Regular updates"
+      ]
+    },
+    "footer": "© 2024 École Algérienne. All rights reserved."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and application configuration",
+    "sections": {
+      "title": "Sections",
+      "profile": "Profile",
+      "farm": "Farm",
+      "notifications": "Notifications",
+      "language": "Language & Region",
+      "security": "Security",
+      "data": "Data"
+    },
+    "profile": {
+      "title": "User profile",
+      "description": "Manage your personal information",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "roles": {
+        "owner": "Owner",
+        "manager": "Manager",
+        "veterinarian": "Veterinarian",
+        "worker": "Worker"
+      },
+      "saveChanges": "Save changes"
+    },
+    "farm": {
+      "title": "Farm information",
+      "description": "Configure your farm details",
+      "farmName": "Farm name",
+      "farmId": "Identification number",
+      "surface": "Area (hectares)",
+      "address": "Address",
+      "wilaya": "Wilaya",
+      "commune": "Commune",
+      "species": "Farmed species",
+      "addSpecies": "+ Add",
+      "speciesTypes": {
+        "sheep": "Sheep",
+        "goat": "Goats",
+        "cattle": "Cattle"
+      },
+      "wilayas": {
+        "select": "Select...",
+        "alger": "Algiers",
+        "oran": "Oran",
+        "constantine": "Constantine",
+        "blida": "Blida",
+        "setif": "Setif"
+      }
+    },
+    "notifications": {
+      "title": "Notification preferences",
+      "description": "Choose how you want to be notified",
+      "vaccinations": {
+        "title": "Upcoming vaccinations",
+        "description": "Receive alert 7 days before"
+      },
+      "treatments": {
+        "title": "Ongoing treatments",
+        "description": "Daily reminder for treatments"
+      },
+      "waitingPeriods": {
+        "title": "Withdrawal periods",
+        "description": "Alert when withdrawal period ends"
+      },
+      "births": {
+        "title": "Births",
+        "description": "Notification for each birth"
+      },
+      "healthAlerts": {
+        "title": "Health alerts",
+        "description": "Urgent notifications for health issues"
+      },
+      "savePreferences": "Save preferences"
+    },
+    "language": {
+      "title": "Language & Region",
+      "description": "Customize display according to your preferences",
+      "interfaceLanguage": "Interface language",
+      "timezone": "Timezone",
+      "dateFormat": "Date format",
+      "currency": "Currency",
+      "darkMode": {
+        "title": "Dark theme",
+        "description": "Enable dark mode"
+      },
+      "languages": {
+        "fr": "Français",
+        "ar": "العربية (Arabic)",
+        "en": "English"
+      },
+      "timezones": {
+        "africaAlgiers": "Africa/Algiers (GMT+1)"
+      },
+      "dateFormats": {
+        "ddmmyyyy": "DD/MM/YYYY",
+        "mmddyyyy": "MM/DD/YYYY",
+        "yyyymmdd": "YYYY-MM-DD"
+      },
+      "currencies": {
+        "dzd": "Algerian Dinar (DA)",
+        "eur": "Euro (€)",
+        "usd": "US Dollar ($)"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "description": "Protect your account and data",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "changePassword": "Change password",
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "label": "2FA",
+        "description": "Add an extra layer of security",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "enable": "Enable 2FA"
+      },
+      "sessions": {
+        "title": "Active sessions",
+        "current": "Current browser",
+        "active": "Active"
+      }
+    },
+    "data": {
+      "title": "Data management",
+      "description": "Backup, export and data deletion",
+      "backup": {
+        "title": "Automatic backup",
+        "lastBackup": "Last backup: Today at 03:00",
+        "enabled": "Enabled",
+        "backupNow": "Backup now"
+      },
+      "export": {
+        "title": "Export data",
+        "description": "Download a complete copy of all your data",
+        "excel": "Export to Excel",
+        "json": "Export to JSON"
+      },
+      "dangerZone": {
+        "title": "Danger zone",
+        "description": "The following actions are irreversible",
+        "deleteAll": "Delete all data"
+      }
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",
