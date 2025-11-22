@@ -111,5 +111,260 @@
     "notFound": "Resource not found",
     "validationError": "Validation error",
     "requiredField": "This field is required"
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "subtitle": "Manage your vaccination, treatment and weighing campaigns",
+    "newCampaign": "New campaign",
+    "editCampaign": "Edit campaign",
+    "deleteCampaign": "Delete campaign",
+    "noCampaigns": "No campaigns found",
+    "campaignCount": "{count} campaign",
+    "campaignCount_plural": "{count} campaigns",
+    "progress": "Progress",
+    "filters": {
+      "allTypes": "All types",
+      "allStatus": "All statuses"
+    },
+    "types": {
+      "vaccination": "Vaccination",
+      "treatment": "Treatment",
+      "weighing": "Weighing",
+      "identification": "Identification"
+    },
+    "status": {
+      "planned": "Planned",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "fields": {
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "campaignDate": "Campaign date",
+      "productId": "Product ID",
+      "productName": "Product name",
+      "veterinarianId": "Veterinarian ID",
+      "veterinarianName": "Veterinarian name",
+      "targetCount": "Target",
+      "completedCount": "Completed",
+      "cost": "Cost",
+      "description": "Description",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "productName": "E.g.: Rabies Vaccine",
+      "description": "Campaign description..."
+    },
+    "messages": {
+      "loadError": "Unable to load campaigns",
+      "created": "Campaign created successfully",
+      "updated": "Campaign updated successfully",
+      "deleted": "Campaign deleted successfully",
+      "createError": "Error creating campaign",
+      "updateError": "Error updating campaign",
+      "deleteError": "Error deleting campaign",
+      "confirmDelete": "Do you really want to delete campaign \"{name}\"?"
+    }
+  },
+  "veterinarians": {
+    "title": "Veterinarians",
+    "subtitle": "Manage your veterinary contacts",
+    "newVeterinarian": "New veterinarian",
+    "editVeterinarian": "Edit veterinarian",
+    "deleteVeterinarian": "Delete veterinarian",
+    "noVeterinarians": "No veterinarians found",
+    "veterinarianCount": "{count} veterinarian",
+    "veterinarianCount_plural": "{count} veterinarians",
+    "filters": {
+      "showInactive": "Show inactive veterinarians"
+    },
+    "sections": {
+      "personal": "Personal information",
+      "specialties": "Specialties",
+      "contact": "Contact",
+      "address": "Address",
+      "availability": "Availability",
+      "pricing": "Pricing",
+      "preferences": "Preferences"
+    },
+    "fields": {
+      "title": "Title",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "licenseNumber": "License number",
+      "specialties": "Specialties",
+      "clinic": "Clinic",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "isAvailable": "Available",
+      "emergencyService": "Emergency service",
+      "workingHours": "Working hours",
+      "consultationFee": "Consultation fee",
+      "emergencyFee": "Emergency fee",
+      "currency": "Currency",
+      "isPreferred": "Preferred veterinarian",
+      "isDefault": "Default veterinarian",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "specialties": "E.g.: Cattle, Sheep, Goats",
+      "workingHours": "E.g.: Mon-Fri 8am-6pm"
+    },
+    "badges": {
+      "default": "Default",
+      "emergency": "Emergency"
+    },
+    "messages": {
+      "loadError": "Unable to load veterinarians",
+      "created": "Veterinarian created successfully",
+      "updated": "Veterinarian updated successfully",
+      "deleted": "Veterinarian deleted successfully",
+      "createError": "Error creating veterinarian",
+      "updateError": "Error updating veterinarian",
+      "deleteError": "Error deleting veterinarian",
+      "confirmDelete": "Do you really want to delete veterinarian {name}?"
+    }
+  },
+  "farmPreferences": {
+    "title": "Farm Preferences",
+    "subtitle": "Configure default settings for your farm",
+    "sections": {
+      "general": "General settings",
+      "defaults": "Default values",
+      "unitsFormats": "Units and formats",
+      "notifications": "Notifications"
+    },
+    "fields": {
+      "defaultVeterinarianId": "Default veterinarian",
+      "defaultSpeciesId": "Default species",
+      "defaultBreedId": "Default breed",
+      "weightUnit": "Weight unit",
+      "currency": "Currency",
+      "language": "Language",
+      "dateFormat": "Date format",
+      "enableNotifications": "Enable notifications"
+    },
+    "placeholders": {
+      "defaultVeterinarianId": "Select a veterinarian",
+      "defaultBreedId": "Select a breed",
+      "selectSpecies": "-- Select --"
+    },
+    "species": {
+      "cattle": "Cattle",
+      "sheep": "Sheep",
+      "goat": "Goat"
+    },
+    "messages": {
+      "loadError": "Unable to load preferences",
+      "updated": "Preferences updated successfully",
+      "updateError": "Error updating preferences",
+      "notificationsInfo": "Receive alerts for vaccinations, treatments and important events"
+    }
+  },
+  "alertConfigurations": {
+    "title": "Alert Configurations",
+    "subtitle": "Manage automatic rules and notifications",
+    "noAlertConfigurations": "No alert configurations found",
+    "alertCount": "{count} configuration",
+    "alertCount_plural": "{count} configurations",
+    "days": "days",
+    "filters": {
+      "allTypes": "All types"
+    },
+    "types": {
+      "urgent": "Urgent",
+      "important": "Important",
+      "routine": "Routine"
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "fields": {
+      "titleKey": "Title key",
+      "messageKey": "Message key",
+      "severity": "Severity",
+      "daysBeforeDue": "Days before due"
+    },
+    "actions": {
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "messages": {
+      "loadError": "Unable to load configurations",
+      "updated": "Configuration updated successfully",
+      "updateError": "Error updating configuration",
+      "infoMessage": "Alert configurations define automatic notifications for important events"
+    }
+  },
+  "farms": {
+    "title": "Farms",
+    "subtitle": "Manage farms and their information",
+    "noFarms": "No farms found",
+    "fields": {
+      "name": "Name",
+      "location": "Location",
+      "ownerId": "Owner ID",
+      "cheptelNumber": "Herd number",
+      "groupId": "Group ID",
+      "groupName": "Group name",
+      "isDefault": "Default farm"
+    },
+    "sections": {
+      "general": "General information",
+      "group": "Group",
+      "preferences": "Preferences"
+    },
+    "placeholders": {
+      "name": "Ex: Sunny Farm",
+      "location": "Ex: Batna Region",
+      "ownerId": "Owner ID",
+      "cheptelNumber": "Ex: FR-123456",
+      "groupId": "Group ID",
+      "groupName": "Group name"
+    },
+    "badges": {
+      "default": "Default"
+    },
+    "stats": {
+      "title": "Statistics",
+      "totalAnimals": "Total animals"
+    },
+    "filters": {
+      "search": "Search by name or location..."
+    },
+    "actions": {
+      "add": "Add farm",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "locationRequired": "Location is required",
+      "ownerIdRequired": "Owner ID is required"
+    },
+    "messages": {
+      "created": "Farm created successfully",
+      "updated": "Farm updated successfully",
+      "deleted": "Farm deleted successfully",
+      "saveError": "Error saving farm",
+      "deleteError": "Error deleting farm",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete the farm \"{{name}}\"?",
+      "addDescription": "Add the information for the new farm",
+      "editDescription": "Edit the farm information"
+    }
   }
 }
