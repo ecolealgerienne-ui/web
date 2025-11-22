@@ -18,7 +18,7 @@ interface UseVaccinesResult {
 
 export function useVaccines(): UseVaccinesResult {
   const toast = useToast();
-  const tc = useCommonTranslations(); // ✅ Utiliser les traductions communes
+  const tc = useCommonTranslations();
   const [vaccines, setVaccines] = useState<Vaccine[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -34,7 +34,6 @@ export function useVaccines(): UseVaccinesResult {
       const error = err as Error;
       setError(error);
       logger.error('Failed to fetch vaccines in hook', { error });
-      // ✅ Message traduit via common translations
       toast.error(tc('messages.error'), tc('messages.loadError') || 'Impossible de charger les données');
     } finally {
       setLoading(false);

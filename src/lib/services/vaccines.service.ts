@@ -10,8 +10,12 @@ import { Vaccine, CreateVaccineDto, UpdateVaccineDto } from '@/lib/types/vaccine
 import { PaginatedResponse } from '@/lib/types/api';
 import { logger } from '@/lib/utils/logger';
 
+// TEMPORAIRE: FarmId simulé en attendant l'authentification
+// TODO: Récupérer le farmId depuis le contexte utilisateur après login
+const TEMP_FARM_ID = '00000000-0000-0000-0000-000000000001';
+
 class VaccinesService {
-  private basePath = '/api/v1/vaccines';
+  private basePath = `/farms/${TEMP_FARM_ID}/vaccines`;
 
   /**
    * Récupère tous les vaccins
