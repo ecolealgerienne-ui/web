@@ -4,11 +4,12 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ToastProvider } from "@/contexts/toast-context";
 import { I18nProvider } from "@/lib/i18n";
-import { defaultMetadata } from "@/lib/utils/metadata";
+import { defaultMetadata, defaultViewport } from "@/lib/utils/metadata";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = defaultMetadata;
+export const viewport = defaultViewport;
 
 export default function RootLayout({
   children,

@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import { Metadata, Viewport } from 'next'
 
 const SITE_NAME = 'AniTra'
 const SITE_DESCRIPTION = 'Application de gestion complète pour éleveurs: suivi des animaux, vaccinations, traitements, rapports et bien plus.'
@@ -72,13 +72,6 @@ export function createMetadata({
       images: [image],
     },
 
-    // Viewport
-    viewport: {
-      width: 'device-width',
-      initialScale: 1,
-      maximumScale: 5,
-    },
-
     // Icons
     icons: {
       icon: '/favicon.ico',
@@ -88,6 +81,13 @@ export function createMetadata({
     // Manifest
     manifest: '/manifest.json',
   }
+}
+
+// Viewport configuration (separate from metadata in Next.js 15+)
+export const defaultViewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 }
 
 // Meta données par défaut pour le site
