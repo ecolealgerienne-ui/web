@@ -19,7 +19,21 @@ class BreedsService {
   async getAll(speciesId?: string): Promise<Breed[]> {
     try {
       const url = speciesId ? `${this.basePath}?speciesId=${speciesId}` : this.basePath
-      const breeds = await apiClient.get<Breed[]>(url)
+      const response = await apiClient.get<any>(url)
+
+      // Le backend peut retourner soit un tableau directement, soit un objet
+      let breeds: Breed[] = []
+
+      if (Array.isArray(response)) {
+        breeds = response
+      } else if (response && Array.isArray(response.data)) {
+        breeds = response.data
+      } else if (response && response.data) {
+        // Cas où data n'est pas un tableau
+        breeds = []
+      } else {
+        breeds = []
+      }
 
       logger.info('Breeds fetched successfully', { count: breeds.length, speciesId })
       return breeds
