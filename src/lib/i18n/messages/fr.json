@@ -366,5 +366,73 @@
     "notFound": "Ressource non trouvée",
     "validationError": "Erreur de validation",
     "requiredField": "Ce champ est requis"
+  },
+  "animals": {
+    "title": "Animaux",
+    "subtitle": "Gérez votre cheptel et suivez vos animaux",
+    "newAnimal": "Nouvel animal",
+    "editAnimal": "Modifier l'animal",
+    "deleteAnimal": "Supprimer l'animal",
+    "noAnimals": "Aucun animal trouvé",
+    "animalCount": "{count} animal",
+    "animalCount_plural": "{count} animaux",
+    "filters": {
+      "allStatus": "Tous les statuts",
+      "allSpecies": "Toutes les espèces",
+      "search": "Rechercher..."
+    },
+    "sex": {
+      "male": "Mâle",
+      "female": "Femelle"
+    },
+    "status": {
+      "alive": "Vivant",
+      "sold": "Vendu",
+      "dead": "Décédé",
+      "missing": "Disparu"
+    },
+    "fields": {
+      "identificationNumber": "N° d'identification",
+      "name": "Nom",
+      "speciesId": "Espèce",
+      "breedId": "Race",
+      "sex": "Sexe",
+      "birthDate": "Date de naissance",
+      "status": "Statut",
+      "motherIdentificationNumber": "N° mère",
+      "fatherIdentificationNumber": "N° père",
+      "acquisitionDate": "Date d'acquisition",
+      "acquisitionPrice": "Prix d'acquisition",
+      "currentWeight": "Poids actuel",
+      "currentLocation": "Emplacement actuel",
+      "healthStatus": "État de santé",
+      "notes": "Notes",
+      "isActive": "Actif"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "genealogy": "Généalogie",
+      "acquisition": "Acquisition",
+      "health": "Santé et localisation"
+    },
+    "placeholders": {
+      "identificationNumber": "Ex: ALG-2024-001",
+      "name": "Nom de l'animal (optionnel)",
+      "currentLocation": "Ex: Pâturage Nord",
+      "notes": "Notes additionnelles..."
+    },
+    "messages": {
+      "loadError": "Impossible de charger les animaux",
+      "created": "Animal créé avec succès",
+      "updated": "Animal modifié avec succès",
+      "deleted": "Animal supprimé avec succès",
+      "createError": "Erreur lors de la création de l'animal",
+      "updateError": "Erreur lors de la modification de l'animal",
+      "deleteError": "Erreur lors de la suppression de l'animal",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer l'animal « {id} » ?",
+      "addDescription": "Ajoutez les informations du nouvel animal",
+      "editDescription": "Modifiez les informations de l'animal"
+    }
   }
 }

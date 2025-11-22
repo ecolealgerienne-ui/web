@@ -366,5 +366,73 @@
       "addDescription": "Add the information for the new farm",
       "editDescription": "Edit the farm information"
     }
+  },
+  "animals": {
+    "title": "Animals",
+    "subtitle": "Manage your herd and track your animals",
+    "newAnimal": "New animal",
+    "editAnimal": "Edit animal",
+    "deleteAnimal": "Delete animal",
+    "noAnimals": "No animals found",
+    "animalCount": "{count} animal",
+    "animalCount_plural": "{count} animals",
+    "filters": {
+      "allStatus": "All statuses",
+      "allSpecies": "All species",
+      "search": "Search..."
+    },
+    "sex": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "status": {
+      "alive": "Alive",
+      "sold": "Sold",
+      "dead": "Deceased",
+      "missing": "Missing"
+    },
+    "fields": {
+      "identificationNumber": "Identification number",
+      "name": "Name",
+      "speciesId": "Species",
+      "breedId": "Breed",
+      "sex": "Sex",
+      "birthDate": "Birth date",
+      "status": "Status",
+      "motherIdentificationNumber": "Mother ID",
+      "fatherIdentificationNumber": "Father ID",
+      "acquisitionDate": "Acquisition date",
+      "acquisitionPrice": "Acquisition price",
+      "currentWeight": "Current weight",
+      "currentLocation": "Current location",
+      "healthStatus": "Health status",
+      "notes": "Notes",
+      "isActive": "Active"
+    },
+    "sections": {
+      "general": "General information",
+      "genealogy": "Genealogy",
+      "acquisition": "Acquisition",
+      "health": "Health and location"
+    },
+    "placeholders": {
+      "identificationNumber": "E.g.: ALG-2024-001",
+      "name": "Animal name (optional)",
+      "currentLocation": "E.g.: North Pasture",
+      "notes": "Additional notes..."
+    },
+    "messages": {
+      "loadError": "Unable to load animals",
+      "created": "Animal created successfully",
+      "updated": "Animal updated successfully",
+      "deleted": "Animal deleted successfully",
+      "createError": "Error creating animal",
+      "updateError": "Error updating animal",
+      "deleteError": "Error deleting animal",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete animal \"{id}\"?",
+      "addDescription": "Add the information for the new animal",
+      "editDescription": "Edit the animal information"
+    }
   }
 }

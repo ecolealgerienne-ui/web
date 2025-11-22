@@ -366,5 +366,73 @@
       "addDescription": "أضف معلومات المزرعة الجديدة",
       "editDescription": "عدل معلومات المزرعة"
     }
+  },
+  "animals": {
+    "title": "الحيوانات",
+    "subtitle": "إدارة قطيعك وتتبع حيواناتك",
+    "newAnimal": "حيوان جديد",
+    "editAnimal": "تعديل الحيوان",
+    "deleteAnimal": "حذف الحيوان",
+    "noAnimals": "لم يتم العثور على حيوانات",
+    "animalCount": "{count} حيوان",
+    "animalCount_plural": "{count} حيوانات",
+    "filters": {
+      "allStatus": "جميع الحالات",
+      "allSpecies": "جميع الأنواع",
+      "search": "بحث..."
+    },
+    "sex": {
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "status": {
+      "alive": "حي",
+      "sold": "مباع",
+      "dead": "متوفى",
+      "missing": "مفقود"
+    },
+    "fields": {
+      "identificationNumber": "رقم التعريف",
+      "name": "الاسم",
+      "speciesId": "النوع",
+      "breedId": "السلالة",
+      "sex": "الجنس",
+      "birthDate": "تاريخ الميلاد",
+      "status": "الحالة",
+      "motherIdentificationNumber": "رقم الأم",
+      "fatherIdentificationNumber": "رقم الأب",
+      "acquisitionDate": "تاريخ الاقتناء",
+      "acquisitionPrice": "سعر الاقتناء",
+      "currentWeight": "الوزن الحالي",
+      "currentLocation": "الموقع الحالي",
+      "healthStatus": "الحالة الصحية",
+      "notes": "ملاحظات",
+      "isActive": "نشط"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "genealogy": "النسب",
+      "acquisition": "الاقتناء",
+      "health": "الصحة والموقع"
+    },
+    "placeholders": {
+      "identificationNumber": "مثال: ALG-2024-001",
+      "name": "اسم الحيوان (اختياري)",
+      "currentLocation": "مثال: المرعى الشمالي",
+      "notes": "ملاحظات إضافية..."
+    },
+    "messages": {
+      "loadError": "تعذر تحميل الحيوانات",
+      "created": "تم إنشاء الحيوان بنجاح",
+      "updated": "تم تحديث الحيوان بنجاح",
+      "deleted": "تم حذف الحيوان بنجاح",
+      "createError": "خطأ في إنشاء الحيوان",
+      "updateError": "خطأ في تحديث الحيوان",
+      "deleteError": "خطأ في حذف الحيوان",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف الحيوان \"{id}\"؟",
+      "addDescription": "أضف معلومات الحيوان الجديد",
+      "editDescription": "عدل معلومات الحيوان"
+    }
   }
 }
