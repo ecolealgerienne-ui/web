@@ -100,7 +100,7 @@ class ApiClient {
     }
   }
 
-  private async handleResponse<T>(response: Response, url: string): Promise<T> {
+  private async handleResponse<T>(response: Response, url: string, method: string): Promise<T> {
     // Vérifier si la réponse est OK
     if (!response.ok) {
       let errorData
@@ -111,7 +111,7 @@ class ApiClient {
       }
 
       logger.httpError(
-        'GET',
+        method.toUpperCase(),
         url,
         response.status,
         errorData,
@@ -157,7 +157,7 @@ class ApiClient {
       ...options,
     })
 
-    return this.handleResponse<T>(response, url)
+    return this.handleResponse<T>(response, url, 'GET')
   }
 
   async post<T>(
@@ -174,7 +174,7 @@ class ApiClient {
       ...options,
     })
 
-    return this.handleResponse<T>(response, url)
+    return this.handleResponse<T>(response, url, 'POST')
   }
 
   async put<T>(
@@ -191,7 +191,7 @@ class ApiClient {
       ...options,
     })
 
-    return this.handleResponse<T>(response, url)
+    return this.handleResponse<T>(response, url, 'PUT')
   }
 
   async patch<T>(
@@ -208,7 +208,7 @@ class ApiClient {
       ...options,
     })
 
-    return this.handleResponse<T>(response, url)
+    return this.handleResponse<T>(response, url, 'PATCH')
   }
 
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
@@ -220,7 +220,7 @@ class ApiClient {
       ...options,
     })
 
-    return this.handleResponse<T>(response, url)
+    return this.handleResponse<T>(response, url, 'DELETE')
   }
 
   // Upload de fichiers
@@ -251,7 +251,7 @@ class ApiClient {
       ...restOptions,
     })
 
-    return this.handleResponse<T>(response, url)
+    return this.handleResponse<T>(response, url, 'POST')
   }
 }
 

@@ -58,16 +58,16 @@ class BreedsService {
    */
   async create(data: CreateBreedDto): Promise<Breed> {
     try {
-      // Convertir en snake_case pour le backend
+      // L'API attend du camelCase pour le body (même si elle retourne du snake_case)
       const payload = {
         id: data.id,
-        species_id: data.speciesId,
-        name_fr: data.nameFr,
-        name_en: data.nameEn,
-        name_ar: data.nameAr,
+        speciesId: data.speciesId,
+        nameFr: data.nameFr,
+        nameEn: data.nameEn,
+        nameAr: data.nameAr,
         description: data.description,
-        display_order: data.displayOrder,
-        is_active: data.isActive ?? true,
+        displayOrder: data.displayOrder,
+        isActive: data.isActive ?? true,
       }
 
       const response = await apiClient.post<any>(this.basePath, payload)
@@ -103,15 +103,15 @@ class BreedsService {
    */
   async update(id: string, data: UpdateBreedDto): Promise<Breed> {
     try {
-      // Convertir en snake_case pour le backend
+      // L'API attend du camelCase pour le body (même si elle retourne du snake_case)
       const payload: any = {}
-      if (data.speciesId !== undefined) payload.species_id = data.speciesId
-      if (data.nameFr !== undefined) payload.name_fr = data.nameFr
-      if (data.nameEn !== undefined) payload.name_en = data.nameEn
-      if (data.nameAr !== undefined) payload.name_ar = data.nameAr
+      if (data.speciesId !== undefined) payload.speciesId = data.speciesId
+      if (data.nameFr !== undefined) payload.nameFr = data.nameFr
+      if (data.nameEn !== undefined) payload.nameEn = data.nameEn
+      if (data.nameAr !== undefined) payload.nameAr = data.nameAr
       if (data.description !== undefined) payload.description = data.description
-      if (data.displayOrder !== undefined) payload.display_order = data.displayOrder
-      if (data.isActive !== undefined) payload.is_active = data.isActive
+      if (data.displayOrder !== undefined) payload.displayOrder = data.displayOrder
+      if (data.isActive !== undefined) payload.isActive = data.isActive
 
       const response = await apiClient.put<any>(`${this.basePath}/${id}`, payload)
 
