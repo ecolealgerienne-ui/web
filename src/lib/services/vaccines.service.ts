@@ -25,9 +25,21 @@ class VaccinesService {
       // D'après les specs, l'API retourne { data: Vaccine[], total, limit, offset }
       const response = await apiClient.get<PaginatedResponse<Vaccine>>(this.basePath);
 
+      // Si pas de données, retourner un tableau vide au lieu d'échouer
+      if (!response || !response.data) {
+        logger.info('No vaccines found, returning empty array');
+        return [];
+      }
+
       logger.info('Vaccines fetched successfully', { count: response.data.length });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Si 404, la liste est simplement vide (pas encore de vaccins créés)
+      if (error?.status === 404) {
+        logger.info('No vaccines endpoint found (404), returning empty array');
+        return [];
+      }
+
       logger.error('Failed to fetch vaccines', { error });
       throw error;
     }
