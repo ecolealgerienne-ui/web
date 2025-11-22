@@ -17,7 +17,26 @@
     "no": "Non",
     "backToHome": "Retour à l'accueil",
     "tryAgain": "Réessayer",
-    "previousPage": "Page précédente"
+    "previousPage": "Page précédente",
+    "status": {
+      "disabled": "Inactif",
+      "enabled": "Actif"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "deleting": "Suppression..."
+    },
+    "messages": {
+      "loading": "Chargement...",
+      "loadError": "Erreur lors du chargement des données",
+      "success": "Succès",
+      "error": "Erreur",
+      "actionIrreversible": "Cette action est irréversible."
+    }
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -183,6 +202,111 @@
     "financial": {
       "title": "Financier",
       "description": "Analyse des coûts, revenus et rentabilité par animal ou lot"
+    }
+  },
+  "breeds": {
+    "title": "Races",
+    "subtitle": "Gérez les races d'animaux de votre exploitation",
+    "newBreed": "Nouvelle race",
+    "editBreed": "Modifier la race",
+    "deleteBreed": "Supprimer la race",
+    "noBreeds": "Aucune race trouvée",
+    "breedCount": "{count} race",
+    "breedCount_plural": "{count} races",
+    "filters": {
+      "allSpecies": "Toutes les espèces",
+      "showInactive": "Afficher les races inactives"
+    },
+    "species": {
+      "label": "Espèce",
+      "sheep": "Ovin",
+      "goat": "Caprin",
+      "cattle": "Bovin"
+    },
+    "fields": {
+      "id": "Identifiant",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "speciesId": "Espèce",
+      "description": "Description",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Active"
+    },
+    "messages": {
+      "loadError": "Impossible de charger les races",
+      "created": "Race créée avec succès",
+      "updated": "Race modifiée avec succès",
+      "deleted": "Race supprimée avec succès",
+      "createError": "Erreur lors de la création de la race",
+      "updateError": "Erreur lors de la modification de la race",
+      "deleteError": "Erreur lors de la suppression de la race",
+      "confirmDelete": "Voulez-vous vraiment supprimer la race \"{name}\" ?",
+      "infoMessage": "Les races sont des données de référence utilisées pour classifier vos animaux."
+    }
+  },
+  "veterinarians": {
+    "title": "Vétérinaires",
+    "subtitle": "Gérez vos contacts vétérinaires",
+    "newVeterinarian": "Nouveau vétérinaire",
+    "editVeterinarian": "Modifier le vétérinaire",
+    "deleteVeterinarian": "Supprimer le vétérinaire",
+    "noVeterinarians": "Aucun vétérinaire trouvé",
+    "veterinarianCount": "{count} vétérinaire",
+    "veterinarianCount_plural": "{count} vétérinaires",
+    "filters": {
+      "showInactive": "Afficher les vétérinaires inactifs"
+    },
+    "sections": {
+      "personal": "Informations personnelles",
+      "specialties": "Spécialités",
+      "contact": "Contact",
+      "address": "Adresse",
+      "availability": "Disponibilité",
+      "pricing": "Tarifs",
+      "preferences": "Préférences"
+    },
+    "fields": {
+      "title": "Titre",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "licenseNumber": "N° de licence",
+      "specialties": "Spécialités",
+      "clinic": "Clinique",
+      "phone": "Téléphone",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Adresse",
+      "city": "Ville",
+      "postalCode": "Code postal",
+      "country": "Pays",
+      "isAvailable": "Disponible",
+      "emergencyService": "Service d'urgence",
+      "workingHours": "Heures d'ouverture",
+      "consultationFee": "Tarif consultation",
+      "emergencyFee": "Tarif urgence",
+      "currency": "Devise",
+      "isPreferred": "Vétérinaire préféré",
+      "isDefault": "Vétérinaire par défaut",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "specialties": "Ex: Bovins, Ovins, Caprins",
+      "workingHours": "Ex: Lun-Ven 8h-18h"
+    },
+    "badges": {
+      "default": "Par défaut",
+      "emergency": "Urgences"
+    },
+    "messages": {
+      "loadError": "Impossible de charger les vétérinaires",
+      "created": "Vétérinaire créé avec succès",
+      "updated": "Vétérinaire modifié avec succès",
+      "deleted": "Vétérinaire supprimé avec succès",
+      "createError": "Erreur lors de la création du vétérinaire",
+      "updateError": "Erreur lors de la modification du vétérinaire",
+      "deleteError": "Erreur lors de la suppression du vétérinaire",
+      "confirmDelete": "Voulez-vous vraiment supprimer le vétérinaire {name} ?"
     }
   },
   "settings": {
