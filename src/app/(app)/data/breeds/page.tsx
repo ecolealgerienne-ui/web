@@ -219,7 +219,7 @@ export default function BreedsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleEdit(breed)}
-                      className="flex-1"
+                      className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800"
                     >
                       <Pencil className="mr-1 h-3 w-3" />
                       {tc('actions.edit')}
