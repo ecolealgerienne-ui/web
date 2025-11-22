@@ -365,6 +365,42 @@
       "confirmDelete": "هل تريد حقاً حذف الطبيب البيطري {name}؟"
     }
   },
+  "farmPreferences": {
+    "title": "تفضيلات المزرعة",
+    "subtitle": "تكوين الإعدادات الافتراضية لمزرعتك",
+    "sections": {
+      "general": "الإعدادات العامة",
+      "defaults": "القيم الافتراضية",
+      "unitsFormats": "الوحدات والتنسيقات",
+      "notifications": "الإشعارات"
+    },
+    "fields": {
+      "defaultVeterinarianId": "الطبيب البيطري الافتراضي",
+      "defaultSpeciesId": "النوع الافتراضي",
+      "defaultBreedId": "السلالة الافتراضية",
+      "weightUnit": "وحدة الوزن",
+      "currency": "العملة",
+      "language": "اللغة",
+      "dateFormat": "تنسيق التاريخ",
+      "enableNotifications": "تفعيل الإشعارات"
+    },
+    "placeholders": {
+      "defaultVeterinarianId": "اختر طبيباً بيطرياً",
+      "defaultBreedId": "اختر سلالة",
+      "selectSpecies": "-- اختر --"
+    },
+    "species": {
+      "cattle": "أبقار",
+      "sheep": "أغنام",
+      "goat": "ماعز"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل التفضيلات",
+      "updated": "تم تحديث التفضيلات بنجاح",
+      "updateError": "خطأ في تحديث التفضيلات",
+      "notificationsInfo": "احصل على تنبيهات للتطعيمات والعلاجات والأحداث المهمة"
+    }
+  },
   "settings": {
     "title": "الإعدادات",
     "profile": {

@@ -365,6 +365,42 @@
       "confirmDelete": "Voulez-vous vraiment supprimer le vétérinaire {name} ?"
     }
   },
+  "farmPreferences": {
+    "title": "Préférences de la ferme",
+    "subtitle": "Configurez les paramètres par défaut de votre exploitation",
+    "sections": {
+      "general": "Paramètres généraux",
+      "defaults": "Valeurs par défaut",
+      "unitsFormats": "Unités et formats",
+      "notifications": "Notifications"
+    },
+    "fields": {
+      "defaultVeterinarianId": "Vétérinaire par défaut",
+      "defaultSpeciesId": "Espèce par défaut",
+      "defaultBreedId": "Race par défaut",
+      "weightUnit": "Unité de poids",
+      "currency": "Devise",
+      "language": "Langue",
+      "dateFormat": "Format de date",
+      "enableNotifications": "Activer les notifications"
+    },
+    "placeholders": {
+      "defaultVeterinarianId": "Sélectionner un vétérinaire",
+      "defaultBreedId": "Sélectionner une race",
+      "selectSpecies": "-- Sélectionner --"
+    },
+    "species": {
+      "cattle": "Bovin",
+      "sheep": "Ovin",
+      "goat": "Caprin"
+    },
+    "messages": {
+      "loadError": "Impossible de charger les préférences",
+      "updated": "Préférences mises à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour des préférences",
+      "notificationsInfo": "Recevez des alertes pour les vaccinations, traitements et événements importants"
+    }
+  },
   "settings": {
     "title": "Paramètres",
     "profile": {

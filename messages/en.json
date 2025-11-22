@@ -207,5 +207,41 @@
       "deleteError": "Error deleting veterinarian",
       "confirmDelete": "Do you really want to delete veterinarian {name}?"
     }
+  },
+  "farmPreferences": {
+    "title": "Farm Preferences",
+    "subtitle": "Configure default settings for your farm",
+    "sections": {
+      "general": "General settings",
+      "defaults": "Default values",
+      "unitsFormats": "Units and formats",
+      "notifications": "Notifications"
+    },
+    "fields": {
+      "defaultVeterinarianId": "Default veterinarian",
+      "defaultSpeciesId": "Default species",
+      "defaultBreedId": "Default breed",
+      "weightUnit": "Weight unit",
+      "currency": "Currency",
+      "language": "Language",
+      "dateFormat": "Date format",
+      "enableNotifications": "Enable notifications"
+    },
+    "placeholders": {
+      "defaultVeterinarianId": "Select a veterinarian",
+      "defaultBreedId": "Select a breed",
+      "selectSpecies": "-- Select --"
+    },
+    "species": {
+      "cattle": "Cattle",
+      "sheep": "Sheep",
+      "goat": "Goat"
+    },
+    "messages": {
+      "loadError": "Unable to load preferences",
+      "updated": "Preferences updated successfully",
+      "updateError": "Error updating preferences",
+      "notificationsInfo": "Receive alerts for vaccinations, treatments and important events"
+    }
   }
 }
