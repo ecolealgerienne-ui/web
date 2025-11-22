@@ -156,6 +156,51 @@
       "title": "Activités Récentes"
     }
   },
+  "animals": {
+    "title": "Animaux",
+    "subtitle": "Gérez votre cheptel et consultez les détails de chaque animal",
+    "addAnimal": "Ajouter un animal",
+    "stats": {
+      "total": "Total",
+      "sheep": "Moutons",
+      "goats": "Chèvres",
+      "cattle": "Bovins"
+    }
+  },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Gérez vos groupes d'animaux par activité",
+    "createLot": "Créer un lot",
+    "stats": {
+      "total": "Lots totaux",
+      "open": "Lots ouverts",
+      "closed": "Lots fermés",
+      "totalAnimals": "Animaux concernés"
+    }
+  },
+  "vaccinations": {
+    "title": "Vaccinations",
+    "subtitle": "Gérez le calendrier vaccinal de votre cheptel",
+    "schedule": "Programmer une vaccination",
+    "stats": {
+      "total": "Total vaccinations",
+      "scheduled": "Programmées",
+      "completed": "Effectuées",
+      "overdue": "En retard"
+    }
+  },
+  "treatments": {
+    "title": "Traitements",
+    "subtitle": "Suivez les soins médicaux et vétérinaires",
+    "new": "Nouveau traitement",
+    "stats": {
+      "total": "Total traitements",
+      "inProgress": "En cours",
+      "completed": "Terminés",
+      "totalCost": "Coût total"
+    },
+    "currency": "DA"
+  },
   "errors": {
     "generic": "Une erreur est survenue",
     "networkError": "Erreur de connexion au serveur",

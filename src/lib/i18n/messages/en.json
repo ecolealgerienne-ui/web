@@ -156,6 +156,51 @@
       "title": "Recent Activities"
     }
   },
+  "animals": {
+    "title": "Animals",
+    "subtitle": "Manage your herd and view details of each animal",
+    "addAnimal": "Add animal",
+    "stats": {
+      "total": "Total",
+      "sheep": "Sheep",
+      "goats": "Goats",
+      "cattle": "Cattle"
+    }
+  },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Manage your animal groups by activity",
+    "createLot": "Create lot",
+    "stats": {
+      "total": "Total lots",
+      "open": "Open lots",
+      "closed": "Closed lots",
+      "totalAnimals": "Animals involved"
+    }
+  },
+  "vaccinations": {
+    "title": "Vaccinations",
+    "subtitle": "Manage your herd's vaccination schedule",
+    "schedule": "Schedule vaccination",
+    "stats": {
+      "total": "Total vaccinations",
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "overdue": "Overdue"
+    }
+  },
+  "treatments": {
+    "title": "Treatments",
+    "subtitle": "Track medical and veterinary care",
+    "new": "New treatment",
+    "stats": {
+      "total": "Total treatments",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "totalCost": "Total cost"
+    },
+    "currency": "DA"
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",

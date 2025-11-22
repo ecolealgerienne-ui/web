@@ -7,9 +7,11 @@ import { AnimalsFilters } from "@/components/animals/animals-filters";
 import { AnimalsTable } from "@/components/animals/animals-table";
 import { useAnimals } from "@/lib/hooks/useAnimals";
 import { AnimalFilters } from "@/lib/types/animal";
+import { useTranslations } from "@/lib/i18n";
 
 export default function AnimalsPage() {
   const [filters, setFilters] = useState<AnimalFilters>({});
+  const t = useTranslations('animals');
 
   // Utiliser le hook pour charger les animaux depuis l'API
   const { animals, loading, pagination } = useAnimals(filters);
@@ -38,14 +40,14 @@ export default function AnimalsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Animaux</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Gérez votre cheptel et consultez les détails de chaque animal
+            {t('subtitle')}
           </p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Ajouter un animal
+          {t('addAnimal')}
         </Button>
       </div>
 
@@ -55,23 +57,23 @@ export default function AnimalsPage() {
       {/* Stats rapides */}
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Total</p>
+          <p className="text-sm text-muted-foreground">{t('stats.total')}</p>
           <p className="text-2xl font-bold">{animals.length}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Moutons</p>
+          <p className="text-sm text-muted-foreground">{t('stats.sheep')}</p>
           <p className="text-2xl font-bold">
             {animals.filter((a) => a.species === "sheep").length}
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Chèvres</p>
+          <p className="text-sm text-muted-foreground">{t('stats.goats')}</p>
           <p className="text-2xl font-bold">
             {animals.filter((a) => a.species === "goat").length}
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Bovins</p>
+          <p className="text-sm text-muted-foreground">{t('stats.cattle')}</p>
           <p className="text-2xl font-bold">
             {animals.filter((a) => a.species === "cattle").length}
           </p>
