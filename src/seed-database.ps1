@@ -6,6 +6,7 @@ param(
     [string]$Token = "test-token"
 )
 
+
 # Configuration
 $headers = @{
     "Authorization" = "Bearer $Token"
