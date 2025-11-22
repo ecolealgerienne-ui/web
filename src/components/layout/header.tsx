@@ -1,11 +1,14 @@
 "use client";
 
-import { Moon, Sun, Beef } from "lucide-react";
+import { Moon, Sun, Beef, LogOut, User } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/contexts/auth-context";
+import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
+  const { user, logout, isAuthenticated } = useAuth();
 
   return (
     <header className="border-b bg-card">
@@ -25,7 +28,23 @@ export function Header() {
           </div>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
+          {/* User Info */}
+          {isAuthenticated && user && (
+            <div className="hidden md:flex items-center gap-3 mr-2">
+              <div className="text-right">
+                <div className="text-sm font-medium">{user.name}</div>
+                <div className="text-xs text-muted-foreground">{user.farmName || user.email}</div>
+              </div>
+              <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+          )}
+
+          {/* Language */}
           <div className="text-sm font-medium">FR</div>
+
+          {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
@@ -35,6 +54,29 @@ export function Header() {
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
+
+          {/* Logout Button (only in prod mode) */}
+          {authConfig.enabled && isAuthenticated && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={logout}
+              title="Déconnexion"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="sr-only">Déconnexion</span>
+            </Button>
+          )}
+
+          {/* Dev Mode Indicator */}
+          {!authConfig.enabled && (
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-md bg-blue-100 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
+              <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                Mode DEV
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </header>
