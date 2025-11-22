@@ -245,6 +245,62 @@
       "infoMessage": "Les races sont des données de référence utilisées pour classifier vos animaux."
     }
   },
+  "campaigns": {
+    "title": "Campagnes",
+    "subtitle": "Gérez vos campagnes de vaccination, traitement et pesée",
+    "newCampaign": "Nouvelle campagne",
+    "editCampaign": "Modifier la campagne",
+    "deleteCampaign": "Supprimer la campagne",
+    "noCampaigns": "Aucune campagne trouvée",
+    "campaignCount": "{count} campagne",
+    "campaignCount_plural": "{count} campagnes",
+    "progress": "Progression",
+    "filters": {
+      "allTypes": "Tous les types",
+      "allStatus": "Tous les statuts"
+    },
+    "types": {
+      "vaccination": "Vaccination",
+      "treatment": "Traitement",
+      "weighing": "Pesée",
+      "identification": "Identification"
+    },
+    "status": {
+      "planned": "Planifié",
+      "in_progress": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "fields": {
+      "name": "Nom",
+      "type": "Type",
+      "status": "Statut",
+      "campaignDate": "Date de la campagne",
+      "productId": "ID Produit",
+      "productName": "Nom du produit",
+      "veterinarianId": "ID Vétérinaire",
+      "veterinarianName": "Nom du vétérinaire",
+      "targetCount": "Objectif",
+      "completedCount": "Complété",
+      "cost": "Coût",
+      "description": "Description",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "productName": "Ex: Vaccin Rage",
+      "description": "Description de la campagne..."
+    },
+    "messages": {
+      "loadError": "Impossible de charger les campagnes",
+      "created": "Campagne créée avec succès",
+      "updated": "Campagne modifiée avec succès",
+      "deleted": "Campagne supprimée avec succès",
+      "createError": "Erreur lors de la création de la campagne",
+      "updateError": "Erreur lors de la modification de la campagne",
+      "deleteError": "Erreur lors de la suppression de la campagne",
+      "confirmDelete": "Voulez-vous vraiment supprimer la campagne \"{name}\" ?"
+    }
+  },
   "veterinarians": {
     "title": "Vétérinaires",
     "subtitle": "Gérez vos contacts vétérinaires",

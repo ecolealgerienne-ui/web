@@ -245,6 +245,62 @@
       "infoMessage": "السلالات هي بيانات مرجعية تستخدم لتصنيف حيواناتك."
     }
   },
+  "campaigns": {
+    "title": "الحملات",
+    "subtitle": "إدارة حملات التطعيم والعلاج والوزن",
+    "newCampaign": "حملة جديدة",
+    "editCampaign": "تعديل الحملة",
+    "deleteCampaign": "حذف الحملة",
+    "noCampaigns": "لم يتم العثور على حملات",
+    "campaignCount": "{count} حملة",
+    "campaignCount_plural": "{count} حملات",
+    "progress": "التقدم",
+    "filters": {
+      "allTypes": "جميع الأنواع",
+      "allStatus": "جميع الحالات"
+    },
+    "types": {
+      "vaccination": "تطعيم",
+      "treatment": "علاج",
+      "weighing": "وزن",
+      "identification": "تحديد الهوية"
+    },
+    "status": {
+      "planned": "مخطط",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    },
+    "fields": {
+      "name": "الاسم",
+      "type": "النوع",
+      "status": "الحالة",
+      "campaignDate": "تاريخ الحملة",
+      "productId": "معرف المنتج",
+      "productName": "اسم المنتج",
+      "veterinarianId": "معرف الطبيب البيطري",
+      "veterinarianName": "اسم الطبيب البيطري",
+      "targetCount": "الهدف",
+      "completedCount": "المكتمل",
+      "cost": "التكلفة",
+      "description": "الوصف",
+      "notes": "ملاحظات"
+    },
+    "placeholders": {
+      "productName": "مثال: لقاح داء الكلب",
+      "description": "وصف الحملة..."
+    },
+    "messages": {
+      "loadError": "تعذر تحميل الحملات",
+      "created": "تم إنشاء الحملة بنجاح",
+      "updated": "تم تحديث الحملة بنجاح",
+      "deleted": "تم حذف الحملة بنجاح",
+      "createError": "خطأ في إنشاء الحملة",
+      "updateError": "خطأ في تحديث الحملة",
+      "deleteError": "خطأ في حذف الحملة",
+      "confirmDelete": "هل تريد حقاً حذف الحملة \"{name}\"؟"
+    }
+  },
   "veterinarians": {
     "title": "الأطباء البيطريون",
     "subtitle": "إدارة جهات الاتصال البيطرية",
