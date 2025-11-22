@@ -114,7 +114,7 @@ export function BreedFormDialog({
       }
 
       onSuccess();
-      onOpenChange(false);
+      // Le parent fermera le dialogue après le refetch
     } catch (error) {
       const errorMessage = isEditMode
         ? 'Erreur lors de la modification de la race'

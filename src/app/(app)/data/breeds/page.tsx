@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useBreeds } from '@/lib/hooks/useBreeds';
 import { BreedFormDialog } from '@/components/data/breed-form-dialog';
 import { Breed } from '@/lib/types/breed';
@@ -29,7 +30,13 @@ const speciesOptions = [
 export default function BreedsPage() {
   const toast = useToast();
   const [selectedSpecies, setSelectedSpecies] = useState('');
-  const { breeds, loading, error, refetch } = useBreeds(selectedSpecies || undefined);
+  const [showInactive, setShowInactive] = useState(true);
+  const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies || undefined);
+
+  // Filtrer les races selon l'état actif/inactif
+  const breeds = showInactive
+    ? allBreeds
+    : allBreeds.filter(breed => breed.isActive !== false);
 
   // État du formulaire
   const [formOpen, setFormOpen] = useState(false);
@@ -72,8 +79,9 @@ export default function BreedsPage() {
     }
   };
 
-  const handleFormSuccess = () => {
-    refetch();
+  const handleFormSuccess = async () => {
+    await refetch();
+    setFormOpen(false);
   };
 
   if (loading) {
@@ -130,8 +138,8 @@ export default function BreedsPage() {
         </Button>
       </div>
 
-      {/* Filtre par espèce */}
-      <div className="flex gap-4">
+      {/* Filtres */}
+      <div className="flex gap-4 items-center flex-wrap">
         <Select
           value={selectedSpecies}
           onChange={(e) => setSelectedSpecies(e.target.value)}
@@ -143,6 +151,23 @@ export default function BreedsPage() {
             </option>
           ))}
         </Select>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="showInactive"
+            checked={showInactive}
+            onChange={(e) => setShowInactive(e.target.checked)}
+            className="h-4 w-4 rounded border-input"
+          />
+          <label htmlFor="showInactive" className="text-sm cursor-pointer">
+            Afficher les races désactivées
+          </label>
+        </div>
+
+        <div className="text-sm text-muted-foreground">
+          {breeds.length} race{breeds.length > 1 ? 's' : ''} affichée{breeds.length > 1 ? 's' : ''}
+        </div>
       </div>
 
       {/* Liste des races */}
@@ -162,9 +187,18 @@ export default function BreedsPage() {
               {breeds.map((breed) => (
                 <div
                   key={breed.id}
-                  className="p-4 border rounded-lg hover:bg-accent transition-colors relative group"
+                  className={`p-4 border rounded-lg hover:bg-accent transition-colors relative group ${
+                    breed.isActive === false ? 'opacity-60 bg-muted/30' : ''
+                  }`}
                 >
-                  <div className="font-semibold text-lg">{breed.nameFr}</div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="font-semibold text-lg flex-1">{breed.nameFr}</div>
+                    {breed.isActive === false && (
+                      <Badge variant="secondary" className="text-xs">
+                        Désactivé
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {breed.nameEn}
                   </div>
@@ -215,7 +249,7 @@ export default function BreedsPage() {
         <CardContent className="pt-6">
           <p className="text-sm text-blue-900 dark:text-blue-100">
             ℹ️ Les races sont des données de référence administrées par les super admins.
-            Vous pouvez créer, modifier ou supprimer des races.
+            Vous pouvez créer, modifier ou supprimer des races. Les races supprimées ne sont plus visibles dans l'interface.
           </p>
         </CardContent>
       </Card>
