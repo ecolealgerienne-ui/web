@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/auth-context";
+import { canAccessAdmin } from "@/lib/utils/permissions";
 
 const menuItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -12,11 +14,17 @@ const menuItems = [
   { icon: Syringe, label: "Vaccinations", href: "/vaccinations" },
   { icon: Pill, label: "Traitements", href: "/treatments" },
   { icon: BarChart3, label: "Rapports", href: "/reports" },
-  { icon: Settings, label: "Paramètres", href: "/settings" },
 ];
+
+const adminMenuItems = [
+  { icon: Database, label: "Administration", href: "/admin/breeds" },
+];
+
+const settingsMenuItem = { icon: Settings, label: "Paramètres", href: "/settings" };
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
@@ -36,6 +44,7 @@ export function Sidebar() {
         </Link>
       </div>
       <nav className="p-4 space-y-1 flex-1">
+        {/* Menu principal */}
         {menuItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -55,6 +64,51 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {/* Séparateur pour administration */}
+        {canAccessAdmin(user) && (
+          <>
+            <div className="my-4 border-t border-border" />
+
+            {/* Menu Administration (super admin uniquement) */}
+            {adminMenuItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </>
+        )}
+
+        {/* Séparateur avant paramètres */}
+        <div className="my-4 border-t border-border" />
+
+        {/* Paramètres */}
+        <Link
+          href={settingsMenuItem.href}
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+            isActive(settingsMenuItem.href)
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          )}
+        >
+          <settingsMenuItem.icon className="h-4 w-4" />
+          {settingsMenuItem.label}
+        </Link>
       </nav>
     </aside>
   );

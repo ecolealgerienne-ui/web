@@ -36,7 +36,7 @@ export const mockUser = {
   id: 'dev-user-1',
   email: 'dev@ecole-algerienne.dz',
   name: 'Utilisateur Dev',
-  role: 'admin' as const,
+  role: 'super_admin' as const, // Super admin pour accès complet en dev
   farmName: 'Ferme de développement',
 }
 

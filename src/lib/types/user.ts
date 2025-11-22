@@ -2,7 +2,7 @@ export interface User {
   id: string
   email: string
   name: string
-  role: 'admin' | 'user' | 'viewer'
+  role: 'super_admin' | 'admin' | 'user' | 'viewer'
   farmName?: string
   avatar?: string
 }
