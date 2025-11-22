@@ -499,5 +499,94 @@
       "addDescription": "أضف معلومات الحدث الجديد",
       "editDescription": "عدل معلومات الحدث"
     }
+  },
+  "vaccinations": {
+    "title": "التطعيمات",
+    "subtitle": "إدارة جدول التطعيم للقطيع",
+    "newVaccination": "جدولة تطعيم",
+    "editVaccination": "تعديل التطعيم",
+    "deleteVaccination": "حذف التطعيم",
+    "noVaccinations": "لا توجد تطعيمات",
+    "vaccinationCount": "{count} تطعيم",
+    "vaccinationCount_plural": "{count} تطعيمات",
+    "filters": {
+      "allStatus": "جميع الحالات",
+      "allTargets": "جميع الأهداف",
+      "search": "بحث..."
+    },
+    "status": {
+      "scheduled": "مجدول",
+      "completed": "مكتمل",
+      "overdue": "متأخر",
+      "cancelled": "ملغى"
+    },
+    "targetType": {
+      "individual": "فردي",
+      "lot": "مجموعة"
+    },
+    "fields": {
+      "animalId": "الحيوان",
+      "lotId": "المجموعة",
+      "targetType": "نوع الهدف",
+      "vaccineName": "اسم اللقاح",
+      "diseaseTarget": "المرض المستهدف",
+      "manufacturer": "الشركة المصنعة",
+      "batchNumber": "رقم الدفعة",
+      "scheduledDate": "التاريخ المجدول",
+      "administeredDate": "تاريخ الإعطاء",
+      "nextDueDate": "الموعد التالي",
+      "administeredBy": "أعطي بواسطة",
+      "veterinarianId": "الطبيب البيطري",
+      "veterinarianName": "اسم الطبيب البيطري",
+      "dosage": "الجرعة",
+      "administrationRoute": "طريقة الإعطاء",
+      "siteOfInjection": "موقع الحقن",
+      "adverseReactions": "ردود الفعل السلبية",
+      "certificateNumber": "رقم الشهادة",
+      "status": "الحالة",
+      "notes": "ملاحظات"
+    },
+    "routes": {
+      "SC": "تحت الجلد (SC)",
+      "IM": "في العضل (IM)",
+      "ID": "داخل الأدمة (ID)",
+      "oral": "فموي",
+      "IV": "في الوريد (IV)"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "vaccine": "تفاصيل اللقاح",
+      "administration": "الإعطاء",
+      "additional": "معلومات إضافية"
+    },
+    "placeholders": {
+      "vaccineName": "مثال: لقاح PPR",
+      "diseaseTarget": "مثال: طاعون المجترات الصغيرة",
+      "manufacturer": "مثال: MCI لصحة الحيوان",
+      "batchNumber": "مثال: PPR-2025-A123",
+      "administeredBy": "اسم الشخص",
+      "dosage": "مثال: 1 مل",
+      "siteOfInjection": "مثال: الرقبة اليسرى",
+      "notes": "ملاحظات إضافية..."
+    },
+    "stats": {
+      "total": "إجمالي التطعيمات",
+      "scheduled": "مجدولة",
+      "completed": "مكتملة",
+      "overdue": "متأخرة"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل التطعيمات",
+      "created": "تم جدولة التطعيم بنجاح",
+      "updated": "تم تحديث التطعيم بنجاح",
+      "deleted": "تم حذف التطعيم بنجاح",
+      "createError": "خطأ في جدولة التطعيم",
+      "updateError": "خطأ في تحديث التطعيم",
+      "deleteError": "خطأ في حذف التطعيم",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا التطعيم؟",
+      "addDescription": "جدولة تطعيم جديد",
+      "editDescription": "تعديل معلومات التطعيم"
+    }
   }
 }

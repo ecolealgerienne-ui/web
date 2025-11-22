@@ -499,5 +499,94 @@
       "addDescription": "Ajoutez les informations du nouvel événement",
       "editDescription": "Modifiez les informations de l'événement"
     }
+  },
+  "vaccinations": {
+    "title": "Vaccinations",
+    "subtitle": "Gérez le calendrier vaccinal de votre cheptel",
+    "newVaccination": "Programmer une vaccination",
+    "editVaccination": "Modifier la vaccination",
+    "deleteVaccination": "Supprimer la vaccination",
+    "noVaccinations": "Aucune vaccination trouvée",
+    "vaccinationCount": "{count} vaccination",
+    "vaccinationCount_plural": "{count} vaccinations",
+    "filters": {
+      "allStatus": "Tous les statuts",
+      "allTargets": "Toutes les cibles",
+      "search": "Rechercher..."
+    },
+    "status": {
+      "scheduled": "Programmée",
+      "completed": "Effectuée",
+      "overdue": "En retard",
+      "cancelled": "Annulée"
+    },
+    "targetType": {
+      "individual": "Individuel",
+      "lot": "Lot"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "lotId": "Lot",
+      "targetType": "Type de cible",
+      "vaccineName": "Nom du vaccin",
+      "diseaseTarget": "Maladie ciblée",
+      "manufacturer": "Fabricant",
+      "batchNumber": "N° de lot",
+      "scheduledDate": "Date programmée",
+      "administeredDate": "Date d'administration",
+      "nextDueDate": "Prochaine échéance",
+      "administeredBy": "Administré par",
+      "veterinarianId": "Vétérinaire",
+      "veterinarianName": "Nom du vétérinaire",
+      "dosage": "Dosage",
+      "administrationRoute": "Voie d'administration",
+      "siteOfInjection": "Site d'injection",
+      "adverseReactions": "Réactions indésirables",
+      "certificateNumber": "N° de certificat",
+      "status": "Statut",
+      "notes": "Notes"
+    },
+    "routes": {
+      "SC": "Sous-cutanée (SC)",
+      "IM": "Intramusculaire (IM)",
+      "ID": "Intradermique (ID)",
+      "oral": "Orale",
+      "IV": "Intraveineuse (IV)"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "vaccine": "Détails du vaccin",
+      "administration": "Administration",
+      "additional": "Informations supplémentaires"
+    },
+    "placeholders": {
+      "vaccineName": "Ex : Vaccin PPR",
+      "diseaseTarget": "Ex : Peste des Petits Ruminants",
+      "manufacturer": "Ex : MCI Santé Animale",
+      "batchNumber": "Ex : PPR-2025-A123",
+      "administeredBy": "Nom de la personne",
+      "dosage": "Ex : 1 ml",
+      "siteOfInjection": "Ex : Encolure gauche",
+      "notes": "Notes supplémentaires..."
+    },
+    "stats": {
+      "total": "Total vaccinations",
+      "scheduled": "Programmées",
+      "completed": "Effectuées",
+      "overdue": "En retard"
+    },
+    "messages": {
+      "loadError": "Impossible de charger les vaccinations",
+      "created": "Vaccination programmée avec succès",
+      "updated": "Vaccination modifiée avec succès",
+      "deleted": "Vaccination supprimée avec succès",
+      "createError": "Erreur lors de la programmation de la vaccination",
+      "updateError": "Erreur lors de la modification de la vaccination",
+      "deleteError": "Erreur lors de la suppression de la vaccination",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette vaccination ?",
+      "addDescription": "Programmez une nouvelle vaccination",
+      "editDescription": "Modifiez les informations de la vaccination"
+    }
   }
 }
