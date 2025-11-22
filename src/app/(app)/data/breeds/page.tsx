@@ -11,6 +11,7 @@ import { BreedFormDialog } from '@/components/data/breed-form-dialog';
 import { Breed } from '@/lib/types/breed';
 import { breedsService } from '@/lib/services/breeds.service';
 import { useToast } from '@/contexts/toast-context';
+import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import {
   Dialog,
   DialogContent,
@@ -20,18 +21,20 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 
-const speciesOptions = [
-  { value: '', label: 'Toutes les espèces' },
-  { value: 'sheep', label: 'Moutons' },
-  { value: 'goat', label: 'Chèvres' },
-  { value: 'cattle', label: 'Bovins' },
-];
-
 export default function BreedsPage() {
+  const t = useTranslations('breeds');
+  const tc = useCommonTranslations();
   const toast = useToast();
   const [selectedSpecies, setSelectedSpecies] = useState('');
   const [showInactive, setShowInactive] = useState(true);
   const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies || undefined);
+
+  const speciesOptions = [
+    { value: '', label: t('filters.allSpecies') },
+    { value: 'sheep', label: t('species.sheep') },
+    { value: 'goat', label: t('species.goat') },
+    { value: 'cattle', label: t('species.cattle') },
+  ];
 
   // Filtrer les races selon l'état actif/inactif
   const breeds = showInactive
@@ -68,12 +71,12 @@ export default function BreedsPage() {
     setDeleting(true);
     try {
       await breedsService.delete(deletingBreed.id);
-      toast.success('Succès', 'Race supprimée avec succès');
+      toast.success(tc('messages.success'), t('messages.deleted'));
       refetch();
       setDeleteDialogOpen(false);
       setDeletingBreed(null);
     } catch (error) {
-      toast.error('Erreur', 'Erreur lors de la suppression de la race');
+      toast.error(tc('messages.error'), t('messages.deleteError'));
     } finally {
       setDeleting(false);
     }
@@ -89,13 +92,13 @@ export default function BreedsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Races</h1>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Données de référence - Races d'animaux
+              {t('subtitle')}
             </p>
           </div>
         </div>
-        <div className="text-center py-12">Chargement...</div>
+        <div className="text-center py-12">{tc('messages.loading')}</div>
       </div>
     );
   }
@@ -105,16 +108,16 @@ export default function BreedsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Races</h1>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Données de référence - Races d'animaux
+              {t('subtitle')}
             </p>
           </div>
         </div>
         <Card>
           <CardContent className="pt-6">
             <div className="text-center text-destructive">
-              Erreur lors du chargement des races
+              {t('messages.deleteError')}
             </div>
           </CardContent>
         </Card>
@@ -127,14 +130,14 @@ export default function BreedsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Races</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Données de référence - Races d'animaux disponibles
+            {t('subtitle')}
           </p>
         </div>
         <Button onClick={handleAdd}>
           <Plus className="mr-2 h-4 w-4" />
-          Nouvelle race
+          {t('newBreed')}
         </Button>
       </div>
 
@@ -161,12 +164,12 @@ export default function BreedsPage() {
             className="h-4 w-4 rounded border-input"
           />
           <label htmlFor="showInactive" className="text-sm cursor-pointer">
-            Afficher les races désactivées
+            {t('filters.showInactive')}
           </label>
         </div>
 
         <div className="text-sm text-muted-foreground">
-          {breeds.length} race{breeds.length > 1 ? 's' : ''} affichée{breeds.length > 1 ? 's' : ''}
+          {t(breeds.length > 1 ? 'breedCount_plural' : 'breedCount', { count: breeds.length })}
         </div>
       </div>
 
@@ -174,13 +177,13 @@ export default function BreedsPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            Liste des races ({breeds.length})
+            {t('title')} ({breeds.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
           {breeds.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              Aucune race trouvée pour ce filtre.
+              {t('noBreeds')}
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -195,7 +198,7 @@ export default function BreedsPage() {
                     <div className="font-semibold text-lg flex-1">{breed.nameFr}</div>
                     {breed.isActive === false && (
                       <Badge variant="secondary" className="text-xs">
-                        Désactivé
+                        {tc('status.disabled')}
                       </Badge>
                     )}
                   </div>
@@ -213,7 +216,7 @@ export default function BreedsPage() {
                     </div>
                   )}
                   <div className="mt-2 text-xs text-muted-foreground">
-                    Espèce: {breed.speciesId}
+                    {t('species.label')}: {breed.speciesId}
                   </div>
 
                   {/* Boutons d'action */}
@@ -225,7 +228,7 @@ export default function BreedsPage() {
                       className="flex-1"
                     >
                       <Pencil className="mr-1 h-3 w-3" />
-                      Modifier
+                      {tc('actions.edit')}
                     </Button>
                     <Button
                       variant="outline"
@@ -234,7 +237,7 @@ export default function BreedsPage() {
                       className="flex-1 text-destructive hover:text-destructive"
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
-                      Supprimer
+                      {tc('actions.delete')}
                     </Button>
                   </div>
                 </div>
@@ -248,8 +251,7 @@ export default function BreedsPage() {
       <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
         <CardContent className="pt-6">
           <p className="text-sm text-blue-900 dark:text-blue-100">
-            ℹ️ Les races sont des données de référence administrées par les super admins.
-            Vous pouvez créer, modifier ou supprimer des races. Les races supprimées ne sont plus visibles dans l'interface.
+            ℹ️ {t('messages.infoMessage')}
           </p>
         </CardContent>
       </Card>
@@ -267,15 +269,14 @@ export default function BreedsPage() {
         <DialogContent>
           <DialogClose onClose={() => setDeleteDialogOpen(false)} />
           <DialogHeader>
-            <DialogTitle>Confirmer la suppression</DialogTitle>
+            <DialogTitle>{t('deleteBreed')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p>
-              Êtes-vous sûr de vouloir supprimer la race{' '}
-              <strong>{deletingBreed?.nameFr}</strong> ?
+              {t('messages.confirmDelete', { name: deletingBreed?.nameFr || '' })}
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Cette action est irréversible.
+              {tc('messages.actionIrreversible')}
             </p>
           </div>
           <DialogFooter>
@@ -284,14 +285,14 @@ export default function BreedsPage() {
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleting}
             >
-              Annuler
+              {tc('actions.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >
-              {deleting ? 'Suppression...' : 'Supprimer'}
+              {deleting ? tc('actions.deleting') : tc('actions.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

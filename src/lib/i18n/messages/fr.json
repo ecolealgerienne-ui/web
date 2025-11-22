@@ -1,0 +1,115 @@
+{
+  "common": {
+    "actions": {
+      "add": "Ajouter",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "create": "Créer",
+      "update": "Mettre à jour",
+      "close": "Fermer",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "refresh": "Rafraîchir",
+      "loading": "Chargement...",
+      "saving": "Enregistrement...",
+      "deleting": "Suppression..."
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "disabled": "Désactivé",
+      "enabled": "Activé"
+    },
+    "messages": {
+      "success": "Succès",
+      "error": "Erreur",
+      "warning": "Attention",
+      "info": "Information",
+      "noData": "Aucune donnée disponible",
+      "loading": "Chargement en cours...",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+      "actionIrreversible": "Cette action est irréversible."
+    },
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif",
+      "createdAt": "Créé le",
+      "updatedAt": "Modifié le",
+      "required": "Requis"
+    }
+  },
+  "navigation": {
+    "menu": {
+      "dashboard": "Tableau de bord",
+      "animals": "Animaux",
+      "data": "Données",
+      "settings": "Paramètres"
+    },
+    "data": {
+      "title": "Données",
+      "breeds": "Races",
+      "vaccines": "Vaccins",
+      "diseases": "Maladies",
+      "medications": "Médicaments"
+    }
+  },
+  "breeds": {
+    "title": "Races",
+    "subtitle": "Données de référence - Races d'animaux disponibles",
+    "newBreed": "Nouvelle race",
+    "editBreed": "Modifier la race",
+    "deleteBreed": "Supprimer la race",
+    "noBreeds": "Aucune race trouvée pour ce filtre.",
+    "breedCount": "{count} race affichée",
+    "breedCount_plural": "{count} races affichées",
+    "filters": {
+      "allSpecies": "Toutes les espèces",
+      "showInactive": "Afficher les races désactivées"
+    },
+    "species": {
+      "label": "Espèce",
+      "sheep": "Moutons",
+      "goat": "Chèvres",
+      "cattle": "Bovins"
+    },
+    "fields": {
+      "id": "ID",
+      "speciesId": "Espèce",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (English)",
+      "nameAr": "Nom (العربية)",
+      "description": "Description (optionnel)",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "id": "ex: ouled-djellal",
+      "nameFr": "ex: Ouled Djellal",
+      "nameEn": "ex: Ouled Djellal",
+      "nameAr": "أولاد جلال",
+      "description": "Description de la race"
+    },
+    "messages": {
+      "created": "Race créée avec succès",
+      "updated": "Race modifiée avec succès",
+      "deleted": "Race supprimée avec succès",
+      "createError": "Erreur lors de la création de la race",
+      "updateError": "Erreur lors de la modification de la race",
+      "deleteError": "Erreur lors de la suppression de la race",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer la race {name} ?",
+      "infoMessage": "Les races sont des données de référence administrées par les super admins. Vous pouvez créer, modifier ou supprimer des races. Les races supprimées ne sont plus visibles dans l'interface."
+    }
+  },
+  "errors": {
+    "generic": "Une erreur est survenue",
+    "networkError": "Erreur de connexion au serveur",
+    "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action",
+    "notFound": "Ressource non trouvée",
+    "validationError": "Erreur de validation",
+    "requiredField": "Ce champ est requis"
+  }
+}

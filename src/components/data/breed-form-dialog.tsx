@@ -16,6 +16,7 @@ import { Select } from '@/components/ui/select';
 import { Breed, CreateBreedDto, UpdateBreedDto } from '@/lib/types/breed';
 import { breedsService } from '@/lib/services/breeds.service';
 import { useToast } from '@/contexts/toast-context';
+import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 
 interface BreedFormDialogProps {
   open: boolean;
@@ -24,20 +25,22 @@ interface BreedFormDialogProps {
   onSuccess: () => void;
 }
 
-const speciesOptions = [
-  { value: 'sheep', label: 'Moutons' },
-  { value: 'goat', label: 'Chèvres' },
-  { value: 'cattle', label: 'Bovins' },
-];
-
 export function BreedFormDialog({
   open,
   onOpenChange,
   breed,
   onSuccess,
 }: BreedFormDialogProps) {
+  const t = useTranslations('breeds');
+  const tc = useCommonTranslations();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+
+  const speciesOptions = [
+    { value: 'sheep', label: t('species.sheep') },
+    { value: 'goat', label: t('species.goat') },
+    { value: 'cattle', label: t('species.cattle') },
+  ];
   const [formData, setFormData] = useState({
     id: '',
     speciesId: 'sheep',
@@ -96,7 +99,7 @@ export function BreedFormDialog({
           isActive: formData.isActive,
         };
         await breedsService.update(breed!.id, updateData);
-        toast.success('Succès', 'Race modifiée avec succès');
+        toast.success(tc('messages.success'), t('messages.updated'));
       } else {
         // Mode création
         const createData: CreateBreedDto = {
@@ -110,16 +113,16 @@ export function BreedFormDialog({
           isActive: formData.isActive,
         };
         await breedsService.create(createData);
-        toast.success('Succès', 'Race créée avec succès');
+        toast.success(tc('messages.success'), t('messages.created'));
       }
 
       onSuccess();
       // Le parent fermera le dialogue après le refetch
     } catch (error) {
       const errorMessage = isEditMode
-        ? 'Erreur lors de la modification de la race'
-        : 'Erreur lors de la création de la race';
-      toast.error('Erreur', errorMessage);
+        ? t('messages.updateError')
+        : t('messages.createError');
+      toast.error(tc('messages.error'), errorMessage);
     } finally {
       setLoading(false);
     }
@@ -131,7 +134,7 @@ export function BreedFormDialog({
         <DialogClose onClose={() => onOpenChange(false)} />
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? 'Modifier la race' : 'Nouvelle race'}
+            {isEditMode ? t('editBreed') : t('newBreed')}
           </DialogTitle>
         </DialogHeader>
 
@@ -141,7 +144,7 @@ export function BreedFormDialog({
             {!isEditMode && (
               <div className="col-span-2">
                 <Label htmlFor="id">
-                  ID <span className="text-destructive">*</span>
+                  {t('fields.id')} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="id"
@@ -150,7 +153,7 @@ export function BreedFormDialog({
                     setFormData({ ...formData, id: e.target.value })
                   }
                   required
-                  placeholder="ex: ouled-djellal"
+                  placeholder={t('placeholders.id')}
                 />
               </div>
             )}
@@ -158,7 +161,7 @@ export function BreedFormDialog({
             {/* Espèce */}
             <div className="col-span-2">
               <Label htmlFor="speciesId">
-                Espèce <span className="text-destructive">*</span>
+                {t('fields.speciesId')} <span className="text-destructive">*</span>
               </Label>
               <Select
                 id="speciesId"
@@ -179,7 +182,7 @@ export function BreedFormDialog({
             {/* Nom FR */}
             <div>
               <Label htmlFor="nameFr">
-                Nom (Français) <span className="text-destructive">*</span>
+                {t('fields.nameFr')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="nameFr"
@@ -188,14 +191,14 @@ export function BreedFormDialog({
                   setFormData({ ...formData, nameFr: e.target.value })
                 }
                 required
-                placeholder="ex: Ouled Djellal"
+                placeholder={t('placeholders.nameFr')}
               />
             </div>
 
             {/* Nom EN */}
             <div>
               <Label htmlFor="nameEn">
-                Nom (English) <span className="text-destructive">*</span>
+                {t('fields.nameEn')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="nameEn"
@@ -204,14 +207,14 @@ export function BreedFormDialog({
                   setFormData({ ...formData, nameEn: e.target.value })
                 }
                 required
-                placeholder="ex: Ouled Djellal"
+                placeholder={t('placeholders.nameEn')}
               />
             </div>
 
             {/* Nom AR */}
             <div className="col-span-2">
               <Label htmlFor="nameAr">
-                Nom (العربية) <span className="text-destructive">*</span>
+                {t('fields.nameAr')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="nameAr"
@@ -220,14 +223,14 @@ export function BreedFormDialog({
                   setFormData({ ...formData, nameAr: e.target.value })
                 }
                 required
-                placeholder="أولاد جلال"
+                placeholder={t('placeholders.nameAr')}
                 dir="rtl"
               />
             </div>
 
             {/* Description */}
             <div className="col-span-2">
-              <Label htmlFor="description">Description (optionnel)</Label>
+              <Label htmlFor="description">{t('fields.description')}</Label>
               <textarea
                 id="description"
                 value={formData.description}
@@ -235,13 +238,13 @@ export function BreedFormDialog({
                   setFormData({ ...formData, description: e.target.value })
                 }
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Description de la race"
+                placeholder={t('placeholders.description')}
               />
             </div>
 
             {/* Ordre d'affichage */}
             <div>
-              <Label htmlFor="displayOrder">Ordre d'affichage</Label>
+              <Label htmlFor="displayOrder">{t('fields.displayOrder')}</Label>
               <Input
                 id="displayOrder"
                 type="number"
@@ -268,7 +271,7 @@ export function BreedFormDialog({
                 className="h-4 w-4 rounded border-input"
               />
               <Label htmlFor="isActive" className="cursor-pointer">
-                Actif
+                {t('fields.isActive')}
               </Label>
             </div>
           </div>
@@ -280,14 +283,14 @@ export function BreedFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Annuler
+              {tc('actions.cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading
-                ? 'Enregistrement...'
+                ? tc('actions.saving')
                 : isEditMode
-                  ? 'Modifier'
-                  : 'Créer'}
+                  ? tc('actions.edit')
+                  : tc('actions.create')}
             </Button>
           </DialogFooter>
         </form>
