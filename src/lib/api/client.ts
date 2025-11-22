@@ -89,7 +89,13 @@ class ApiClient {
         throw new ApiError(408, 'Request Timeout', undefined, url)
       }
 
-      logger.error('API request failed', { url, error: error.message })
+      logger.error('API request failed', {
+        url,
+        errorMessage: error.message,
+        errorName: error.name,
+        errorType: typeof error,
+        error: String(error)
+      })
       throw error
     }
   }
