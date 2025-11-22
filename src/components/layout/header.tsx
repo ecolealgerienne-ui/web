@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/auth-context";
 import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -41,8 +42,8 @@ export function Header() {
             </div>
           )}
 
-          {/* Language */}
-          <div className="text-sm font-medium">FR</div>
+          {/* Language Switcher */}
+          <LanguageSwitcher />
 
           {/* Theme Toggle */}
           <Button
