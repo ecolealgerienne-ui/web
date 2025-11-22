@@ -1,71 +1,61 @@
 {
   "common": {
+    "appName": "Algerian School",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "yes": "Yes",
+    "no": "No",
+    "backToHome": "Back to home",
+    "tryAgain": "Try again",
+    "previousPage": "Previous page",
+    "status": {
+      "disabled": "Inactive",
+      "enabled": "Active"
+    },
     "actions": {
-      "add": "Add",
       "edit": "Edit",
       "delete": "Delete",
       "cancel": "Cancel",
       "save": "Save",
-      "create": "Create",
-      "update": "Update",
-      "close": "Close",
-      "search": "Search",
-      "filter": "Filter",
-      "refresh": "Refresh",
-      "loading": "Loading...",
       "saving": "Saving...",
       "deleting": "Deleting..."
     },
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive",
-      "disabled": "Disabled",
-      "enabled": "Enabled"
-    },
     "messages": {
+      "loading": "Loading...",
+      "loadError": "Error loading data",
       "success": "Success",
       "error": "Error",
-      "warning": "Warning",
-      "info": "Information",
-      "noData": "No data available",
-      "loading": "Loading...",
-      "confirmDelete": "Are you sure you want to delete this item?",
       "actionIrreversible": "This action is irreversible."
-    },
-    "fields": {
-      "name": "Name",
-      "description": "Description",
-      "displayOrder": "Display Order",
-      "isActive": "Active",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At",
-      "required": "Required"
     }
   },
-  "navigation": {
-    "menu": {
-      "dashboard": "Dashboard",
-      "animals": "Animals",
-      "data": "Data",
-      "settings": "Settings"
-    },
-    "data": {
-      "title": "Data",
-      "breeds": "Breeds",
-      "vaccines": "Vaccines",
-      "diseases": "Diseases",
-      "medications": "Medications"
-    }
+  "nav": {
+    "dashboard": "Dashboard",
+    "animals": "Animals",
+    "lots": "Lots",
+    "vaccinations": "Vaccinations",
+    "treatments": "Treatments",
+    "reports": "Reports",
+    "settings": "Settings"
   },
   "breeds": {
     "title": "Breeds",
-    "subtitle": "Reference data - Available animal breeds",
+    "subtitle": "Manage animal breeds for your farm",
     "newBreed": "New breed",
     "editBreed": "Edit breed",
     "deleteBreed": "Delete breed",
-    "noBreeds": "No breeds found for this filter.",
-    "breedCount": "{count} breed displayed",
-    "breedCount_plural": "{count} breeds displayed",
+    "noBreeds": "No breeds found",
+    "breedCount": "{count} breed",
+    "breedCount_plural": "{count} breeds",
     "filters": {
       "allSpecies": "All species",
       "showInactive": "Show inactive breeds"
@@ -73,44 +63,30 @@
     "species": {
       "label": "Species",
       "sheep": "Sheep",
-      "goat": "Goats",
+      "goat": "Goat",
       "cattle": "Cattle"
     },
     "fields": {
       "id": "ID",
-      "speciesId": "Species",
       "nameFr": "Name (French)",
       "nameEn": "Name (English)",
       "nameAr": "Name (Arabic)",
-      "description": "Description (optional)",
-      "displayOrder": "Display Order",
+      "speciesId": "Species",
+      "description": "Description",
+      "displayOrder": "Display order",
       "isActive": "Active"
     },
-    "placeholders": {
-      "id": "e.g.: ouled-djellal",
-      "nameFr": "e.g.: Ouled Djellal",
-      "nameEn": "e.g.: Ouled Djellal",
-      "nameAr": "أولاد جلال",
-      "description": "Breed description"
-    },
     "messages": {
+      "loadError": "Unable to load breeds",
       "created": "Breed created successfully",
       "updated": "Breed updated successfully",
       "deleted": "Breed deleted successfully",
       "createError": "Error creating breed",
       "updateError": "Error updating breed",
       "deleteError": "Error deleting breed",
-      "confirmDelete": "Are you sure you want to delete the breed {name}?",
-      "infoMessage": "Breeds are reference data managed by super admins. You can create, edit or delete breeds. Deleted breeds are no longer visible in the interface."
+      "confirmDelete": "Do you really want to delete the breed \"{name}\"?",
+      "infoMessage": "Breeds are reference data used to classify your animals."
     }
-  },
-  "errors": {
-    "generic": "An error occurred",
-    "networkError": "Server connection error",
-    "unauthorized": "You are not authorized to perform this action",
-    "notFound": "Resource not found",
-    "validationError": "Validation error",
-    "requiredField": "This field is required"
   },
   "campaigns": {
     "title": "Campaigns",
@@ -365,139 +341,6 @@
       "deleteConfirmDescription": "Are you sure you want to delete the farm \"{{name}}\"?",
       "addDescription": "Add the information for the new farm",
       "editDescription": "Edit the farm information"
-    }
-  },
-  "animals": {
-    "title": "Animals",
-    "subtitle": "Manage your herd and track your animals",
-    "newAnimal": "New animal",
-    "editAnimal": "Edit animal",
-    "deleteAnimal": "Delete animal",
-    "noAnimals": "No animals found",
-    "animalCount": "{count} animal",
-    "animalCount_plural": "{count} animals",
-    "filters": {
-      "allStatus": "All statuses",
-      "allSpecies": "All species",
-      "search": "Search..."
-    },
-    "sex": {
-      "male": "Male",
-      "female": "Female"
-    },
-    "status": {
-      "alive": "Alive",
-      "sold": "Sold",
-      "dead": "Deceased",
-      "missing": "Missing"
-    },
-    "fields": {
-      "identificationNumber": "Identification number",
-      "name": "Name",
-      "speciesId": "Species",
-      "breedId": "Breed",
-      "sex": "Sex",
-      "birthDate": "Birth date",
-      "status": "Status",
-      "motherIdentificationNumber": "Mother ID",
-      "fatherIdentificationNumber": "Father ID",
-      "acquisitionDate": "Acquisition date",
-      "acquisitionPrice": "Acquisition price",
-      "currentWeight": "Current weight",
-      "currentLocation": "Current location",
-      "healthStatus": "Health status",
-      "notes": "Notes",
-      "isActive": "Active"
-    },
-    "sections": {
-      "general": "General information",
-      "genealogy": "Genealogy",
-      "acquisition": "Acquisition",
-      "health": "Health and location"
-    },
-    "placeholders": {
-      "identificationNumber": "E.g.: ALG-2024-001",
-      "name": "Animal name (optional)",
-      "currentLocation": "E.g.: North Pasture",
-      "notes": "Additional notes..."
-    },
-    "messages": {
-      "loadError": "Unable to load animals",
-      "created": "Animal created successfully",
-      "updated": "Animal updated successfully",
-      "deleted": "Animal deleted successfully",
-      "createError": "Error creating animal",
-      "updateError": "Error updating animal",
-      "deleteError": "Error deleting animal",
-      "deleteConfirmTitle": "Confirm deletion",
-      "deleteConfirmDescription": "Are you sure you want to delete animal \"{id}\"?",
-      "addDescription": "Add the information for the new animal",
-      "editDescription": "Edit the animal information"
-    }
-  },
-  "animalEvents": {
-    "title": "Animal Events",
-    "subtitle": "Record and track all events for your animals",
-    "newEvent": "New event",
-    "editEvent": "Edit event",
-    "deleteEvent": "Delete event",
-    "noEvents": "No events found",
-    "eventCount": "{count} event",
-    "eventCount_plural": "{count} events",
-    "filters": {
-      "allTypes": "All types",
-      "search": "Search..."
-    },
-    "types": {
-      "birth": "Birth",
-      "death": "Death",
-      "sale": "Sale",
-      "purchase": "Purchase",
-      "transfer": "Transfer",
-      "health_check": "Health Check",
-      "vaccination": "Vaccination",
-      "treatment": "Treatment",
-      "weighing": "Weighing",
-      "other": "Other"
-    },
-    "fields": {
-      "animalId": "Animal",
-      "eventType": "Event type",
-      "eventDate": "Date",
-      "title": "Title",
-      "description": "Description",
-      "performedBy": "Performed by",
-      "veterinarianId": "Veterinarian",
-      "cost": "Cost",
-      "relatedAnimalId": "Related animal",
-      "location": "Location",
-      "notes": "Notes",
-      "attachments": "Attachments"
-    },
-    "sections": {
-      "general": "General information",
-      "details": "Details",
-      "additional": "Additional information"
-    },
-    "placeholders": {
-      "title": "E.g.: Annual vaccination",
-      "description": "Event description...",
-      "performedBy": "Person's name",
-      "location": "E.g.: Barn 1",
-      "notes": "Additional notes..."
-    },
-    "messages": {
-      "loadError": "Unable to load events",
-      "created": "Event created successfully",
-      "updated": "Event updated successfully",
-      "deleted": "Event deleted successfully",
-      "createError": "Error creating event",
-      "updateError": "Error updating event",
-      "deleteError": "Error deleting event",
-      "deleteConfirmTitle": "Confirm deletion",
-      "deleteConfirmDescription": "Are you sure you want to delete this event?",
-      "addDescription": "Add the information for the new event",
-      "editDescription": "Edit the event information"
     }
   }
 }

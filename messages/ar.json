@@ -17,7 +17,26 @@
     "no": "لا",
     "backToHome": "العودة للرئيسية",
     "tryAgain": "حاول مرة أخرى",
-    "previousPage": "الصفحة السابقة"
+    "previousPage": "الصفحة السابقة",
+    "status": {
+      "disabled": "غير نشط",
+      "enabled": "نشط"
+    },
+    "actions": {
+      "edit": "تعديل",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "deleting": "جاري الحذف..."
+    },
+    "messages": {
+      "loading": "جاري التحميل...",
+      "loadError": "خطأ في تحميل البيانات",
+      "success": "نجح",
+      "error": "خطأ",
+      "actionIrreversible": "هذا الإجراء لا رجعة فيه."
+    }
   },
   "nav": {
     "dashboard": "لوحة القيادة",
@@ -183,6 +202,302 @@
     "financial": {
       "title": "المالي",
       "description": "تحليل التكاليف والإيرادات والربحية حسب الحيوان أو المجموعة"
+    }
+  },
+  "breeds": {
+    "title": "السلالات",
+    "subtitle": "إدارة سلالات الحيوانات في مزرعتك",
+    "newBreed": "سلالة جديدة",
+    "editBreed": "تعديل السلالة",
+    "deleteBreed": "حذف السلالة",
+    "noBreeds": "لم يتم العثور على سلالات",
+    "breedCount": "{count} سلالة",
+    "breedCount_plural": "{count} سلالات",
+    "filters": {
+      "allSpecies": "جميع الأنواع",
+      "showInactive": "عرض السلالات غير النشطة"
+    },
+    "species": {
+      "label": "النوع",
+      "sheep": "أغنام",
+      "goat": "ماعز",
+      "cattle": "أبقار"
+    },
+    "fields": {
+      "id": "المعرف",
+      "nameFr": "الاسم (فرنسي)",
+      "nameEn": "الاسم (إنجليزي)",
+      "nameAr": "الاسم (عربي)",
+      "speciesId": "النوع",
+      "description": "الوصف",
+      "displayOrder": "ترتيب العرض",
+      "isActive": "نشط"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل السلالات",
+      "created": "تم إنشاء السلالة بنجاح",
+      "updated": "تم تحديث السلالة بنجاح",
+      "deleted": "تم حذف السلالة بنجاح",
+      "createError": "خطأ في إنشاء السلالة",
+      "updateError": "خطأ في تحديث السلالة",
+      "deleteError": "خطأ في حذف السلالة",
+      "confirmDelete": "هل تريد حقاً حذف السلالة \"{name}\"؟",
+      "infoMessage": "السلالات هي بيانات مرجعية تستخدم لتصنيف حيواناتك."
+    }
+  },
+  "campaigns": {
+    "title": "الحملات",
+    "subtitle": "إدارة حملات التطعيم والعلاج والوزن",
+    "newCampaign": "حملة جديدة",
+    "editCampaign": "تعديل الحملة",
+    "deleteCampaign": "حذف الحملة",
+    "noCampaigns": "لم يتم العثور على حملات",
+    "campaignCount": "{count} حملة",
+    "campaignCount_plural": "{count} حملات",
+    "progress": "التقدم",
+    "filters": {
+      "allTypes": "جميع الأنواع",
+      "allStatus": "جميع الحالات"
+    },
+    "types": {
+      "vaccination": "تطعيم",
+      "treatment": "علاج",
+      "weighing": "وزن",
+      "identification": "تحديد الهوية"
+    },
+    "status": {
+      "planned": "مخطط",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    },
+    "fields": {
+      "name": "الاسم",
+      "type": "النوع",
+      "status": "الحالة",
+      "campaignDate": "تاريخ الحملة",
+      "productId": "معرف المنتج",
+      "productName": "اسم المنتج",
+      "veterinarianId": "معرف الطبيب البيطري",
+      "veterinarianName": "اسم الطبيب البيطري",
+      "targetCount": "الهدف",
+      "completedCount": "المكتمل",
+      "cost": "التكلفة",
+      "description": "الوصف",
+      "notes": "ملاحظات"
+    },
+    "placeholders": {
+      "productName": "مثال: لقاح داء الكلب",
+      "description": "وصف الحملة..."
+    },
+    "messages": {
+      "loadError": "تعذر تحميل الحملات",
+      "created": "تم إنشاء الحملة بنجاح",
+      "updated": "تم تحديث الحملة بنجاح",
+      "deleted": "تم حذف الحملة بنجاح",
+      "createError": "خطأ في إنشاء الحملة",
+      "updateError": "خطأ في تحديث الحملة",
+      "deleteError": "خطأ في حذف الحملة",
+      "confirmDelete": "هل تريد حقاً حذف الحملة \"{name}\"؟"
+    }
+  },
+  "veterinarians": {
+    "title": "الأطباء البيطريون",
+    "subtitle": "إدارة جهات الاتصال البيطرية",
+    "newVeterinarian": "طبيب بيطري جديد",
+    "editVeterinarian": "تعديل الطبيب البيطري",
+    "deleteVeterinarian": "حذف الطبيب البيطري",
+    "noVeterinarians": "لم يتم العثور على أطباء بيطريين",
+    "veterinarianCount": "{count} طبيب بيطري",
+    "veterinarianCount_plural": "{count} أطباء بيطريين",
+    "filters": {
+      "showInactive": "عرض الأطباء البيطريين غير النشطين"
+    },
+    "sections": {
+      "personal": "المعلومات الشخصية",
+      "specialties": "التخصصات",
+      "contact": "الاتصال",
+      "address": "العنوان",
+      "availability": "التوافر",
+      "pricing": "الأسعار",
+      "preferences": "التفضيلات"
+    },
+    "fields": {
+      "title": "اللقب",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "licenseNumber": "رقم الترخيص",
+      "specialties": "التخصصات",
+      "clinic": "العيادة",
+      "phone": "الهاتف",
+      "mobile": "الجوال",
+      "email": "البريد الإلكتروني",
+      "address": "العنوان",
+      "city": "المدينة",
+      "postalCode": "الرمز البريدي",
+      "country": "البلد",
+      "isAvailable": "متاح",
+      "emergencyService": "خدمة الطوارئ",
+      "workingHours": "ساعات العمل",
+      "consultationFee": "رسوم الاستشارة",
+      "emergencyFee": "رسوم الطوارئ",
+      "currency": "العملة",
+      "isPreferred": "طبيب بيطري مفضل",
+      "isDefault": "طبيب بيطري افتراضي",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "specialties": "مثال: أبقار، أغنام، ماعز",
+      "workingHours": "مثال: الإثنين-الجمعة 8 ص-6 م"
+    },
+    "badges": {
+      "default": "افتراضي",
+      "emergency": "طوارئ"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل الأطباء البيطريين",
+      "created": "تم إنشاء الطبيب البيطري بنجاح",
+      "updated": "تم تحديث الطبيب البيطري بنجاح",
+      "deleted": "تم حذف الطبيب البيطري بنجاح",
+      "createError": "خطأ في إنشاء الطبيب البيطري",
+      "updateError": "خطأ في تحديث الطبيب البيطري",
+      "deleteError": "خطأ في حذف الطبيب البيطري",
+      "confirmDelete": "هل تريد حقاً حذف الطبيب البيطري {name}؟"
+    }
+  },
+  "farmPreferences": {
+    "title": "تفضيلات المزرعة",
+    "subtitle": "تكوين الإعدادات الافتراضية لمزرعتك",
+    "sections": {
+      "general": "الإعدادات العامة",
+      "defaults": "القيم الافتراضية",
+      "unitsFormats": "الوحدات والتنسيقات",
+      "notifications": "الإشعارات"
+    },
+    "fields": {
+      "defaultVeterinarianId": "الطبيب البيطري الافتراضي",
+      "defaultSpeciesId": "النوع الافتراضي",
+      "defaultBreedId": "السلالة الافتراضية",
+      "weightUnit": "وحدة الوزن",
+      "currency": "العملة",
+      "language": "اللغة",
+      "dateFormat": "تنسيق التاريخ",
+      "enableNotifications": "تفعيل الإشعارات"
+    },
+    "placeholders": {
+      "defaultVeterinarianId": "اختر طبيباً بيطرياً",
+      "defaultBreedId": "اختر سلالة",
+      "selectSpecies": "-- اختر --"
+    },
+    "species": {
+      "cattle": "أبقار",
+      "sheep": "أغنام",
+      "goat": "ماعز"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل التفضيلات",
+      "updated": "تم تحديث التفضيلات بنجاح",
+      "updateError": "خطأ في تحديث التفضيلات",
+      "notificationsInfo": "احصل على تنبيهات للتطعيمات والعلاجات والأحداث المهمة"
+    }
+  },
+  "alertConfigurations": {
+    "title": "تكوينات التنبيهات",
+    "subtitle": "إدارة القواعد والإشعارات التلقائية",
+    "noAlertConfigurations": "لم يتم العثور على تكوينات تنبيه",
+    "alertCount": "{count} تكوين",
+    "alertCount_plural": "{count} تكوينات",
+    "days": "أيام",
+    "filters": {
+      "allTypes": "جميع الأنواع"
+    },
+    "types": {
+      "urgent": "عاجل",
+      "important": "مهم",
+      "routine": "روتيني"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "critical": "حرجة"
+    },
+    "fields": {
+      "titleKey": "مفتاح العنوان",
+      "messageKey": "مفتاح الرسالة",
+      "severity": "الخطورة",
+      "daysBeforeDue": "أيام قبل الاستحقاق"
+    },
+    "actions": {
+      "enable": "تفعيل",
+      "disable": "تعطيل"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل التكوينات",
+      "updated": "تم تحديث التكوين بنجاح",
+      "updateError": "خطأ في تحديث التكوين",
+      "infoMessage": "تحدد تكوينات التنبيهات الإشعارات التلقائية للأحداث المهمة"
+    }
+  },
+  "farms": {
+    "title": "المزارع",
+    "subtitle": "إدارة المزارع ومعلوماتها",
+    "noFarms": "لم يتم العثور على مزارع",
+    "fields": {
+      "name": "الاسم",
+      "location": "الموقع",
+      "ownerId": "معرف المالك",
+      "cheptelNumber": "رقم القطيع",
+      "groupId": "معرف المجموعة",
+      "groupName": "اسم المجموعة",
+      "isDefault": "المزرعة الافتراضية"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "group": "المجموعة",
+      "preferences": "التفضيلات"
+    },
+    "placeholders": {
+      "name": "مثال: مزرعة الشمس",
+      "location": "مثال: منطقة باتنة",
+      "ownerId": "معرف المالك",
+      "cheptelNumber": "مثال: FR-123456",
+      "groupId": "معرف المجموعة",
+      "groupName": "اسم المجموعة"
+    },
+    "badges": {
+      "default": "افتراضي"
+    },
+    "stats": {
+      "title": "الإحصائيات",
+      "totalAnimals": "إجمالي الحيوانات"
+    },
+    "filters": {
+      "search": "البحث بالاسم أو الموقع..."
+    },
+    "actions": {
+      "add": "إضافة مزرعة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ..."
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "locationRequired": "الموقع مطلوب",
+      "ownerIdRequired": "معرف المالك مطلوب"
+    },
+    "messages": {
+      "created": "تم إنشاء المزرعة بنجاح",
+      "updated": "تم تحديث المزرعة بنجاح",
+      "deleted": "تم حذف المزرعة بنجاح",
+      "saveError": "خطأ في حفظ المزرعة",
+      "deleteError": "خطأ في حذف المزرعة",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{{name}}»؟",
+      "addDescription": "أضف معلومات المزرعة الجديدة",
+      "editDescription": "عدل معلومات المزرعة"
     }
   },
   "settings": {

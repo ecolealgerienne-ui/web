@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Building2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { useAnimals } from '@/lib/hooks/useAnimals';
-import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
-import { animalsService } from '@/lib/services/animals.service';
-import { AnimalFormDialog } from '@/components/data/animal-form-dialog';
+import { useFarms } from '@/lib/hooks/useFarms';
+import { Farm, CreateFarmDto, UpdateFarmDto } from '@/lib/types/farm';
+import { farmsService } from '@/lib/services/farms.service';
+import { FarmFormDialog } from '@/components/data/farm-form-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import {
@@ -23,79 +23,63 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-export default function AnimalsPage() {
-  const t = useTranslations('animals');
+export default function FarmsPage() {
+  const t = useTranslations('farms');
   const tc = useCommonTranslations();
   const toast = useToast();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
+  const { farms, loading, error, refetch } = useFarms({ search });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedAnimal, setSelectedAnimal] = useState<Animal | undefined>();
-  const [animalToDelete, setAnimalToDelete] = useState<Animal | null>(null);
+  const [selectedFarm, setSelectedFarm] = useState<Farm | undefined>();
+  const [farmToDelete, setFarmToDelete] = useState<Farm | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAdd = () => {
-    setSelectedAnimal(undefined);
+    setSelectedFarm(undefined);
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (animal: Animal) => {
-    setSelectedAnimal(animal);
+  const handleEdit = (farm: Farm) => {
+    setSelectedFarm(farm);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (animal: Animal) => {
-    setAnimalToDelete(animal);
+  const handleDelete = (farm: Farm) => {
+    setFarmToDelete(farm);
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (data: CreateAnimalDto | UpdateAnimalDto) => {
+  const handleSubmit = async (data: CreateFarmDto | UpdateFarmDto) => {
     setIsSubmitting(true);
     try {
-      if (selectedAnimal) {
-        await animalsService.update(selectedAnimal.id, data as UpdateAnimalDto);
+      if (selectedFarm) {
+        await farmsService.update(selectedFarm.id, data as UpdateFarmDto);
         toast.success(tc('messages.success'), t('messages.updated'));
       } else {
-        await animalsService.create(data as CreateAnimalDto);
+        await farmsService.create(data as CreateFarmDto);
         toast.success(tc('messages.success'), t('messages.created'));
       }
       setIsDialogOpen(false);
       refetch();
     } catch (error) {
-      toast.error(tc('messages.error'), t('messages.createError'));
+      toast.error(tc('messages.error'), t('messages.saveError'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const confirmDelete = async () => {
-    if (!animalToDelete) return;
+    if (!farmToDelete) return;
 
     try {
-      await animalsService.delete(animalToDelete.id);
+      await farmsService.delete(farmToDelete.id);
       toast.success(tc('messages.success'), t('messages.deleted'));
       setIsDeleteDialogOpen(false);
-      setAnimalToDelete(null);
+      setFarmToDelete(null);
       refetch();
     } catch (error) {
       toast.error(tc('messages.error'), t('messages.deleteError'));
-    }
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'alive':
-        return 'default';
-      case 'sold':
-        return 'secondary';
-      case 'dead':
-        return 'destructive';
-      case 'missing':
-        return 'outline';
-      default:
-        return 'outline';
     }
   };
 
@@ -139,106 +123,113 @@ export default function AnimalsPage() {
 
       {/* Filtres et actions */}
       <div className="flex gap-4 items-center flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t('filters.search')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-        >
-          <option value="">{t('filters.allStatus')}</option>
-          <option value="alive">{t('status.alive')}</option>
-          <option value="sold">{t('status.sold')}</option>
-          <option value="dead">{t('status.dead')}</option>
-          <option value="missing">{t('status.missing')}</option>
-        </select>
+        <Input
+          placeholder={t('filters.search')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full md:w-[300px]"
+        />
 
         <Button onClick={handleAdd} className="ml-auto">
           <Plus className="mr-2 h-4 w-4" />
-          {t('newAnimal')}
+          {t('actions.add')}
         </Button>
       </div>
 
-      {/* Liste des animaux */}
+      {/* Liste des fermes */}
       <Card>
         <CardHeader>
           <CardTitle>
-            {t('title')} ({animals.length})
+            {t('title')} ({farms.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {animals.length === 0 ? (
+          {farms.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              {t('noAnimals')}
+              {t('noFarms')}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {animals.map((animal) => (
+              {farms.map((farm) => (
                 <div
-                  key={animal.id}
+                  key={farm.id}
                   className="p-4 border rounded-lg hover:bg-accent transition-colors"
                 >
                   <div className="space-y-3">
                     {/* Header */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-lg truncate">
-                          {animal.identificationNumber}
+                        <div className="flex items-center gap-2 mb-1">
+                          <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <div className="font-semibold truncate">{farm.name}</div>
                         </div>
-                        {animal.name && (
-                          <div className="text-sm text-muted-foreground truncate">
-                            {animal.name}
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <MapPin className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{farm.location}</span>
+                        </div>
                       </div>
-                      <Badge variant={getStatusBadgeVariant(animal.status)}>
-                        {t(`status.${animal.status}`)}
-                      </Badge>
+
+                      {farm.isDefault && (
+                        <Badge variant="default" className="text-xs flex-shrink-0">
+                          {t('badges.default')}
+                        </Badge>
+                      )}
                     </div>
 
                     {/* Informations */}
                     <div className="text-sm text-muted-foreground space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{t('fields.sex')}:</span>
-                        <span>{t(`sex.${animal.sex}`)}</span>
-                      </div>
-                      {animal.birthDate && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.birthDate')}:</span>
-                          <span>{new Date(animal.birthDate).toLocaleDateString()}</span>
+                      {farm.cheptelNumber && (
+                        <div>
+                          <span className="font-medium">{t('fields.cheptelNumber')}:</span>{' '}
+                          {farm.cheptelNumber}
                         </div>
                       )}
-                      {animal.currentWeight && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.currentWeight')}:</span>
-                          <span>{animal.currentWeight} kg</span>
+                      {farm.groupName && (
+                        <div>
+                          <span className="font-medium">{t('fields.groupName')}:</span>{' '}
+                          {farm.groupName}
                         </div>
                       )}
                     </div>
+
+                    {/* Statistiques */}
+                    {farm.stats && (
+                      <div className="pt-2 border-t">
+                        <div className="text-sm font-medium mb-2">{t('stats.title')}</div>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">{t('stats.totalAnimals')}:</span>
+                            <span className="font-medium">{farm.stats.totalAnimals}</span>
+                          </div>
+                          {farm.stats.animalsBySpecies && Object.keys(farm.stats.animalsBySpecies).length > 0 && (
+                            <div className="text-xs text-muted-foreground">
+                              {Object.entries(farm.stats.animalsBySpecies).map(([species, count]) => (
+                                <div key={species} className="flex justify-between">
+                                  <span>{species}:</span>
+                                  <span>{count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-2 border-t">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleEdit(animal)}
+                        onClick={() => handleEdit(farm)}
                         className="flex-1"
                       >
                         <Edit2 className="mr-1 h-3 w-3" />
-                        {tc('actions.edit')}
+                        {t('actions.edit')}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDelete(animal)}
+                        onClick={() => handleDelete(farm)}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -253,11 +244,11 @@ export default function AnimalsPage() {
       </Card>
 
       {/* Dialog formulaire */}
-      <AnimalFormDialog
+      <FarmFormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSubmit={handleSubmit}
-        animal={selectedAnimal}
+        farm={selectedFarm}
         isLoading={isSubmitting}
       />
 
@@ -267,7 +258,7 @@ export default function AnimalsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('messages.deleteConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('messages.deleteConfirmDescription', { id: animalToDelete?.identificationNumber || '' })}
+              {t('messages.deleteConfirmDescription', { name: farmToDelete?.name || '' })}
               <br />
               <span className="text-destructive font-medium">
                 {tc('messages.actionIrreversible')}
