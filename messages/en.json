@@ -1,0 +1,155 @@
+{
+  "common": {
+    "appName": "Algerian School",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "yes": "Yes",
+    "no": "No",
+    "backToHome": "Back to home",
+    "tryAgain": "Try again",
+    "previousPage": "Previous page",
+    "status": {
+      "disabled": "Inactive",
+      "enabled": "Active"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "deleting": "Deleting..."
+    },
+    "messages": {
+      "loading": "Loading...",
+      "loadError": "Error loading data",
+      "success": "Success",
+      "error": "Error",
+      "actionIrreversible": "This action is irreversible."
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "animals": "Animals",
+    "lots": "Lots",
+    "vaccinations": "Vaccinations",
+    "treatments": "Treatments",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "breeds": {
+    "title": "Breeds",
+    "subtitle": "Manage animal breeds for your farm",
+    "newBreed": "New breed",
+    "editBreed": "Edit breed",
+    "deleteBreed": "Delete breed",
+    "noBreeds": "No breeds found",
+    "breedCount": "{count} breed",
+    "breedCount_plural": "{count} breeds",
+    "filters": {
+      "allSpecies": "All species",
+      "showInactive": "Show inactive breeds"
+    },
+    "species": {
+      "label": "Species",
+      "sheep": "Sheep",
+      "goat": "Goat",
+      "cattle": "Cattle"
+    },
+    "fields": {
+      "id": "ID",
+      "nameFr": "Name (French)",
+      "nameEn": "Name (English)",
+      "nameAr": "Name (Arabic)",
+      "speciesId": "Species",
+      "description": "Description",
+      "displayOrder": "Display order",
+      "isActive": "Active"
+    },
+    "messages": {
+      "loadError": "Unable to load breeds",
+      "created": "Breed created successfully",
+      "updated": "Breed updated successfully",
+      "deleted": "Breed deleted successfully",
+      "createError": "Error creating breed",
+      "updateError": "Error updating breed",
+      "deleteError": "Error deleting breed",
+      "confirmDelete": "Do you really want to delete the breed \"{name}\"?",
+      "infoMessage": "Breeds are reference data used to classify your animals."
+    }
+  },
+  "veterinarians": {
+    "title": "Veterinarians",
+    "subtitle": "Manage your veterinary contacts",
+    "newVeterinarian": "New veterinarian",
+    "editVeterinarian": "Edit veterinarian",
+    "deleteVeterinarian": "Delete veterinarian",
+    "noVeterinarians": "No veterinarians found",
+    "veterinarianCount": "{count} veterinarian",
+    "veterinarianCount_plural": "{count} veterinarians",
+    "filters": {
+      "showInactive": "Show inactive veterinarians"
+    },
+    "sections": {
+      "personal": "Personal information",
+      "specialties": "Specialties",
+      "contact": "Contact",
+      "address": "Address",
+      "availability": "Availability",
+      "pricing": "Pricing",
+      "preferences": "Preferences"
+    },
+    "fields": {
+      "title": "Title",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "licenseNumber": "License number",
+      "specialties": "Specialties",
+      "clinic": "Clinic",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "isAvailable": "Available",
+      "emergencyService": "Emergency service",
+      "workingHours": "Working hours",
+      "consultationFee": "Consultation fee",
+      "emergencyFee": "Emergency fee",
+      "currency": "Currency",
+      "isPreferred": "Preferred veterinarian",
+      "isDefault": "Default veterinarian",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "specialties": "E.g.: Cattle, Sheep, Goats",
+      "workingHours": "E.g.: Mon-Fri 8am-6pm"
+    },
+    "badges": {
+      "default": "Default",
+      "emergency": "Emergency"
+    },
+    "messages": {
+      "loadError": "Unable to load veterinarians",
+      "created": "Veterinarian created successfully",
+      "updated": "Veterinarian updated successfully",
+      "deleted": "Veterinarian deleted successfully",
+      "createError": "Error creating veterinarian",
+      "updateError": "Error updating veterinarian",
+      "deleteError": "Error deleting veterinarian",
+      "confirmDelete": "Do you really want to delete veterinarian {name}?"
+    }
+  }
+}
