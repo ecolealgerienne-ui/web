@@ -1,6 +1,9 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 interface Alert {
   id: number;
@@ -15,13 +18,14 @@ interface AlertsCardProps {
 
 export function AlertsCard({ alerts }: AlertsCardProps) {
   const totalAlerts = alerts.reduce((sum, alert) => sum + alert.count, 0);
+  const t = useTranslations('dashboard.alerts');
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          Alertes Actives ({totalAlerts})
+          {t('title')} ({totalAlerts})
         </CardTitle>
       </CardHeader>
       <CardContent>

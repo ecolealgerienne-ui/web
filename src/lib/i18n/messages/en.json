@@ -46,7 +46,10 @@
     "menu": {
       "dashboard": "Dashboard",
       "animals": "Animals",
-      "data": "Data",
+      "lots": "Lots",
+      "vaccinations": "Vaccinations",
+      "treatments": "Treatments",
+      "reports": "Reports",
       "settings": "Settings"
     },
     "data": {
@@ -55,6 +58,12 @@
       "vaccines": "Vaccines",
       "diseases": "Diseases",
       "medications": "Medications"
+    },
+    "header": {
+      "dashboard": "Dashboard",
+      "overview": "Overview",
+      "logout": "Logout",
+      "devMode": "DEV Mode"
     }
   },
   "breeds": {
@@ -103,6 +112,48 @@
       "confirmDelete": "Are you sure you want to deactivate the breed {name}?",
       "confirmDeleteDetails": "This breed will be marked as inactive (soft delete). The data will not be physically deleted.",
       "infoMessage": "Breeds are reference data managed by super admins. You can create, edit or deactivate breeds. Deactivated breeds remain in the database but are not visible by default."
+    }
+  },
+  "vaccines": {
+    "title": "Vaccines",
+    "subtitle": "Manage available vaccines",
+    "newItem": "New vaccine",
+    "listTitle": "Vaccine list",
+    "emptyMessage": "No vaccines registered.",
+    "emptyAction": "Click \"New vaccine\" to add one."
+  },
+  "diseases": {
+    "title": "Diseases",
+    "subtitle": "Manage known diseases",
+    "newItem": "New disease",
+    "listTitle": "Disease list",
+    "emptyMessage": "No diseases registered.",
+    "emptyAction": "Click \"New disease\" to add one."
+  },
+  "medications": {
+    "title": "Medications",
+    "subtitle": "Manage available medications",
+    "newItem": "New medication",
+    "listTitle": "Medication list",
+    "emptyMessage": "No medications registered.",
+    "emptyAction": "Click \"New medication\" to add one."
+  },
+  "dashboard": {
+    "kpis": {
+      "totalAnimals": "Total Animals",
+      "births": "Births",
+      "deaths": "Deaths",
+      "vaccinations": "Vaccinations"
+    },
+    "periods": {
+      "thisMonth": "This month",
+      "upcoming": "Upcoming"
+    },
+    "alerts": {
+      "title": "Active Alerts"
+    },
+    "activities": {
+      "title": "Recent Activities"
     }
   },
   "errors": {

@@ -3,34 +3,37 @@
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslations } from '@/lib/i18n';
 
 export default function MedicationsPage() {
+  const t = useTranslations('medications');
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Médicaments</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestion des médicaments disponibles
+            {t('subtitle')}
           </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Nouveau médicament
+          {t('newItem')}
         </Button>
       </div>
 
       {/* Liste des médicaments */}
       <Card>
         <CardHeader>
-          <CardTitle>Liste des médicaments</CardTitle>
+          <CardTitle>{t('listTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12 text-muted-foreground">
-            Aucun médicament enregistré.
+            {t('emptyMessage')}
             <br />
-            Cliquez sur "Nouveau médicament" pour en ajouter un.
+            {t('emptyAction')}
           </div>
         </CardContent>
       </Card>

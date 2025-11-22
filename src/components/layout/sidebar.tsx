@@ -6,31 +6,32 @@ import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database } fro
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
-
-const menuItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: Beef, label: "Animaux", href: "/animals" },
-  { icon: Package, label: "Lots", href: "/lots" },
-  { icon: Syringe, label: "Vaccinations", href: "/vaccinations" },
-  { icon: Pill, label: "Traitements", href: "/treatments" },
-];
-
-// Menu Données de référence (super admin uniquement)
-const dataMenuItems = [
-  { label: "Races", href: "/data/breeds" },
-  { label: "Vaccins", href: "/data/vaccines" },
-  { label: "Maladies", href: "/data/diseases" },
-  { label: "Médicaments", href: "/data/medications" },
-];
-
-const bottomMenuItems = [
-  { icon: BarChart3, label: "Rapports", href: "/reports" },
-  { icon: Settings, label: "Paramètres", href: "/settings" },
-];
+import { useTranslations } from "@/lib/i18n";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const t = useTranslations('navigation');
+
+  const menuItems = [
+    { icon: Home, label: t('menu.dashboard'), href: "/dashboard" },
+    { icon: Beef, label: t('menu.animals'), href: "/animals" },
+    { icon: Package, label: t('menu.lots'), href: "/lots" },
+    { icon: Syringe, label: t('menu.vaccinations'), href: "/vaccinations" },
+    { icon: Pill, label: t('menu.treatments'), href: "/treatments" },
+  ];
+
+  const dataMenuItems = [
+    { label: t('data.breeds'), href: "/data/breeds" },
+    { label: t('data.vaccines'), href: "/data/vaccines" },
+    { label: t('data.diseases'), href: "/data/diseases" },
+    { label: t('data.medications'), href: "/data/medications" },
+  ];
+
+  const bottomMenuItems = [
+    { icon: BarChart3, label: t('menu.reports'), href: "/reports" },
+    { icon: Settings, label: t('menu.settings'), href: "/settings" },
+  ];
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
@@ -80,7 +81,7 @@ export function Sidebar() {
             <div className="mb-1">
               <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
                 <Database className="h-4 w-4" />
-                Données
+                {t('data.title')}
               </div>
               <div className="ml-7 space-y-1">
                 {dataMenuItems.map((item) => {

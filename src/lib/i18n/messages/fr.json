@@ -46,7 +46,10 @@
     "menu": {
       "dashboard": "Tableau de bord",
       "animals": "Animaux",
-      "data": "Données",
+      "lots": "Lots",
+      "vaccinations": "Vaccinations",
+      "treatments": "Traitements",
+      "reports": "Rapports",
       "settings": "Paramètres"
     },
     "data": {
@@ -55,6 +58,12 @@
       "vaccines": "Vaccins",
       "diseases": "Maladies",
       "medications": "Médicaments"
+    },
+    "header": {
+      "dashboard": "Dashboard",
+      "overview": "Vue d'ensemble",
+      "logout": "Déconnexion",
+      "devMode": "Mode DEV"
     }
   },
   "breeds": {
@@ -103,6 +112,48 @@
       "confirmDelete": "Êtes-vous sûr de vouloir désactiver la race {name} ?",
       "confirmDeleteDetails": "Cette race sera marquée comme inactive (suppression logique). Les données ne seront pas supprimées physiquement.",
       "infoMessage": "Les races sont des données de référence administrées par les super admins. Vous pouvez créer, modifier ou désactiver des races. Les races désactivées restent en base de données mais ne sont plus visibles par défaut."
+    }
+  },
+  "vaccines": {
+    "title": "Vaccins",
+    "subtitle": "Gestion des vaccins disponibles",
+    "newItem": "Nouveau vaccin",
+    "listTitle": "Liste des vaccins",
+    "emptyMessage": "Aucun vaccin enregistré.",
+    "emptyAction": "Cliquez sur \"Nouveau vaccin\" pour en ajouter un."
+  },
+  "diseases": {
+    "title": "Maladies",
+    "subtitle": "Gestion des maladies connues",
+    "newItem": "Nouvelle maladie",
+    "listTitle": "Liste des maladies",
+    "emptyMessage": "Aucune maladie enregistrée.",
+    "emptyAction": "Cliquez sur \"Nouvelle maladie\" pour en ajouter une."
+  },
+  "medications": {
+    "title": "Médicaments",
+    "subtitle": "Gestion des médicaments disponibles",
+    "newItem": "Nouveau médicament",
+    "listTitle": "Liste des médicaments",
+    "emptyMessage": "Aucun médicament enregistré.",
+    "emptyAction": "Cliquez sur \"Nouveau médicament\" pour en ajouter un."
+  },
+  "dashboard": {
+    "kpis": {
+      "totalAnimals": "Total Animaux",
+      "births": "Naissances",
+      "deaths": "Décès",
+      "vaccinations": "Vaccinations"
+    },
+    "periods": {
+      "thisMonth": "Ce mois",
+      "upcoming": "À venir"
+    },
+    "alerts": {
+      "title": "Alertes Actives"
+    },
+    "activities": {
+      "title": "Activités Récentes"
     }
   },
   "errors": {

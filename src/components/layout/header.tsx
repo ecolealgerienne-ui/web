@@ -6,10 +6,12 @@ import { useAuth } from "@/contexts/auth-context";
 import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { useTranslations } from "@/lib/i18n";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { user, logout, isAuthenticated } = useAuth();
+  const t = useTranslations('navigation.header');
 
   return (
     <header className="border-b bg-card">
@@ -24,8 +26,8 @@ export function Header() {
           </div>
           {/* Desktop Title */}
           <div className="hidden md:block">
-            <h1 className="text-xl font-semibold">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Vue d&apos;ensemble</p>
+            <h1 className="text-xl font-semibold">{t('dashboard')}</h1>
+            <p className="text-sm text-muted-foreground">{t('overview')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
@@ -62,10 +64,10 @@ export function Header() {
               variant="ghost"
               size="icon"
               onClick={logout}
-              title="Déconnexion"
+              title={t('logout')}
             >
               <LogOut className="h-5 w-5" />
-              <span className="sr-only">Déconnexion</span>
+              <span className="sr-only">{t('logout')}</span>
             </Button>
           )}
 
@@ -74,7 +76,7 @@ export function Header() {
             <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-md bg-blue-100 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
               <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
               <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
-                Mode DEV
+                {t('devMode')}
               </span>
             </div>
           )}

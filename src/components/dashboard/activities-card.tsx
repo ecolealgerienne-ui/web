@@ -1,5 +1,8 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 interface Activity {
   id: number;
@@ -12,12 +15,14 @@ interface ActivitiesCardProps {
 }
 
 export function ActivitiesCard({ activities }: ActivitiesCardProps) {
+  const t = useTranslations('dashboard.activities');
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="h-5 w-5" />
-          Activités Récentes
+          {t('title')}
         </CardTitle>
       </CardHeader>
       <CardContent>

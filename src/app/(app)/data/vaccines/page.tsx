@@ -3,34 +3,37 @@
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslations } from '@/lib/i18n';
 
 export default function VaccinesPage() {
+  const t = useTranslations('vaccines');
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Vaccins</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestion des vaccins disponibles
+            {t('subtitle')}
           </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Nouveau vaccin
+          {t('newItem')}
         </Button>
       </div>
 
       {/* Liste des vaccins */}
       <Card>
         <CardHeader>
-          <CardTitle>Liste des vaccins</CardTitle>
+          <CardTitle>{t('listTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12 text-muted-foreground">
-            Aucun vaccin enregistré.
+            {t('emptyMessage')}
             <br />
-            Cliquez sur "Nouveau vaccin" pour en ajouter un.
+            {t('emptyAction')}
           </div>
         </CardContent>
       </Card>

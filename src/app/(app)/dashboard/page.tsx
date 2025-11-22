@@ -1,3 +1,5 @@
+'use client';
+
 import { Beef, Plus, X, Syringe } from "lucide-react";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ChartEvolution } from "@/components/dashboard/chart-evolution";
@@ -9,8 +11,11 @@ import {
   mockAlerts,
   mockRecentActivities,
 } from "@/lib/data/mock";
+import { useTranslations } from "@/lib/i18n";
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard');
+
   return (
     <div className="space-y-6">
       {/* KPI Cards Grid */}
@@ -18,28 +23,28 @@ export default function DashboardPage() {
         <KpiCard
           icon={Beef}
           value={mockDashboardStats.totalAnimals.toLocaleString("fr-FR")}
-          label="Total Animaux"
+          label={t('kpis.totalAnimals')}
           iconColor="text-primary"
         />
         <KpiCard
           icon={Plus}
           value={mockDashboardStats.births.count}
-          label="Naissances"
-          subtitle={mockDashboardStats.births.period}
+          label={t('kpis.births')}
+          subtitle={t('periods.thisMonth')}
           iconColor="text-green-600"
         />
         <KpiCard
           icon={X}
           value={mockDashboardStats.deaths.count}
-          label="Décès"
-          subtitle={mockDashboardStats.deaths.period}
+          label={t('kpis.deaths')}
+          subtitle={t('periods.thisMonth')}
           iconColor="text-red-600"
         />
         <KpiCard
           icon={Syringe}
           value={mockDashboardStats.vaccinations.upcoming}
-          label="Vaccinations"
-          subtitle={mockDashboardStats.vaccinations.label}
+          label={t('kpis.vaccinations')}
+          subtitle={t('periods.upcoming')}
           iconColor="text-blue-600"
         />
       </div>
