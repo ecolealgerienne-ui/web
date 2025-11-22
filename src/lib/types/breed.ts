@@ -1,20 +1,13 @@
 /**
- * Types pour la gestion des races d'animaux
+ * Types pour les races d'animaux (données de référence READ ONLY)
  */
 
 export interface Breed {
   id: string
   name: string
-  species: 'sheep' | 'goat' | 'cattle'
-  description?: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateBreedDto {
-  name: string
-  species: 'sheep' | 'goat' | 'cattle'
+  nameFr: string
+  nameEn: string
+  nameAr: string
+  speciesId: string
   description?: string
 }
-
-export interface UpdateBreedDto extends Partial<CreateBreedDto> {}

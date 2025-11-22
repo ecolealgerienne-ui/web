@@ -1,5 +1,5 @@
 /**
- * Hook React pour la gestion des races
+ * Hook React pour la gestion des races (READ ONLY)
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -15,7 +15,7 @@ interface UseBreedsResult {
   refetch: () => Promise<void>
 }
 
-export function useBreeds(species?: string): UseBreedsResult {
+export function useBreeds(speciesId?: string): UseBreedsResult {
   const toast = useToast()
   const [breeds, setBreeds] = useState<Breed[]>([])
   const [loading, setLoading] = useState(true)
@@ -26,7 +26,7 @@ export function useBreeds(species?: string): UseBreedsResult {
     setError(null)
 
     try {
-      const data = await breedsService.getAll(species)
+      const data = await breedsService.getAll(speciesId)
       setBreeds(data)
     } catch (err) {
       const error = err as Error
@@ -36,7 +36,7 @@ export function useBreeds(species?: string): UseBreedsResult {
     } finally {
       setLoading(false)
     }
-  }, [species]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [speciesId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchBreeds()
