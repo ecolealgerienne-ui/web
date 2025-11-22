@@ -29,6 +29,7 @@
       "info": "Information",
       "noData": "No data available",
       "loading": "Loading...",
+      "loadError": "Unable to load data",
       "confirmDelete": "Are you sure you want to delete this item?",
       "actionIrreversible": "This action is irreversible."
     },
@@ -116,11 +117,50 @@
   },
   "vaccines": {
     "title": "Vaccines",
-    "subtitle": "Manage available vaccines",
+    "subtitle": "Reference data - available vaccines for the herd",
     "newItem": "New vaccine",
+    "editItem": "Edit vaccine",
+    "deleteVaccine": "Delete vaccine",
     "listTitle": "Vaccine list",
     "emptyMessage": "No vaccines registered.",
-    "emptyAction": "Click \"New vaccine\" to add one."
+    "emptyAction": "Click \"New vaccine\" to add one.",
+    "noVaccines": "No vaccines found for this filter.",
+    "vaccineCount": "{count} vaccine displayed",
+    "vaccineCount_plural": "{count} vaccines displayed",
+    "filters": {
+      "showInactive": "Show disabled vaccines"
+    },
+    "fields": {
+      "id": "Identifier",
+      "nameFr": "Name (French)",
+      "nameEn": "Name (English)",
+      "nameAr": "Name (Arabic)",
+      "description": "Description (optional)",
+      "manufacturer": "Manufacturer",
+      "diseaseTarget": "Target disease",
+      "displayOrder": "Display order",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "id": "e.g.: rabies-vaccine",
+      "nameFr": "e.g.: Vaccin contre la rage",
+      "nameEn": "e.g.: Rabies Vaccine",
+      "nameAr": "مثال: لقاح داء الكلب",
+      "description": "Vaccine description",
+      "manufacturer": "e.g.: Laborat Pharma",
+      "diseaseTarget": "e.g.: Rabies"
+    },
+    "messages": {
+      "created": "Vaccine created successfully",
+      "updated": "Vaccine updated successfully",
+      "deleted": "Vaccine disabled successfully (soft delete)",
+      "createError": "Error creating vaccine",
+      "updateError": "Error updating vaccine",
+      "deleteError": "Error deleting vaccine",
+      "confirmDelete": "Are you sure you want to disable the vaccine {name}?",
+      "confirmDeleteDetails": "This vaccine will be marked as inactive (soft delete). The data will not be physically deleted.",
+      "infoMessage": "Vaccines are administered reference data. You can create, edit or disable vaccines. Disabled vaccines remain in the database but are no longer visible by default."
+    }
   },
   "diseases": {
     "title": "Diseases",

@@ -3,6 +3,7 @@
  */
 
 import { Breed } from '@/lib/types/breed';
+import { Vaccine } from '@/lib/types/vaccine';
 
 type Locale = 'fr' | 'en' | 'ar';
 
@@ -19,6 +20,22 @@ export function getBreedName(breed: Breed, locale: Locale): string {
       return breed.nameAr || breed.nameFr || breed.name;
     default:
       return breed.nameFr || breed.name;
+  }
+}
+
+/**
+ * Obtient le nom d'un vaccin dans la langue courante
+ */
+export function getVaccineName(vaccine: Vaccine, locale: Locale): string {
+  switch (locale) {
+    case 'fr':
+      return vaccine.nameFr || vaccine.name;
+    case 'en':
+      return vaccine.nameEn || vaccine.nameFr || vaccine.name;
+    case 'ar':
+      return vaccine.nameAr || vaccine.nameFr || vaccine.name;
+    default:
+      return vaccine.nameFr || vaccine.name;
   }
 }
 

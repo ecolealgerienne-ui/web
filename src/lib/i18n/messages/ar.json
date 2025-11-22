@@ -29,6 +29,7 @@
       "info": "معلومة",
       "noData": "لا توجد بيانات متاحة",
       "loading": "جاري التحميل...",
+      "loadError": "تعذر تحميل البيانات",
       "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
       "actionIrreversible": "هذا الإجراء لا رجعة فيه."
     },
@@ -116,11 +117,50 @@
   },
   "vaccines": {
     "title": "اللقاحات",
-    "subtitle": "إدارة اللقاحات المتاحة",
+    "subtitle": "بيانات مرجعية - اللقاحات المتاحة للقطيع",
     "newItem": "لقاح جديد",
+    "editItem": "تعديل اللقاح",
+    "deleteVaccine": "حذف اللقاح",
     "listTitle": "قائمة اللقاحات",
     "emptyMessage": "لا توجد لقاحات مسجلة.",
-    "emptyAction": "انقر على \"لقاح جديد\" لإضافة واحد."
+    "emptyAction": "انقر على \"لقاح جديد\" لإضافة واحد.",
+    "noVaccines": "لم يتم العثور على لقاحات لهذا الفلتر.",
+    "vaccineCount": "{count} لقاح معروض",
+    "vaccineCount_plural": "{count} لقاحات معروضة",
+    "filters": {
+      "showInactive": "إظهار اللقاحات المعطلة"
+    },
+    "fields": {
+      "id": "المعرف",
+      "nameFr": "الاسم (بالفرنسية)",
+      "nameEn": "الاسم (بالإنجليزية)",
+      "nameAr": "الاسم (بالعربية)",
+      "description": "الوصف (اختياري)",
+      "manufacturer": "الشركة المصنعة",
+      "diseaseTarget": "المرض المستهدف",
+      "displayOrder": "ترتيب العرض",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "id": "مثال: rabies-vaccine",
+      "nameFr": "مثال: Vaccin contre la rage",
+      "nameEn": "مثال: Rabies Vaccine",
+      "nameAr": "لقاح داء الكلب",
+      "description": "وصف اللقاح",
+      "manufacturer": "مثال: Laborat Pharma",
+      "diseaseTarget": "مثال: داء الكلب"
+    },
+    "messages": {
+      "created": "تم إنشاء اللقاح بنجاح",
+      "updated": "تم تعديل اللقاح بنجاح",
+      "deleted": "تم تعطيل اللقاح بنجاح (حذف منطقي)",
+      "createError": "خطأ في إنشاء اللقاح",
+      "updateError": "خطأ في تعديل اللقاح",
+      "deleteError": "خطأ في حذف اللقاح",
+      "confirmDelete": "هل أنت متأكد أنك تريد تعطيل اللقاح {name}؟",
+      "confirmDeleteDetails": "سيتم وضع علامة على هذا اللقاح كغير نشط (حذف منطقي). لن يتم حذف البيانات فعليًا.",
+      "infoMessage": "اللقاحات هي بيانات مرجعية يديرها المسؤولون. يمكنك إنشاء أو تعديل أو تعطيل اللقاحات. اللقاحات المعطلة تبقى في قاعدة البيانات لكنها غير مرئية بشكل افتراضي."
+    }
   },
   "diseases": {
     "title": "الأمراض",

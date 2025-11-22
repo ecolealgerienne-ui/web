@@ -29,6 +29,7 @@
       "info": "Information",
       "noData": "Aucune donnée disponible",
       "loading": "Chargement en cours...",
+      "loadError": "Impossible de charger les données",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
       "actionIrreversible": "Cette action est irréversible."
     },
@@ -116,11 +117,50 @@
   },
   "vaccines": {
     "title": "Vaccins",
-    "subtitle": "Gestion des vaccins disponibles",
+    "subtitle": "Données de référence - vaccins disponibles pour le cheptel",
     "newItem": "Nouveau vaccin",
+    "editItem": "Modifier le vaccin",
+    "deleteVaccine": "Supprimer le vaccin",
     "listTitle": "Liste des vaccins",
     "emptyMessage": "Aucun vaccin enregistré.",
-    "emptyAction": "Cliquez sur \"Nouveau vaccin\" pour en ajouter un."
+    "emptyAction": "Cliquez sur \"Nouveau vaccin\" pour en ajouter un.",
+    "noVaccines": "Aucun vaccin trouvé pour ce filtre.",
+    "vaccineCount": "{count} vaccin affiché",
+    "vaccineCount_plural": "{count} vaccins affichés",
+    "filters": {
+      "showInactive": "Afficher les vaccins désactivés"
+    },
+    "fields": {
+      "id": "Identifiant",
+      "nameFr": "Nom (français)",
+      "nameEn": "Nom (anglais)",
+      "nameAr": "Nom (arabe)",
+      "description": "Description (optionnelle)",
+      "manufacturer": "Fabricant",
+      "diseaseTarget": "Maladie ciblée",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "id": "ex: rabies-vaccine",
+      "nameFr": "ex: Vaccin contre la rage",
+      "nameEn": "ex: Rabies Vaccine",
+      "nameAr": "مثال: لقاح داء الكلب",
+      "description": "Description du vaccin",
+      "manufacturer": "ex: Laborat Pharma",
+      "diseaseTarget": "ex: Rage"
+    },
+    "messages": {
+      "created": "Vaccin créé avec succès",
+      "updated": "Vaccin modifié avec succès",
+      "deleted": "Vaccin désactivé avec succès (suppression logique)",
+      "createError": "Erreur lors de la création du vaccin",
+      "updateError": "Erreur lors de la modification du vaccin",
+      "deleteError": "Erreur lors de la suppression du vaccin",
+      "confirmDelete": "Êtes-vous sûr de vouloir désactiver le vaccin {name} ?",
+      "confirmDeleteDetails": "Ce vaccin sera marqué comme inactif (suppression logique). Les données ne seront pas supprimées physiquement.",
+      "infoMessage": "Les vaccins sont des données de référence administrées. Vous pouvez créer, modifier ou désactiver des vaccins. Les vaccins désactivés restent en base de données mais ne sont plus visibles par défaut."
+    }
   },
   "diseases": {
     "title": "Maladies",
