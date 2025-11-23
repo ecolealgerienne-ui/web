@@ -56,15 +56,35 @@ class VaccinesService {
       if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
 
       const url = `/farms/${TEMP_FARM_ID}/vaccines${params.toString() ? `?${params}` : ''}`;
-      const response = await apiClient.get<{ data: Vaccine[] }>(url);
-      logger.info('Vaccines fetched', { count: response.data?.length || 0 });
-      return response.data || [];
+      logger.info('Fetching vaccines from', { url });
+
+      const response = await apiClient.get<any>(url);
+      logger.info('Vaccines response received', {
+        responseType: typeof response,
+        isArray: Array.isArray(response),
+        hasData: 'data' in response,
+        response: JSON.stringify(response).substring(0, 200)
+      });
+
+      // Handle both response formats: { data: [...] } or direct array [...]
+      let vaccines: Vaccine[];
+      if (Array.isArray(response)) {
+        vaccines = response;
+      } else if (response && typeof response === 'object' && 'data' in response) {
+        vaccines = response.data || [];
+      } else {
+        logger.warn('Unexpected response format', { response });
+        vaccines = [];
+      }
+
+      logger.info('Vaccines fetched', { count: vaccines.length });
+      return vaccines;
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No vaccines found (404)');
         return [];
       }
-      logger.error('Failed to fetch vaccines', { error });
+      logger.error('Failed to fetch vaccines', { error: error.message, status: error.status });
       throw error;
     }
   }

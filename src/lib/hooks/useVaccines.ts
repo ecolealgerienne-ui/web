@@ -20,18 +20,21 @@ export function useVaccines(filters?: Partial<VaccineFilters>): UseVaccinesResul
   const [error, setError] = useState<Error | null>(null);
 
   const fetchVaccines = useCallback(async () => {
+    logger.info('useVaccines: Starting fetch', { filters });
     setLoading(true);
     setError(null);
 
     try {
       const data = await vaccinesService.getAll(filters);
+      logger.info('useVaccines: Data received', { count: data.length, data });
       setVaccines(data);
     } catch (err) {
       const error = err as Error;
       setError(error);
-      logger.error('Failed to fetch vaccines in hook', { error });
+      logger.error('Failed to fetch vaccines in hook', { error: error.message, stack: error.stack });
     } finally {
       setLoading(false);
+      logger.info('useVaccines: Fetch completed');
     }
   }, [filters?.search, filters?.isActive]);
 
