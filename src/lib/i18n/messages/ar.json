@@ -30,7 +30,8 @@
       "noData": "لا توجد بيانات متاحة",
       "loading": "جاري التحميل...",
       "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
-      "actionIrreversible": "هذا الإجراء لا رجعة فيه."
+      "actionIrreversible": "هذا الإجراء لا رجعة فيه.",
+      "loadError": "خطأ في تحميل البيانات"
     },
     "fields": {
       "name": "الاسم",

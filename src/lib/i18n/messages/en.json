@@ -30,7 +30,8 @@
       "noData": "No data available",
       "loading": "Loading...",
       "confirmDelete": "Are you sure you want to delete this item?",
-      "actionIrreversible": "This action is irreversible."
+      "actionIrreversible": "This action is irreversible.",
+      "loadError": "Error loading data"
     },
     "fields": {
       "name": "Name",

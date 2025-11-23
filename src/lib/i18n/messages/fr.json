@@ -30,7 +30,8 @@
       "noData": "Aucune donnée disponible",
       "loading": "Chargement en cours...",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
-      "actionIrreversible": "Cette action est irréversible."
+      "actionIrreversible": "Cette action est irréversible.",
+      "loadError": "Erreur lors du chargement des données"
     },
     "fields": {
       "name": "Nom",
