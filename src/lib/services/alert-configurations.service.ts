@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api/client'
 import { AlertConfiguration, CreateAlertConfigurationDto, UpdateAlertConfigurationDto, AlertType } from '@/lib/types/alert-configuration'
 import { logger } from '@/lib/utils/logger'
 
-const TEMP_FARM_ID = 'a37a7e4c-c70d-4e7e-abc9-0eb5faaa6842'
+const TEMP_FARM_ID = 'd3934abb-13d2-4950-8d1c-f8ab4628e762'
 
 class AlertConfigurationsService {
   private getBasePath() {

@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api/client';
 import { Lot, LotFilters, LotAnimal } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
 
-const TEMP_FARM_ID = 'a37a7e4c-c70d-4e7e-abc9-0eb5faaa6842';
+const TEMP_FARM_ID = 'd3934abb-13d2-4950-8d1c-f8ab4628e762';
 
 export interface CreateLotDto {
   name: string;
