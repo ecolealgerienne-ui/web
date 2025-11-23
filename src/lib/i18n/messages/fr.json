@@ -1004,6 +1004,36 @@
       "health": "Santé & Bien-être",
       "production": "Production & Performance",
       "financial": "Finances & Réglementaire"
+    },
+    "definitions": {
+      "herd-inventory": {
+        "name": "Inventaire du Cheptel",
+        "description": "État complet du cheptel par espèce, âge et statut"
+      },
+      "vaccinations-report": {
+        "name": "Registre de Vaccinations",
+        "description": "Historique des vaccinations et calendrier à venir"
+      },
+      "treatments-report": {
+        "name": "Registre des Traitements",
+        "description": "Historique des traitements et délais d'attente"
+      },
+      "movements-report": {
+        "name": "Mouvements d'Animaux",
+        "description": "Entrées, sorties, naissances et décès"
+      },
+      "growth-report": {
+        "name": "Croissance et Performance",
+        "description": "Évolution des poids et gains moyens quotidiens"
+      },
+      "health-report": {
+        "name": "Bilan Sanitaire",
+        "description": "Taux de morbidité, mortalité et incidents sanitaires"
+      },
+      "financial-report": {
+        "name": "Rapport Financier",
+        "description": "Coûts des soins vétérinaires et revenus"
+      }
     }
   },
   "settings": {

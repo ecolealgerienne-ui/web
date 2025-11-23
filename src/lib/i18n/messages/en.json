@@ -958,6 +958,36 @@
       "health": "Health & Wellness",
       "production": "Production & Performance",
       "financial": "Finance & Regulatory"
+    },
+    "definitions": {
+      "herd-inventory": {
+        "name": "Herd Inventory",
+        "description": "Complete herd status by species, age and status"
+      },
+      "vaccinations-report": {
+        "name": "Vaccination Register",
+        "description": "Vaccination history and upcoming schedule"
+      },
+      "treatments-report": {
+        "name": "Treatment Register",
+        "description": "Treatment history and withdrawal periods"
+      },
+      "movements-report": {
+        "name": "Animal Movements",
+        "description": "Entries, exits, births and deaths"
+      },
+      "growth-report": {
+        "name": "Growth and Performance",
+        "description": "Weight evolution and average daily gains"
+      },
+      "health-report": {
+        "name": "Health Report",
+        "description": "Morbidity, mortality rates and health incidents"
+      },
+      "financial-report": {
+        "name": "Financial Report",
+        "description": "Veterinary care costs and revenue"
+      }
     }
   },
   "settings": {

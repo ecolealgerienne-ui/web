@@ -1004,6 +1004,36 @@
       "health": "الصحة والرفاهية",
       "production": "الإنتاج والأداء",
       "financial": "المالية والتنظيمية"
+    },
+    "definitions": {
+      "herd-inventory": {
+        "name": "جرد القطيع",
+        "description": "الحالة الكاملة للقطيع حسب النوع والعمر والحالة"
+      },
+      "vaccinations-report": {
+        "name": "سجل التطعيمات",
+        "description": "تاريخ التطعيمات والجدول القادم"
+      },
+      "treatments-report": {
+        "name": "سجل العلاجات",
+        "description": "تاريخ العلاجات وفترات الانتظار"
+      },
+      "movements-report": {
+        "name": "حركات الحيوانات",
+        "description": "المداخل والمخارج والولادات والوفيات"
+      },
+      "growth-report": {
+        "name": "النمو والأداء",
+        "description": "تطور الأوزان والمكاسب اليومية المتوسطة"
+      },
+      "health-report": {
+        "name": "التقرير الصحي",
+        "description": "معدلات المرض والوفيات والحوادث الصحية"
+      },
+      "financial-report": {
+        "name": "التقرير المالي",
+        "description": "تكاليف الرعاية البيطرية والإيرادات"
+      }
     }
   },
   "settings": {

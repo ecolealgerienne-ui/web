@@ -111,9 +111,9 @@ export default function ReportsPage() {
                           <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <CardTitle className="text-base">{report.name}</CardTitle>
+                          <CardTitle className="text-base">{t(`definitions.${report.id}.name`)}</CardTitle>
                           <CardDescription className="text-xs mt-1">
-                            {report.description}
+                            {t(`definitions.${report.id}.description`)}
                           </CardDescription>
                         </div>
                       </div>
@@ -149,9 +149,9 @@ export default function ReportsPage() {
                           <Icon className="h-5 w-5 text-green-600 dark:text-green-400" />
                         </div>
                         <div>
-                          <CardTitle className="text-base">{report.name}</CardTitle>
+                          <CardTitle className="text-base">{t(`definitions.${report.id}.name`)}</CardTitle>
                           <CardDescription className="text-xs mt-1">
-                            {report.description}
+                            {t(`definitions.${report.id}.description`)}
                           </CardDescription>
                         </div>
                       </div>
