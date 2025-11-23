@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { REPORT_DEFINITIONS, ReportPeriod } from '@/lib/types/report';
 import { useTranslations } from '@/lib/i18n';
@@ -71,18 +71,22 @@ export default function ReportsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="period">{t('period.label')}</Label>
               <Select
-                id="period"
                 value={period}
-                onChange={(e) => setPeriod(e.target.value as ReportPeriod)}
+                onValueChange={(value) => setPeriod(value as ReportPeriod)}
               >
-                <option value="week">{t('period.week')}</option>
-                <option value="month">{t('period.month')}</option>
-                <option value="quarter">{t('period.quarter')}</option>
-                <option value="year">{t('period.year')}</option>
-                <option value="custom">{t('settings.customPeriod')}</option>
+                <SelectTrigger id="period">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">{t('period.week')}</SelectItem>
+                  <SelectItem value="month">{t('period.month')}</SelectItem>
+                  <SelectItem value="quarter">{t('period.quarter')}</SelectItem>
+                  <SelectItem value="year">{t('period.year')}</SelectItem>
+                  <SelectItem value="custom">{t('settings.customPeriod')}</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div className="flex items-end">
