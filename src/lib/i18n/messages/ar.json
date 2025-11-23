@@ -421,6 +421,11 @@
       "currentLocation": "مثال: المرعى الشمالي",
       "notes": "ملاحظات إضافية..."
     },
+    "actions": {
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ..."
+    },
     "messages": {
       "loadError": "تعذر تحميل الحيوانات",
       "created": "تم إنشاء الحيوان بنجاح",
@@ -546,7 +551,8 @@
       "adverseReactions": "ردود الفعل السلبية",
       "certificateNumber": "رقم الشهادة",
       "status": "الحالة",
-      "notes": "ملاحظات"
+      "notes": "ملاحظات",
+      "cost": "التكلفة"
     },
     "routes": {
       "SC": "تحت الجلد (SC)",

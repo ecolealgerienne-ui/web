@@ -421,6 +421,11 @@
       "currentLocation": "E.g.: North Pasture",
       "notes": "Additional notes..."
     },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
     "messages": {
       "loadError": "Unable to load animals",
       "created": "Animal created successfully",
@@ -546,7 +551,8 @@
       "adverseReactions": "Adverse reactions",
       "certificateNumber": "Certificate number",
       "status": "Status",
-      "notes": "Notes"
+      "notes": "Notes",
+      "cost": "Cost"
     },
     "routes": {
       "SC": "Subcutaneous (SC)",

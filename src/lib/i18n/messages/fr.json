@@ -421,6 +421,11 @@
       "currentLocation": "Ex: Pâturage Nord",
       "notes": "Notes additionnelles..."
     },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
     "messages": {
       "loadError": "Impossible de charger les animaux",
       "created": "Animal créé avec succès",
@@ -546,7 +551,8 @@
       "adverseReactions": "Réactions indésirables",
       "certificateNumber": "N° de certificat",
       "status": "Statut",
-      "notes": "Notes"
+      "notes": "Notes",
+      "cost": "Coût"
     },
     "routes": {
       "SC": "Sous-cutanée (SC)",
