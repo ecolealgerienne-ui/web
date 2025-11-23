@@ -8,56 +8,49 @@ class WeighingsService {
   async getAll(filters?: Partial<WeighingFilters>): Promise<Weighing[]> {
     try {
       const params = new URLSearchParams();
-      if (filters?.purpose && filters.purpose !== 'all') params.append('purpose', filters.purpose);
-      if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
-      if (filters?.dateTo) params.append('dateTo', filters.dateTo);
-      if (filters?.minWeight) params.append('minWeight', filters.minWeight.toString());
-      if (filters?.maxWeight) params.append('maxWeight', filters.maxWeight.toString());
-      if (filters?.search) params.append('search', filters.search);
+      // Map frontend filters to API query params as per WEB_API_SPECIFICATIONS.md
+      // API endpoint is /weights (not /weighings)
+      if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.source) params.append('source', filters.source);
+      if (filters?.dateFrom) params.append('fromDate', filters.dateFrom);
+      if (filters?.dateTo) params.append('toDate', filters.dateTo);
 
-      const url = `/farms/${TEMP_FARM_ID}/weighings${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `/farms/${TEMP_FARM_ID}/weights${params.toString() ? `?${params.toString()}` : ''}`;
       const response = await apiClient.get<{ data: Weighing[] }>(url);
       return response.data || [];
     } catch (error: any) {
       if (error.status === 404) {
-        logger.info('No weighings found (404)');
+        logger.info('No weights found (404)');
         return [];
       }
-      logger.error('Failed to fetch weighings', error);
+      logger.error('Failed to fetch weights', error);
       throw error;
     }
   }
 
   async getById(id: string): Promise<Weighing> {
-    const response = await apiClient.get<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weighings/${id}`);
+    const response = await apiClient.get<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weights/${id}`);
     return response.data;
   }
 
   async getByAnimalId(animalId: string): Promise<Weighing[]> {
-    try {
-      const response = await apiClient.get<{ data: Weighing[] }>(`/farms/${TEMP_FARM_ID}/animals/${animalId}/weighings`);
-      return response.data || [];
-    } catch (error: any) {
-      if (error.status === 404) {
-        logger.info(`No weighings found for animal ${animalId} (404)`);
-        return [];
-      }
-      throw error;
-    }
+    // Use getAll with animalId filter as per API specs
+    return this.getAll({ animalId });
   }
 
   async create(data: CreateWeighingDto): Promise<Weighing> {
-    const response = await apiClient.post<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weighings`, data);
+    const response = await apiClient.post<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weights`, data);
     return response.data;
   }
 
   async update(id: string, data: UpdateWeighingDto): Promise<Weighing> {
-    const response = await apiClient.patch<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weighings/${id}`, data);
+    // Use PUT as per API specs (not PATCH)
+    const response = await apiClient.put<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weights/${id}`, data);
     return response.data;
   }
 
   async delete(id: string): Promise<void> {
-    await apiClient.delete(`/farms/${TEMP_FARM_ID}/weighings/${id}`);
+    await apiClient.delete(`/farms/${TEMP_FARM_ID}/weights/${id}`);
   }
 }
 
