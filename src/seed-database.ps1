@@ -112,109 +112,10 @@ foreach ($breedData in $breedsData) {
 Write-Host "`n  -> $($global:Data.Breeds.Count) races creees`n" -ForegroundColor Green
 
 # ============================================================================
-# PHASE 2: CREER LES PRODUITS MEDICAUX
+# PHASE 2: CREER LA FERME
 # ============================================================================
 
-Write-Host "[2/10] Creation des produits medicaux..." -ForegroundColor Green
-
-$productsData = @(
-    # Antibiotiques
-    @{nameFr="Oxytetracycline 20%"; nameEn="Oxytetracycline 20%"; nameAr="Oksitatrasikleen 20%"; category="Antibiotique"; manufacturer="Vetoquinol"; withdrawalPeriodDays=28; unit="ml"},
-    @{nameFr="Penicilline G"; nameEn="Penicillin G"; nameAr="Benisilin G"; category="Antibiotique"; manufacturer="MSD"; withdrawalPeriodDays=14; unit="ml"},
-    @{nameFr="Amoxicilline"; nameEn="Amoxicillin"; nameAr="Amouksisillin"; category="Antibiotique"; manufacturer="Ceva"; withdrawalPeriodDays=21; unit="ml"},
-
-    # Antiparasitaires
-    @{nameFr="Ivermectine 1%"; nameEn="Ivermectin 1%"; nameAr="Ivermektine 1%"; category="Antiparasitaire"; manufacturer="Merial"; withdrawalPeriodDays=35; unit="ml"},
-    @{nameFr="Albendazole 10%"; nameEn="Albendazole 10%"; nameAr="Albendazol 10%"; category="Antiparasitaire"; manufacturer="Virbac"; withdrawalPeriodDays=14; unit="ml"},
-    @{nameFr="Moxidectine 1%"; nameEn="Moxidectin 1%"; nameAr="Moksiditine 1%"; category="Antiparasitaire"; manufacturer="Zoetis"; withdrawalPeriodDays=28; unit="ml"},
-
-    # Vitamines et supplements
-    @{nameFr="Vitamine AD3E"; nameEn="Vitamin AD3E"; nameAr="Fitamin AD3E"; category="Vitamine"; manufacturer="Vetoquinol"; withdrawalPeriodDays=0; unit="ml"},
-    @{nameFr="Selenium + Vitamine E"; nameEn="Selenium + Vitamin E"; nameAr="Silinyoum + Fitamin E"; category="Vitamine"; manufacturer="Ceva"; withdrawalPeriodDays=0; unit="ml"},
-
-    # Anti-inflammatoires
-    @{nameFr="Flunixine 50mg/ml"; nameEn="Flunixin 50mg/ml"; nameAr="Flouniksine 50mg/ml"; category="Anti-inflammatoire"; manufacturer="MSD"; withdrawalPeriodDays=7; unit="ml"},
-    @{nameFr="Meloxicam 20mg/ml"; nameEn="Meloxicam 20mg/ml"; nameAr="Meloksikam 20mg/ml"; category="Anti-inflammatoire"; manufacturer="Boehringer"; withdrawalPeriodDays=5; unit="ml"}
-)
-
-$counter = 1
-foreach ($productData in $productsData) {
-    $product = @{
-        id = [guid]::NewGuid().ToString()
-        nameFr = $productData.nameFr
-        nameEn = $productData.nameEn
-        nameAr = $productData.nameAr
-        category = $productData.category
-        manufacturer = $productData.manufacturer
-        withdrawalPeriodDays = $productData.withdrawalPeriodDays
-        unit = $productData.unit
-        displayOrder = $counter
-        isActive = $true
-    }
-
-    $created = Invoke-ApiCall -Method "POST" -Endpoint "/api/v1/products" -Body $product
-    if ($created) {
-        $productId = if ($created.id) { $created.id } else { $product.id }
-        $global:Data.Products += @{
-            Id = $productId
-            Name = $productData.nameFr
-        }
-        Write-Host "  [OK] $($productData.nameFr)" -ForegroundColor Gray
-    }
-    $counter++
-}
-
-Write-Host "`n  -> $($global:Data.Products.Count) produits crees`n" -ForegroundColor Green
-
-# ============================================================================
-# PHASE 3: CREER LES VACCINS
-# ============================================================================
-
-Write-Host "[3/10] Creation des vaccins..." -ForegroundColor Green
-
-$vaccinesData = @(
-    @{nameFr="Enterotoxemie"; nameEn="Enterotoxemia"; nameAr="Antarotoksimiya"; disease="Enterotoxemie"; manufacturer="Merial"; type="obligatoire"; withdrawalPeriodDays=0},
-    @{nameFr="Fievre Aphteuse"; nameEn="Foot-and-Mouth Disease"; nameAr="Al-Houmma Al-Qala'iya"; disease="Fievre aphteuse"; manufacturer="Ceva"; type="obligatoire"; withdrawalPeriodDays=0},
-    @{nameFr="Brucellose"; nameEn="Brucellosis"; nameAr="Dawaa Al-Bourossila"; disease="Brucellose"; manufacturer="Merial"; type="obligatoire"; withdrawalPeriodDays=0},
-    @{nameFr="Pasteurellose"; nameEn="Pasteurellosis"; nameAr="Bastoriloze"; disease="Pasteurellose"; manufacturer="Zoetis"; type="recommande"; withdrawalPeriodDays=0},
-    @{nameFr="Charbon Symptomatique"; nameEn="Blackleg"; nameAr="Charbon"; disease="Charbon symptomatique"; manufacturer="Virbac"; type="recommande"; withdrawalPeriodDays=0},
-    @{nameFr="Rage"; nameEn="Rabies"; nameAr="Dawaa Al-Kalab"; disease="Rage"; manufacturer="MSD"; type="obligatoire"; withdrawalPeriodDays=0}
-)
-
-$counter = 1
-foreach ($vaccineData in $vaccinesData) {
-    $vaccine = @{
-        id = [guid]::NewGuid().ToString()
-        nameFr = $vaccineData.nameFr
-        nameEn = $vaccineData.nameEn
-        nameAr = $vaccineData.nameAr
-        disease = $vaccineData.disease
-        manufacturer = $vaccineData.manufacturer
-        type = $vaccineData.type
-        withdrawalPeriodDays = $vaccineData.withdrawalPeriodDays
-        displayOrder = $counter
-        isActive = $true
-    }
-
-    $created = Invoke-ApiCall -Method "POST" -Endpoint "/api/v1/vaccines" -Body $vaccine
-    if ($created) {
-        $vaccineId = if ($created.id) { $created.id } else { $vaccine.id }
-        $global:Data.Vaccines += @{
-            Id = $vaccineId
-            Name = $vaccineData.nameFr
-        }
-        Write-Host "  [OK] $($vaccineData.nameFr)" -ForegroundColor Gray
-    }
-    $counter++
-}
-
-Write-Host "`n  -> $($global:Data.Vaccines.Count) vaccins crees`n" -ForegroundColor Green
-
-# ============================================================================
-# PHASE 4: CREER LA FERME
-# ============================================================================
-
-Write-Host "[4/10] Creation de la ferme..." -ForegroundColor Green
+Write-Host "[2/10] Creation de la ferme..." -ForegroundColor Green
 
 $farm = @{
     id = [guid]::NewGuid().ToString()
@@ -234,6 +135,111 @@ if ($createdFarm) {
     Write-Host "  [FAIL] Impossible de creer la ferme" -ForegroundColor Red
     exit 1
 }
+
+# ============================================================================
+# PHASE 3: CREER LES PRODUITS MEDICAUX (par ferme)
+# ============================================================================
+
+Write-Host "[3/10] Creation des produits medicaux..." -ForegroundColor Green
+
+$productsData = @(
+    # Antibiotiques
+    @{name="Oxytetracycline 20%"; category="antibiotic"; manufacturer="Vetoquinol"; withdrawalPeriodMeat=28; withdrawalPeriodMilk=72; stockUnit="ml"},
+    @{name="Penicilline G"; category="antibiotic"; manufacturer="MSD"; withdrawalPeriodMeat=14; withdrawalPeriodMilk=48; stockUnit="ml"},
+    @{name="Amoxicilline"; category="antibiotic"; manufacturer="Ceva"; withdrawalPeriodMeat=21; withdrawalPeriodMilk=60; stockUnit="ml"},
+
+    # Antiparasitaires
+    @{name="Ivermectine 1%"; category="antiparasitic"; manufacturer="Merial"; withdrawalPeriodMeat=35; withdrawalPeriodMilk=0; stockUnit="ml"},
+    @{name="Albendazole 10%"; category="antiparasitic"; manufacturer="Virbac"; withdrawalPeriodMeat=14; withdrawalPeriodMilk=0; stockUnit="ml"},
+    @{name="Moxidectine 1%"; category="antiparasitic"; manufacturer="Zoetis"; withdrawalPeriodMeat=28; withdrawalPeriodMilk=0; stockUnit="ml"},
+
+    # Vitamines
+    @{name="Vitamine AD3E"; category="vitamin"; manufacturer="Vetoquinol"; withdrawalPeriodMeat=0; withdrawalPeriodMilk=0; stockUnit="ml"},
+    @{name="Selenium + Vitamine E"; category="vitamin"; manufacturer="Ceva"; withdrawalPeriodMeat=0; withdrawalPeriodMilk=0; stockUnit="ml"},
+
+    # Anti-inflammatoires
+    @{name="Flunixine 50mg/ml"; category="anti-inflammatory"; manufacturer="MSD"; withdrawalPeriodMeat=7; withdrawalPeriodMilk=24; stockUnit="ml"},
+    @{name="Meloxicam 20mg/ml"; category="anti-inflammatory"; manufacturer="Boehringer"; withdrawalPeriodMeat=5; withdrawalPeriodMilk=24; stockUnit="ml"}
+)
+
+$counter = 1
+foreach ($productData in $productsData) {
+    $product = @{
+        name = $productData.name
+        category = $productData.category
+        manufacturer = $productData.manufacturer
+        withdrawalPeriodMeat = $productData.withdrawalPeriodMeat
+        withdrawalPeriodMilk = $productData.withdrawalPeriodMilk
+        stockUnit = $productData.stockUnit
+        currentStock = Get-Random -Minimum 10 -Maximum 100
+        minStock = 10
+        unitPrice = [math]::Round((Get-Random -Minimum 10 -Maximum 50) + (Get-Random) * 9.99, 2)
+        isActive = $true
+    }
+
+    $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/medical-products" -Body $product
+    if ($created) {
+        $productId = if ($created.id) { $created.id } elseif ($created.data.id) { $created.data.id } else { $null }
+        if ($productId) {
+            $global:Data.Products += @{
+                Id = $productId
+                Name = $productData.name
+            }
+            Write-Host "  [OK] $($productData.name)" -ForegroundColor Gray
+        }
+    }
+    $counter++
+}
+
+Write-Host "`n  -> $($global:Data.Products.Count) produits crees`n" -ForegroundColor Green
+
+# ============================================================================
+# PHASE 4: CREER LES VACCINS (par ferme)
+# ============================================================================
+
+Write-Host "[4/10] Creation des vaccins..." -ForegroundColor Green
+
+$vaccinesData = @(
+    @{name="Enterotoxemie"; disease="Enterotoxemie"; manufacturer="Merial"; species=@("sheep", "goat")},
+    @{name="Fievre Aphteuse"; disease="Fievre aphteuse"; manufacturer="Ceva"; species=@("cattle", "sheep", "goat")},
+    @{name="Brucellose"; disease="Brucellose"; manufacturer="Merial"; species=@("cattle", "sheep", "goat")},
+    @{name="Pasteurellose"; disease="Pasteurellose"; manufacturer="Zoetis"; species=@("sheep", "goat")},
+    @{name="Charbon Symptomatique"; disease="Charbon symptomatique"; manufacturer="Virbac"; species=@("cattle")},
+    @{name="Rage"; disease="Rage"; manufacturer="MSD"; species=@("cattle", "sheep", "goat")}
+)
+
+$counter = 1
+foreach ($vaccineData in $vaccinesData) {
+    $vaccine = @{
+        name = $vaccineData.name
+        description = "Vaccin contre $($vaccineData.disease)"
+        manufacturer = $vaccineData.manufacturer
+        targetSpecies = $vaccineData.species
+        targetDiseases = @($vaccineData.disease)
+        standardDose = 2
+        injectionsRequired = 1
+        injectionIntervalDays = 0
+        meatWithdrawalDays = 0
+        milkWithdrawalDays = 0
+        administrationRoute = "Sous-cutanee"
+        isActive = $true
+    }
+
+    $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/vaccines" -Body $vaccine
+    if ($created) {
+        $vaccineId = if ($created.id) { $created.id } elseif ($created.data.id) { $created.data.id } else { $null }
+        if ($vaccineId) {
+            $global:Data.Vaccines += @{
+                Id = $vaccineId
+                Name = $vaccineData.name
+            }
+            Write-Host "  [OK] $($vaccineData.name)" -ForegroundColor Gray
+        }
+    }
+    $counter++
+}
+
+Write-Host "`n  -> $($global:Data.Vaccines.Count) vaccins crees`n" -ForegroundColor Green
 
 # ============================================================================
 # PHASE 5: CREER LES ANIMAUX
@@ -326,9 +332,9 @@ Write-Host "[6/10] Creation des lots..." -ForegroundColor Green
 
 if ($global:Data.Animals.Count -ge 3) {
     $lotsData = @(
-        @{name="Lot Engraissement Hiver"; nameFr="Lot Engraissement Hiver"; nameEn="Winter Fattening Batch"; nameAr="Majmou'at Al-Tasmin Al-Shita'i"; type="fattening"; status="open"},
-        @{name="Lot Reproduction Printemps"; nameFr="Lot Reproduction Printemps"; nameEn="Spring Breeding Batch"; nameAr="Majmou'at Al-Takathur Al-Rabi'i"; type="breeding"; status="open"},
-        @{name="Lot Agnelage 2025"; nameFr="Lot Agnelage 2025"; nameEn="Lambing Batch 2025"; nameAr="Majmou'at Al-Wilada 2025"; type="breeding"; status="open"}
+        @{name="Lot Engraissement Hiver"; type="fattening"; status="open"},
+        @{name="Lot Reproduction Printemps"; type="breeding"; status="open"},
+        @{name="Lot Agnelage 2025"; type="breeding"; status="open"}
     )
 
     $counter = 0
@@ -537,7 +543,7 @@ if ($global:Data.Animals.Count -ge 2) {
             }
             "sale" {
                 $movement.buyerName = $movementData.buyerSellerName
-                $movement.buyerType = "cooperative"
+                $movement.buyerType = "farm"
                 $movement.salePrice = $movementData.price
             }
         }
