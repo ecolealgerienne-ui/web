@@ -879,6 +879,19 @@
       "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
       "addDescription": "إضافة وزن جديد",
       "editDescription": "تعديل معلومات الوزن"
+    },
+    "filters": "الفلاتر",
+    "searchPlaceholder": "بحث...",
+    "list": "قائمة الوزن",
+    "loading": "جاري التحميل...",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "labels": {
+      "animal": "الحيوان",
+      "gain": "الزيادة",
+      "rate": "المعدل",
+      "method": "الطريقة",
+      "perDay": "كغ/يوم"
     }
   },
   "homepage": {
@@ -936,7 +949,29 @@
       "totalAnimals": "الحيوانات المعنية"
     },
     "loading": "جاري التحميل...",
-    "noLots": "لم يتم العثور على قطعان"
+    "noLots": "لم يتم العثور على قطعان",
+    "filters": {
+      "search": "بحث",
+      "searchPlaceholder": "الاسم، الوصف، المنتج...",
+      "type": "نوع القطيع",
+      "typePlaceholder": "جميع الأنواع",
+      "allTypes": "جميع الأنواع",
+      "status": "الحالة",
+      "statusPlaceholder": "جميع الحالات",
+      "allStatuses": "جميع الحالات"
+    },
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "status": "الحالة",
+      "animals": "الحيوانات",
+      "date": "التاريخ",
+      "product": "المنتج/النشاط",
+      "amount": "المبلغ",
+      "actions": "الإجراءات",
+      "buyer": "المشتري",
+      "seller": "البائع"
+    }
   },
   "reports": {
     "title": "التقارير",

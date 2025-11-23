@@ -160,7 +160,7 @@ export default function WeighingsPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filtres</CardTitle>
+          <CardTitle>{t('filters')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
@@ -168,7 +168,7 @@ export default function WeighingsPage() {
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Rechercher..."
+                  placeholder={t('searchPlaceholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-8"
@@ -198,7 +198,7 @@ export default function WeighingsPage() {
       {/* Weighings List */}
       <Card>
         <CardHeader>
-          <CardTitle>Liste des pesées</CardTitle>
+          <CardTitle>{t('list')}</CardTitle>
           <CardDescription>
             {totalWeighings} pesée{totalWeighings !== 1 ? 's' : ''} au total
           </CardDescription>
@@ -206,7 +206,7 @@ export default function WeighingsPage() {
         <CardContent>
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">
-              Chargement...
+              {t('loading')}
             </div>
           ) : weighings.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -231,17 +231,17 @@ export default function WeighingsPage() {
                     <div className="flex gap-4 text-sm text-muted-foreground">
                       <span>🗓️ {new Date(weighing.weighingDate).toLocaleDateString('fr-FR')}</span>
                       {weighing.weighingTime && <span>🕐 {weighing.weighingTime}</span>}
-                      <span>🐄 Animal: {weighing.animalId}</span>
+                      <span>🐄 {t('labels.animal')}: {weighing.animalId}</span>
                     </div>
                     {weighing.weightGain && (
                       <div className="flex gap-4 mt-1 text-sm text-green-600">
-                        <span>📈 Gain: {weighing.weightGain} kg</span>
-                        {weighing.growthRate && <span>📊 Taux: {weighing.growthRate} kg/jour</span>}
+                        <span>📈 {t('labels.gain')}: {weighing.weightGain} kg</span>
+                        {weighing.growthRate && <span>📊 {t('labels.rate')}: {weighing.growthRate} {t('labels.perDay')}</span>}
                       </div>
                     )}
                     {weighing.method && (
                       <p className="text-sm text-muted-foreground">
-                        Méthode: {weighing.method}
+                        {t('labels.method')}: {weighing.method}
                       </p>
                     )}
                     {weighing.notes && (
@@ -294,9 +294,9 @@ export default function WeighingsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>
-              Supprimer
+              {t('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

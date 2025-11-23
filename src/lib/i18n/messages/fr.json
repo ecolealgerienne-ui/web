@@ -879,6 +879,19 @@
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
       "addDescription": "Ajoutez une nouvelle pesée",
       "editDescription": "Modifiez les informations de la pesée"
+    },
+    "filters": "Filtres",
+    "searchPlaceholder": "Rechercher...",
+    "list": "Liste des pesées",
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "labels": {
+      "animal": "Animal",
+      "gain": "Gain",
+      "rate": "Taux",
+      "method": "Méthode",
+      "perDay": "kg/jour"
     }
   },
   "homepage": {
@@ -936,7 +949,29 @@
       "totalAnimals": "Animaux concernés"
     },
     "loading": "Chargement...",
-    "noLots": "Aucun lot trouvé"
+    "noLots": "Aucun lot trouvé",
+    "filters": {
+      "search": "Recherche",
+      "searchPlaceholder": "Nom, description, produit...",
+      "type": "Type de lot",
+      "typePlaceholder": "Tous les types",
+      "allTypes": "Tous les types",
+      "status": "Statut",
+      "statusPlaceholder": "Tous les statuts",
+      "allStatuses": "Tous les statuts"
+    },
+    "table": {
+      "name": "Nom",
+      "type": "Type",
+      "status": "Statut",
+      "animals": "Animaux",
+      "date": "Date",
+      "product": "Produit/Activité",
+      "amount": "Montant",
+      "actions": "Actions",
+      "buyer": "Acheteur",
+      "seller": "Vendeur"
+    }
   },
   "reports": {
     "title": "Rapports",

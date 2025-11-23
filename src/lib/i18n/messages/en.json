@@ -817,10 +817,7 @@
     "noWeighings": "No weighings found",
     "weighingCount": "{count} weighing",
     "weighingCount_plural": "{count} weighings",
-    "filters": {
-      "allPurposes": "All purposes",
-      "search": "Search..."
-    },
+    "filters": "Filters",
     "purpose": {
       "routine": "Routine",
       "medical": "Medical",
@@ -881,6 +878,18 @@
       "deleteConfirmDescription": "Are you sure you want to delete this weighing?",
       "addDescription": "Record a new weighing",
       "editDescription": "Edit the weighing information"
+    },
+    "searchPlaceholder": "Search...",
+    "list": "Weighings list",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "labels": {
+      "animal": "Animal",
+      "gain": "Gain",
+      "rate": "Rate",
+      "method": "Method",
+      "perDay": "kg/day"
     }
   },
   "lots": {
@@ -894,7 +903,29 @@
       "totalAnimals": "Animals concerned"
     },
     "loading": "Loading...",
-    "noLots": "No lots found"
+    "noLots": "No lots found",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Name, description, product...",
+      "type": "Lot type",
+      "typePlaceholder": "All types",
+      "allTypes": "All types",
+      "status": "Status",
+      "statusPlaceholder": "All statuses",
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "animals": "Animals",
+      "date": "Date",
+      "product": "Product/Activity",
+      "amount": "Amount",
+      "actions": "Actions",
+      "buyer": "Buyer",
+      "seller": "Seller"
+    }
   },
   "reports": {
     "title": "Reports",
