@@ -7,8 +7,10 @@ import { LotsFilters } from '@/components/lots/lots-filters';
 import { LotsTable } from '@/components/lots/lots-table';
 import { useLots } from '@/lib/hooks/useLots';
 import { LotFilters } from '@/lib/types/lot';
+import { useTranslations } from '@/lib/i18n';
 
 export default function LotsPage() {
+  const t = useTranslations('lots');
   const [filters, setFilters] = useState<LotFilters>({
     search: '',
     type: 'all',
@@ -33,14 +35,14 @@ export default function LotsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Lots</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Gérez vos groupes d'animaux par activité
+            {t('subtitle')}
           </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Créer un lot
+          {t('newLot')}
         </Button>
       </div>
 
@@ -51,30 +53,30 @@ export default function LotsPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-6">
           <div className="text-2xl font-bold">{stats.total}</div>
-          <p className="text-xs text-muted-foreground">Lots totaux</p>
+          <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="text-2xl font-bold text-green-600">{stats.open}</div>
-          <p className="text-xs text-muted-foreground">Lots ouverts</p>
+          <p className="text-xs text-muted-foreground">{t('stats.open')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="text-2xl font-bold text-blue-600">{stats.closed}</div>
-          <p className="text-xs text-muted-foreground">Lots fermés</p>
+          <p className="text-xs text-muted-foreground">{t('stats.closed')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="text-2xl font-bold">{stats.totalAnimals}</div>
-          <p className="text-xs text-muted-foreground">Animaux concernés</p>
+          <p className="text-xs text-muted-foreground">{t('stats.totalAnimals')}</p>
         </div>
       </div>
 
       {/* Table */}
       {loading ? (
         <div className="text-center py-8 text-muted-foreground">
-          Chargement...
+          {t('loading')}
         </div>
       ) : lots.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
-          Aucun lot trouvé
+          {t('noLots')}
         </div>
       ) : (
         <LotsTable lots={lots} />

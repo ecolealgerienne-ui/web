@@ -6,10 +6,12 @@ import { useAuth } from "@/contexts/auth-context";
 import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { useTranslations } from "@/lib/i18n";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { user, logout, isAuthenticated } = useAuth();
+  const t = useTranslations('header.dashboard');
 
   return (
     <header className="border-b bg-card">
@@ -24,8 +26,8 @@ export function Header() {
           </div>
           {/* Desktop Title */}
           <div className="hidden md:block">
-            <h1 className="text-xl font-semibold">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Vue d&apos;ensemble</p>
+            <h1 className="text-xl font-semibold">{t('title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 md:gap-4">

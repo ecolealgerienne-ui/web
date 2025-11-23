@@ -42,6 +42,12 @@
       "required": "Requis"
     }
   },
+  "header": {
+    "dashboard": {
+      "title": "Tableau de bord",
+      "subtitle": "Vue d'ensemble"
+    }
+  },
   "navigation": {
     "menu": {
       "dashboard": "Tableau de bord",
@@ -803,78 +809,78 @@
     }
   },
   "weighings": {
-      "title": "Pesées",
-      "subtitle": "Suivez le poids et la croissance de votre troupeau",
-      "newWeighing": "Nouvelle pesée",
-      "fields": {
-        "animalId": "Animal",
-        "weight": "Poids",
-        "unit": "Unité",
-        "weighingDate": "Date de pesée",
-        "weighingTime": "Heure",
-        "purpose": "Objectif",
-        "method": "Méthode",
-        "location": "Emplacement",
-        "previousWeight": "Poids précédent",
-        "weightGain": "Gain de poids",
-        "growthRate": "Taux de croissance (par jour)",
-        "age": "Âge (jours)",
-        "recordedBy": "Enregistré par",
-        "notes": "Notes",
-        "conditions": "Conditions",
-        "dateFrom": "Date de début",
-        "dateTo": "Date de fin",
-        "minWeight": "Poids minimum",
-        "maxWeight": "Poids maximum"
-      },
-      "purpose": {
-        "all": "Tous",
-        "routine": "Routine",
-        "medical": "Médical",
-        "sale": "Vente",
-        "growth_monitoring": "Suivi de croissance",
-        "other": "Autre"
-      },
-      "units": {
-        "kg": "kg",
-        "lbs": "lbs"
-      },
-      "sections": {
-        "general": "Informations générales",
-        "data": "Données de pesée",
-        "growth": "Suivi de croissance",
-        "additional": "Informations supplémentaires"
-      },
-      "placeholders": {
-        "weight": "Entrez le poids",
-        "method": "ex: Balance électronique, bascule, ruban",
-        "location": "ex: Étable, pâturage",
-        "recordedBy": "Nom de la personne",
-        "notes": "Notes ou observations supplémentaires",
-        "conditions": "ex: À jeun, après repas",
-        "minWeight": "Poids min",
-        "maxWeight": "Poids max"
-      },
-      "stats": {
-        "total": "Total des pesées",
-        "routine": "Routine",
-        "medical": "Médical",
-        "avgWeight": "Poids moyen"
-      },
-      "messages": {
-        "noWeighings": "Aucune pesée trouvée",
-        "createSuccess": "Pesée créée avec succès",
-        "createError": "Erreur lors de la création de la pesée",
-        "updateSuccess": "Pesée mise à jour avec succès",
-        "updateError": "Erreur lors de la mise à jour de la pesée",
-        "deleteSuccess": "Pesée supprimée avec succès",
-        "deleteError": "Erreur lors de la suppression de la pesée",
-        "deleteConfirmTitle": "Confirmer la suppression",
-        "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
-        "addDescription": "Ajoutez une nouvelle pesée",
-        "editDescription": "Modifiez les informations de la pesée"
-      }
+    "title": "Pesées",
+    "subtitle": "Suivez le poids et la croissance de votre troupeau",
+    "newWeighing": "Nouvelle pesée",
+    "fields": {
+      "animalId": "Animal",
+      "weight": "Poids",
+      "unit": "Unité",
+      "weighingDate": "Date de pesée",
+      "weighingTime": "Heure",
+      "purpose": "Objectif",
+      "method": "Méthode",
+      "location": "Emplacement",
+      "previousWeight": "Poids précédent",
+      "weightGain": "Gain de poids",
+      "growthRate": "Taux de croissance (par jour)",
+      "age": "Âge (jours)",
+      "recordedBy": "Enregistré par",
+      "notes": "Notes",
+      "conditions": "Conditions",
+      "dateFrom": "Date de début",
+      "dateTo": "Date de fin",
+      "minWeight": "Poids minimum",
+      "maxWeight": "Poids maximum"
     },
+    "purpose": {
+      "all": "Tous",
+      "routine": "Routine",
+      "medical": "Médical",
+      "sale": "Vente",
+      "growth_monitoring": "Suivi de croissance",
+      "other": "Autre"
+    },
+    "units": {
+      "kg": "kg",
+      "lbs": "lbs"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "data": "Données de pesée",
+      "growth": "Suivi de croissance",
+      "additional": "Informations supplémentaires"
+    },
+    "placeholders": {
+      "weight": "Entrez le poids",
+      "method": "ex: Balance électronique, bascule, ruban",
+      "location": "ex: Étable, pâturage",
+      "recordedBy": "Nom de la personne",
+      "notes": "Notes ou observations supplémentaires",
+      "conditions": "ex: À jeun, après repas",
+      "minWeight": "Poids min",
+      "maxWeight": "Poids max"
+    },
+    "stats": {
+      "total": "Total des pesées",
+      "routine": "Routine",
+      "medical": "Médical",
+      "avgWeight": "Poids moyen"
+    },
+    "messages": {
+      "noWeighings": "Aucune pesée trouvée",
+      "createSuccess": "Pesée créée avec succès",
+      "createError": "Erreur lors de la création de la pesée",
+      "updateSuccess": "Pesée mise à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour de la pesée",
+      "deleteSuccess": "Pesée supprimée avec succès",
+      "deleteError": "Erreur lors de la suppression de la pesée",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
+      "addDescription": "Ajoutez une nouvelle pesée",
+      "editDescription": "Modifiez les informations de la pesée"
+    }
+  },
   "homepage": {
     "title": "Gestion complète de votre élevage",
     "subtitle": "Suivez vos animaux, gérez les vaccinations, traitements et optimisez votre production avec une solution moderne et intuitive.",
@@ -918,5 +924,50 @@
     "footer": {
       "copyright": "© 2024 École Algérienne. Tous droits réservés."
     }
+  },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Gérez vos groupes d'animaux par activité",
+    "newLot": "Créer un lot",
+    "stats": {
+      "total": "Lots totaux",
+      "open": "Lots ouverts",
+      "closed": "Lots fermés",
+      "totalAnimals": "Animaux concernés"
+    },
+    "loading": "Chargement...",
+    "noLots": "Aucun lot trouvé"
+  },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "Analysez vos données avec des rapports détaillés",
+    "period": {
+      "label": "Période",
+      "week": "Semaine",
+      "month": "Mois",
+      "quarter": "Trimestre",
+      "year": "Année"
+    },
+    "generate": "Générer",
+    "export": "Exporter",
+    "categories": {
+      "health": "Santé",
+      "production": "Production",
+      "financial": "Financier"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez vos préférences et la configuration de l'application",
+    "sections": {
+      "title": "Sections",
+      "profile": "Profil",
+      "farm": "Ferme",
+      "notifications": "Notifications",
+      "language": "Langue & Région",
+      "security": "Sécurité",
+      "data": "Données"
+    },
+    "save": "Enregistrer les modifications"
   }
 }

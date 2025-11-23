@@ -42,6 +42,12 @@
       "required": "Required"
     }
   },
+  "header": {
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Overview"
+    }
+  },
   "navigation": {
     "menu": {
       "dashboard": "Dashboard",
@@ -876,6 +882,51 @@
       "addDescription": "Record a new weighing",
       "editDescription": "Edit the weighing information"
     }
+  },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Manage your animal groups by activity",
+    "newLot": "Create a lot",
+    "stats": {
+      "total": "Total lots",
+      "open": "Open lots",
+      "closed": "Closed lots",
+      "totalAnimals": "Animals concerned"
+    },
+    "loading": "Loading...",
+    "noLots": "No lots found"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Analyze your data with detailed reports",
+    "period": {
+      "label": "Period",
+      "week": "Week",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year"
+    },
+    "generate": "Generate",
+    "export": "Export",
+    "categories": {
+      "health": "Health",
+      "production": "Production",
+      "financial": "Financial"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and application configuration",
+    "sections": {
+      "title": "Sections",
+      "profile": "Profile",
+      "farm": "Farm",
+      "notifications": "Notifications",
+      "language": "Language & Region",
+      "security": "Security",
+      "data": "Data"
+    },
+    "save": "Save changes"
   },
   "homepage": {
     "title": "Complete Management of Your Livestock",

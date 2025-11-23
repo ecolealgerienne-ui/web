@@ -42,6 +42,12 @@
       "required": "مطلوب"
     }
   },
+  "header": {
+    "dashboard": {
+      "title": "لوحة القيادة",
+      "subtitle": "نظرة عامة"
+    }
+  },
   "navigation": {
     "menu": {
       "dashboard": "لوحة القيادة",
@@ -803,78 +809,78 @@
     }
   },
   "weighings": {
-      "title": "الوزن",
-      "subtitle": "تتبع وزن ونمو قطيعك",
-      "newWeighing": "وزن جديد",
-      "fields": {
-        "animalId": "الحيوان",
-        "weight": "الوزن",
-        "unit": "الوحدة",
-        "weighingDate": "تاريخ الوزن",
-        "weighingTime": "الوقت",
-        "purpose": "الغرض",
-        "method": "الطريقة",
-        "location": "الموقع",
-        "previousWeight": "الوزن السابق",
-        "weightGain": "زيادة الوزن",
-        "growthRate": "معدل النمو (يوميًا)",
-        "age": "العمر (أيام)",
-        "recordedBy": "سجل بواسطة",
-        "notes": "ملاحظات",
-        "conditions": "الظروف",
-        "dateFrom": "من تاريخ",
-        "dateTo": "إلى تاريخ",
-        "minWeight": "الوزن الأدنى",
-        "maxWeight": "الوزن الأقصى"
-      },
-      "purpose": {
-        "all": "الكل",
-        "routine": "روتيني",
-        "medical": "طبي",
-        "sale": "بيع",
-        "growth_monitoring": "مراقبة النمو",
-        "other": "أخرى"
-      },
-      "units": {
-        "kg": "كجم",
-        "lbs": "رطل"
-      },
-      "sections": {
-        "general": "معلومات عامة",
-        "data": "بيانات الوزن",
-        "growth": "تتبع النمو",
-        "additional": "معلومات إضافية"
-      },
-      "placeholders": {
-        "weight": "أدخل الوزن",
-        "method": "مثال: ميزان إلكتروني، ميزان، شريط",
-        "location": "مثال: الحظيرة، المرعى",
-        "recordedBy": "اسم الشخص",
-        "notes": "ملاحظات أو ملاحظات إضافية",
-        "conditions": "مثال: على معدة فارغة، بعد الوجبة",
-        "minWeight": "الوزن الأدنى",
-        "maxWeight": "الوزن الأقصى"
-      },
-      "stats": {
-        "total": "إجمالي الوزن",
-        "routine": "روتيني",
-        "medical": "طبي",
-        "avgWeight": "متوسط ​​الوزن"
-      },
-      "messages": {
-        "noWeighings": "لم يتم العثور على وزن",
-        "createSuccess": "تم إنشاء الوزن بنجاح",
-        "createError": "خطأ في إنشاء الوزن",
-        "updateSuccess": "تم تحديث الوزن بنجاح",
-        "updateError": "خطأ في تحديث الوزن",
-        "deleteSuccess": "تم حذف الوزن بنجاح",
-        "deleteError": "خطأ في حذف الوزن",
-        "deleteConfirmTitle": "تأكيد الحذف",
-        "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
-        "addDescription": "إضافة وزن جديد",
-        "editDescription": "تعديل معلومات الوزن"
-      }
+    "title": "الوزن",
+    "subtitle": "تتبع وزن ونمو قطيعك",
+    "newWeighing": "وزن جديد",
+    "fields": {
+      "animalId": "الحيوان",
+      "weight": "الوزن",
+      "unit": "الوحدة",
+      "weighingDate": "تاريخ الوزن",
+      "weighingTime": "الوقت",
+      "purpose": "الغرض",
+      "method": "الطريقة",
+      "location": "الموقع",
+      "previousWeight": "الوزن السابق",
+      "weightGain": "زيادة الوزن",
+      "growthRate": "معدل النمو (يوميًا)",
+      "age": "العمر (أيام)",
+      "recordedBy": "سجل بواسطة",
+      "notes": "ملاحظات",
+      "conditions": "الظروف",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "minWeight": "الوزن الأدنى",
+      "maxWeight": "الوزن الأقصى"
     },
+    "purpose": {
+      "all": "الكل",
+      "routine": "روتيني",
+      "medical": "طبي",
+      "sale": "بيع",
+      "growth_monitoring": "مراقبة النمو",
+      "other": "أخرى"
+    },
+    "units": {
+      "kg": "كجم",
+      "lbs": "رطل"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "data": "بيانات الوزن",
+      "growth": "تتبع النمو",
+      "additional": "معلومات إضافية"
+    },
+    "placeholders": {
+      "weight": "أدخل الوزن",
+      "method": "مثال: ميزان إلكتروني، ميزان، شريط",
+      "location": "مثال: الحظيرة، المرعى",
+      "recordedBy": "اسم الشخص",
+      "notes": "ملاحظات أو ملاحظات إضافية",
+      "conditions": "مثال: على معدة فارغة، بعد الوجبة",
+      "minWeight": "الوزن الأدنى",
+      "maxWeight": "الوزن الأقصى"
+    },
+    "stats": {
+      "total": "إجمالي الوزن",
+      "routine": "روتيني",
+      "medical": "طبي",
+      "avgWeight": "متوسط ​​الوزن"
+    },
+    "messages": {
+      "noWeighings": "لم يتم العثور على وزن",
+      "createSuccess": "تم إنشاء الوزن بنجاح",
+      "createError": "خطأ في إنشاء الوزن",
+      "updateSuccess": "تم تحديث الوزن بنجاح",
+      "updateError": "خطأ في تحديث الوزن",
+      "deleteSuccess": "تم حذف الوزن بنجاح",
+      "deleteError": "خطأ في حذف الوزن",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
+      "addDescription": "إضافة وزن جديد",
+      "editDescription": "تعديل معلومات الوزن"
+    }
+  },
   "homepage": {
     "title": "إدارة شاملة لمزرعتك",
     "subtitle": "تتبع حيواناتك، وإدارة التطعيمات والعلاجات وتحسين إنتاجك بحل حديث وسهل الاستخدام.",
@@ -918,5 +924,50 @@
     "footer": {
       "copyright": "© 2024 المدرسة الجزائرية. جميع الحقوق محفوظة."
     }
+  },
+  "lots": {
+    "title": "القطعان",
+    "subtitle": "إدارة مجموعات الحيوانات حسب النشاط",
+    "newLot": "إنشاء قطيع",
+    "stats": {
+      "total": "إجمالي القطعان",
+      "open": "القطعان المفتوحة",
+      "closed": "القطعان المغلقة",
+      "totalAnimals": "الحيوانات المعنية"
+    },
+    "loading": "جاري التحميل...",
+    "noLots": "لم يتم العثور على قطعان"
+  },
+  "reports": {
+    "title": "التقارير",
+    "subtitle": "تحليل بياناتك بتقارير مفصلة",
+    "period": {
+      "label": "الفترة",
+      "week": "أسبوع",
+      "month": "شهر",
+      "quarter": "ربع سنة",
+      "year": "سنة"
+    },
+    "generate": "إنشاء",
+    "export": "تصدير",
+    "categories": {
+      "health": "الصحة",
+      "production": "الإنتاج",
+      "financial": "المالية"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "إدارة تفضيلاتك وإعدادات التطبيق",
+    "sections": {
+      "title": "الأقسام",
+      "profile": "الملف الشخصي",
+      "farm": "المزرعة",
+      "notifications": "الإشعارات",
+      "language": "اللغة والمنطقة",
+      "security": "الأمان",
+      "data": "البيانات"
+    },
+    "save": "حفظ التغييرات"
   }
 }
