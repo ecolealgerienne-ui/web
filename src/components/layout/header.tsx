@@ -7,6 +7,7 @@ import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { useTranslations } from "@/lib/i18n";
+import Link from "next/link";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -18,12 +19,12 @@ export function Header() {
       <div className="flex h-16 items-center px-4 md:px-6 justify-between">
         <div className="flex items-center gap-4">
           {/* Mobile Logo */}
-          <div className="flex md:hidden items-center gap-2">
+          <Link href="/dashboard" className="flex md:hidden items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Beef className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold">AniTra</span>
-          </div>
+          </Link>
           {/* Desktop Title */}
           <div className="hidden md:block">
             <h1 className="text-xl font-semibold">{t('title')}</h1>
