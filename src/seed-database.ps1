@@ -109,27 +109,13 @@ Write-Host "`n============================================================" -For
 Write-Host "         CREATION DES DONNEES DE REFERENCE (GLOBALES)       " -ForegroundColor Cyan
 Write-Host "============================================================`n" -ForegroundColor Cyan
 
-# --- ESPECES (globales) ---
-Write-Host "[CREATE] Creation des especes..." -ForegroundColor Green
+# --- ESPECES (hardcodees dans le code) ---
+Write-Host "[INFO] Les especes sont hardcodees: sheep, goat, cattle" -ForegroundColor Gray
 
-$speciesData = @(
-    @{nameFr="Bovin"; nameEn="Cattle"; nameAr="Abqar"; description="Bovins d'elevage"},
-    @{nameFr="Ovin"; nameEn="Sheep"; nameAr="Aghnam"; description="Ovins d'elevage"},
-    @{nameFr="Caprin"; nameEn="Goat"; nameAr="Ma'iz"; description="Caprins d'elevage"}
-)
-
-foreach ($species in $speciesData) {
-    $created = Invoke-ApiCall -Method "POST" -Endpoint "/api/v1/species" -Body $species
-    if ($created) {
-        $global:ReferenceData.Species += $created
-        Write-Host "   [OK] $($species.nameFr)" -ForegroundColor Gray
-    }
-}
-
-# Recuperer les IDs des especes
-$bovineId = ($global:ReferenceData.Species | Where-Object { $_.nameEn -eq "Cattle" }).id
-$ovineId = ($global:ReferenceData.Species | Where-Object { $_.nameEn -eq "Sheep" }).id
-$caprineId = ($global:ReferenceData.Species | Where-Object { $_.nameEn -eq "Goat" }).id
+# Les IDs des especes sont des strings fixes (non stockees en BD)
+$bovineId = "cattle"
+$ovineId = "sheep"
+$caprineId = "goat"
 
 # --- RACES (globales) ---
 Write-Host "`n[CREATE] Creation des races algeriennes..." -ForegroundColor Green
@@ -382,7 +368,7 @@ Write-Host "============================================================`n" -For
 Write-Host "[SUCCESS] Base de donnees initialisee avec succes !`n" -ForegroundColor Green
 
 Write-Host "[STATS] DONNEES DE REFERENCE (GLOBALES):" -ForegroundColor Cyan
-Write-Host "   - Especes: $($global:ReferenceData.Species.Count)" -ForegroundColor White
+Write-Host "   - Especes: 3 (hardcodees: sheep, goat, cattle)" -ForegroundColor White
 Write-Host "   - Races: $($global:ReferenceData.Breeds.Count)" -ForegroundColor White
 Write-Host "   - Produits medicaux: $($global:ReferenceData.Products.Count)" -ForegroundColor White
 Write-Host "   - Vaccins: $($global:ReferenceData.Vaccines.Count)" -ForegroundColor White
