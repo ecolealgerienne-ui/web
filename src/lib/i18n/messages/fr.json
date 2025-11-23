@@ -773,4 +773,48 @@
         "editDescription": "Modifiez les informations de la pesée"
       }
     }
+  "homepage": {
+    "title": "Gestion complète de votre élevage",
+    "subtitle": "Suivez vos animaux, gérez les vaccinations, traitements et optimisez votre production avec une solution moderne et intuitive.",
+    "getStarted": "Commencer",
+    "accessDashboard": "Accéder au tableau de bord",
+    "login": "Se connecter",
+    "features": {
+      "animalTracking": {
+        "title": "Suivi des animaux",
+        "description": "Enregistrez et suivez tous vos animaux avec leur historique complet"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Traitements",
+        "description": "Gérez les calendriers de vaccination et les traitements vétérinaires"
+      },
+      "reports": {
+        "title": "Rapports détaillés",
+        "description": "Analysez vos données avec des rapports complets et exportables"
+      },
+      "lotManagement": {
+        "title": "Gestion des lots",
+        "description": "Organisez vos animaux par lots pour une meilleure gestion"
+      },
+      "traceability": {
+        "title": "Traçabilité complète",
+        "description": "Assurez la traçabilité de tous vos produits et animaux"
+      },
+      "multiUser": {
+        "title": "Multi-utilisateurs",
+        "description": "Collaborez avec votre équipe en toute sécurité"
+      }
+    },
+    "benefits": {
+      "title": "Pourquoi choisir notre solution ?",
+      "modernInterface": "Interface moderne et intuitive",
+      "accessAnywhere": "Accessible depuis n'importe quel appareil",
+      "secureData": "Données sécurisées et conformes",
+      "reactiveSupport": "Support client réactif",
+      "regularUpdates": "Mises à jour régulières"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. Tous droits réservés."
+    }
   }
+}

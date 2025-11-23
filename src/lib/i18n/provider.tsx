@@ -2,7 +2,7 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode, useState, useEffect } from 'react';
-import { getPreferredLocale, type Locale } from './config';
+import { getPreferredLocale, isRTL, type Locale } from './config';
 
 interface I18nProviderProps {
   children: ReactNode;
@@ -21,13 +21,19 @@ export function I18nProvider({ children }: I18nProviderProps) {
     const preferredLocale = getPreferredLocale();
     setLocale(preferredLocale);
 
+    // Appliquer la direction RTL si nécessaire
+    if (typeof document !== 'undefined') {
+      document.documentElement.dir = isRTL(preferredLocale) ? 'rtl' : 'ltr';
+      document.documentElement.lang = preferredLocale;
+    }
+
     // Charger les messages
     import(`./messages/${preferredLocale}.json`)
       .then((module) => setMessages(module.default))
       .catch((error) => {
         console.error('Failed to load locale messages:', error);
-        // Fallback sur FR
-        import('./messages/fr.json').then((module) => setMessages(module.default));
+        // Fallback sur EN
+        import('./messages/en.json').then((module) => setMessages(module.default));
       });
   }, []);
 
@@ -57,6 +63,9 @@ export function useLocale() {
       // Sauvegarder la préférence
       if (typeof window !== 'undefined') {
         localStorage.setItem('locale', newLocale);
+        // Appliquer la direction RTL si nécessaire
+        document.documentElement.dir = isRTL(newLocale) ? 'rtl' : 'ltr';
+        document.documentElement.lang = newLocale;
       }
 
       setLocaleState(newLocale);

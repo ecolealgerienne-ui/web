@@ -775,4 +775,48 @@
       "editDescription": "Edit the weighing information"
     }
   }
+  "homepage": {
+    "title": "Complete Management of Your Livestock",
+    "subtitle": "Track your animals, manage vaccinations, treatments and optimize your production with a modern and intuitive solution.",
+    "getStarted": "Get Started",
+    "accessDashboard": "Access Dashboard",
+    "login": "Login",
+    "features": {
+      "animalTracking": {
+        "title": "Animal Tracking",
+        "description": "Record and track all your animals with their complete history"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Treatments",
+        "description": "Manage vaccination schedules and veterinary treatments"
+      },
+      "reports": {
+        "title": "Detailed Reports",
+        "description": "Analyze your data with comprehensive and exportable reports"
+      },
+      "lotManagement": {
+        "title": "Lot Management",
+        "description": "Organize your animals by lots for better management"
+      },
+      "traceability": {
+        "title": "Complete Traceability",
+        "description": "Ensure traceability of all your products and animals"
+      },
+      "multiUser": {
+        "title": "Multi-user",
+        "description": "Collaborate with your team securely"
+      }
+    },
+    "benefits": {
+      "title": "Why choose our solution?",
+      "modernInterface": "Modern and intuitive interface",
+      "accessAnywhere": "Accessible from any device",
+      "secureData": "Secure and compliant data",
+      "reactiveSupport": "Responsive customer support",
+      "regularUpdates": "Regular updates"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. All rights reserved."
+    }
+  }
 }
