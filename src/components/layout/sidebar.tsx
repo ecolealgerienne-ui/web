@@ -6,38 +6,40 @@ import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Cale
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
+import { useTranslations } from "@/lib/i18n";
 
 const menuItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: Beef, label: "Animaux", href: "/animals" },
-  { icon: Calendar, label: "Événements", href: "/animal-events" },
-  { icon: Package, label: "Lots", href: "/lots" },
-  { icon: Syringe, label: "Vaccinations", href: "/vaccinations" },
-  { icon: Pill, label: "Traitements", href: "/treatments" },
-  { icon: Scale, label: "Pesées", href: "/weighings" },
+  { icon: Home, key: "dashboard", href: "/dashboard" },
+  { icon: Beef, key: "animals", href: "/animals" },
+  { icon: Calendar, key: "events", href: "/animal-events" },
+  { icon: Package, key: "lots", href: "/lots" },
+  { icon: Syringe, key: "vaccinations", href: "/vaccinations" },
+  { icon: Pill, key: "treatments", href: "/treatments" },
+  { icon: Scale, key: "weighings", href: "/weighings" },
 ];
 
 // Menu Données de référence (super admin uniquement)
 const dataMenuItems = [
-  { label: "Races", href: "/data/breeds" },
-  { label: "Vaccins", href: "/data/vaccines" },
-  { label: "Maladies", href: "/data/diseases" },
-  { label: "Médicaments", href: "/data/medications" },
-  { label: "Vétérinaires", href: "/data/veterinarians" },
-  { label: "Campagnes", href: "/data/campaigns" },
-  { label: "Préférences", href: "/data/farm-preferences" },
-  { label: "Alertes", href: "/data/alert-configurations" },
-  { label: "Fermes", href: "/data/farms" },
+  { key: "breeds", href: "/data/breeds" },
+  { key: "vaccines", href: "/data/vaccines" },
+  { key: "diseases", href: "/data/diseases" },
+  { key: "medications", href: "/data/medications" },
+  { key: "veterinarians", href: "/data/veterinarians" },
+  { key: "campaigns", href: "/data/campaigns" },
+  { key: "preferences", href: "/data/farm-preferences" },
+  { key: "alerts", href: "/data/alert-configurations" },
+  { key: "farms", href: "/data/farms" },
 ];
 
 const bottomMenuItems = [
-  { icon: BarChart3, label: "Rapports", href: "/reports" },
-  { icon: Settings, label: "Paramètres", href: "/settings" },
+  { icon: BarChart3, key: "reports", href: "/reports" },
+  { icon: Settings, key: "settings", href: "/settings" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const t = useTranslations('navigation');
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
@@ -73,7 +75,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="h-4 w-4" />
-              {item.label}
+              {t(`menu.${item.key}`)}
             </Link>
           );
         })}
@@ -87,7 +89,7 @@ export function Sidebar() {
             <div className="mb-1">
               <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
                 <Database className="h-4 w-4" />
-                Données
+                {t('data.title')}
               </div>
               <div className="ml-7 space-y-1">
                 {dataMenuItems.map((item) => {
@@ -103,7 +105,7 @@ export function Sidebar() {
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       )}
                     >
-                      {item.label}
+                      {t(`data.${item.key}`)}
                     </Link>
                   );
                 })}
@@ -131,7 +133,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="h-4 w-4" />
-              {item.label}
+              {t(`menu.${item.key}`)}
             </Link>
           );
         })}

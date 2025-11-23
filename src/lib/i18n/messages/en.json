@@ -46,7 +46,13 @@
     "menu": {
       "dashboard": "Dashboard",
       "animals": "Animals",
+      "events": "Events",
+      "lots": "Lots",
+      "vaccinations": "Vaccinations",
+      "treatments": "Treatments",
+      "weighings": "Weighings",
       "data": "Data",
+      "reports": "Reports",
       "settings": "Settings"
     },
     "data": {
@@ -54,7 +60,12 @@
       "breeds": "Breeds",
       "vaccines": "Vaccines",
       "diseases": "Diseases",
-      "medications": "Medications"
+      "medications": "Medications",
+      "veterinarians": "Veterinarians",
+      "campaigns": "Campaigns",
+      "preferences": "Preferences",
+      "alerts": "Alerts",
+      "farms": "Farms"
     }
   },
   "breeds": {

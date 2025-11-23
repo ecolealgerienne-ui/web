@@ -46,7 +46,13 @@
     "menu": {
       "dashboard": "لوحة القيادة",
       "animals": "الحيوانات",
+      "events": "الأحداث",
+      "lots": "القطعان",
+      "vaccinations": "التطعيمات",
+      "treatments": "العلاجات",
+      "weighings": "الوزن",
       "data": "البيانات",
+      "reports": "التقارير",
       "settings": "الإعدادات"
     },
     "data": {
@@ -54,7 +60,12 @@
       "breeds": "السلالات",
       "vaccines": "اللقاحات",
       "diseases": "الأمراض",
-      "medications": "الأدوية"
+      "medications": "الأدوية",
+      "veterinarians": "الأطباء البيطريون",
+      "campaigns": "الحملات",
+      "preferences": "التفضيلات",
+      "alerts": "التنبيهات",
+      "farms": "المزارع"
     }
   },
   "breeds": {
