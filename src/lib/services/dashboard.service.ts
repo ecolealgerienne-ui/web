@@ -5,6 +5,7 @@
 import { apiClient } from '@/lib/api/client';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
+import { animalsService } from './animals.service';
 
 
 export interface DashboardStats {
@@ -52,17 +53,42 @@ export interface HerdEvolution {
 class DashboardService {
   async getStats(): Promise<DashboardStats> {
     try {
+      // Fetch dashboard stats from API
       const response = await apiClient.get<DashboardStats>(`/farms/${TEMP_FARM_ID}/dashboard/stats`);
-      return response;
+
+      // Get real animal count from animals endpoint
+      const animals = await animalsService.getAll();
+      const totalAnimals = animals.length;
+
+      // Override totalAnimals with real count from animals API
+      return {
+        ...response,
+        totalAnimals,
+      };
     } catch (error: any) {
       if (error.status === 404) {
-        logger.info('Dashboard stats not found (404), using defaults');
-        return {
-          totalAnimals: 0,
-          births: { count: 0, period: 'thisMonth' },
-          deaths: { count: 0, period: 'thisMonth' },
-          vaccinations: { upcoming: 0, label: 'upcoming' },
-        };
+        logger.info('Dashboard stats not found (404), fetching real animal count');
+
+        // If dashboard stats not found, get real animal count
+        try {
+          const animals = await animalsService.getAll();
+          const totalAnimals = animals.length;
+
+          return {
+            totalAnimals,
+            births: { count: 0, period: 'thisMonth' },
+            deaths: { count: 0, period: 'thisMonth' },
+            vaccinations: { upcoming: 0, label: 'upcoming' },
+          };
+        } catch (animalsError) {
+          logger.error('Failed to fetch animals for stats', { error: animalsError });
+          return {
+            totalAnimals: 0,
+            births: { count: 0, period: 'thisMonth' },
+            deaths: { count: 0, period: 'thisMonth' },
+            vaccinations: { upcoming: 0, label: 'upcoming' },
+          };
+        }
       }
       logger.error('Failed to fetch dashboard stats', { error });
       throw error;
