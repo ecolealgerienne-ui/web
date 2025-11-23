@@ -1031,7 +1031,9 @@
       "species": "Livestock Species",
       "addSpecies": "+ Add",
       "selectWilaya": "Select...",
-      "saveButton": "Save changes"
+      "saveButton": "Save changes",
+      "department": "Department",
+      "selectDepartment": "Select..."
     },
     "notifications": {
       "title": "Notification Preferences",

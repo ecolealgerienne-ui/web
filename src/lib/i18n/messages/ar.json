@@ -1077,7 +1077,9 @@
       "species": "الأنواع المربّاة",
       "addSpecies": "+ إضافة",
       "selectWilaya": "اختر...",
-      "saveButton": "حفظ التغييرات"
+      "saveButton": "حفظ التغييرات",
+      "department": "المقاطعة",
+      "selectDepartment": "اختر..."
     },
     "notifications": {
       "title": "تفضيلات الإشعارات",

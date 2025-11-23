@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useTranslations } from '@/lib/i18n';
 import {
@@ -98,11 +104,16 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label htmlFor="role">{t('profile.role')}</Label>
-                  <Select id="role" defaultValue="manager">
-                    <option value="owner">{t('profile.roles.owner')}</option>
-                    <option value="manager">{t('profile.roles.manager')}</option>
-                    <option value="veterinarian">{t('profile.roles.veterinarian')}</option>
-                    <option value="worker">{t('profile.roles.worker')}</option>
+                  <Select defaultValue="manager">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="owner">{t('profile.roles.owner')}</SelectItem>
+                      <SelectItem value="manager">{t('profile.roles.manager')}</SelectItem>
+                      <SelectItem value="veterinarian">{t('profile.roles.veterinarian')}</SelectItem>
+                      <SelectItem value="worker">{t('profile.roles.worker')}</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <Button>
@@ -143,14 +154,54 @@ export default function SettingsPage() {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="wilaya">{t('farm.wilaya')}</Label>
-                    <Select id="wilaya">
-                      <option value="">{t('farm.selectWilaya')}</option>
-                      <option value="alger">Alger</option>
-                      <option value="oran">Oran</option>
-                      <option value="constantine">Constantine</option>
-                      <option value="blida">Blida</option>
-                      <option value="setif">Sétif</option>
+                    <Label htmlFor="department">{t('farm.department')}</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('farm.selectDepartment')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ain">Ain (01)</SelectItem>
+                        <SelectItem value="aisne">Aisne (02)</SelectItem>
+                        <SelectItem value="allier">Allier (03)</SelectItem>
+                        <SelectItem value="alpes-de-haute-provence">Alpes-de-Haute-Provence (04)</SelectItem>
+                        <SelectItem value="hautes-alpes">Hautes-Alpes (05)</SelectItem>
+                        <SelectItem value="alpes-maritimes">Alpes-Maritimes (06)</SelectItem>
+                        <SelectItem value="ardeche">Ardèche (07)</SelectItem>
+                        <SelectItem value="ardennes">Ardennes (08)</SelectItem>
+                        <SelectItem value="ariege">Ariège (09)</SelectItem>
+                        <SelectItem value="aube">Aube (10)</SelectItem>
+                        <SelectItem value="bouches-du-rhone">Bouches-du-Rhône (13)</SelectItem>
+                        <SelectItem value="calvados">Calvados (14)</SelectItem>
+                        <SelectItem value="charente">Charente (16)</SelectItem>
+                        <SelectItem value="cote-dor">Côte-d'Or (21)</SelectItem>
+                        <SelectItem value="dordogne">Dordogne (24)</SelectItem>
+                        <SelectItem value="essonne">Essonne (91)</SelectItem>
+                        <SelectItem value="gironde">Gironde (33)</SelectItem>
+                        <SelectItem value="herault">Hérault (34)</SelectItem>
+                        <SelectItem value="ille-et-vilaine">Ille-et-Vilaine (35)</SelectItem>
+                        <SelectItem value="isere">Isère (38)</SelectItem>
+                        <SelectItem value="loire">Loire (42)</SelectItem>
+                        <SelectItem value="loire-atlantique">Loire-Atlantique (44)</SelectItem>
+                        <SelectItem value="loiret">Loiret (45)</SelectItem>
+                        <SelectItem value="maine-et-loire">Maine-et-Loire (49)</SelectItem>
+                        <SelectItem value="marne">Marne (51)</SelectItem>
+                        <SelectItem value="meurthe-et-moselle">Meurthe-et-Moselle (54)</SelectItem>
+                        <SelectItem value="moselle">Moselle (57)</SelectItem>
+                        <SelectItem value="nord">Nord (59)</SelectItem>
+                        <SelectItem value="paris">Paris (75)</SelectItem>
+                        <SelectItem value="pas-de-calais">Pas-de-Calais (62)</SelectItem>
+                        <SelectItem value="puy-de-dome">Puy-de-Dôme (63)</SelectItem>
+                        <SelectItem value="bas-rhin">Bas-Rhin (67)</SelectItem>
+                        <SelectItem value="haut-rhin">Haut-Rhin (68)</SelectItem>
+                        <SelectItem value="rhone">Rhône (69)</SelectItem>
+                        <SelectItem value="sarthe">Sarthe (72)</SelectItem>
+                        <SelectItem value="savoie">Savoie (73)</SelectItem>
+                        <SelectItem value="haute-savoie">Haute-Savoie (74)</SelectItem>
+                        <SelectItem value="paris">Paris (75)</SelectItem>
+                        <SelectItem value="var">Var (83)</SelectItem>
+                        <SelectItem value="vaucluse">Vaucluse (84)</SelectItem>
+                        <SelectItem value="vienne">Vienne (86)</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                   <div>
@@ -253,32 +304,56 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="language">{t('language.interfaceLanguage')}</Label>
-                  <Select id="language" defaultValue="fr">
-                    <option value="fr">Français</option>
-                    <option value="ar">العربية (Arabe)</option>
-                    <option value="en">English</option>
+                  <Select defaultValue="fr">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="ar">العربية (Arabe)</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="timezone">{t('language.timezone')}</Label>
-                  <Select id="timezone" defaultValue="africa-algiers">
-                    <option value="africa-algiers">Afrique/Alger (GMT+1)</option>
+                  <Select defaultValue="europe-paris">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="europe-paris">Europe/Paris (GMT+1)</SelectItem>
+                      <SelectItem value="europe-london">Europe/London (GMT+0)</SelectItem>
+                      <SelectItem value="america-new-york">America/New York (GMT-5)</SelectItem>
+                      <SelectItem value="asia-tokyo">Asia/Tokyo (GMT+9)</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="dateFormat">{t('language.dateFormat')}</Label>
-                  <Select id="dateFormat" defaultValue="dd/mm/yyyy">
-                    <option value="dd/mm/yyyy">JJ/MM/AAAA</option>
-                    <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
-                    <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
+                  <Select defaultValue="dd/mm/yyyy">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dd/mm/yyyy">JJ/MM/AAAA</SelectItem>
+                      <SelectItem value="mm/dd/yyyy">MM/JJ/AAAA</SelectItem>
+                      <SelectItem value="yyyy-mm-dd">AAAA-MM-JJ</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="currency">{t('language.currency')}</Label>
-                  <Select id="currency" defaultValue="dzd">
-                    <option value="dzd">Dinar Algérien (DA)</option>
-                    <option value="eur">Euro (€)</option>
-                    <option value="usd">Dollar US ($)</option>
+                  <Select defaultValue="eur">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="eur">Euro (€)</SelectItem>
+                      <SelectItem value="usd">Dollar US ($)</SelectItem>
+                      <SelectItem value="gbp">Livre Sterling (£)</SelectItem>
+                      <SelectItem value="chf">Franc Suisse (CHF)</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div className="flex items-center justify-between">

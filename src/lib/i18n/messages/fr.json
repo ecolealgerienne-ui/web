@@ -1077,7 +1077,9 @@
       "species": "Espèces élevées",
       "addSpecies": "+ Ajouter",
       "selectWilaya": "Sélectionner...",
-      "saveButton": "Enregistrer les modifications"
+      "saveButton": "Enregistrer les modifications",
+      "department": "Département",
+      "selectDepartment": "Sélectionner..."
     },
     "notifications": {
       "title": "Préférences de notifications",
