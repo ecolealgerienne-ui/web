@@ -404,6 +404,11 @@
     "alertCount": "{count} configuration",
     "alertCount_plural": "{count} configurations",
     "days": "jours",
+    "dialog": {
+      "createTitle": "Créer une configuration d'alerte",
+      "editTitle": "Modifier la configuration d'alerte",
+      "errorTitle": "Erreur détaillée"
+    },
     "filters": {
       "allTypes": "Tous les types"
     },
@@ -419,10 +424,24 @@
       "critical": "Critique"
     },
     "fields": {
+      "evaluationType": "Type d'évaluation",
+      "type": "Type",
+      "category": "Catégorie",
       "titleKey": "Clé titre",
       "messageKey": "Clé message",
       "severity": "Sévérité",
-      "daysBeforeDue": "Jours avant échéance"
+      "iconName": "Nom de l'icône",
+      "colorHex": "Couleur",
+      "enabled": "Activé",
+      "daysBeforeDue": "Jours avant échéance",
+      "priority": "Priorité"
+    },
+    "placeholders": {
+      "evaluationType": "Ex: vaccination, weighing",
+      "category": "Ex: health, monitoring",
+      "titleKey": "Ex: alert.vaccination.due.title",
+      "messageKey": "Ex: alert.vaccination.due.message",
+      "iconName": "Ex: syringe, scale"
     },
     "actions": {
       "enable": "Activer",
@@ -430,8 +449,12 @@
     },
     "messages": {
       "loadError": "Impossible de charger les configurations",
+      "created": "Configuration créée avec succès",
       "updated": "Configuration mise à jour avec succès",
+      "deleted": "Configuration supprimée avec succès",
       "updateError": "Erreur lors de la mise à jour",
+      "deleteError": "Erreur lors de la suppression",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette configuration d'alerte ?",
       "infoMessage": "Les configurations d'alertes définissent les notifications automatiques pour les événements importants"
     }
   },

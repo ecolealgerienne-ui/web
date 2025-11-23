@@ -412,6 +412,11 @@
     "alertCount": "{count} configuration",
     "alertCount_plural": "{count} configurations",
     "days": "days",
+    "dialog": {
+      "createTitle": "Create Alert Configuration",
+      "editTitle": "Edit Alert Configuration",
+      "errorTitle": "Detailed Error"
+    },
     "filters": {
       "allTypes": "All types"
     },
@@ -427,10 +432,24 @@
       "critical": "Critical"
     },
     "fields": {
-      "titleKey": "Title key",
-      "messageKey": "Message key",
+      "evaluationType": "Evaluation Type",
+      "type": "Type",
+      "category": "Category",
+      "titleKey": "Title Key",
+      "messageKey": "Message Key",
       "severity": "Severity",
-      "daysBeforeDue": "Days before due"
+      "iconName": "Icon Name",
+      "colorHex": "Color",
+      "enabled": "Enabled",
+      "daysBeforeDue": "Days Before Due",
+      "priority": "Priority"
+    },
+    "placeholders": {
+      "evaluationType": "e.g., vaccination, weighing",
+      "category": "e.g., health, monitoring",
+      "titleKey": "e.g., alert.vaccination.due.title",
+      "messageKey": "e.g., alert.vaccination.due.message",
+      "iconName": "e.g., syringe, scale"
     },
     "actions": {
       "enable": "Enable",
@@ -438,8 +457,12 @@
     },
     "messages": {
       "loadError": "Unable to load configurations",
+      "created": "Configuration created successfully",
       "updated": "Configuration updated successfully",
+      "deleted": "Configuration deleted successfully",
       "updateError": "Error updating configuration",
+      "deleteError": "Error deleting configuration",
+      "confirmDelete": "Are you sure you want to delete this alert configuration?",
       "infoMessage": "Alert configurations define automatic notifications for important events"
     }
   },

@@ -176,6 +176,100 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 ---
 
+### Erreur 8: Utilisation incorrecte du composant Select de Radix UI
+**Contexte**: Formulaire de campagnes
+**Symptôme**: Les options du Select s'affichent comme du texte brut au lieu d'un dropdown fonctionnel
+**Cause**: Utilisation de l'API HTML native (`onChange`, `<option>`) au lieu de l'API Radix UI
+**Impact**: Impossible de sélectionner une option, formulaire inutilisable
+
+**Solution**:
+```tsx
+// ❌ MAUVAIS - API HTML native
+import { Select } from '@/components/ui/select';
+<Select onChange={(e) => setValue(e.target.value)}>
+  <option value="option1">Option 1</option>
+</Select>
+
+// ✅ BON - API Radix UI
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+<Select value={value} onValueChange={(val) => setValue(val)}>
+  <SelectTrigger>
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="option1">Option 1</SelectItem>
+    <SelectItem value="option2">Option 2</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+**Leçon**:
+- Toujours importer les composants Radix UI complets (SelectTrigger, SelectValue, SelectContent, SelectItem)
+- Utiliser `onValueChange` au lieu de `onChange`
+- Ne PAS utiliser `<option>` - utiliser `<SelectItem>`
+- Toujours envelopper avec `<SelectTrigger>` et `<SelectValue>`
+
+---
+
+### Erreur 9: Envoi de champs optionnels vides causant 400 Bad Request
+**Contexte**: Formulaire de campagnes (et potentiellement tous les formulaires)
+**Symptôme**: Erreur HTTP 400 Bad Request lors de la création/modification
+**Cause**:
+- Formulaire envoie des chaînes vides (`""`) pour les champs optionnels
+- Formulaire envoie des zéros (`0`) pour les champs numériques optionnels
+- Le backend valide strictement et rejette ces valeurs invalides
+**Impact**: Impossible de créer/modifier des ressources, expérience utilisateur cassée
+
+**Solution**:
+```tsx
+// ❌ MAUVAIS - Envoie tous les champs
+const handleSubmit = async (e: React.FormEvent) => {
+  const payload = { ...formData };  // Inclut tous les champs vides
+  await service.create(payload);
+};
+
+// ✅ BON - Nettoie le payload
+const handleSubmit = async (e: React.FormEvent) => {
+  // Start with only required fields
+  const cleanPayload: any = {
+    name: formData.name,
+    type: formData.type,
+  };
+
+  // Add optional fields ONLY if they have values
+  if (formData.optionalString?.trim()) {
+    cleanPayload.optionalString = formData.optionalString.trim();
+  }
+  if (formData.optionalNumber > 0) {
+    cleanPayload.optionalNumber = formData.optionalNumber;
+  }
+  if (formData.optionalId?.trim()) {
+    cleanPayload.optionalId = formData.optionalId.trim();
+  }
+
+  await service.create(cleanPayload);
+};
+```
+
+**Leçon**:
+- Ne JAMAIS envoyer des chaînes vides (`""`) pour les champs optionnels
+- Ne JAMAIS envoyer des zéros (`0`) pour les champs numériques optionnels
+- Créer un `cleanPayload` avec seulement les champs requis
+- Ajouter les champs optionnels UNIQUEMENT s'ils ont des vraies valeurs :
+  - Strings : vérifier `.trim()` et longueur > 0
+  - Numbers : vérifier > 0 (ou selon la logique métier)
+  - IDs : vérifier `.trim()` et longueur > 0
+- Utiliser `?.trim()` pour éviter les erreurs sur undefined/null
+
+---
+
 ## ✅ Plan d'implémentation complet
 
 ### Phase 1: Recherche et Analyse (OBLIGATOIRE)

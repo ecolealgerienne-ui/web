@@ -1,25 +1,56 @@
 'use client';
 
 import { useState } from 'react';
-import { Bell, Edit2 } from 'lucide-react';
+import { Bell, Edit2, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAlertConfigurations } from '@/lib/hooks/useAlertConfigurations';
 import { AlertConfiguration, AlertType } from '@/lib/types/alert-configuration';
 import { alertConfigurationsService } from '@/lib/services/alert-configurations.service';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { AlertConfigurationFormDialog } from '@/components/data/alert-configuration-form-dialog';
 
 export default function AlertConfigurationsPage() {
   const t = useTranslations('alertConfigurations');
   const tc = useCommonTranslations();
   const toast = useToast();
   const [selectedType, setSelectedType] = useState<AlertType | ''>('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState<AlertConfiguration | null>(null);
   const { alertConfigurations, loading, error, refetch } = useAlertConfigurations({
     type: selectedType || undefined,
   });
+
+  const handleCreate = () => {
+    setSelectedAlert(null);
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (alert: AlertConfiguration) => {
+    setSelectedAlert(alert);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (alert: AlertConfiguration) => {
+    if (!confirm(t('messages.confirmDelete'))) return;
+
+    try {
+      await alertConfigurationsService.delete(alert.id);
+      toast.success(tc('messages.success'), t('messages.deleted'));
+      refetch();
+    } catch (error) {
+      toast.error(tc('messages.error'), t('messages.deleteError'));
+    }
+  };
 
   const handleToggleEnabled = async (alert: AlertConfiguration) => {
     try {
@@ -31,30 +62,34 @@ export default function AlertConfigurationsPage() {
     }
   };
 
-  const getTypeBadgeVariant = (type: AlertType) => {
+  const handleDialogSuccess = () => {
+    refetch();
+  };
+
+  const getTypeBadgeVariant = (type: AlertType): "default" | "destructive" | "warning" | "success" => {
     switch (type) {
       case 'urgent':
         return 'destructive';
       case 'important':
-        return 'default';
+        return 'warning';
       case 'routine':
-        return 'secondary';
+        return 'success';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
-  const getPriorityBadgeVariant = (priority: string) => {
+  const getPriorityBadgeVariant = (priority: string): "default" | "destructive" | "warning" | "success" => {
     switch (priority) {
       case 'critical':
       case 'high':
         return 'destructive';
       case 'medium':
-        return 'default';
+        return 'warning';
       case 'low':
-        return 'secondary';
+        return 'success';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
@@ -91,22 +126,30 @@ export default function AlertConfigurationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+        </div>
+        <Button onClick={handleCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          {tc('actions.create')}
+        </Button>
       </div>
 
       {/* Filtres */}
       <div className="flex gap-4 items-center flex-wrap">
-        <Select
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value as AlertType | '')}
-          className="w-full md:w-[200px]"
-        >
-          <option value="">{t('filters.allTypes')}</option>
-          <option value="urgent">{t('types.urgent')}</option>
-          <option value="important">{t('types.important')}</option>
-          <option value="routine">{t('types.routine')}</option>
+        {/* Error 8: Correct Radix UI Select usage */}
+        <Select value={selectedType} onValueChange={(value) => setSelectedType(value as AlertType | '')}>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder={t('filters.allTypes')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="urgent">{t('types.urgent')}</SelectItem>
+            <SelectItem value="important">{t('types.important')}</SelectItem>
+            <SelectItem value="routine">{t('types.routine')}</SelectItem>
+          </SelectContent>
         </Select>
 
         <div className="text-sm text-muted-foreground">
@@ -150,11 +193,11 @@ export default function AlertConfigurationsPage() {
                         <Badge variant={getPriorityBadgeVariant(alert.priority)} className="text-xs">
                           {t(`priorities.${alert.priority}`)}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="default" className="text-xs">
                           {alert.category}
                         </Badge>
                         {!alert.enabled && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="warning" className="text-xs">
                             {tc('status.disabled')}
                           </Badge>
                         )}
@@ -181,11 +224,28 @@ export default function AlertConfigurationsPage() {
                     {/* Actions */}
                     <div className="flex flex-col gap-2">
                       <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(alert)}
+                      >
+                        <Edit2 className="h-4 w-4 mr-2" />
+                        {tc('actions.edit')}
+                      </Button>
+                      <Button
                         variant={alert.enabled ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => handleToggleEnabled(alert)}
                       >
                         {alert.enabled ? t('actions.disable') : t('actions.enable')}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(alert)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {tc('actions.delete')}
                       </Button>
                     </div>
                   </div>
@@ -204,6 +264,14 @@ export default function AlertConfigurationsPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Form Dialog */}
+      <AlertConfigurationFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        alertConfiguration={selectedAlert}
+        onSuccess={handleDialogSuccess}
+      />
     </div>
   );
 }

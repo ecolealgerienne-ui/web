@@ -412,6 +412,11 @@
     "alertCount": "{count} تكوين",
     "alertCount_plural": "{count} تكوينات",
     "days": "أيام",
+    "dialog": {
+      "createTitle": "إنشاء تكوين تنبيه",
+      "editTitle": "تعديل تكوين التنبيه",
+      "errorTitle": "خطأ مفصل"
+    },
     "filters": {
       "allTypes": "جميع الأنواع"
     },
@@ -427,10 +432,24 @@
       "critical": "حرجة"
     },
     "fields": {
+      "evaluationType": "نوع التقييم",
+      "type": "النوع",
+      "category": "الفئة",
       "titleKey": "مفتاح العنوان",
       "messageKey": "مفتاح الرسالة",
       "severity": "الخطورة",
-      "daysBeforeDue": "أيام قبل الاستحقاق"
+      "iconName": "اسم الأيقونة",
+      "colorHex": "اللون",
+      "enabled": "مفعّل",
+      "daysBeforeDue": "أيام قبل الاستحقاق",
+      "priority": "الأولوية"
+    },
+    "placeholders": {
+      "evaluationType": "مثال: vaccination, weighing",
+      "category": "مثال: health, monitoring",
+      "titleKey": "مثال: alert.vaccination.due.title",
+      "messageKey": "مثال: alert.vaccination.due.message",
+      "iconName": "مثال: syringe, scale"
     },
     "actions": {
       "enable": "تفعيل",
@@ -438,8 +457,12 @@
     },
     "messages": {
       "loadError": "تعذر تحميل التكوينات",
+      "created": "تم إنشاء التكوين بنجاح",
       "updated": "تم تحديث التكوين بنجاح",
+      "deleted": "تم حذف التكوين بنجاح",
       "updateError": "خطأ في تحديث التكوين",
+      "deleteError": "خطأ في حذف التكوين",
+      "confirmDelete": "هل أنت متأكد من حذف تكوين التنبيه هذا؟",
       "infoMessage": "تحدد تكوينات التنبيهات الإشعارات التلقائية للأحداث المهمة"
     }
   },
