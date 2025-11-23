@@ -211,7 +211,6 @@ for ($i = 1; $i -le $cattleCount; $i++) {
         $animalCounter++
     }
 }
-
 Write-Host "`n  -> $($global:Data.Animals.Count) animaux crees`n" -ForegroundColor Green
 
 # ============================================================================
@@ -239,3 +238,4 @@ Write-Host "  - Chevres: $goatTotal" -ForegroundColor White
 Write-Host "  - Vaches: $cattleTotal" -ForegroundColor White
 
 Write-Host "`n[SUCCESS] Base de donnees prete pour les tests !`n" -ForegroundColor Green
+
