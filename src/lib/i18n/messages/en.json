@@ -693,5 +693,80 @@
       "addDescription": "Add a new treatment",
       "editDescription": "Edit the treatment information"
     }
+  },
+  "weighings": {
+    "title": "Weighings",
+    "subtitle": "Track weight and growth of your herd",
+    "newWeighing": "New weighing",
+    "editWeighing": "Edit weighing",
+    "deleteWeighing": "Delete weighing",
+    "noWeighings": "No weighings found",
+    "weighingCount": "{count} weighing",
+    "weighingCount_plural": "{count} weighings",
+    "filters": {
+      "allPurposes": "All purposes",
+      "search": "Search..."
+    },
+    "purpose": {
+      "routine": "Routine",
+      "medical": "Medical",
+      "sale": "Sale",
+      "growth_monitoring": "Growth monitoring",
+      "other": "Other"
+    },
+    "unit": {
+      "kg": "kg",
+      "lbs": "lbs"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "weight": "Weight",
+      "unit": "Unit",
+      "weighingDate": "Weighing date",
+      "weighingTime": "Time",
+      "purpose": "Purpose",
+      "method": "Method",
+      "location": "Location",
+      "previousWeight": "Previous weight",
+      "weightGain": "Weight gain",
+      "growthRate": "Growth rate (per day)",
+      "age": "Age (days)",
+      "recordedBy": "Recorded by",
+      "notes": "Notes",
+      "conditions": "Conditions"
+    },
+    "sections": {
+      "general": "General information",
+      "weight": "Weight data",
+      "growth": "Growth tracking",
+      "additional": "Additional information"
+    },
+    "placeholders": {
+      "weight": "E.g.: 45.5",
+      "method": "E.g.: Electronic scale",
+      "location": "E.g.: Barn",
+      "recordedBy": "Person's name",
+      "notes": "Additional notes...",
+      "conditions": "E.g.: Fasting, after feeding"
+    },
+    "stats": {
+      "total": "Total weighings",
+      "avgWeight": "Average weight",
+      "avgGrowth": "Average growth",
+      "lastWeighing": "Last weighing"
+    },
+    "messages": {
+      "loadError": "Unable to load weighings",
+      "created": "Weighing recorded successfully",
+      "updated": "Weighing updated successfully",
+      "deleted": "Weighing deleted successfully",
+      "createError": "Error recording weighing",
+      "updateError": "Error updating weighing",
+      "deleteError": "Error deleting weighing",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete this weighing?",
+      "addDescription": "Record a new weighing",
+      "editDescription": "Edit the weighing information"
+    }
   }
 }

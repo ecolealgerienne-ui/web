@@ -692,6 +692,79 @@
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce traitement ?",
       "addDescription": "Ajoutez un nouveau traitement",
       "editDescription": "Modifiez les informations du traitement"
+    },
+    "weighings": {
+      "title": "Pesées",
+      "subtitle": "Suivez le poids et la croissance de votre troupeau",
+      "newWeighing": "Nouvelle pesée",
+      "fields": {
+        "animalId": "Animal",
+        "weight": "Poids",
+        "unit": "Unité",
+        "weighingDate": "Date de pesée",
+        "weighingTime": "Heure",
+        "purpose": "Objectif",
+        "method": "Méthode",
+        "location": "Emplacement",
+        "previousWeight": "Poids précédent",
+        "weightGain": "Gain de poids",
+        "growthRate": "Taux de croissance (par jour)",
+        "age": "Âge (jours)",
+        "recordedBy": "Enregistré par",
+        "notes": "Notes",
+        "conditions": "Conditions",
+        "dateFrom": "Date de début",
+        "dateTo": "Date de fin",
+        "minWeight": "Poids minimum",
+        "maxWeight": "Poids maximum"
+      },
+      "purpose": {
+        "all": "Tous",
+        "routine": "Routine",
+        "medical": "Médical",
+        "sale": "Vente",
+        "growth_monitoring": "Suivi de croissance",
+        "other": "Autre"
+      },
+      "units": {
+        "kg": "kg",
+        "lbs": "lbs"
+      },
+      "sections": {
+        "general": "Informations générales",
+        "data": "Données de pesée",
+        "growth": "Suivi de croissance",
+        "additional": "Informations supplémentaires"
+      },
+      "placeholders": {
+        "weight": "Entrez le poids",
+        "method": "ex: Balance électronique, bascule, ruban",
+        "location": "ex: Étable, pâturage",
+        "recordedBy": "Nom de la personne",
+        "notes": "Notes ou observations supplémentaires",
+        "conditions": "ex: À jeun, après repas",
+        "minWeight": "Poids min",
+        "maxWeight": "Poids max"
+      },
+      "stats": {
+        "total": "Total des pesées",
+        "routine": "Routine",
+        "medical": "Médical",
+        "avgWeight": "Poids moyen"
+      },
+      "messages": {
+        "noWeighings": "Aucune pesée trouvée",
+        "createSuccess": "Pesée créée avec succès",
+        "createError": "Erreur lors de la création de la pesée",
+        "updateSuccess": "Pesée mise à jour avec succès",
+        "updateError": "Erreur lors de la mise à jour de la pesée",
+        "deleteSuccess": "Pesée supprimée avec succès",
+        "deleteError": "Erreur lors de la suppression de la pesée",
+        "deleteConfirmTitle": "Confirmer la suppression",
+        "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
+        "addDescription": "Ajoutez une nouvelle pesée",
+        "editDescription": "Modifiez les informations de la pesée"
+      }
     }
   }
 }

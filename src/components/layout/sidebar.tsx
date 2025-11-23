@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -14,6 +14,7 @@ const menuItems = [
   { icon: Package, label: "Lots", href: "/lots" },
   { icon: Syringe, label: "Vaccinations", href: "/vaccinations" },
   { icon: Pill, label: "Traitements", href: "/treatments" },
+  { icon: Scale, label: "Pesées", href: "/weighings" },
 ];
 
 // Menu Données de référence (super admin uniquement)

@@ -692,6 +692,79 @@
       "deleteConfirmDescription": "هل أنت متأكد من حذف هذا العلاج؟",
       "addDescription": "إضافة علاج جديد",
       "editDescription": "تعديل معلومات العلاج"
+    },
+    "weighings": {
+      "title": "الوزن",
+      "subtitle": "تتبع وزن ونمو قطيعك",
+      "newWeighing": "وزن جديد",
+      "fields": {
+        "animalId": "الحيوان",
+        "weight": "الوزن",
+        "unit": "الوحدة",
+        "weighingDate": "تاريخ الوزن",
+        "weighingTime": "الوقت",
+        "purpose": "الغرض",
+        "method": "الطريقة",
+        "location": "الموقع",
+        "previousWeight": "الوزن السابق",
+        "weightGain": "زيادة الوزن",
+        "growthRate": "معدل النمو (يوميًا)",
+        "age": "العمر (أيام)",
+        "recordedBy": "سجل بواسطة",
+        "notes": "ملاحظات",
+        "conditions": "الظروف",
+        "dateFrom": "من تاريخ",
+        "dateTo": "إلى تاريخ",
+        "minWeight": "الوزن الأدنى",
+        "maxWeight": "الوزن الأقصى"
+      },
+      "purpose": {
+        "all": "الكل",
+        "routine": "روتيني",
+        "medical": "طبي",
+        "sale": "بيع",
+        "growth_monitoring": "مراقبة النمو",
+        "other": "أخرى"
+      },
+      "units": {
+        "kg": "كجم",
+        "lbs": "رطل"
+      },
+      "sections": {
+        "general": "معلومات عامة",
+        "data": "بيانات الوزن",
+        "growth": "تتبع النمو",
+        "additional": "معلومات إضافية"
+      },
+      "placeholders": {
+        "weight": "أدخل الوزن",
+        "method": "مثال: ميزان إلكتروني، ميزان، شريط",
+        "location": "مثال: الحظيرة، المرعى",
+        "recordedBy": "اسم الشخص",
+        "notes": "ملاحظات أو ملاحظات إضافية",
+        "conditions": "مثال: على معدة فارغة، بعد الوجبة",
+        "minWeight": "الوزن الأدنى",
+        "maxWeight": "الوزن الأقصى"
+      },
+      "stats": {
+        "total": "إجمالي الوزن",
+        "routine": "روتيني",
+        "medical": "طبي",
+        "avgWeight": "متوسط ​​الوزن"
+      },
+      "messages": {
+        "noWeighings": "لم يتم العثور على وزن",
+        "createSuccess": "تم إنشاء الوزن بنجاح",
+        "createError": "خطأ في إنشاء الوزن",
+        "updateSuccess": "تم تحديث الوزن بنجاح",
+        "updateError": "خطأ في تحديث الوزن",
+        "deleteSuccess": "تم حذف الوزن بنجاح",
+        "deleteError": "خطأ في حذف الوزن",
+        "deleteConfirmTitle": "تأكيد الحذف",
+        "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
+        "addDescription": "إضافة وزن جديد",
+        "editDescription": "تعديل معلومات الوزن"
+      }
     }
   }
 }
