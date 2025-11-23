@@ -341,16 +341,12 @@ if ($global:Data.Animals.Count -ge 3) {
     foreach ($lotData in $lotsData) {
         if ($counter -ge 10) { break }
 
-        # Prendre 2-3 animaux aléatoires
-        $lotAnimals = $global:Data.Animals | Get-Random -Count ([math]::Min(3, $global:Data.Animals.Count))
-        $animalIds = $lotAnimals | ForEach-Object { if ($_.id) { $_.id } else { $_.data.id } }
-
+        # Créer le lot SANS animaux pour éviter les conflits
         $lot = @{
             id = [guid]::NewGuid().ToString()
             name = $lotData.name
             type = $lotData.type
             status = $lotData.status
-            animalIds = @($animalIds)
             notes = "Cree automatiquement"
         }
 
