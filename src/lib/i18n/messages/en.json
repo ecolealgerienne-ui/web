@@ -943,6 +943,21 @@
       "health": "Health",
       "production": "Production",
       "financial": "Financial"
+    },
+    "settings": {
+      "title": "General Settings",
+      "description": "Select the period for all reports",
+      "applyToAll": "Apply to all",
+      "customPeriod": "Custom period"
+    },
+    "buttons": {
+      "generate": "Generate",
+      "exportPdf": "Export PDF"
+    },
+    "categoryTitles": {
+      "health": "Health & Wellness",
+      "production": "Production & Performance",
+      "financial": "Finance & Regulatory"
     }
   },
   "settings": {
@@ -957,7 +972,116 @@
       "security": "Security",
       "data": "Data"
     },
-    "save": "Save changes"
+    "save": "Save changes",
+    "profile": {
+      "title": "User Profile",
+      "description": "Manage your personal information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "roles": {
+        "owner": "Owner",
+        "manager": "Manager",
+        "veterinarian": "Veterinarian",
+        "worker": "Worker"
+      },
+      "saveButton": "Save changes"
+    },
+    "farm": {
+      "title": "Farm Information",
+      "description": "Configure your farm details",
+      "farmName": "Farm Name",
+      "farmId": "ID Number",
+      "surface": "Surface (hectares)",
+      "address": "Address",
+      "wilaya": "Province",
+      "commune": "Municipality",
+      "species": "Livestock Species",
+      "addSpecies": "+ Add",
+      "selectWilaya": "Select...",
+      "saveButton": "Save changes"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "description": "Choose how you want to be notified",
+      "vaccinations": {
+        "title": "Upcoming Vaccinations",
+        "description": "Receive alert 7 days before"
+      },
+      "treatments": {
+        "title": "Ongoing Treatments",
+        "description": "Daily reminder for treatments"
+      },
+      "waitingPeriods": {
+        "title": "Waiting Periods",
+        "description": "Alert at end of waiting period"
+      },
+      "births": {
+        "title": "Births",
+        "description": "Notification for each birth"
+      },
+      "healthAlerts": {
+        "title": "Health Alerts",
+        "description": "Urgent notifications for health issues"
+      },
+      "saveButton": "Save preferences"
+    },
+    "language": {
+      "title": "Language & Region",
+      "description": "Customize display according to your preferences",
+      "interfaceLanguage": "Interface Language",
+      "timezone": "Timezone",
+      "dateFormat": "Date Format",
+      "currency": "Currency",
+      "darkTheme": {
+        "title": "Dark Theme",
+        "description": "Enable dark mode"
+      },
+      "saveButton": "Save preferences"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Protect your account and data",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "changePasswordButton": "Change password",
+      "twoFactor": {
+        "title": "Two-Factor Authentication",
+        "label": "2FA",
+        "description": "Add an extra layer of security",
+        "disabled": "Disabled",
+        "enable": "Enable 2FA"
+      },
+      "activeSessions": {
+        "title": "Active Sessions",
+        "currentBrowser": "Current Browser",
+        "active": "Active"
+      }
+    },
+    "data": {
+      "title": "Data Management",
+      "description": "Backup, export and data deletion",
+      "autoBackup": {
+        "title": "Automatic Backup",
+        "lastBackup": "Last backup: Today at 3:00 AM",
+        "enabled": "Enabled",
+        "backupNow": "Backup now"
+      },
+      "export": {
+        "title": "Export Data",
+        "description": "Download a complete copy of all your data",
+        "excel": "Export to Excel",
+        "json": "Export to JSON"
+      },
+      "dangerZone": {
+        "title": "Danger Zone",
+        "description": "The following actions are irreversible",
+        "deleteAll": "Delete all data"
+      }
+    }
   },
   "homepage": {
     "title": "Complete Management of Your Livestock",

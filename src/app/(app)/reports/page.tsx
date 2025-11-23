@@ -64,9 +64,9 @@ export default function ReportsPage() {
       {/* Période globale */}
       <Card>
         <CardHeader>
-          <CardTitle>Paramètres généraux</CardTitle>
+          <CardTitle>{t('settings.title')}</CardTitle>
           <CardDescription>
-            Sélectionnez la période pour tous les rapports
+            {t('settings.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -82,13 +82,13 @@ export default function ReportsPage() {
                 <option value="month">{t('period.month')}</option>
                 <option value="quarter">{t('period.quarter')}</option>
                 <option value="year">{t('period.year')}</option>
-                <option value="custom">Période personnalisée</option>
+                <option value="custom">{t('settings.customPeriod')}</option>
               </Select>
             </div>
             <div className="flex items-end">
               <Button className="w-full">
                 <Calendar className="mr-2 h-4 w-4" />
-                Appliquer à tous
+                {t('settings.applyToAll')}
               </Button>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function ReportsPage() {
       {/* Rapports par catégorie */}
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Santé & Bien-être</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('categoryTitles.health')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {REPORT_DEFINITIONS.filter((r) => r.category === 'health').map((report) => {
               const Icon = iconMap[report.icon as keyof typeof iconMap];
@@ -122,11 +122,11 @@ export default function ReportsPage() {
                   <CardContent className="space-y-2">
                     <Button className="w-full" size="sm">
                       <FileText className="mr-2 h-4 w-4" />
-                      Générer
+                      {t('buttons.generate')}
                     </Button>
                     <Button variant="outline" className="w-full" size="sm">
                       <Download className="mr-2 h-4 w-4" />
-                      Exporter PDF
+                      {t('buttons.exportPdf')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -136,7 +136,7 @@ export default function ReportsPage() {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Production & Performance</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('categoryTitles.production')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {REPORT_DEFINITIONS.filter((r) => r.category === 'production').map((report) => {
               const Icon = iconMap[report.icon as keyof typeof iconMap];
@@ -160,11 +160,11 @@ export default function ReportsPage() {
                   <CardContent className="space-y-2">
                     <Button className="w-full" size="sm">
                       <FileText className="mr-2 h-4 w-4" />
-                      Générer
+                      {t('buttons.generate')}
                     </Button>
                     <Button variant="outline" className="w-full" size="sm">
                       <Download className="mr-2 h-4 w-4" />
-                      Exporter PDF
+                      {t('buttons.exportPdf')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -174,7 +174,7 @@ export default function ReportsPage() {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Finances & Réglementaire</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('categoryTitles.financial')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {REPORT_DEFINITIONS.filter((r) => ['financial', 'regulatory'].includes(r.category)).map(
               (report) => {

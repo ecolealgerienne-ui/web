@@ -989,6 +989,21 @@
       "health": "الصحة",
       "production": "الإنتاج",
       "financial": "المالية"
+    },
+    "settings": {
+      "title": "الإعدادات العامة",
+      "description": "حدد الفترة لجميع التقارير",
+      "applyToAll": "تطبيق على الكل",
+      "customPeriod": "فترة مخصصة"
+    },
+    "buttons": {
+      "generate": "توليد",
+      "exportPdf": "تصدير PDF"
+    },
+    "categoryTitles": {
+      "health": "الصحة والرفاهية",
+      "production": "الإنتاج والأداء",
+      "financial": "المالية والتنظيمية"
     }
   },
   "settings": {
@@ -1003,6 +1018,115 @@
       "security": "الأمان",
       "data": "البيانات"
     },
-    "save": "حفظ التغييرات"
+    "save": "حفظ التغييرات",
+    "profile": {
+      "title": "الملف الشخصي",
+      "description": "إدارة معلوماتك الشخصية",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "role": "الدور",
+      "roles": {
+        "owner": "مالك",
+        "manager": "مدير",
+        "veterinarian": "طبيب بيطري",
+        "worker": "موظف"
+      },
+      "saveButton": "حفظ التغييرات"
+    },
+    "farm": {
+      "title": "معلومات المزرعة",
+      "description": "قم بتكوين تفاصيل مزرعتك",
+      "farmName": "اسم المزرعة",
+      "farmId": "رقم التعريف",
+      "surface": "المساحة (هكتار)",
+      "address": "العنوان",
+      "wilaya": "الولاية",
+      "commune": "البلدية",
+      "species": "الأنواع المربّاة",
+      "addSpecies": "+ إضافة",
+      "selectWilaya": "اختر...",
+      "saveButton": "حفظ التغييرات"
+    },
+    "notifications": {
+      "title": "تفضيلات الإشعارات",
+      "description": "اختر كيف تريد أن يتم إعلامك",
+      "vaccinations": {
+        "title": "التطعيمات القادمة",
+        "description": "تلقي تنبيه قبل 7 أيام"
+      },
+      "treatments": {
+        "title": "العلاجات الجارية",
+        "description": "تذكير يومي للعلاجات"
+      },
+      "waitingPeriods": {
+        "title": "فترات الانتظار",
+        "description": "تنبيه في نهاية فترة الانتظار"
+      },
+      "births": {
+        "title": "الولادات",
+        "description": "إشعار لكل ولادة"
+      },
+      "healthAlerts": {
+        "title": "التنبيهات الصحية",
+        "description": "إشعارات عاجلة للمشاكل الصحية"
+      },
+      "saveButton": "حفظ التفضيلات"
+    },
+    "language": {
+      "title": "اللغة والمنطقة",
+      "description": "قم بتخصيص العرض وفقًا لتفضيلاتك",
+      "interfaceLanguage": "لغة الواجهة",
+      "timezone": "المنطقة الزمنية",
+      "dateFormat": "تنسيق التاريخ",
+      "currency": "العملة",
+      "darkTheme": {
+        "title": "المظهر الداكن",
+        "description": "تمكين الوضع الداكن"
+      },
+      "saveButton": "حفظ التفضيلات"
+    },
+    "security": {
+      "title": "الأمان",
+      "description": "احمِ حسابك وبياناتك",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة مرور جديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "changePasswordButton": "تغيير كلمة المرور",
+      "twoFactor": {
+        "title": "المصادقة الثنائية",
+        "label": "2FA",
+        "description": "إضافة طبقة أمان إضافية",
+        "disabled": "معطل",
+        "enable": "تمكين 2FA"
+      },
+      "activeSessions": {
+        "title": "الجلسات النشطة",
+        "currentBrowser": "المتصفح الحالي",
+        "active": "نشط"
+      }
+    },
+    "data": {
+      "title": "إدارة البيانات",
+      "description": "النسخ الاحتياطي والتصدير وحذف البيانات",
+      "autoBackup": {
+        "title": "النسخ الاحتياطي التلقائي",
+        "lastBackup": "آخر نسخة احتياطية: اليوم الساعة 03:00",
+        "enabled": "مفعّل",
+        "backupNow": "نسخ احتياطي الآن"
+      },
+      "export": {
+        "title": "تصدير البيانات",
+        "description": "قم بتنزيل نسخة كاملة من جميع بياناتك",
+        "excel": "تصدير إلى Excel",
+        "json": "تصدير إلى JSON"
+      },
+      "dangerZone": {
+        "title": "منطقة الخطر",
+        "description": "الإجراءات التالية لا رجعة فيها",
+        "deleteAll": "حذف جميع البيانات"
+      }
+    }
   }
 }

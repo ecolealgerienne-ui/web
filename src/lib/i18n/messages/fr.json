@@ -989,6 +989,21 @@
       "health": "Santé",
       "production": "Production",
       "financial": "Financier"
+    },
+    "settings": {
+      "title": "Paramètres généraux",
+      "description": "Sélectionnez la période pour tous les rapports",
+      "applyToAll": "Appliquer à tous",
+      "customPeriod": "Période personnalisée"
+    },
+    "buttons": {
+      "generate": "Générer",
+      "exportPdf": "Exporter PDF"
+    },
+    "categoryTitles": {
+      "health": "Santé & Bien-être",
+      "production": "Production & Performance",
+      "financial": "Finances & Réglementaire"
     }
   },
   "settings": {
@@ -1003,6 +1018,115 @@
       "security": "Sécurité",
       "data": "Données"
     },
-    "save": "Enregistrer les modifications"
+    "save": "Enregistrer les modifications",
+    "profile": {
+      "title": "Profil utilisateur",
+      "description": "Gérez vos informations personnelles",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "role": "Rôle",
+      "roles": {
+        "owner": "Propriétaire",
+        "manager": "Gestionnaire",
+        "veterinarian": "Vétérinaire",
+        "worker": "Employé"
+      },
+      "saveButton": "Enregistrer les modifications"
+    },
+    "farm": {
+      "title": "Informations de la ferme",
+      "description": "Configurez les détails de votre exploitation",
+      "farmName": "Nom de la ferme",
+      "farmId": "N° d'identification",
+      "surface": "Surface (hectares)",
+      "address": "Adresse",
+      "wilaya": "Wilaya",
+      "commune": "Commune",
+      "species": "Espèces élevées",
+      "addSpecies": "+ Ajouter",
+      "selectWilaya": "Sélectionner...",
+      "saveButton": "Enregistrer les modifications"
+    },
+    "notifications": {
+      "title": "Préférences de notifications",
+      "description": "Choisissez comment vous souhaitez être alerté",
+      "vaccinations": {
+        "title": "Vaccinations à venir",
+        "description": "Recevoir une alerte 7 jours avant"
+      },
+      "treatments": {
+        "title": "Traitements en cours",
+        "description": "Rappel quotidien pour les traitements"
+      },
+      "waitingPeriods": {
+        "title": "Délais d'attente",
+        "description": "Alerte fin de délai d'attente"
+      },
+      "births": {
+        "title": "Naissances",
+        "description": "Notification à chaque naissance"
+      },
+      "healthAlerts": {
+        "title": "Alertes sanitaires",
+        "description": "Notifications urgentes pour problèmes de santé"
+      },
+      "saveButton": "Enregistrer les préférences"
+    },
+    "language": {
+      "title": "Langue & Région",
+      "description": "Personnalisez l'affichage selon vos préférences",
+      "interfaceLanguage": "Langue de l'interface",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date",
+      "currency": "Devise",
+      "darkTheme": {
+        "title": "Thème sombre",
+        "description": "Activer le mode sombre"
+      },
+      "saveButton": "Enregistrer les préférences"
+    },
+    "security": {
+      "title": "Sécurité",
+      "description": "Protégez votre compte et vos données",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "changePasswordButton": "Changer le mot de passe",
+      "twoFactor": {
+        "title": "Authentification à deux facteurs",
+        "label": "2FA",
+        "description": "Ajouter une couche de sécurité supplémentaire",
+        "disabled": "Désactivé",
+        "enable": "Activer 2FA"
+      },
+      "activeSessions": {
+        "title": "Sessions actives",
+        "currentBrowser": "Navigateur actuel",
+        "active": "Active"
+      }
+    },
+    "data": {
+      "title": "Gestion des données",
+      "description": "Sauvegarde, export et suppression de données",
+      "autoBackup": {
+        "title": "Sauvegarde automatique",
+        "lastBackup": "Dernière sauvegarde : Aujourd'hui à 03:00",
+        "enabled": "Activé",
+        "backupNow": "Sauvegarder maintenant"
+      },
+      "export": {
+        "title": "Exporter les données",
+        "description": "Téléchargez une copie complète de toutes vos données",
+        "excel": "Exporter en Excel",
+        "json": "Exporter en JSON"
+      },
+      "dangerZone": {
+        "title": "Zone de danger",
+        "description": "Les actions suivantes sont irréversibles",
+        "deleteAll": "Supprimer toutes les données"
+      }
+    }
   }
 }
