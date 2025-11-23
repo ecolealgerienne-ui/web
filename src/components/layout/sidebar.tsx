@@ -51,7 +51,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-64 border-r bg-card h-screen sticky top-0 flex-col">
       <div className="flex h-16 items-center border-b px-6">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <Beef className="h-5 w-5 text-primary-foreground" />
           </div>
