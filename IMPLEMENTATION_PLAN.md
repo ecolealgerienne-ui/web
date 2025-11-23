@@ -270,6 +270,53 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 ---
 
+### Erreur 10: Utilisation de valeur vide ("") dans SelectItem de Radix UI
+**Contexte**: Filtres avec Select dans les pages de liste
+**Symptôme**: Erreur runtime "A <Select.Item /> must have a value prop that is not an empty string"
+**Cause**:
+- Tentative d'utiliser `<SelectItem value="">` pour l'option "Tous"
+- Radix UI réserve la chaîne vide pour le placeholder et la réinitialisation
+**Impact**: Page crash au chargement, impossible d'utiliser les filtres
+
+**Solution**:
+```tsx
+// ❌ MAUVAIS - Utilise une valeur vide
+const [selectedType, setSelectedType] = useState<AlertType | ''>('');
+const { data } = useResource({
+  type: selectedType || undefined,  // Conversion manuelle
+});
+
+<Select value={selectedType} onValueChange={(v) => setSelectedType(v as AlertType | '')}>
+  <SelectContent>
+    <SelectItem value="">{t('filters.all')}</SelectItem>  {/* ❌ ERREUR */}
+    <SelectItem value="type1">Type 1</SelectItem>
+  </SelectContent>
+</Select>
+
+// ✅ BON - Utilise une valeur non vide comme "all"
+const [selectedType, setSelectedType] = useState<string>('all');
+const { data } = useResource({
+  type: selectedType === 'all' ? undefined : (selectedType as AlertType),
+});
+
+<Select value={selectedType} onValueChange={setSelectedType}>
+  <SelectContent>
+    <SelectItem value="all">{t('filters.all')}</SelectItem>  {/* ✅ OK */}
+    <SelectItem value="type1">Type 1</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+**Leçon**:
+- Ne JAMAIS utiliser `value=""` dans un `<SelectItem>`
+- Radix UI réserve la chaîne vide pour le mécanisme de placeholder
+- Utiliser une valeur spéciale comme `"all"` pour "Tous"
+- Filtrer cette valeur spéciale côté logique : `selectedType === 'all' ? undefined : selectedType`
+- Simplifier le type state : `string` au lieu de `Type | ''`
+- Simplifier onValueChange : `setSelectedType` directement sans cast
+
+---
+
 ## ✅ Plan d'implémentation complet
 
 ### Phase 1: Recherche et Analyse (OBLIGATOIRE)

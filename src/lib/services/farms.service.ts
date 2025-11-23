@@ -6,10 +6,17 @@ import { apiClient } from '@/lib/api/client'
 import { Farm, CreateFarmDto, UpdateFarmDto } from '@/lib/types/farm'
 import { logger } from '@/lib/utils/logger'
 
+export interface FarmFilters {
+  ownerId?: string;
+  groupId?: string;
+  isDefault?: boolean;
+  search?: string;
+}
+
 class FarmsService {
   private basePath = '/api/farms'
 
-  async getAll(filters?: { ownerId?: string; groupId?: string; isDefault?: boolean; search?: string }): Promise<Farm[]> {
+  async getAll(filters?: Partial<FarmFilters>): Promise<Farm[]> {
     try {
       const params = new URLSearchParams()
       if (filters?.ownerId) params.append('ownerId', filters.ownerId)
@@ -18,16 +25,35 @@ class FarmsService {
       if (filters?.search) params.append('search', filters.search)
 
       const url = params.toString() ? `${this.basePath}?${params}` : this.basePath
-      const response = await apiClient.get<{ data: Farm[] }>(url)
+      logger.info('Fetching farms from', { url })
 
-      logger.info('Farms fetched', { count: response.data?.length || 0 })
-      return response.data || []
+      const response = await apiClient.get<any>(url)
+      logger.info('Farms response received', {
+        responseType: typeof response,
+        isArray: Array.isArray(response),
+        hasData: 'data' in response,
+        response: JSON.stringify(response).substring(0, 200)
+      })
+
+      // Handle both response formats: { data: [...] } or direct array [...]
+      let farms: Farm[]
+      if (Array.isArray(response)) {
+        farms = response
+      } else if (response && typeof response === 'object' && 'data' in response) {
+        farms = response.data || []
+      } else {
+        logger.warn('Unexpected response format', { response })
+        farms = []
+      }
+
+      logger.info('Farms fetched', { count: farms.length })
+      return farms
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No farms found (404)')
         return []
       }
-      logger.error('Failed to fetch farms', { error })
+      logger.error('Failed to fetch farms', { error: error.message, status: error.status })
       throw error
     }
   }
@@ -45,25 +71,17 @@ class FarmsService {
   }
 
   async create(data: CreateFarmDto): Promise<Farm> {
-    try {
-      const response = await apiClient.post<Farm>(this.basePath, data)
-      logger.info('Farm created', { id: response.id })
-      return response
-    } catch (error) {
-      logger.error('Failed to create farm', { error })
-      throw error
-    }
+    logger.info('Creating farm', { data })
+    const response = await apiClient.post<{ data: Farm }>(this.basePath, data)
+    logger.info('Farm created', { id: response.data?.id || response })
+    return response.data || response
   }
 
   async update(id: string, data: UpdateFarmDto): Promise<Farm> {
-    try {
-      const response = await apiClient.put<Farm>(`${this.basePath}/${id}`, data)
-      logger.info('Farm updated', { id })
-      return response
-    } catch (error) {
-      logger.error('Failed to update farm', { error })
-      throw error
-    }
+    logger.info('Updating farm', { id, data })
+    const response = await apiClient.put<{ data: Farm }>(`${this.basePath}/${id}`, data)
+    logger.info('Farm updated', { id })
+    return response.data || response
   }
 
   async delete(id: string): Promise<void> {
