@@ -34,6 +34,7 @@ export function VeterinarianFormDialog({
   const tc = useCommonTranslations();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -121,20 +122,35 @@ export function VeterinarianFormDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorDetails(null);
 
     try {
       if (isEditMode) {
         const updateData: UpdateVeterinarianDto = { ...formData };
+        console.log('Updating veterinarian:', updateData);
         await veterinariansService.update(veterinarian!.id, updateData);
         toast.success(tc('messages.success'), t('messages.updated'));
       } else {
         const createData: CreateVeterinarianDto = { ...formData };
+        console.log('Creating veterinarian:', createData);
         await veterinariansService.create(createData);
         toast.success(tc('messages.success'), t('messages.created'));
       }
 
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error submitting veterinarian form:', error);
+
+      // Extract detailed error message
+      let detailedError = error?.message || 'Unknown error';
+      if (error?.response?.data?.message) {
+        detailedError = error.response.data.message;
+      } else if (error?.data?.message) {
+        detailedError = error.data.message;
+      }
+
+      setErrorDetails(`${detailedError} (Status: ${error?.status || 'N/A'})`);
+
       const errorMessage = isEditMode
         ? t('messages.updateError')
         : t('messages.createError');
@@ -153,6 +169,13 @@ export function VeterinarianFormDialog({
             {isEditMode ? t('editVeterinarian') : t('newVeterinarian')}
           </DialogTitle>
         </DialogHeader>
+
+        {errorDetails && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4">
+            <p className="text-sm font-semibold text-destructive mb-1">Erreur détaillée :</p>
+            <p className="text-sm text-destructive/90">{errorDetails}</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section: Informations personnelles */}
