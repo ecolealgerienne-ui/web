@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { REPORT_DEFINITIONS, ReportPeriod } from '@/lib/types/report';
+import { useTranslations } from '@/lib/i18n';
 import {
   Beef,
   Syringe,
@@ -30,6 +31,7 @@ const iconMap = {
 };
 
 export default function ReportsPage() {
+  const t = useTranslations('reports');
   const [period, setPeriod] = useState<ReportPeriod>('month');
 
   const getCategoryColor = (category: string) => {
@@ -52,9 +54,9 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Rapports</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Générez des rapports détaillés sur votre exploitation
+            {t('subtitle')}
           </p>
         </div>
       </div>
@@ -70,16 +72,16 @@ export default function ReportsPage() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <Label htmlFor="period">Période</Label>
+              <Label htmlFor="period">{t('period.label')}</Label>
               <Select
                 id="period"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value as ReportPeriod)}
               >
-                <option value="week">Cette semaine</option>
-                <option value="month">Ce mois</option>
-                <option value="quarter">Ce trimestre</option>
-                <option value="year">Cette année</option>
+                <option value="week">{t('period.week')}</option>
+                <option value="month">{t('period.month')}</option>
+                <option value="quarter">{t('period.quarter')}</option>
+                <option value="year">{t('period.year')}</option>
                 <option value="custom">Période personnalisée</option>
               </Select>
             </div>
