@@ -239,3 +239,4 @@ Write-Host "  - Chevres: $goatTotal" -ForegroundColor White
 Write-Host "  - Vaches: $cattleTotal" -ForegroundColor White
 
 Write-Host "`n[SUCCESS] Base de donnees prete pour les tests !`n" -ForegroundColor Green
+
