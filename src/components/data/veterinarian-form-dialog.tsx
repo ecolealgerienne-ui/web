@@ -69,7 +69,9 @@ export function VeterinarianFormDialog({
         lastName: veterinarian.lastName,
         title: veterinarian.title || 'Dr.',
         licenseNumber: veterinarian.licenseNumber,
-        specialties: veterinarian.specialties,
+        specialties: Array.isArray(veterinarian.specialties)
+          ? veterinarian.specialties.join(', ')
+          : veterinarian.specialties || '',
         clinic: veterinarian.clinic || '',
         phone: veterinarian.phone,
         mobile: veterinarian.mobile || '',

@@ -204,7 +204,7 @@ export default function VeterinariansPage() {
 
                   {/* Spécialités */}
                   <div className="text-sm text-muted-foreground mb-2">
-                    {vet.specialties}
+                    {Array.isArray(vet.specialties) ? vet.specialties.join(', ') : vet.specialties}
                   </div>
 
                   {/* Clinique */}
@@ -239,12 +239,12 @@ export default function VeterinariansPage() {
                   {/* Tarifs */}
                   {(vet.consultationFee || vet.emergencyFee) && (
                     <div className="text-xs text-muted-foreground mb-3 pt-2 border-t">
-                      {vet.consultationFee > 0 && (
+                      {vet.consultationFee && vet.consultationFee > 0 && (
                         <div>
                           {t('fields.consultationFee')}: {vet.consultationFee} {vet.currency || 'EUR'}
                         </div>
                       )}
-                      {vet.emergencyFee > 0 && (
+                      {vet.emergencyFee && vet.emergencyFee > 0 && (
                         <div>
                           {t('fields.emergencyFee')}: {vet.emergencyFee} {vet.currency || 'EUR'}
                         </div>

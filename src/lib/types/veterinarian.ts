@@ -9,7 +9,7 @@ export interface Veterinarian {
   lastName: string
   title?: string
   licenseNumber: string
-  specialties: string
+  specialties?: string[] // Array in API response
   clinic?: string
   phone: string
   mobile?: string
