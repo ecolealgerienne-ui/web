@@ -332,9 +332,9 @@ Write-Host "[6/10] Creation des lots..." -ForegroundColor Green
 
 if ($global:Data.Animals.Count -ge 3) {
     $lotsData = @(
-        @{name="Lot Engraissement Hiver"; nameFr="Lot Engraissement Hiver"; nameEn="Winter Fattening Batch"; nameAr="Majmou'at Al-Tasmin Al-Shita'i"; type="fattening"; status="open"},
-        @{name="Lot Reproduction Printemps"; nameFr="Lot Reproduction Printemps"; nameEn="Spring Breeding Batch"; nameAr="Majmou'at Al-Takathur Al-Rabi'i"; type="breeding"; status="open"},
-        @{name="Lot Agnelage 2025"; nameFr="Lot Agnelage 2025"; nameEn="Lambing Batch 2025"; nameAr="Majmou'at Al-Wilada 2025"; type="breeding"; status="open"}
+        @{name="Lot Engraissement Hiver"; type="fattening"; status="open"},
+        @{name="Lot Reproduction Printemps"; type="breeding"; status="open"},
+        @{name="Lot Agnelage 2025"; type="breeding"; status="open"}
     )
 
     $counter = 0
@@ -543,7 +543,7 @@ if ($global:Data.Animals.Count -ge 2) {
             }
             "sale" {
                 $movement.buyerName = $movementData.buyerSellerName
-                $movement.buyerType = "cooperative"
+                $movement.buyerType = "farm"
                 $movement.salePrice = $movementData.price
             }
         }
