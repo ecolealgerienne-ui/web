@@ -125,16 +125,12 @@ if ($createdFarm) {
     $testBreedId = if ($testBreed.id) { $testBreed.id } elseif ($testBreed.data.id) { $testBreed.data.id } else { $breedForAnimal.id }
 
     $animal = @{
-        eid = "250123456789012"
-        internalId = "M001"
-        name = "Mouton Test"
-        species = "sheep"
+        id = [guid]::NewGuid().ToString()
+        visualId = "M001"
+        speciesId = "sheep"
         breedId = $testBreedId
         sex = "female"
         birthDate = "2023-01-15"
-        acquisitionDate = "2023-01-15"
-        acquisitionType = "birth"
-        currentWeight = 45.5
     }
 
     $createdAnimal = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/animals" -Body $animal
@@ -150,8 +146,8 @@ if ($createdFarm) {
         # Test UPDATE
         Write-Host "`n[TEST 3.2] Mise a jour de l'animal..." -ForegroundColor Cyan
         $updateData = @{
-            name = "Mouton Test Modifie"
-            currentWeight = 50.0
+            visualId = "M001-MODIFIE"
+            sex = "male"
         }
         $updatedAnimal = Invoke-ApiCall -Method "PUT" -Endpoint "/farms/$farmId/animals/$animalId" -Body $updateData
 
@@ -177,4 +173,4 @@ if ($createdFarm) {
 
 Write-Host "`n========================================" -ForegroundColor Green
 Write-Host "TESTS TERMINES" -ForegroundColor Green
-Write-Host "========================================`n" -ForegroundColor Green
+Write-Host "========================================`n" -ForegroundColor Gree
