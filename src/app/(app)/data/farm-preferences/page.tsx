@@ -130,14 +130,13 @@ export default function FarmPreferencesPage() {
                 <div>
                   <Label htmlFor="defaultSpeciesId">{t('fields.defaultSpeciesId')}</Label>
                   <Select
-                    value={formData.defaultSpeciesId}
+                    value={formData.defaultSpeciesId || undefined}
                     onValueChange={(value) => setFormData({ ...formData, defaultSpeciesId: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('placeholders.selectSpecies')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{t('placeholders.selectSpecies')}</SelectItem>
                       <SelectItem value="cattle">{t('species.cattle')}</SelectItem>
                       <SelectItem value="sheep">{t('species.sheep')}</SelectItem>
                       <SelectItem value="goat">{t('species.goat')}</SelectItem>
