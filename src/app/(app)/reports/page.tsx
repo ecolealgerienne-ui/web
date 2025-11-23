@@ -212,11 +212,11 @@ export default function ReportsPage() {
                     <CardContent className="space-y-2">
                       <Button className="w-full" size="sm">
                         <FileText className="mr-2 h-4 w-4" />
-                        Générer
+                        {t('buttons.generate')}
                       </Button>
                       <Button variant="outline" className="w-full" size="sm">
                         <Download className="mr-2 h-4 w-4" />
-                        Exporter PDF
+                        {t('buttons.exportPdf')}
                       </Button>
                     </CardContent>
                   </Card>
