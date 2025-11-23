@@ -81,8 +81,18 @@ class DashboardService {
 
       // Calculate real stats
       const totalAnimals = animals.length;
-      const birthsCount = movementStats.byType.birth || 0;
-      const deathsCount = movementStats.byType.death || 0;
+
+      // Extract count from birth/death data (API might return object or number)
+      const birthData = movementStats.byType.birth;
+      const deathData = movementStats.byType.death;
+
+      const birthsCount = typeof birthData === 'object' && birthData !== null && 'count' in birthData
+        ? (birthData as any).count
+        : (birthData as number) || 0;
+
+      const deathsCount = typeof deathData === 'object' && deathData !== null && 'count' in deathData
+        ? (deathData as any).count
+        : (deathData as number) || 0;
 
       // Count upcoming vaccinations (nextDueDate within next 30 days)
       const now = new Date();
