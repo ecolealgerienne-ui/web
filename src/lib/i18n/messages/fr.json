@@ -516,7 +516,8 @@
       "deleteConfirmTitle": "Confirmer la suppression",
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer la ferme « {name} » ?",
       "addDescription": "Ajoutez les informations de la nouvelle ferme",
-      "editDescription": "Modifiez les informations de la ferme"
+      "editDescription": "Modifiez les informations de la ferme",
+      "errorTitle": "Erreur détaillée"
     }
   },
   "errors": {

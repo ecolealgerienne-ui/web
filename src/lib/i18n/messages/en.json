@@ -524,7 +524,8 @@
       "deleteConfirmTitle": "Confirm deletion",
       "deleteConfirmDescription": "Are you sure you want to delete the farm \"{name}\"?",
       "addDescription": "Add the information for the new farm",
-      "editDescription": "Edit the farm information"
+      "editDescription": "Edit the farm information",
+      "errorTitle": "Detailed error"
     }
   },
   "animals": {

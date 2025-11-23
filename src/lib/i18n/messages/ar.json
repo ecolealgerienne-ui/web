@@ -524,7 +524,8 @@
       "deleteConfirmTitle": "تأكيد الحذف",
       "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{name}»؟",
       "addDescription": "أضف معلومات المزرعة الجديدة",
-      "editDescription": "عدل معلومات المزرعة"
+      "editDescription": "عدل معلومات المزرعة",
+      "errorTitle": "خطأ مفصل"
     }
   },
   "animals": {

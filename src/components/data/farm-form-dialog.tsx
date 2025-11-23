@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Dialog,
@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Farm, CreateFarmDto, UpdateFarmDto } from '@/lib/types/farm';
-import { useTranslations } from '@/lib/i18n';
+import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 
 interface FarmFormDialogProps {
   open: boolean;
@@ -33,6 +33,8 @@ export function FarmFormDialog({
   isLoading = false,
 }: FarmFormDialogProps) {
   const t = useTranslations('farms');
+  const tc = useCommonTranslations();
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   const {
     register,
@@ -77,11 +79,50 @@ export function FarmFormDialog({
         isDefault: false,
       });
     }
-  }, [farm, reset]);
+    setErrorDetails(null);
+  }, [farm, reset, open]);
 
   const handleFormSubmit = async (data: CreateFarmDto) => {
-    await onSubmit(data);
-    reset();
+    setErrorDetails(null);
+
+    try {
+      // Error 9: Clean payload - remove empty strings for optional fields
+      const cleanPayload: any = {
+        name: data.name,
+        location: data.location,
+        ownerId: data.ownerId,
+        isDefault: data.isDefault,
+      };
+
+      // Add optional fields only if they have values
+      if (data.cheptelNumber?.trim()) {
+        cleanPayload.cheptelNumber = data.cheptelNumber.trim();
+      }
+      if (data.groupId?.trim()) {
+        cleanPayload.groupId = data.groupId.trim();
+      }
+      if (data.groupName?.trim()) {
+        cleanPayload.groupName = data.groupName.trim();
+      }
+
+      console.log(farm ? 'Updating farm:' : 'Creating farm:', cleanPayload); // Error 7: Log data before sending
+
+      await onSubmit(cleanPayload);
+      reset();
+    } catch (error: any) {
+      console.error('Error submitting farm form:', error); // Error 7: Log error details
+
+      // Error 7: Extract detailed error message from multiple formats
+      let detailedError = error?.message || 'Unknown error';
+      if (error?.response?.data?.message) {
+        detailedError = error.response.data.message;
+      } else if (error?.data?.message) {
+        detailedError = error.data.message;
+      }
+
+      setErrorDetails(`${detailedError} (Status: ${error?.status || 'N/A'})`);
+      throw error; // Re-throw so parent can handle toast
+    }
   };
 
   return (
@@ -93,6 +134,16 @@ export function FarmFormDialog({
             {farm ? t('messages.editDescription') : t('messages.addDescription')}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Error 7: Display error banner if there's an error */}
+        {errorDetails && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4">
+            <p className="text-sm font-semibold text-destructive mb-1">
+              {t('messages.errorTitle') || 'Erreur détaillée'}
+            </p>
+            <p className="text-sm text-destructive/90">{errorDetails}</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
           {/* Informations générales */}
