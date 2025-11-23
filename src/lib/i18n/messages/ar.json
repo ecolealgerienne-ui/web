@@ -115,6 +115,97 @@
       "infoMessage": "السلالات هي بيانات مرجعية يديرها المسؤولون الفائقون. يمكنك إنشاء أو تعديل أو حذف السلالات. السلالات المحذوفة لم تعد مرئية في الواجهة."
     }
   },
+  "vaccines": {
+    "title": "اللقاحات",
+    "subtitle": "بيانات مرجعية - اللقاحات المتاحة",
+    "newVaccine": "لقاح جديد",
+    "editVaccine": "تعديل اللقاح",
+    "deleteVaccine": "حذف اللقاح",
+    "noVaccines": "لم يتم العثور على لقاحات",
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "manufacturer": "الشركة المصنعة",
+      "diseaseId": "المرض",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: لقاح ضد داء الكلب",
+      "description": "وصف اللقاح",
+      "manufacturer": "مثال: MSD لصحة الحيوان"
+    },
+    "messages": {
+      "created": "تم إنشاء اللقاح بنجاح",
+      "updated": "تم تحديث اللقاح بنجاح",
+      "deleted": "تم حذف اللقاح بنجاح",
+      "createError": "خطأ في إنشاء اللقاح",
+      "updateError": "خطأ في تحديث اللقاح",
+      "deleteError": "خطأ في حذف اللقاح",
+      "confirmDelete": "هل أنت متأكد من حذف اللقاح {name}؟"
+    }
+  },
+  "diseases": {
+    "title": "الأمراض",
+    "subtitle": "بيانات مرجعية - الأمراض المعروفة",
+    "newDisease": "مرض جديد",
+    "editDisease": "تعديل المرض",
+    "deleteDisease": "حذف المرض",
+    "noDiseases": "لم يتم العثور على أمراض",
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "symptoms": "الأعراض",
+      "treatment": "العلاج",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: داء الكلب",
+      "description": "وصف المرض",
+      "symptoms": "الأعراض الشائعة",
+      "treatment": "العلاج الموصى به"
+    },
+    "messages": {
+      "created": "تم إنشاء المرض بنجاح",
+      "updated": "تم تحديث المرض بنجاح",
+      "deleted": "تم حذف المرض بنجاح",
+      "createError": "خطأ في إنشاء المرض",
+      "updateError": "خطأ في تحديث المرض",
+      "deleteError": "خطأ في حذف المرض",
+      "confirmDelete": "هل أنت متأكد من حذف المرض {name}؟"
+    }
+  },
+  "medications": {
+    "title": "الأدوية",
+    "subtitle": "بيانات مرجعية - الأدوية المتاحة",
+    "newMedication": "دواء جديد",
+    "editMedication": "تعديل الدواء",
+    "deleteMedication": "حذف الدواء",
+    "noMedications": "لم يتم العثور على أدوية",
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "manufacturer": "الشركة المصنعة",
+      "activeIngredient": "المادة الفعالة",
+      "dosage": "الجرعة",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: إيفرمكتين",
+      "description": "وصف الدواء",
+      "manufacturer": "مثال: باير",
+      "activeIngredient": "مثال: إيفرمكتين 1%",
+      "dosage": "مثال: 1 مل لكل 50 كجم"
+    },
+    "messages": {
+      "created": "تم إنشاء الدواء بنجاح",
+      "updated": "تم تحديث الدواء بنجاح",
+      "deleted": "تم حذف الدواء بنجاح",
+      "createError": "خطأ في إنشاء الدواء",
+      "updateError": "خطأ في تحديث الدواء",
+      "deleteError": "خطأ في حذف الدواء",
+      "confirmDelete": "هل أنت متأكد من حذف الدواء {name}؟"
+    }
+  },
   "errors": {
     "generic": "حدث خطأ",
     "networkError": "خطأ في الاتصال بالخادم",

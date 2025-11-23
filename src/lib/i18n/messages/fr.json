@@ -115,6 +115,97 @@
       "infoMessage": "Les races sont des données de référence administrées par les super admins. Vous pouvez créer, modifier ou supprimer des races. Les races supprimées ne sont plus visibles dans l'interface."
     }
   },
+  "vaccines": {
+    "title": "Vaccins",
+    "subtitle": "Données de référence - Vaccins disponibles",
+    "newVaccine": "Nouveau vaccin",
+    "editVaccine": "Modifier le vaccin",
+    "deleteVaccine": "Supprimer le vaccin",
+    "noVaccines": "Aucun vaccin trouvé",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "manufacturer": "Fabricant",
+      "diseaseId": "Maladie",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Vaccin contre la rage",
+      "description": "Description du vaccin",
+      "manufacturer": "ex: MSD Santé Animale"
+    },
+    "messages": {
+      "created": "Vaccin créé avec succès",
+      "updated": "Vaccin mis à jour avec succès",
+      "deleted": "Vaccin supprimé avec succès",
+      "createError": "Erreur lors de la création du vaccin",
+      "updateError": "Erreur lors de la mise à jour du vaccin",
+      "deleteError": "Erreur lors de la suppression du vaccin",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer le vaccin {name} ?"
+    }
+  },
+  "diseases": {
+    "title": "Maladies",
+    "subtitle": "Données de référence - Maladies connues",
+    "newDisease": "Nouvelle maladie",
+    "editDisease": "Modifier la maladie",
+    "deleteDisease": "Supprimer la maladie",
+    "noDiseases": "Aucune maladie trouvée",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "symptoms": "Symptômes",
+      "treatment": "Traitement",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Rage",
+      "description": "Description de la maladie",
+      "symptoms": "Symptômes courants",
+      "treatment": "Traitement recommandé"
+    },
+    "messages": {
+      "created": "Maladie créée avec succès",
+      "updated": "Maladie mise à jour avec succès",
+      "deleted": "Maladie supprimée avec succès",
+      "createError": "Erreur lors de la création de la maladie",
+      "updateError": "Erreur lors de la mise à jour de la maladie",
+      "deleteError": "Erreur lors de la suppression de la maladie",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer la maladie {name} ?"
+    }
+  },
+  "medications": {
+    "title": "Médicaments",
+    "subtitle": "Données de référence - Médicaments disponibles",
+    "newMedication": "Nouveau médicament",
+    "editMedication": "Modifier le médicament",
+    "deleteMedication": "Supprimer le médicament",
+    "noMedications": "Aucun médicament trouvé",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "manufacturer": "Fabricant",
+      "activeIngredient": "Principe actif",
+      "dosage": "Posologie",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Ivermectine",
+      "description": "Description du médicament",
+      "manufacturer": "ex: Bayer",
+      "activeIngredient": "ex: Ivermectine 1%",
+      "dosage": "ex: 1ml par 50kg"
+    },
+    "messages": {
+      "created": "Médicament créé avec succès",
+      "updated": "Médicament mis à jour avec succès",
+      "deleted": "Médicament supprimé avec succès",
+      "createError": "Erreur lors de la création du médicament",
+      "updateError": "Erreur lors de la mise à jour du médicament",
+      "deleteError": "Erreur lors de la suppression du médicament",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer le médicament {name} ?"
+    }
+  },
   "campaigns": {
     "title": "Campagnes",
     "subtitle": "Gérez vos campagnes de vaccination, traitement et pesée",

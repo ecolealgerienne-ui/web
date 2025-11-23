@@ -115,6 +115,97 @@
       "infoMessage": "Breeds are reference data managed by super admins. You can create, edit or delete breeds. Deleted breeds are no longer visible in the interface."
     }
   },
+  "vaccines": {
+    "title": "Vaccines",
+    "subtitle": "Reference data - Available vaccines",
+    "newVaccine": "New vaccine",
+    "editVaccine": "Edit vaccine",
+    "deleteVaccine": "Delete vaccine",
+    "noVaccines": "No vaccines found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "manufacturer": "Manufacturer",
+      "diseaseId": "Disease",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Rabies vaccine",
+      "description": "Vaccine description",
+      "manufacturer": "e.g.: MSD Animal Health"
+    },
+    "messages": {
+      "created": "Vaccine created successfully",
+      "updated": "Vaccine updated successfully",
+      "deleted": "Vaccine deleted successfully",
+      "createError": "Error creating vaccine",
+      "updateError": "Error updating vaccine",
+      "deleteError": "Error deleting vaccine",
+      "confirmDelete": "Are you sure you want to delete the vaccine {name}?"
+    }
+  },
+  "diseases": {
+    "title": "Diseases",
+    "subtitle": "Reference data - Known diseases",
+    "newDisease": "New disease",
+    "editDisease": "Edit disease",
+    "deleteDisease": "Delete disease",
+    "noDiseases": "No diseases found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "symptoms": "Symptoms",
+      "treatment": "Treatment",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Rabies",
+      "description": "Disease description",
+      "symptoms": "Common symptoms",
+      "treatment": "Recommended treatment"
+    },
+    "messages": {
+      "created": "Disease created successfully",
+      "updated": "Disease updated successfully",
+      "deleted": "Disease deleted successfully",
+      "createError": "Error creating disease",
+      "updateError": "Error updating disease",
+      "deleteError": "Error deleting disease",
+      "confirmDelete": "Are you sure you want to delete the disease {name}?"
+    }
+  },
+  "medications": {
+    "title": "Medications",
+    "subtitle": "Reference data - Available medications",
+    "newMedication": "New medication",
+    "editMedication": "Edit medication",
+    "deleteMedication": "Delete medication",
+    "noMedications": "No medications found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "manufacturer": "Manufacturer",
+      "activeIngredient": "Active ingredient",
+      "dosage": "Dosage",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Ivermectin",
+      "description": "Medication description",
+      "manufacturer": "e.g.: Bayer",
+      "activeIngredient": "e.g.: Ivermectin 1%",
+      "dosage": "e.g.: 1ml per 50kg"
+    },
+    "messages": {
+      "created": "Medication created successfully",
+      "updated": "Medication updated successfully",
+      "deleted": "Medication deleted successfully",
+      "createError": "Error creating medication",
+      "updateError": "Error updating medication",
+      "deleteError": "Error deleting medication",
+      "confirmDelete": "Are you sure you want to delete the medication {name}?"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",
