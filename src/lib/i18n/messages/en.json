@@ -362,7 +362,7 @@
       "saveError": "Error saving farm",
       "deleteError": "Error deleting farm",
       "deleteConfirmTitle": "Confirm deletion",
-      "deleteConfirmDescription": "Are you sure you want to delete the farm \"{{name}}\"?",
+      "deleteConfirmDescription": "Are you sure you want to delete the farm \"{name}\"?",
       "addDescription": "Add the information for the new farm",
       "editDescription": "Edit the farm information"
     }

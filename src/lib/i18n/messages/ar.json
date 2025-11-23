@@ -362,7 +362,7 @@
       "saveError": "خطأ في حفظ المزرعة",
       "deleteError": "خطأ في حذف المزرعة",
       "deleteConfirmTitle": "تأكيد الحذف",
-      "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{{name}}»؟",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{name}»؟",
       "addDescription": "أضف معلومات المزرعة الجديدة",
       "editDescription": "عدل معلومات المزرعة"
     }

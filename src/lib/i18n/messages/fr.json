@@ -354,7 +354,7 @@
       "saveError": "Erreur lors de l'enregistrement de la ferme",
       "deleteError": "Erreur lors de la suppression de la ferme",
       "deleteConfirmTitle": "Confirmer la suppression",
-      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer la ferme « {{name}} » ?",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer la ferme « {name} » ?",
       "addDescription": "Ajoutez les informations de la nouvelle ferme",
       "editDescription": "Modifiez les informations de la ferme"
     }
