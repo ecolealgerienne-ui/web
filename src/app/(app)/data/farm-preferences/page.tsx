@@ -6,7 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useFarmPreferences } from '@/lib/hooks/useFarmPreferences';
 import { UpdateFarmPreferenceDto } from '@/lib/types/farm-preference';
 import { farmPreferencesService } from '@/lib/services/farm-preferences.service';
@@ -124,14 +130,18 @@ export default function FarmPreferencesPage() {
                 <div>
                   <Label htmlFor="defaultSpeciesId">{t('fields.defaultSpeciesId')}</Label>
                   <Select
-                    id="defaultSpeciesId"
                     value={formData.defaultSpeciesId}
-                    onChange={(e) => setFormData({ ...formData, defaultSpeciesId: e.target.value })}
+                    onValueChange={(value) => setFormData({ ...formData, defaultSpeciesId: value })}
                   >
-                    <option value="">{t('placeholders.selectSpecies')}</option>
-                    <option value="cattle">{t('species.cattle')}</option>
-                    <option value="sheep">{t('species.sheep')}</option>
-                    <option value="goat">{t('species.goat')}</option>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('placeholders.selectSpecies')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{t('placeholders.selectSpecies')}</SelectItem>
+                      <SelectItem value="cattle">{t('species.cattle')}</SelectItem>
+                      <SelectItem value="sheep">{t('species.sheep')}</SelectItem>
+                      <SelectItem value="goat">{t('species.goat')}</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
@@ -153,48 +163,64 @@ export default function FarmPreferencesPage() {
                 <div>
                   <Label htmlFor="weightUnit">{t('fields.weightUnit')}</Label>
                   <Select
-                    id="weightUnit"
                     value={formData.weightUnit}
-                    onChange={(e) => setFormData({ ...formData, weightUnit: e.target.value })}
+                    onValueChange={(value) => setFormData({ ...formData, weightUnit: value })}
                   >
-                    <option value="kg">kg</option>
-                    <option value="lb">lb</option>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="kg">kg</SelectItem>
+                      <SelectItem value="lb">lb</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="currency">{t('fields.currency')}</Label>
                   <Select
-                    id="currency"
                     value={formData.currency}
-                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
                   >
-                    <option value="EUR">EUR (€)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="DZD">DZD (دج)</option>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EUR">EUR (€)</SelectItem>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="DZD">DZD (دج)</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="language">{t('fields.language')}</Label>
                   <Select
-                    id="language"
                     value={formData.language}
-                    onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                    onValueChange={(value) => setFormData({ ...formData, language: value })}
                   >
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="ar">العربية</option>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="ar">العربية</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="dateFormat">{t('fields.dateFormat')}</Label>
                   <Select
-                    id="dateFormat"
                     value={formData.dateFormat}
-                    onChange={(e) => setFormData({ ...formData, dateFormat: e.target.value })}
+                    onValueChange={(value) => setFormData({ ...formData, dateFormat: value })}
                   >
-                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                      <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                      <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
               </div>
