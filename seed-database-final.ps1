@@ -34,7 +34,7 @@ function Invoke-ApiCall {
         } else {
             $response = Invoke-RestMethod -Uri $uri -Method $Method -Headers $headers
         }
-        Start-Sleep -Milliseconds 350
+        Start-Sleep -Seconds 1
         return $response
     } catch {
         Write-Host "[ERROR] $Method $Endpoint : $($_.Exception.Message)" -ForegroundColor Red
