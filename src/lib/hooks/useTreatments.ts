@@ -18,6 +18,9 @@ export function useTreatments(filters?: Partial<TreatmentFilters>): UseTreatment
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Stabiliser les filtres pour éviter les boucles infinies
+  const filtersKey = JSON.stringify(filters);
+
   const fetchTreatments = useCallback(async () => {
     try {
       setLoading(true);
@@ -31,7 +34,7 @@ export function useTreatments(filters?: Partial<TreatmentFilters>): UseTreatment
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filtersKey]);
 
   useEffect(() => {
     fetchTreatments();
