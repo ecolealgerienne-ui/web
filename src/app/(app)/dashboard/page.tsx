@@ -1,18 +1,17 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Beef, Plus, X, Syringe } from "lucide-react";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { AlertsCard } from "@/components/dashboard/alerts-card";
 import { ActivitiesCard } from "@/components/dashboard/activities-card";
 import { useDashboard } from "@/lib/hooks/useDashboard";
-import { mockChartData } from "@/lib/data/mock";
 import { useTranslations } from "@/lib/i18n";
 import { FlexibleChart, type ChartPeriod } from "@/components/ui/charts";
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
-  const { stats, alerts, activities, loading } = useDashboard();
+  const { stats, alerts, activities, herdEvolution, loading, fetchHerdEvolution } = useDashboard();
   const [selectedPeriod, setSelectedPeriod] = useState<ChartPeriod>('6months');
 
   // Helper to translate period/label values
@@ -22,43 +21,30 @@ export default function DashboardPage() {
     return value; // Return as-is if not a key
   };
 
-  // Helper to translate month names
-  const translateMonth = (month: string) => {
-    const monthMap: Record<string, string> = {
-      'Janvier': 'jan', 'Février': 'feb', 'Mars': 'mar', 'Avril': 'apr',
-      'Mai': 'may', 'Juin': 'jun', 'Juillet': 'jul', 'Août': 'aug',
-      'Septembre': 'sep', 'Octobre': 'oct', 'Novembre': 'nov', 'Décembre': 'dec'
-    };
-    const monthKey = monthMap[month];
-    return monthKey ? t(`months.${monthKey}`) : month;
-  };
-
-  // Generate mock data based on period
-  const generateChartData = (period: ChartPeriod) => {
-    // Mock data generation - in real app, this would fetch from API
-    const now = new Date();
-    const data = [];
-
-    let monthsToShow = 6;
-    if (period === '12months' || period === '1year') monthsToShow = 12;
-    else if (period === '2years') monthsToShow = 24;
-    else if (period === 'all') monthsToShow = 24; // or fetch all available
-
-    for (let i = monthsToShow - 1; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-      const monthKey = monthNames[date.getMonth()];
-
-      data.push({
-        month: t(`months.${monthKey}`),
-        animals: Math.floor(1000 + Math.random() * 300 + i * 10)
-      });
+  // Transform API data to chart format with translated month names
+  const chartData = useMemo(() => {
+    if (!herdEvolution || !herdEvolution.data || herdEvolution.data.length === 0) {
+      return [];
     }
 
-    return data;
-  };
+    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-  const chartData = generateChartData(selectedPeriod);
+    return herdEvolution.data.map((point) => {
+      const date = new Date(point.date);
+      const monthKey = monthNames[date.getMonth()];
+
+      return {
+        month: t(`months.${monthKey}`),
+        animals: point.count,
+      };
+    });
+  }, [herdEvolution, t]);
+
+  // Handle period change
+  const handlePeriodChange = (period: ChartPeriod) => {
+    setSelectedPeriod(period);
+    fetchHerdEvolution(period);
+  };
 
   if (loading) {
     return (
@@ -122,7 +108,7 @@ export default function DashboardPage() {
         defaultChartType="line"
         showPeriodSelector={true}
         showTypeSelector={true}
-        onPeriodChange={setSelectedPeriod}
+        onPeriodChange={handlePeriodChange}
         height={300}
       />
 

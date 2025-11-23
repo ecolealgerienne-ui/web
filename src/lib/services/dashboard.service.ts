@@ -39,6 +39,16 @@ export interface Activity {
   user?: string;
 }
 
+export interface HerdEvolutionDataPoint {
+  date: string;
+  count: number;
+}
+
+export interface HerdEvolution {
+  data: HerdEvolutionDataPoint[];
+  period: string;
+}
+
 class DashboardService {
   async getStats(): Promise<DashboardStats> {
     try {
@@ -83,6 +93,24 @@ class DashboardService {
         return [];
       }
       logger.error('Failed to fetch activities', { error });
+      throw error;
+    }
+  }
+
+  async getHerdEvolution(period?: string): Promise<HerdEvolution> {
+    try {
+      const queryParams = period ? `?period=${period}` : '';
+      const response = await apiClient.get<HerdEvolution>(`/farms/${TEMP_FARM_ID}/dashboard/herd-evolution${queryParams}`);
+      return response;
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('Herd evolution data not found (404), using empty data');
+        return {
+          data: [],
+          period: period || '6months',
+        };
+      }
+      logger.error('Failed to fetch herd evolution', { error });
       throw error;
     }
   }
