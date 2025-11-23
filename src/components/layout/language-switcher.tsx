@@ -1,7 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
-import { usePathname, useRouter } from 'next/navigation';
+import { useLocale, type Locale } from '@/lib/i18n';
 import {
   Select,
   SelectContent,
@@ -12,22 +11,16 @@ import {
 import { Globe } from 'lucide-react';
 
 const languages = [
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'ar', label: 'العربية', flag: '🇩🇿' },
+  { code: 'fr' as Locale, label: 'Français', flag: '🇫🇷' },
+  { code: 'en' as Locale, label: 'English', flag: '🇬🇧' },
+  { code: 'ar' as Locale, label: 'العربية', flag: '🇩🇿' },
 ];
 
 export function LanguageSwitcher() {
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
+  const { locale, changeLocale } = useLocale();
 
   const handleLanguageChange = (newLocale: string) => {
-    // Remplacer le locale dans l'URL
-    const segments = pathname.split('/');
-    segments[1] = newLocale;
-    const newPath = segments.join('/');
-    router.push(newPath);
+    changeLocale(newLocale as Locale);
   };
 
   const currentLanguage = languages.find((lang) => lang.code === locale) || languages[0];
