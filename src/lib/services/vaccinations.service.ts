@@ -8,10 +8,11 @@ class VaccinationsService {
   async getAll(filters?: Partial<VaccinationFilters>): Promise<Vaccination[]> {
     try {
       const params = new URLSearchParams();
-      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
-      if (filters?.targetType && filters.targetType !== 'all') params.append('targetType', filters.targetType);
-      if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
-      if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+      // Map frontend filters to API query params as per WEB_API_SPECIFICATIONS.md
+      if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.targetType && filters.targetType !== 'all') params.append('type', filters.targetType);
+      if (filters?.dateFrom) params.append('fromDate', filters.dateFrom);
+      if (filters?.dateTo) params.append('toDate', filters.dateTo);
       if (filters?.search) params.append('search', filters.search);
 
       const url = `/farms/${TEMP_FARM_ID}/vaccinations${params.toString() ? `?${params.toString()}` : ''}`;
@@ -33,16 +34,8 @@ class VaccinationsService {
   }
 
   async getByAnimalId(animalId: string): Promise<Vaccination[]> {
-    try {
-      const response = await apiClient.get<{ data: Vaccination[] }>(`/farms/${TEMP_FARM_ID}/animals/${animalId}/vaccinations`);
-      return response.data || [];
-    } catch (error: any) {
-      if (error.status === 404) {
-        logger.info(`No vaccinations found for animal ${animalId} (404)`);
-        return [];
-      }
-      throw error;
-    }
+    // Use getAll with animalId filter as per API specs
+    return this.getAll({ animalId });
   }
 
   async create(data: CreateVaccinationDto): Promise<Vaccination> {
@@ -51,7 +44,8 @@ class VaccinationsService {
   }
 
   async update(id: string, data: UpdateVaccinationDto): Promise<Vaccination> {
-    const response = await apiClient.patch<{ data: Vaccination }>(`/farms/${TEMP_FARM_ID}/vaccinations/${id}`, data);
+    // Use PUT as per API specs (not PATCH)
+    const response = await apiClient.put<{ data: Vaccination }>(`/farms/${TEMP_FARM_ID}/vaccinations/${id}`, data);
     return response.data;
   }
 
