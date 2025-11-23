@@ -103,18 +103,32 @@ export function CampaignFormDialog({
     setErrorDetails(null);
 
     try {
-      const payload = {
-        ...formData,
+      // Clean payload - remove empty strings and zero values for optional fields
+      const cleanPayload: any = {
+        name: formData.name,
+        type: formData.type,
         campaignDate: new Date(formData.campaignDate).toISOString(),
+        status: formData.status,
       };
 
+      // Add optional fields only if they have values
+      if (formData.productId?.trim()) cleanPayload.productId = formData.productId.trim();
+      if (formData.productName?.trim()) cleanPayload.productName = formData.productName.trim();
+      if (formData.targetCount > 0) cleanPayload.targetCount = formData.targetCount;
+      if (formData.completedCount > 0) cleanPayload.completedCount = formData.completedCount;
+      if (formData.description?.trim()) cleanPayload.description = formData.description.trim();
+      if (formData.veterinarianId?.trim()) cleanPayload.veterinarianId = formData.veterinarianId.trim();
+      if (formData.veterinarianName?.trim()) cleanPayload.veterinarianName = formData.veterinarianName.trim();
+      if (formData.cost > 0) cleanPayload.cost = formData.cost;
+      if (formData.notes?.trim()) cleanPayload.notes = formData.notes.trim();
+
       if (isEditMode) {
-        const updateData: UpdateCampaignDto = payload;
+        const updateData: UpdateCampaignDto = cleanPayload;
         console.log('Updating campaign:', updateData);
         await campaignsService.update(campaign!.id, updateData);
         toast.success(tc('messages.success'), t('messages.updated'));
       } else {
-        const createData: CreateCampaignDto = payload;
+        const createData: CreateCampaignDto = cleanPayload;
         console.log('Creating campaign:', createData);
         await campaignsService.create(createData);
         toast.success(tc('messages.success'), t('messages.created'));
