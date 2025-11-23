@@ -823,7 +823,8 @@
       "medical": "Medical",
       "sale": "Sale",
       "growth_monitoring": "Growth monitoring",
-      "other": "Other"
+      "other": "Other",
+      "all": "All"
     },
     "unit": {
       "kg": "kg",
@@ -864,7 +865,9 @@
       "total": "Total weighings",
       "avgWeight": "Average weight",
       "avgGrowth": "Average growth",
-      "lastWeighing": "Last weighing"
+      "lastWeighing": "Last weighing",
+      "routine": "Routine",
+      "medical": "Medical"
     },
     "messages": {
       "loadError": "Unable to load weighings",
