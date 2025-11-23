@@ -55,9 +55,9 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
-              {Object.entries(LOT_TYPE_LABELS).map(([value, label]) => (
+              {Object.keys(LOT_TYPE_LABELS).map((value) => (
                 <SelectItem key={value} value={value}>
-                  {label}
+                  {t(`type.${value}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -78,9 +78,9 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
-              {Object.entries(LOT_STATUS_LABELS).map(([value, label]) => (
+              {Object.keys(LOT_STATUS_LABELS).map((value) => (
                 <SelectItem key={value} value={value}>
-                  {label}
+                  {t(`status.${value}`)}
                 </SelectItem>
               ))}
             </SelectContent>

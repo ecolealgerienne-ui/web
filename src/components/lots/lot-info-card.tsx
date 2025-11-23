@@ -2,6 +2,7 @@
 
 import { Lot, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from '@/lib/i18n';
 import {
   Card,
   CardContent,
@@ -24,6 +25,8 @@ interface LotInfoCardProps {
 }
 
 export function LotInfoCard({ lot }: LotInfoCardProps) {
+  const t = useTranslations('lots');
+
   return (
     <Card>
       <CardHeader>
@@ -33,8 +36,8 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
       <CardContent className="space-y-4">
         {/* Type et Statut */}
         <div className="flex items-center gap-2">
-          <Badge className="border border-border bg-background">{LOT_TYPE_LABELS[lot.type]}</Badge>
-          <Badge variant="default">{LOT_STATUS_LABELS[lot.status]}</Badge>
+          <Badge className="border border-border bg-background">{t(`type.${lot.type}`)}</Badge>
+          <Badge variant="default">{t(`status.${lot.status}`)}</Badge>
           {lot.completed && <Badge variant="success">Complété</Badge>}
         </div>
 

@@ -972,6 +972,19 @@
       "actions": "الإجراءات",
       "buyer": "المشتري",
       "seller": "البائع"
+    },
+    "status": {
+      "open": "مفتوح",
+      "closed": "مغلق",
+      "archived": "مؤرشف"
+    },
+    "type": {
+      "treatment": "علاج",
+      "vaccination": "تطعيم",
+      "sale": "بيع",
+      "slaughter": "ذبح",
+      "purchase": "شراء",
+      "breeding": "تكاثر"
     }
   },
   "reports": {

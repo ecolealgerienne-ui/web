@@ -96,12 +96,12 @@ export function LotsTable({ lots }: LotsTableProps) {
               </TableCell>
               <TableCell>
                 <Badge className={getTypeColor(lot.type)}>
-                  {LOT_TYPE_LABELS[lot.type]}
+                  {t(`type.${lot.type}`)}
                 </Badge>
               </TableCell>
               <TableCell>
                 <Badge variant={getStatusVariant(lot.status)}>
-                  {LOT_STATUS_LABELS[lot.status]}
+                  {t(`status.${lot.status}`)}
                 </Badge>
               </TableCell>
               <TableCell className="text-right font-medium">

@@ -929,6 +929,19 @@
       "actions": "Actions",
       "buyer": "Buyer",
       "seller": "Seller"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "archived": "Archived"
+    },
+    "type": {
+      "treatment": "Treatment",
+      "vaccination": "Vaccination",
+      "sale": "Sale",
+      "slaughter": "Slaughter",
+      "purchase": "Purchase",
+      "breeding": "Breeding"
     }
   },
   "reports": {
