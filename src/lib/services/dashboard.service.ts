@@ -6,6 +6,8 @@ import { apiClient } from '@/lib/api/client';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 import { animalsService } from './animals.service';
+import { movementsService } from './movements.service';
+import { vaccinationsService } from './vaccinations.service';
 
 
 export interface DashboardStats {
@@ -51,47 +53,65 @@ export interface HerdEvolution {
 }
 
 class DashboardService {
+  private getThisMonthDates() {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    return {
+      fromDate: firstDay.toISOString(),
+      toDate: lastDay.toISOString(),
+    };
+  }
+
+  private getUpcomingVaccinationsDays() {
+    return 30; // Consider vaccinations due in next 30 days as "upcoming"
+  }
+
   async getStats(): Promise<DashboardStats> {
     try {
-      // Fetch dashboard stats from API
-      const response = await apiClient.get<DashboardStats>(`/farms/${TEMP_FARM_ID}/dashboard/stats`);
+      // Get real data from multiple endpoints
+      const { fromDate, toDate } = this.getThisMonthDates();
 
-      // Get real animal count from animals endpoint
-      const animals = await animalsService.getAll();
+      const [animals, movementStats, vaccinations] = await Promise.all([
+        animalsService.getAll(),
+        movementsService.getStatistics(fromDate, toDate),
+        vaccinationsService.getAll(),
+      ]);
+
+      // Calculate real stats
       const totalAnimals = animals.length;
+      const birthsCount = movementStats.byType.birth || 0;
+      const deathsCount = movementStats.byType.death || 0;
 
-      // Override totalAnimals with real count from animals API
+      // Count upcoming vaccinations (nextDueDate within next 30 days)
+      const now = new Date();
+      const upcomingDays = this.getUpcomingVaccinationsDays();
+      const futureDate = new Date();
+      futureDate.setDate(now.getDate() + upcomingDays);
+
+      const upcomingVaccinations = vaccinations.filter((vacc) => {
+        if (!vacc.nextDueDate) return false;
+        const dueDate = new Date(vacc.nextDueDate);
+        return dueDate >= now && dueDate <= futureDate;
+      }).length;
+
       return {
-        ...response,
         totalAnimals,
+        births: { count: birthsCount, period: 'thisMonth' },
+        deaths: { count: deathsCount, period: 'thisMonth' },
+        vaccinations: { upcoming: upcomingVaccinations, label: 'upcoming' },
       };
     } catch (error: any) {
-      if (error.status === 404) {
-        logger.info('Dashboard stats not found (404), fetching real animal count');
-
-        // If dashboard stats not found, get real animal count
-        try {
-          const animals = await animalsService.getAll();
-          const totalAnimals = animals.length;
-
-          return {
-            totalAnimals,
-            births: { count: 0, period: 'thisMonth' },
-            deaths: { count: 0, period: 'thisMonth' },
-            vaccinations: { upcoming: 0, label: 'upcoming' },
-          };
-        } catch (animalsError) {
-          logger.error('Failed to fetch animals for stats', { error: animalsError });
-          return {
-            totalAnimals: 0,
-            births: { count: 0, period: 'thisMonth' },
-            deaths: { count: 0, period: 'thisMonth' },
-            vaccinations: { upcoming: 0, label: 'upcoming' },
-          };
-        }
-      }
       logger.error('Failed to fetch dashboard stats', { error });
-      throw error;
+
+      // Return zeros on error
+      return {
+        totalAnimals: 0,
+        births: { count: 0, period: 'thisMonth' },
+        deaths: { count: 0, period: 'thisMonth' },
+        vaccinations: { upcoming: 0, label: 'upcoming' },
+      };
     }
   }
 
