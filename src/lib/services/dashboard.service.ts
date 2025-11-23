@@ -49,9 +49,9 @@ class DashboardService {
         logger.info('Dashboard stats not found (404), using defaults');
         return {
           totalAnimals: 0,
-          births: { count: 0, period: 'Ce mois' },
-          deaths: { count: 0, period: 'Ce mois' },
-          vaccinations: { upcoming: 0, label: 'À venir' },
+          births: { count: 0, period: 'thisMonth' },
+          deaths: { count: 0, period: 'thisMonth' },
+          vaccinations: { upcoming: 0, label: 'upcoming' },
         };
       }
       logger.error('Failed to fetch dashboard stats', { error });

@@ -1174,5 +1174,44 @@
         "deleteAll": "Supprimer toutes les données"
       }
     }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "loading": "Chargement du dashboard...",
+    "loadingData": "Récupération des données",
+    "loadError": "Impossible de charger les statistiques",
+    "kpi": {
+      "totalAnimals": "Total Animaux",
+      "births": "Naissances",
+      "deaths": "Décès",
+      "vaccinations": "Vaccinations"
+    },
+    "periods": {
+      "thisMonth": "Ce mois",
+      "upcoming": "À venir"
+    },
+    "chart": {
+      "evolution": "Évolution du Cheptel (6 mois)"
+    },
+    "alerts": {
+      "title": "Alertes Actives"
+    },
+    "activities": {
+      "title": "Activités Récentes"
+    },
+    "months": {
+      "jan": "Janvier",
+      "feb": "Février",
+      "mar": "Mars",
+      "apr": "Avril",
+      "may": "Mai",
+      "jun": "Juin",
+      "jul": "Juillet",
+      "aug": "Août",
+      "sep": "Septembre",
+      "oct": "Octobre",
+      "nov": "Novembre",
+      "dec": "Décembre"
+    }
   }
 }

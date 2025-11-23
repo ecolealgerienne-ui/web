@@ -10,16 +10,19 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslations } from "@/lib/i18n";
 
 interface ChartEvolutionProps {
   data: Array<{ month: string; animals: number }>;
 }
 
 export function ChartEvolution({ data }: ChartEvolutionProps) {
+  const t = useTranslations('dashboard');
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Évolution du Cheptel (6 mois)</CardTitle>
+        <CardTitle className="text-lg">{t('chart.evolution')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>

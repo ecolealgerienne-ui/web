@@ -1175,5 +1175,44 @@
     "footer": {
       "copyright": "© 2024 École Algérienne. All rights reserved."
     }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Loading dashboard...",
+    "loadingData": "Fetching data",
+    "loadError": "Unable to load statistics",
+    "kpi": {
+      "totalAnimals": "Total Animals",
+      "births": "Births",
+      "deaths": "Deaths",
+      "vaccinations": "Vaccinations"
+    },
+    "periods": {
+      "thisMonth": "This month",
+      "upcoming": "Upcoming"
+    },
+    "chart": {
+      "evolution": "Herd Evolution (6 months)"
+    },
+    "alerts": {
+      "title": "Active Alerts"
+    },
+    "activities": {
+      "title": "Recent Activities"
+    },
+    "months": {
+      "jan": "January",
+      "feb": "February",
+      "mar": "March",
+      "apr": "April",
+      "may": "May",
+      "jun": "June",
+      "jul": "July",
+      "aug": "August",
+      "sep": "September",
+      "oct": "October",
+      "nov": "November",
+      "dec": "December"
+    }
   }
 }
