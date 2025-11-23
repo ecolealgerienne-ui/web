@@ -53,28 +53,29 @@ Write-Host "  INITIALISATION BD - 1 FERME + 50 ANIMAUX" -ForegroundColor Cyan
 Write-Host "============================================================`n" -ForegroundColor Cyan
 
 # ============================================================================
-# PHASE 1: CREER LES RACES ALGERIENNES
+# PHASE 1: CREER LES RACES FRANCAISES
 # ============================================================================
 
-Write-Host "[1/3] Creation des races algeriennes..." -ForegroundColor Green
+Write-Host "[1/3] Creation des races francaises..." -ForegroundColor Green
 
 $breedsData = @(
     # Bovins
-    @{speciesId="cattle"; nameFr="Brune de l'Atlas"; nameEn="Atlas Brown"; nameAr="Boniya Al-Atlas"; description="Race rustique des montagnes"},
-    @{speciesId="cattle"; nameFr="Guelmoise"; nameEn="Guelmoise"; nameAr="Al-Qalmiya"; description="Race laitiere de l'Est algerien"},
-    @{speciesId="cattle"; nameFr="Cheurfa"; nameEn="Cheurfa"; nameAr="Al-Sharfa"; description="Race locale de l'Ouest"},
+    @{speciesId="cattle"; nameFr="Charolaise"; nameEn="Charolais"; nameAr="Charolaise"; description="Race a viande blanche tres repandue"},
+    @{speciesId="cattle"; nameFr="Limousine"; nameEn="Limousin"; nameAr="Limousine"; description="Race a viande rousse rustique"},
+    @{speciesId="cattle"; nameFr="Normande"; nameEn="Norman"; nameAr="Normande"; description="Race laitiere normande"},
+    @{speciesId="cattle"; nameFr="Montbeliarde"; nameEn="Montbeliard"; nameAr="Montbeliarde"; description="Race laitiere de montagne"},
 
     # Ovins
-    @{speciesId="sheep"; nameFr="Ouled Djellal"; nameEn="Ouled Djellal"; nameAr="Awlad Djallal"; description="Race ovine la plus repandue en Algerie"},
-    @{speciesId="sheep"; nameFr="Rembi"; nameEn="Rembi"; nameAr="Al-Rambi"; description="Race de l'Ouest algerien"},
-    @{speciesId="sheep"; nameFr="D'Man"; nameEn="D'Man"; nameAr="Daman"; description="Race prolifique du Sahara"},
-    @{speciesId="sheep"; nameFr="Barbarine"; nameEn="Barbarine"; nameAr="Al-Barbariya"; description="Race a queue grasse"},
+    @{speciesId="sheep"; nameFr="Lacaune"; nameEn="Lacaune"; nameAr="Lacaune"; description="Race laitiere pour le Roquefort"},
+    @{speciesId="sheep"; nameFr="Merinos d'Arles"; nameEn="Arles Merino"; nameAr="Merinos d'Arles"; description="Race a laine fine"},
+    @{speciesId="sheep"; nameFr="Ile-de-France"; nameEn="Ile-de-France"; nameAr="Ile-de-France"; description="Race bouchere"},
+    @{speciesId="sheep"; nameFr="Prealpes du Sud"; nameEn="South Prealpes"; nameAr="Prealpes"; description="Race rustique de montagne"},
 
     # Caprins
-    @{speciesId="goat"; nameFr="Arabia"; nameEn="Arabia"; nameAr="Al-Arabiya"; description="Race caprine laitiere"},
-    @{speciesId="goat"; nameFr="Kabyle"; nameEn="Kabyle"; nameAr="Al-Qaba'iliya"; description="Chevre de Kabylie"},
-    @{speciesId="goat"; nameFr="M'Zabite"; nameEn="M'Zabite"; nameAr="Al-Mozabiya"; description="Race du M'Zab"},
-    @{speciesId="goat"; nameFr="Naine de Kabylie"; nameEn="Kabyle Dwarf"; nameAr="Al-Qaba'iliya Al-Qazma"; description="Petite race locale"}
+    @{speciesId="goat"; nameFr="Alpine"; nameEn="Alpine"; nameAr="Alpine"; description="Race laitiere chamoisee"},
+    @{speciesId="goat"; nameFr="Saanen"; nameEn="Saanen"; nameAr="Saanen"; description="Race laitiere blanche"},
+    @{speciesId="goat"; nameFr="Angora"; nameEn="Angora"; nameAr="Angora"; description="Race a poil mohair"},
+    @{speciesId="goat"; nameFr="Poitevine"; nameEn="Poitevine"; nameAr="Poitevine"; description="Race rustique du Poitou"}
 )
 
 $counter = 1
@@ -113,10 +114,10 @@ Write-Host "[2/3] Creation de la ferme..." -ForegroundColor Green
 
 $farm = @{
     id = [guid]::NewGuid().ToString()
-    name = "Ferme El Baraka"
-    location = "Medea, Algerie"
+    name = "Ferme du Val Fleuri"
+    location = "Normandie, France"
     ownerId = "00000000-0000-0000-0000-000000000001"
-    cheptelNumber = "DZ-26-12345"
+    cheptelNumber = "FR-14-98765"
     isDefault = $false
 }
 
