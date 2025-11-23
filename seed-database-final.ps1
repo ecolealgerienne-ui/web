@@ -18,6 +18,11 @@ $global:Data = @{
     Vaccines = @()
     Farm = $null
     Animals = @()
+    Lots = @()
+    Vaccinations = @()
+    Treatments = @()
+    Weights = @()
+    Movements = @()
 }
 
 function Invoke-ApiCall {
@@ -58,7 +63,7 @@ Write-Host "============================================================`n" -For
 # PHASE 1: CREER LES RACES FRANCAISES
 # ============================================================================
 
-Write-Host "[1/5] Creation des races francaises..." -ForegroundColor Green
+Write-Host "[1/10] Creation des races francaises..." -ForegroundColor Green
 
 $breedsData = @(
     # Bovins (3 races)
@@ -110,7 +115,7 @@ Write-Host "`n  -> $($global:Data.Breeds.Count) races creees`n" -ForegroundColor
 # PHASE 2: CREER LES PRODUITS MEDICAUX
 # ============================================================================
 
-Write-Host "[2/5] Creation des produits medicaux..." -ForegroundColor Green
+Write-Host "[2/10] Creation des produits medicaux..." -ForegroundColor Green
 
 $productsData = @(
     # Antibiotiques
@@ -165,7 +170,7 @@ Write-Host "`n  -> $($global:Data.Products.Count) produits crees`n" -ForegroundC
 # PHASE 3: CREER LES VACCINS
 # ============================================================================
 
-Write-Host "[3/5] Creation des vaccins..." -ForegroundColor Green
+Write-Host "[3/10] Creation des vaccins..." -ForegroundColor Green
 
 $vaccinesData = @(
     @{nameFr="Enterotoxemie"; nameEn="Enterotoxemia"; nameAr="Antarotoksimiya"; disease="Enterotoxemie"; manufacturer="Merial"; type="obligatoire"; withdrawalPeriodDays=0},
@@ -209,7 +214,7 @@ Write-Host "`n  -> $($global:Data.Vaccines.Count) vaccins crees`n" -ForegroundCo
 # PHASE 4: CREER LA FERME
 # ============================================================================
 
-Write-Host "[4/5] Creation de la ferme..." -ForegroundColor Green
+Write-Host "[4/10] Creation de la ferme..." -ForegroundColor Green
 
 $farm = @{
     id = [guid]::NewGuid().ToString()
@@ -234,7 +239,7 @@ if ($createdFarm) {
 # PHASE 5: CREER LES ANIMAUX
 # ============================================================================
 
-Write-Host "[5/5] Creation de $TotalAnimals animaux..." -ForegroundColor Green
+Write-Host "[5/10] Creation de $TotalAnimals animaux..." -ForegroundColor Green
 
 # Repartition: 40% moutons, 35% chevres, 25% vaches
 $sheepCount = [math]::Floor($TotalAnimals * 0.4)
@@ -314,6 +319,241 @@ for ($i = 1; $i -le $cattleCount; $i++) {
 Write-Host "`n  -> $($global:Data.Animals.Count) animaux crees`n" -ForegroundColor Green
 
 # ============================================================================
+# PHASE 6: CREER LES LOTS
+# ============================================================================
+
+Write-Host "[6/10] Creation des lots..." -ForegroundColor Green
+
+if ($global:Data.Animals.Count -ge 3) {
+    $lotsData = @(
+        @{name="Lot Engraissement Hiver"; nameFr="Lot Engraissement Hiver"; nameEn="Winter Fattening Batch"; nameAr="Majmou'at Al-Tasmin Al-Shita'i"; type="fattening"; status="open"},
+        @{name="Lot Reproduction Printemps"; nameFr="Lot Reproduction Printemps"; nameEn="Spring Breeding Batch"; nameAr="Majmou'at Al-Takathur Al-Rabi'i"; type="breeding"; status="open"},
+        @{name="Lot Agnelage 2025"; nameFr="Lot Agnelage 2025"; nameEn="Lambing Batch 2025"; nameAr="Majmou'at Al-Wilada 2025"; type="breeding"; status="open"}
+    )
+
+    $counter = 0
+    foreach ($lotData in $lotsData) {
+        if ($counter -ge 10) { break }
+
+        # Prendre 2-3 animaux aléatoires
+        $lotAnimals = $global:Data.Animals | Get-Random -Count ([math]::Min(3, $global:Data.Animals.Count))
+        $animalIds = $lotAnimals | ForEach-Object { if ($_.id) { $_.id } else { $_.data.id } }
+
+        $lot = @{
+            id = [guid]::NewGuid().ToString()
+            name = $lotData.name
+            type = $lotData.type
+            status = $lotData.status
+            animalIds = @($animalIds)
+            notes = "Cree automatiquement"
+        }
+
+        $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/lots" -Body $lot
+        if ($created) {
+            $lotId = if ($created.id) { $created.id } elseif ($created.data.id) { $created.data.id } else { $lot.id }
+            $global:Data.Lots += @{
+                Id = $lotId
+                Name = $lotData.name
+            }
+            Write-Host "  [OK] $($lotData.name)" -ForegroundColor Gray
+        }
+        $counter++
+    }
+}
+
+Write-Host "`n  -> $($global:Data.Lots.Count) lots crees`n" -ForegroundColor Green
+
+# ============================================================================
+# PHASE 7: CREER LES VACCINATIONS
+# ============================================================================
+
+Write-Host "[7/10] Creation des vaccinations..." -ForegroundColor Green
+
+if ($global:Data.Animals.Count -gt 0 -and $global:Data.Vaccines.Count -gt 0) {
+    $counter = 0
+    foreach ($animal in $global:Data.Animals) {
+        if ($counter -ge 10) { break }
+
+        $animalId = if ($animal.id) { $animal.id } elseif ($animal.data.id) { $animal.data.id } else { $null }
+        if (-not $animalId) { continue }
+
+        $vaccine = $global:Data.Vaccines | Get-Random
+        $daysAgo = Get-Random -Minimum 30 -Maximum 365
+        $vaccinationDate = (Get-Date).AddDays(-$daysAgo).ToString("yyyy-MM-ddT10:00:00Z")
+        $nextDueDate = (Get-Date).AddDays(-$daysAgo + 365).ToString("yyyy-MM-ddT10:00:00Z")
+
+        $vaccination = @{
+            id = [guid]::NewGuid().ToString()
+            animalId = $animalId
+            vaccineName = $vaccine.Name
+            type = "obligatoire"
+            disease = $vaccine.Name
+            vaccinationDate = $vaccinationDate
+            nextDueDate = $nextDueDate
+            dose = "2ml"
+            administrationRoute = "Sous-cutanee"
+            withdrawalPeriodDays = 0
+            batchNumber = "BATCH-2025-$(Get-Random -Minimum 100 -Maximum 999)"
+        }
+
+        $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/vaccinations" -Body $vaccination
+        if ($created) {
+            $global:Data.Vaccinations += $created
+            Write-Host "  [OK] Vaccination $($vaccine.Name) pour animal $animalId" -ForegroundColor Gray
+        }
+        $counter++
+    }
+}
+
+Write-Host "`n  -> $($global:Data.Vaccinations.Count) vaccinations creees`n" -ForegroundColor Green
+
+# ============================================================================
+# PHASE 8: CREER LES TRAITEMENTS
+# ============================================================================
+
+Write-Host "[8/10] Creation des traitements medicaux..." -ForegroundColor Green
+
+if ($global:Data.Animals.Count -gt 0 -and $global:Data.Products.Count -gt 0) {
+    $counter = 0
+    foreach ($animal in $global:Data.Animals) {
+        if ($counter -ge 10) { break }
+
+        $animalId = if ($animal.id) { $animal.id } elseif ($animal.data.id) { $animal.data.id } else { $null }
+        if (-not $animalId) { continue }
+
+        $product = $global:Data.Products | Get-Random
+        $daysAgo = Get-Random -Minimum 7 -Maximum 180
+        $treatmentDate = (Get-Date).AddDays(-$daysAgo).ToString("yyyy-MM-ddT10:00:00Z")
+        $withdrawalEndDate = (Get-Date).AddDays(-$daysAgo + 28).ToString("yyyy-MM-ddT10:00:00Z")
+
+        $treatment = @{
+            id = [guid]::NewGuid().ToString()
+            animalId = $animalId
+            productId = $product.Id
+            productName = $product.Name
+            dose = [math]::Round((Get-Random -Minimum 5 -Maximum 20) + (Get-Random) * 0.9, 1)
+            treatmentDate = $treatmentDate
+            withdrawalEndDate = $withdrawalEndDate
+            notes = "Traitement preventif"
+        }
+
+        $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/treatments" -Body $treatment
+        if ($created) {
+            $global:Data.Treatments += $created
+            Write-Host "  [OK] Traitement $($product.Name) pour animal $animalId" -ForegroundColor Gray
+        }
+        $counter++
+    }
+}
+
+Write-Host "`n  -> $($global:Data.Treatments.Count) traitements crees`n" -ForegroundColor Green
+
+# ============================================================================
+# PHASE 9: CREER LES PESEES
+# ============================================================================
+
+Write-Host "[9/10] Creation des pesees..." -ForegroundColor Green
+
+if ($global:Data.Animals.Count -gt 0) {
+    $counter = 0
+    foreach ($animal in $global:Data.Animals) {
+        if ($counter -ge 10) { break }
+
+        $animalId = if ($animal.id) { $animal.id } elseif ($animal.data.id) { $animal.data.id } else { $null }
+        if (-not $animalId) { continue }
+
+        # Déterminer le poids selon l'espèce
+        $speciesId = if ($animal.speciesId) { $animal.speciesId } else { "sheep" }
+        $baseWeight = switch ($speciesId) {
+            "cattle" { Get-Random -Minimum 350 -Maximum 650 }
+            "sheep" { Get-Random -Minimum 40 -Maximum 80 }
+            "goat" { Get-Random -Minimum 30 -Maximum 60 }
+            default { Get-Random -Minimum 40 -Maximum 80 }
+        }
+
+        $daysAgo = Get-Random -Minimum 1 -Maximum 90
+        $weightDate = (Get-Date).AddDays(-$daysAgo).ToString("yyyy-MM-ddT10:00:00Z")
+
+        $weight = @{
+            id = [guid]::NewGuid().ToString()
+            animalId = $animalId
+            weight = [math]::Round($baseWeight + (Get-Random) * 10, 1)
+            weightDate = $weightDate
+            source = "scale"
+            notes = "Pesee de routine"
+        }
+
+        $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/weights" -Body $weight
+        if ($created) {
+            $global:Data.Weights += $created
+            Write-Host "  [OK] Pesee $($weight.weight)kg pour animal $animalId" -ForegroundColor Gray
+        }
+        $counter++
+    }
+}
+
+Write-Host "`n  -> $($global:Data.Weights.Count) pesees creees`n" -ForegroundColor Green
+
+# ============================================================================
+# PHASE 10: CREER LES MOUVEMENTS
+# ============================================================================
+
+Write-Host "[10/10] Creation des mouvements..." -ForegroundColor Green
+
+if ($global:Data.Animals.Count -ge 2) {
+    $movementsData = @(
+        @{type="purchase"; buyerSellerName="Ferme Dupont"; price=1500; desc="Achat de reproducteurs"},
+        @{type="sale"; buyerSellerName="Cooperative Agricole"; price=2200; desc="Vente d'agneaux"},
+        @{type="death"; buyerSellerName=""; price=0; desc="Mort naturelle"}
+    )
+
+    $counter = 0
+    foreach ($movementData in $movementsData) {
+        if ($counter -ge 10) { break }
+        if ($global:Data.Animals.Count -eq 0) { break }
+
+        # Prendre 1-2 animaux aléatoires
+        $movementAnimals = $global:Data.Animals | Get-Random -Count ([math]::Min(2, $global:Data.Animals.Count))
+        $animalIds = $movementAnimals | ForEach-Object { if ($_.id) { $_.id } elseif ($_.data.id) { $_.data.id } else { $null } } | Where-Object { $_ -ne $null }
+
+        if ($animalIds.Count -eq 0) { continue }
+
+        $daysAgo = Get-Random -Minimum 7 -Maximum 180
+        $movementDate = (Get-Date).AddDays(-$daysAgo).ToString("yyyy-MM-ddT10:00:00Z")
+
+        $movement = @{
+            id = [guid]::NewGuid().ToString()
+            movementType = $movementData.type
+            movementDate = $movementDate
+            animalIds = @($animalIds)
+            notes = $movementData.desc
+        }
+
+        # Ajouter les champs spécifiques selon le type
+        switch ($movementData.type) {
+            "purchase" {
+                $movement.sellerName = $movementData.buyerSellerName
+                $movement.purchasePrice = $movementData.price
+            }
+            "sale" {
+                $movement.buyerName = $movementData.buyerSellerName
+                $movement.buyerType = "cooperative"
+                $movement.salePrice = $movementData.price
+            }
+        }
+
+        $created = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/movements" -Body $movement
+        if ($created) {
+            $global:Data.Movements += $created
+            Write-Host "  [OK] Mouvement $($movementData.type) - $($movementData.desc)" -ForegroundColor Gray
+        }
+        $counter++
+    }
+}
+
+Write-Host "`n  -> $($global:Data.Movements.Count) mouvements crees`n" -ForegroundColor Green
+
+# ============================================================================
 # RESUME
 # ============================================================================
 
@@ -321,14 +561,18 @@ Write-Host "`n============================================================" -For
 Write-Host "                  INITIALISATION TERMINEE" -ForegroundColor Green
 Write-Host "============================================================`n" -ForegroundColor Green
 
-Write-Host "[RACES]" -ForegroundColor Cyan
+Write-Host "=== DONNEES DE REFERENCE ===" -ForegroundColor Yellow
+
+Write-Host "`n[RACES]" -ForegroundColor Cyan
 Write-Host "  - Total: $($global:Data.Breeds.Count)" -ForegroundColor White
 
-Write-Host "`n[PRODUITS]" -ForegroundColor Cyan
+Write-Host "`n[PRODUITS MEDICAUX]" -ForegroundColor Cyan
 Write-Host "  - Total: $($global:Data.Products.Count)" -ForegroundColor White
 
 Write-Host "`n[VACCINS]" -ForegroundColor Cyan
 Write-Host "  - Total: $($global:Data.Vaccines.Count)" -ForegroundColor White
+
+Write-Host "`n`n=== DONNEES TRANSACTIONNELLES ===" -ForegroundColor Yellow
 
 Write-Host "`n[FERME]" -ForegroundColor Cyan
 Write-Host "  - Nom: $($global:Data.Farm.Name)" -ForegroundColor White
@@ -343,5 +587,22 @@ Write-Host "  - Moutons: $sheepTotal" -ForegroundColor White
 Write-Host "  - Chevres: $goatTotal" -ForegroundColor White
 Write-Host "  - Vaches: $cattleTotal" -ForegroundColor White
 
-Write-Host "`n[SUCCESS] Base de donnees prete pour les tests !`n" -ForegroundColor Green
+Write-Host "`n[LOTS]" -ForegroundColor Cyan
+Write-Host "  - Total: $($global:Data.Lots.Count)" -ForegroundColor White
+
+Write-Host "`n[VACCINATIONS]" -ForegroundColor Cyan
+Write-Host "  - Total: $($global:Data.Vaccinations.Count)" -ForegroundColor White
+
+Write-Host "`n[TRAITEMENTS]" -ForegroundColor Cyan
+Write-Host "  - Total: $($global:Data.Treatments.Count)" -ForegroundColor White
+
+Write-Host "`n[PESEES]" -ForegroundColor Cyan
+Write-Host "  - Total: $($global:Data.Weights.Count)" -ForegroundColor White
+
+Write-Host "`n[MOUVEMENTS]" -ForegroundColor Cyan
+Write-Host "  - Total: $($global:Data.Movements.Count)" -ForegroundColor White
+
+Write-Host "`n============================================================" -ForegroundColor Green
+$totalEntities = $global:Data.Breeds.Count + $global:Data.Products.Count + $global:Data.Vaccines.Count + $global:Data.Animals.Count + $global:Data.Lots.Count + $global:Data.Vaccinations.Count + $global:Data.Treatments.Count + $global:Data.Weights.Count + $global:Data.Movements.Count + 1
+Write-Host "[SUCCESS] $totalEntities entites creees avec succes !`n" -ForegroundColor Green
 
