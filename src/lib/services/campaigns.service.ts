@@ -7,13 +7,19 @@ import { Campaign, CreateCampaignDto, UpdateCampaignDto, CampaignProgress, Campa
 import { logger } from '@/lib/utils/logger'
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 
+export interface CampaignFilters {
+  type?: CampaignType;
+  status?: CampaignStatus;
+  fromDate?: string;
+  toDate?: string;
+}
 
 class CampaignsService {
   private getBasePath() {
     return `/farms/${TEMP_FARM_ID}/campaigns`
   }
 
-  async getAll(filters?: { type?: CampaignType; status?: CampaignStatus; fromDate?: string; toDate?: string }): Promise<Campaign[]> {
+  async getAll(filters?: Partial<CampaignFilters>): Promise<Campaign[]> {
     try {
       const params = new URLSearchParams()
       if (filters?.type) params.append('type', filters.type)
@@ -22,16 +28,35 @@ class CampaignsService {
       if (filters?.toDate) params.append('toDate', filters.toDate)
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath()
-      const response = await apiClient.get<{ data: Campaign[] }>(url)
+      logger.info('Fetching campaigns from', { url })
 
-      logger.info('Campaigns fetched', { count: response.data?.length || 0 })
-      return response.data || []
+      const response = await apiClient.get<any>(url)
+      logger.info('Campaigns response received', {
+        responseType: typeof response,
+        isArray: Array.isArray(response),
+        hasData: 'data' in response,
+        response: JSON.stringify(response).substring(0, 200)
+      })
+
+      // Handle both response formats: { data: [...] } or direct array [...]
+      let campaigns: Campaign[]
+      if (Array.isArray(response)) {
+        campaigns = response
+      } else if (response && typeof response === 'object' && 'data' in response) {
+        campaigns = response.data || []
+      } else {
+        logger.warn('Unexpected response format', { response })
+        campaigns = []
+      }
+
+      logger.info('Campaigns fetched', { count: campaigns.length })
+      return campaigns
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No campaigns found (404)')
         return []
       }
-      logger.error('Failed to fetch campaigns', { error })
+      logger.error('Failed to fetch campaigns', { error: error.message, status: error.status })
       throw error
     }
   }
@@ -71,25 +96,17 @@ class CampaignsService {
   }
 
   async create(data: CreateCampaignDto): Promise<Campaign> {
-    try {
-      const response = await apiClient.post<Campaign>(this.getBasePath(), data)
-      logger.info('Campaign created', { id: response.id })
-      return response
-    } catch (error) {
-      logger.error('Failed to create campaign', { error })
-      throw error
-    }
+    logger.info('Creating campaign', { data })
+    const response = await apiClient.post<{ data: Campaign }>(this.getBasePath(), data)
+    logger.info('Campaign created', { id: response.data?.id || response })
+    return response.data || response
   }
 
   async update(id: string, data: UpdateCampaignDto): Promise<Campaign> {
-    try {
-      const response = await apiClient.put<Campaign>(`${this.getBasePath()}/${id}`, data)
-      logger.info('Campaign updated', { id })
-      return response
-    } catch (error) {
-      logger.error('Failed to update campaign', { error })
-      throw error
-    }
+    logger.info('Updating campaign', { id, data })
+    const response = await apiClient.put<{ data: Campaign }>(`${this.getBasePath()}/${id}`, data)
+    logger.info('Campaign updated', { id })
+    return response.data || response
   }
 
   async delete(id: string): Promise<void> {
