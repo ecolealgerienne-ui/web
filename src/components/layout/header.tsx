@@ -19,7 +19,7 @@ export function Header() {
       <div className="flex h-16 items-center px-4 md:px-6 justify-between">
         <div className="flex items-center gap-4">
           {/* Mobile Logo */}
-          <Link href="/dashboard" className="flex md:hidden items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
+          <Link href="/" className="flex md:hidden items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Beef className="h-5 w-5 text-primary-foreground" />
             </div>
