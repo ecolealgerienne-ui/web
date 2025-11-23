@@ -66,7 +66,9 @@ $breed = @{
 $createdBreed = Invoke-ApiCall -Method "POST" -Endpoint "/api/v1/breeds" -Body $breed
 
 if ($createdBreed) {
-    Write-Host "[OK] Race creee avec ID: $($createdBreed.id)" -ForegroundColor Green
+    # Extraire l'ID (peut etre dans .id ou .data.id)
+    $createdBreedId = if ($createdBreed.id) { $createdBreed.id } elseif ($createdBreed.data.id) { $createdBreed.data.id } else { $breedId }
+    Write-Host "[OK] Race creee avec ID: $createdBreedId" -ForegroundColor Green
 
     # Test GET
     Write-Host "`n[TEST 1.1] Recuperation de la race..." -ForegroundColor Cyan
@@ -74,7 +76,7 @@ if ($createdBreed) {
 
     # Test DELETE
     Write-Host "`n[TEST 1.2] Suppression de la race..." -ForegroundColor Cyan
-    Invoke-ApiCall -Method "DELETE" -Endpoint "/api/v1/breeds/$($createdBreed.id)"
+    Invoke-ApiCall -Method "DELETE" -Endpoint "/api/v1/breeds/$createdBreedId"
 } else {
     Write-Host "[FAIL] Impossible de creer la race" -ForegroundColor Red
     exit 1
@@ -87,21 +89,20 @@ if ($createdBreed) {
 Write-Host "`n`n[TEST 2] Creation d'une ferme..." -ForegroundColor Cyan
 
 $farm = @{
+    id = [guid]::NewGuid().ToString()
     name = "Ferme Test"
-    address = "Route de Medea"
-    city = "Medea"
-    postalCode = "26000"
-    phone = "+213550111222"
-    email = "test@test.dz"
-    taxId = "12345678901"
-    mainActivity = "Elevage ovin"
+    location = "Medea, Algerie"
+    ownerId = "00000000-0000-0000-0000-000000000001"
+    cheptelNumber = "DZ-26-12345"
+    isDefault = $false
 }
 
 $createdFarm = Invoke-ApiCall -Method "POST" -Endpoint "/api/farms" -Body $farm
 
 if ($createdFarm) {
-    Write-Host "[OK] Ferme creee avec ID: $($createdFarm.id)" -ForegroundColor Green
-    $farmId = $createdFarm.id
+    # Extraire l'ID
+    $farmId = if ($createdFarm.id) { $createdFarm.id } elseif ($createdFarm.data.id) { $createdFarm.data.id } else { $farm.id }
+    Write-Host "[OK] Ferme creee avec ID: $farmId" -ForegroundColor Green
 
     # ============================================================================
     # TEST 3: CREER UN ANIMAL (donnee transactionnelle par ferme)
@@ -121,13 +122,14 @@ if ($createdFarm) {
         isActive = $true
     }
     $testBreed = Invoke-ApiCall -Method "POST" -Endpoint "/api/v1/breeds" -Body $breedForAnimal
+    $testBreedId = if ($testBreed.id) { $testBreed.id } elseif ($testBreed.data.id) { $testBreed.data.id } else { $breedForAnimal.id }
 
     $animal = @{
         eid = "250123456789012"
         internalId = "M001"
         name = "Mouton Test"
         species = "sheep"
-        breedId = $testBreed.id
+        breedId = $testBreedId
         sex = "female"
         birthDate = "2023-01-15"
         acquisitionDate = "2023-01-15"
@@ -138,11 +140,12 @@ if ($createdFarm) {
     $createdAnimal = Invoke-ApiCall -Method "POST" -Endpoint "/farms/$farmId/animals" -Body $animal
 
     if ($createdAnimal) {
-        Write-Host "[OK] Animal cree avec ID: $($createdAnimal.id)" -ForegroundColor Green
+        $animalId = if ($createdAnimal.id) { $createdAnimal.id } elseif ($createdAnimal.data.id) { $createdAnimal.data.id } else { $null }
+        Write-Host "[OK] Animal cree avec ID: $animalId" -ForegroundColor Green
 
         # Test GET
         Write-Host "`n[TEST 3.1] Recuperation de l'animal..." -ForegroundColor Cyan
-        $fetchedAnimal = Invoke-ApiCall -Method "GET" -Endpoint "/farms/$farmId/animals/$($createdAnimal.id)"
+        $fetchedAnimal = Invoke-ApiCall -Method "GET" -Endpoint "/farms/$farmId/animals/$animalId"
 
         # Test UPDATE
         Write-Host "`n[TEST 3.2] Mise a jour de l'animal..." -ForegroundColor Cyan
@@ -150,11 +153,11 @@ if ($createdFarm) {
             name = "Mouton Test Modifie"
             currentWeight = 50.0
         }
-        $updatedAnimal = Invoke-ApiCall -Method "PUT" -Endpoint "/farms/$farmId/animals/$($createdAnimal.id)" -Body $updateData
+        $updatedAnimal = Invoke-ApiCall -Method "PUT" -Endpoint "/farms/$farmId/animals/$animalId" -Body $updateData
 
         # Test DELETE
         Write-Host "`n[TEST 3.3] Suppression de l'animal..." -ForegroundColor Cyan
-        Invoke-ApiCall -Method "DELETE" -Endpoint "/farms/$farmId/animals/$($createdAnimal.id)"
+        Invoke-ApiCall -Method "DELETE" -Endpoint "/farms/$farmId/animals/$animalId"
     } else {
         Write-Host "[FAIL] Impossible de creer l'animal" -ForegroundColor Red
     }
@@ -165,7 +168,7 @@ if ($createdFarm) {
 
     # Cleanup: supprimer la race de test
     Write-Host "[CLEANUP] Suppression de la race de test..." -ForegroundColor Cyan
-    Invoke-ApiCall -Method "DELETE" -Endpoint "/api/v1/breeds/$($testBreed.id)"
+    Invoke-ApiCall -Method "DELETE" -Endpoint "/api/v1/breeds/$testBreedId"
 
 } else {
     Write-Host "[FAIL] Impossible de creer la ferme" -ForegroundColor Red
