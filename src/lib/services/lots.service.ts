@@ -101,12 +101,14 @@ class LotsService {
   }
 
   async addAnimal(lotId: string, animalId: string): Promise<void> {
-    await apiClient.post(`${this.getBasePath()}/${lotId}/animals`, { animalId });
+    // API expects animalIds (plural) as array
+    await apiClient.post(`${this.getBasePath()}/${lotId}/animals`, { animalIds: [animalId] });
     logger.info('Animal added to lot', { lotId, animalId });
   }
 
   async removeAnimal(lotId: string, animalId: string): Promise<void> {
-    await apiClient.delete(`${this.getBasePath()}/${lotId}/animals/${animalId}`);
+    // API expects DELETE with body containing animalIds array
+    await apiClient.delete(`${this.getBasePath()}/${lotId}/animals`, { animalIds: [animalId] });
     logger.info('Animal removed from lot', { lotId, animalId });
   }
 }
