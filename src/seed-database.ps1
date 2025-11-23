@@ -1,4 +1,4 @@
-# Script d'initialisation - 1 ferme avec 50 animaux
+ # Script d'initialisation - 1 ferme avec 50 animaux
 # Usage: .\seed-database.ps1
 
 param(
@@ -34,7 +34,7 @@ function Invoke-ApiCall {
         } else {
             $response = Invoke-RestMethod -Uri $uri -Method $Method -Headers $headers
         }
-        Start-Sleep -Milliseconds 350
+        Start-Sleep -Seconds 1
         return $response
     } catch {
         Write-Host "[ERROR] $Method $Endpoint : $($_.Exception.Message)" -ForegroundColor Red
@@ -211,6 +211,7 @@ for ($i = 1; $i -le $cattleCount; $i++) {
         $animalCounter++
     }
 }
+
 Write-Host "`n  -> $($global:Data.Animals.Count) animaux crees`n" -ForegroundColor Green
 
 # ============================================================================
@@ -238,4 +239,5 @@ Write-Host "  - Chevres: $goatTotal" -ForegroundColor White
 Write-Host "  - Vaches: $cattleTotal" -ForegroundColor White
 
 Write-Host "`n[SUCCESS] Base de donnees prete pour les tests !`n" -ForegroundColor Green
+
 
