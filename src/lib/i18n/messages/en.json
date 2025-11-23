@@ -588,5 +588,108 @@
       "addDescription": "Schedule a new vaccination",
       "editDescription": "Edit the vaccination information"
     }
+  },
+  "treatments": {
+    "title": "Treatments",
+    "subtitle": "Manage medical treatments for your herd",
+    "newTreatment": "New treatment",
+    "editTreatment": "Edit treatment",
+    "deleteTreatment": "Delete treatment",
+    "noTreatments": "No treatments found",
+    "treatmentCount": "{count} treatment",
+    "treatmentCount_plural": "{count} treatments",
+    "filters": {
+      "allStatus": "All statuses",
+      "allTypes": "All types",
+      "allTargets": "All targets",
+      "search": "Search..."
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "antibiotic": "Antibiotic",
+      "antiparasitic": "Antiparasitic",
+      "anti_inflammatory": "Anti-inflammatory",
+      "vitamin": "Vitamin/Supplement",
+      "other": "Other"
+    },
+    "targetType": {
+      "individual": "Individual",
+      "lot": "Lot"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "lotId": "Lot",
+      "targetType": "Target type",
+      "productName": "Product name",
+      "treatmentType": "Treatment type",
+      "manufacturer": "Manufacturer",
+      "batchNumber": "Batch number",
+      "reason": "Reason",
+      "diagnosis": "Diagnosis",
+      "dosage": "Dosage",
+      "administrationRoute": "Administration route",
+      "frequency": "Frequency",
+      "duration": "Duration (days)",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "administeredBy": "Administered by",
+      "veterinarianId": "Veterinarian",
+      "prescriptionNumber": "Prescription number",
+      "withdrawalPeriodMeat": "Withdrawal period - meat (days)",
+      "withdrawalPeriodMilk": "Withdrawal period - milk (days)",
+      "status": "Status",
+      "notes": "Notes",
+      "adverseReactions": "Adverse reactions",
+      "effectiveness": "Effectiveness",
+      "cost": "Cost"
+    },
+    "routes": {
+      "SC": "Subcutaneous (SC)",
+      "IM": "Intramuscular (IM)",
+      "ID": "Intradermal (ID)",
+      "oral": "Oral",
+      "IV": "Intravenous (IV)",
+      "topical": "Topical"
+    },
+    "sections": {
+      "general": "General information",
+      "product": "Product details",
+      "administration": "Administration",
+      "withdrawal": "Withdrawal periods",
+      "additional": "Additional information"
+    },
+    "placeholders": {
+      "productName": "E.g.: Oxytetracycline",
+      "reason": "E.g.: Respiratory infection",
+      "diagnosis": "E.g.: Pneumonia",
+      "dosage": "E.g.: 1 ml/10 kg",
+      "frequency": "E.g.: 2x per day",
+      "administeredBy": "Person's name",
+      "notes": "Additional notes..."
+    },
+    "stats": {
+      "total": "Total treatments",
+      "scheduled": "Scheduled",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    },
+    "messages": {
+      "loadError": "Unable to load treatments",
+      "created": "Treatment created successfully",
+      "updated": "Treatment updated successfully",
+      "deleted": "Treatment deleted successfully",
+      "createError": "Error creating treatment",
+      "updateError": "Error updating treatment",
+      "deleteError": "Error deleting treatment",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete this treatment?",
+      "addDescription": "Add a new treatment",
+      "editDescription": "Edit the treatment information"
+    }
   }
 }

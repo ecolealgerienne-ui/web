@@ -588,5 +588,108 @@
       "addDescription": "جدولة تطعيم جديد",
       "editDescription": "تعديل معلومات التطعيم"
     }
+  },
+  "treatments": {
+    "title": "العلاجات",
+    "subtitle": "إدارة العلاجات الطبية للقطيع",
+    "newTreatment": "علاج جديد",
+    "editTreatment": "تعديل العلاج",
+    "deleteTreatment": "حذف العلاج",
+    "noTreatments": "لا توجد علاجات",
+    "treatmentCount": "{count} علاج",
+    "treatmentCount_plural": "{count} علاجات",
+    "filters": {
+      "allStatus": "جميع الحالات",
+      "allTypes": "جميع الأنواع",
+      "allTargets": "جميع الأهداف",
+      "search": "بحث..."
+    },
+    "status": {
+      "scheduled": "مجدول",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    },
+    "type": {
+      "antibiotic": "مضاد حيوي",
+      "antiparasitic": "مضاد طفيليات",
+      "anti_inflammatory": "مضاد التهاب",
+      "vitamin": "فيتامين/مكمل",
+      "other": "آخر"
+    },
+    "targetType": {
+      "individual": "فردي",
+      "lot": "مجموعة"
+    },
+    "fields": {
+      "animalId": "الحيوان",
+      "lotId": "المجموعة",
+      "targetType": "نوع الهدف",
+      "productName": "اسم المنتج",
+      "treatmentType": "نوع العلاج",
+      "manufacturer": "الشركة المصنعة",
+      "batchNumber": "رقم الدفعة",
+      "reason": "السبب",
+      "diagnosis": "التشخيص",
+      "dosage": "الجرعة",
+      "administrationRoute": "طريقة الإعطاء",
+      "frequency": "التكرار",
+      "duration": "المدة (أيام)",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "administeredBy": "أعطي بواسطة",
+      "veterinarianId": "الطبيب البيطري",
+      "prescriptionNumber": "رقم الوصفة",
+      "withdrawalPeriodMeat": "فترة السحب - لحم (أيام)",
+      "withdrawalPeriodMilk": "فترة السحب - حليب (أيام)",
+      "status": "الحالة",
+      "notes": "ملاحظات",
+      "adverseReactions": "ردود الفعل السلبية",
+      "effectiveness": "الفعالية",
+      "cost": "التكلفة"
+    },
+    "routes": {
+      "SC": "تحت الجلد (SC)",
+      "IM": "في العضل (IM)",
+      "ID": "داخل الأدمة (ID)",
+      "oral": "فموي",
+      "IV": "في الوريد (IV)",
+      "topical": "موضعي"
+    },
+    "sections": {
+      "general": "معلومات عامة",
+      "product": "تفاصيل المنتج",
+      "administration": "الإعطاء",
+      "withdrawal": "فترات السحب",
+      "additional": "معلومات إضافية"
+    },
+    "placeholders": {
+      "productName": "مثال: أوكسيتتراسيكلين",
+      "reason": "مثال: عدوى تنفسية",
+      "diagnosis": "مثال: التهاب رئوي",
+      "dosage": "مثال: 1 مل/10 كغ",
+      "frequency": "مثال: مرتين يومياً",
+      "administeredBy": "اسم الشخص",
+      "notes": "ملاحظات إضافية..."
+    },
+    "stats": {
+      "total": "إجمالي العلاجات",
+      "scheduled": "مجدولة",
+      "inProgress": "قيد التنفيذ",
+      "completed": "مكتملة"
+    },
+    "messages": {
+      "loadError": "تعذر تحميل العلاجات",
+      "created": "تم إنشاء العلاج بنجاح",
+      "updated": "تم تحديث العلاج بنجاح",
+      "deleted": "تم حذف العلاج بنجاح",
+      "createError": "خطأ في إنشاء العلاج",
+      "updateError": "خطأ في تحديث العلاج",
+      "deleteError": "خطأ في حذف العلاج",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا العلاج؟",
+      "addDescription": "إضافة علاج جديد",
+      "editDescription": "تعديل معلومات العلاج"
+    }
   }
 }
