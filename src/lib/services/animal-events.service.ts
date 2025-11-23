@@ -5,8 +5,8 @@
 import { apiClient } from '@/lib/api/client';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { logger } from '@/lib/utils/logger';
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 
-const TEMP_FARM_ID = 'd3934abb-13d2-4950-8d1c-f8ab4628e762';
 
 class AnimalEventsService {
   private getBasePath(): string {

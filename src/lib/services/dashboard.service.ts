@@ -4,8 +4,8 @@
 
 import { apiClient } from '@/lib/api/client';
 import { logger } from '@/lib/utils/logger';
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 
-const TEMP_FARM_ID = 'd3934abb-13d2-4950-8d1c-f8ab4628e762';
 
 export interface DashboardStats {
   totalAnimals: number;
