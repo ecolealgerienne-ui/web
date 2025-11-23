@@ -23,11 +23,11 @@ export default function AlertConfigurationsPage() {
   const t = useTranslations('alertConfigurations');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [selectedType, setSelectedType] = useState<AlertType | ''>('');
+  const [selectedType, setSelectedType] = useState<string>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<AlertConfiguration | null>(null);
   const { alertConfigurations, loading, error, refetch } = useAlertConfigurations({
-    type: selectedType || undefined,
+    type: selectedType === 'all' ? undefined : (selectedType as AlertType),
   });
 
   const handleCreate = () => {
@@ -140,12 +140,12 @@ export default function AlertConfigurationsPage() {
       {/* Filtres */}
       <div className="flex gap-4 items-center flex-wrap">
         {/* Error 8: Correct Radix UI Select usage */}
-        <Select value={selectedType} onValueChange={(value) => setSelectedType(value as AlertType | '')}>
+        <Select value={selectedType} onValueChange={setSelectedType}>
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder={t('filters.allTypes')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
             <SelectItem value="urgent">{t('types.urgent')}</SelectItem>
             <SelectItem value="important">{t('types.important')}</SelectItem>
             <SelectItem value="routine">{t('types.routine')}</SelectItem>
