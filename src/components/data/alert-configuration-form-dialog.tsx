@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -344,11 +343,14 @@ export function AlertConfigurationFormDialog({
           </div>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={loading}>
-                {tc('actions.cancel')}
-              </Button>
-            </DialogClose>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+            >
+              {tc('actions.cancel')}
+            </Button>
             <Button type="submit" disabled={loading}>
               {loading ? tc('messages.loading') : isEditMode ? tc('actions.save') : tc('actions.create')}
             </Button>
