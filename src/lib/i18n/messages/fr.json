@@ -698,8 +698,9 @@
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce traitement ?",
       "addDescription": "Ajoutez un nouveau traitement",
       "editDescription": "Modifiez les informations du traitement"
-    },
-    "weighings": {
+    }
+  },
+  "weighings": {
       "title": "Pesées",
       "subtitle": "Suivez le poids et la croissance de votre troupeau",
       "newWeighing": "Nouvelle pesée",
@@ -773,4 +774,3 @@
       }
     }
   }
-}

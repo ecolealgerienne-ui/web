@@ -698,8 +698,9 @@
       "deleteConfirmDescription": "هل أنت متأكد من حذف هذا العلاج؟",
       "addDescription": "إضافة علاج جديد",
       "editDescription": "تعديل معلومات العلاج"
-    },
-    "weighings": {
+    }
+  },
+  "weighings": {
       "title": "الوزن",
       "subtitle": "تتبع وزن ونمو قطيعك",
       "newWeighing": "وزن جديد",
@@ -773,4 +774,3 @@
       }
     }
   }
-}
