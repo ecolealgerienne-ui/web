@@ -115,6 +115,67 @@ logger.info('Response received', { count: data.length });
 
 ---
 
+### Erreur 7: Gestion d'erreur insuffisante dans les formulaires
+**Contexte**: Formulaire de création de vétérinaires
+**Symptôme**: Erreur lors de la création mais impossible de voir le message d'erreur détaillé
+**Cause**:
+- Erreur capturée mais seulement message générique affiché
+- Pas de console.log pour voir les données envoyées
+- Pas d'extraction du message d'erreur depuis les différents formats de réponse
+**Impact**: Débogage impossible, perte de temps énorme
+
+**Solution**:
+```typescript
+// ❌ MAUVAIS - Erreur générique seulement
+catch (error) {
+  toast.error('Erreur lors de la création');
+}
+
+// ✅ BON - Affichage détaillé + logging + extraction
+const [errorDetails, setErrorDetails] = useState<string | null>(null);
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setErrorDetails(null);
+
+  try {
+    const createData = { ...formData };
+    console.log('Creating resource:', createData); // 🔍 LOG DES DONNÉES
+    await service.create(createData);
+  } catch (error: any) {
+    console.error('Error submitting form:', error); // 🔍 LOG DE L'ERREUR
+
+    // Extraire le message détaillé depuis tous les formats possibles
+    let detailedError = error?.message || 'Unknown error';
+    if (error?.response?.data?.message) {
+      detailedError = error.response.data.message;
+    } else if (error?.data?.message) {
+      detailedError = error.data.message;
+    }
+
+    setErrorDetails(`${detailedError} (Status: ${error?.status || 'N/A'})`);
+    toast.error('Erreur', detailedError);
+  }
+};
+
+// Dans le JSX - afficher l'erreur dans le formulaire
+{errorDetails && (
+  <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4">
+    <p className="text-sm font-semibold text-destructive mb-1">Erreur détaillée :</p>
+    <p className="text-sm text-destructive/90">{errorDetails}</p>
+  </div>
+)}
+```
+
+**Leçon**:
+- Toujours logger les données AVANT l'envoi : `console.log('Creating:', data)`
+- Toujours logger l'erreur complète : `console.error('Error:', error)`
+- Extraire le message d'erreur depuis tous les formats possibles (error.response.data.message, error.data.message, error.message)
+- Afficher l'erreur détaillée dans le formulaire ET dans un toast
+- Inclure le code de statut HTTP dans l'affichage
+
+---
+
 ## ✅ Plan d'implémentation complet
 
 ### Phase 1: Recherche et Analyse (OBLIGATOIRE)
