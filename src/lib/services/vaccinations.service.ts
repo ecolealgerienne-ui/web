@@ -2,7 +2,7 @@ import { apiClient } from '@/lib/api/client';
 import { logger } from '@/lib/utils/logger';
 import type { Vaccination, CreateVaccinationDto, UpdateVaccinationDto, VaccinationFilters } from '@/lib/types/vaccination';
 
-const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e';
+const TEMP_FARM_ID = 'a37a7e4c-c70d-4e7e-abc9-0eb5faaa6842';
 
 class VaccinationsService {
   async getAll(filters?: Partial<VaccinationFilters>): Promise<Vaccination[]> {

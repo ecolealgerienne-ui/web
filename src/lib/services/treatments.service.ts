@@ -2,7 +2,7 @@ import { apiClient } from '@/lib/api/client';
 import { logger } from '@/lib/utils/logger';
 import type { Treatment, TreatmentFilters } from '@/lib/types/treatment';
 
-const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e';
+const TEMP_FARM_ID = 'a37a7e4c-c70d-4e7e-abc9-0eb5faaa6842';
 
 export interface CreateTreatmentDto {
   animalId?: string;

@@ -37,7 +37,7 @@ export const mockUser = {
   email: 'dev@ecole-algerienne.dz',
   name: 'Utilisateur Dev',
   role: 'super_admin' as const, // Super admin pour accès complet en dev
-  farmName: 'Ferme de développement',
+  farmName: 'Ferme du Val Fleuri',
 }
 
 // Vérifier si une route est publique
