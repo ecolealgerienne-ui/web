@@ -1214,5 +1214,23 @@
       "nov": "November",
       "dec": "December"
     }
+  },
+  "chart": {
+    "periods": {
+      "6months": "6 months",
+      "12months": "12 months",
+      "1year": "1 year",
+      "2years": "2 years",
+      "all": "All"
+    },
+    "types": {
+      "line": "Line",
+      "bar": "Bar",
+      "area": "Area"
+    },
+    "labels": {
+      "selectPeriod": "Select period",
+      "selectType": "Chart type"
+    }
   }
 }
