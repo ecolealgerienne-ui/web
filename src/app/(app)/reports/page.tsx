@@ -201,9 +201,9 @@ export default function ReportsPage() {
                             />
                           </div>
                           <div>
-                            <CardTitle className="text-base">{report.name}</CardTitle>
+                            <CardTitle className="text-base">{t(`definitions.${report.id}.name`)}</CardTitle>
                             <CardDescription className="text-xs mt-1">
-                              {report.description}
+                              {t(`definitions.${report.id}.description`)}
                             </CardDescription>
                           </div>
                         </div>
