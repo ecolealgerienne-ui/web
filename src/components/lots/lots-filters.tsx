@@ -2,7 +2,13 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { LotFilters, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
 import { Search } from 'lucide-react';
 
@@ -36,18 +42,22 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
         <div>
           <Label htmlFor="type">Type de lot</Label>
           <Select
-            id="type"
             value={filters.type}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, type: e.target.value as any })
+            onValueChange={(value) =>
+              onFiltersChange({ ...filters, type: value as any })
             }
           >
-            <option value="all">Tous les types</option>
-            {Object.entries(LOT_TYPE_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Tous les types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les types</SelectItem>
+              {Object.entries(LOT_TYPE_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
@@ -55,18 +65,22 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
         <div>
           <Label htmlFor="status">Statut</Label>
           <Select
-            id="status"
             value={filters.status}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, status: e.target.value as any })
+            onValueChange={(value) =>
+              onFiltersChange({ ...filters, status: value as any })
             }
           >
-            <option value="all">Tous les statuts</option>
-            {Object.entries(LOT_STATUS_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Tous les statuts" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              {Object.entries(LOT_STATUS_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </div>
