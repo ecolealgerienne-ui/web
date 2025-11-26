@@ -19,7 +19,7 @@ export default function AnimalEventsPage() {
   const t = useTranslations('animalEvents');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
   const { events, loading, error, refetch } = useAnimalEvents({ eventType: typeFilter });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -85,7 +85,7 @@ export default function AnimalEventsPage() {
       </div>
 
       <div className="flex gap-4 items-center">
-        <Select value={typeFilter || "all"} onValueChange={(value) => setTypeFilter(value === "all" ? '' : value)}>
+        <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value)}>
           <SelectTrigger className="w-[250px]">
             <SelectValue placeholder={t('filters.allTypes')} />
           </SelectTrigger>

@@ -13,11 +13,11 @@ class CampaignsService {
     return `/farms/${TEMP_FARM_ID}/campaigns`
   }
 
-  async getAll(filters?: { type?: CampaignType; status?: CampaignStatus; fromDate?: string; toDate?: string }): Promise<Campaign[]> {
+  async getAll(filters?: { type?: CampaignType | 'all'; status?: CampaignStatus | 'all'; fromDate?: string; toDate?: string }): Promise<Campaign[]> {
     try {
       const params = new URLSearchParams()
-      if (filters?.type) params.append('type', filters.type)
-      if (filters?.status) params.append('status', filters.status)
+      if (filters?.type && filters.type !== 'all') params.append('type', filters.type)
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status)
       if (filters?.fromDate) params.append('fromDate', filters.fromDate)
       if (filters?.toDate) params.append('toDate', filters.toDate)
 

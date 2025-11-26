@@ -16,7 +16,7 @@ class AnimalsService {
   async getAll(filters?: { status?: string; speciesId?: string; search?: string }): Promise<Animal[]> {
     try {
       const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
       if (filters?.search) params.append('search', filters.search);
 

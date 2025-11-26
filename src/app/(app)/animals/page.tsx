@@ -29,7 +29,7 @@ export default function AnimalsPage() {
   const tc = useCommonTranslations();
   const toast = useToast();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -151,8 +151,8 @@ export default function AnimalsPage() {
         </div>
 
         <Select
-          value={statusFilter || "all"}
-          onValueChange={(value) => setStatusFilter(value === "all" ? '' : value)}
+          value={statusFilter}
+          onValueChange={(value) => setStatusFilter(value)}
         >
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder={t('filters.allStatus')} />

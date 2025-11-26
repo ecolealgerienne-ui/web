@@ -14,7 +14,7 @@ interface UseCampaignsResult {
   refetch: () => Promise<void>
 }
 
-export function useCampaigns(filters?: { type?: CampaignType; status?: CampaignStatus }): UseCampaignsResult {
+export function useCampaigns(filters?: { type?: CampaignType | 'all'; status?: CampaignStatus | 'all' }): UseCampaignsResult {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
