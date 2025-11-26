@@ -25,11 +25,11 @@ export default function CampaignsPage() {
   const t = useTranslations('campaigns');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [selectedType, setSelectedType] = useState<CampaignType | ''>('');
-  const [selectedStatus, setSelectedStatus] = useState<CampaignStatus | ''>('');
+  const [selectedType, setSelectedType] = useState<CampaignType | 'all'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<CampaignStatus | 'all'>('all');
   const { campaigns, loading, error, refetch } = useCampaigns({
-    type: selectedType || undefined,
-    status: selectedStatus || undefined,
+    type: selectedType,
+    status: selectedStatus,
   });
 
   // État du formulaire
@@ -149,8 +149,8 @@ export default function CampaignsPage() {
       {/* Filtres */}
       <div className="flex gap-4 items-center flex-wrap">
         <Select
-          value={selectedType || "all"}
-          onValueChange={(value) => setSelectedType(value === "all" ? '' : (value as CampaignType))}
+          value={selectedType}
+          onValueChange={(value) => setSelectedType(value as CampaignType | 'all')}
         >
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue />
@@ -165,8 +165,8 @@ export default function CampaignsPage() {
         </Select>
 
         <Select
-          value={selectedStatus || "all"}
-          onValueChange={(value) => setSelectedStatus(value === "all" ? '' : (value as CampaignStatus))}
+          value={selectedStatus}
+          onValueChange={(value) => setSelectedStatus(value as CampaignStatus | 'all')}
         >
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue />

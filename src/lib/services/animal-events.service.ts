@@ -19,7 +19,7 @@ class AnimalEventsService {
       const params = new URLSearchParams();
       if (filters?.animalId) params.append('animalId', filters.animalId);
       // Map eventType to movementType for API compatibility
-      if (filters?.eventType) params.append('movementType', filters.eventType);
+      if (filters?.eventType && filters.eventType !== 'all') params.append('movementType', filters.eventType);
       if (filters?.fromDate) params.append('fromDate', filters.fromDate);
       if (filters?.toDate) params.append('toDate', filters.toDate);
 

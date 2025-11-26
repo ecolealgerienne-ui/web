@@ -47,11 +47,8 @@ export const sexLabels: Record<string, string> = {
  */
 export const statusLabels: Record<string, string> = {
   alive: "Vivant",
-  active: "Actif",
   sold: "Vendu",
   dead: "Décédé",
-  missing: "Disparu",
-  slaughtered: "Abattu",
 };
 
 /**
@@ -64,7 +61,6 @@ export function getStatusVariant(status: Animal["status"]): "success" | "default
     case "sold":
       return "default";
     case "dead":
-    case "missing":
       return "destructive";
     default:
       return "default";
