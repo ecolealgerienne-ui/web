@@ -18,9 +18,6 @@ export function useWeighings(filters?: Partial<WeighingFilters>): UseWeighingsRe
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Stabiliser les filtres pour éviter les boucles infinies
-  const filtersKey = JSON.stringify(filters);
-
   const fetchWeighings = useCallback(async () => {
     try {
       setLoading(true);
@@ -34,7 +31,7 @@ export function useWeighings(filters?: Partial<WeighingFilters>): UseWeighingsRe
     } finally {
       setLoading(false);
     }
-  }, [filtersKey]);
+  }, [filters?.search, filters?.purpose, filters?.dateFrom, filters?.dateTo, filters?.minWeight, filters?.maxWeight, filters?.animalId, filters?.source]);
 
   useEffect(() => {
     fetchWeighings();
