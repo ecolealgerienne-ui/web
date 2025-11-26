@@ -35,14 +35,7 @@ export function useVaccinations(
     } finally {
       setLoading(false);
     }
-  }, [
-    filters?.animalId,
-    filters?.status,
-    filters?.dateFrom,
-    filters?.dateTo,
-    filters?.search,
-    filters?.targetType,
-  ]);
+  }, [filters]);
 
   useEffect(() => {
     fetchVaccinations();

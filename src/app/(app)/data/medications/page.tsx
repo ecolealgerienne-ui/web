@@ -117,7 +117,7 @@ export default function MedicationsPage() {
             <div className="text-center py-12 text-muted-foreground">
               Aucun produit médical trouvé.
               <br />
-              Cliquez sur "Nouveau produit" pour en ajouter un.
+              Cliquez sur &quot;Nouveau produit&quot; pour en ajouter un.
             </div>
           )}
 

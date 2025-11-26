@@ -117,7 +117,7 @@ export default function VaccinesPage() {
             <div className="text-center py-12 text-muted-foreground">
               Aucun vaccin trouvé.
               <br />
-              Cliquez sur "Nouveau vaccin" pour en ajouter un.
+              Cliquez sur &quot;Nouveau vaccin&quot; pour en ajouter un.
             </div>
           )}
 
