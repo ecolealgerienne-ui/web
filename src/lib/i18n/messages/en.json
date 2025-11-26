@@ -30,7 +30,8 @@
       "noData": "No data available",
       "loading": "Loading...",
       "confirmDelete": "Are you sure you want to delete this item?",
-      "actionIrreversible": "This action is irreversible."
+      "actionIrreversible": "This action is irreversible.",
+      "loadError": "Error loading data"
     },
     "fields": {
       "name": "Name",
@@ -42,11 +43,23 @@
       "required": "Required"
     }
   },
+  "header": {
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Overview"
+    }
+  },
   "navigation": {
     "menu": {
       "dashboard": "Dashboard",
       "animals": "Animals",
+      "events": "Events",
+      "lots": "Lots",
+      "vaccinations": "Vaccinations",
+      "treatments": "Treatments",
+      "weighings": "Weighings",
       "data": "Data",
+      "reports": "Reports",
       "settings": "Settings"
     },
     "data": {
@@ -54,7 +67,12 @@
       "breeds": "Breeds",
       "vaccines": "Vaccines",
       "diseases": "Diseases",
-      "medications": "Medications"
+      "medications": "Medications",
+      "veterinarians": "Veterinarians",
+      "campaigns": "Campaigns",
+      "preferences": "Preferences",
+      "alerts": "Alerts",
+      "farms": "Farms"
     }
   },
   "breeds": {
@@ -102,6 +120,97 @@
       "deleteError": "Error deleting breed",
       "confirmDelete": "Are you sure you want to delete the breed {name}?",
       "infoMessage": "Breeds are reference data managed by super admins. You can create, edit or delete breeds. Deleted breeds are no longer visible in the interface."
+    }
+  },
+  "vaccines": {
+    "title": "Vaccines",
+    "subtitle": "Reference data - Available vaccines",
+    "newVaccine": "New vaccine",
+    "editVaccine": "Edit vaccine",
+    "deleteVaccine": "Delete vaccine",
+    "noVaccines": "No vaccines found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "manufacturer": "Manufacturer",
+      "diseaseId": "Disease",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Rabies vaccine",
+      "description": "Vaccine description",
+      "manufacturer": "e.g.: MSD Animal Health"
+    },
+    "messages": {
+      "created": "Vaccine created successfully",
+      "updated": "Vaccine updated successfully",
+      "deleted": "Vaccine deleted successfully",
+      "createError": "Error creating vaccine",
+      "updateError": "Error updating vaccine",
+      "deleteError": "Error deleting vaccine",
+      "confirmDelete": "Are you sure you want to delete the vaccine {name}?"
+    }
+  },
+  "diseases": {
+    "title": "Diseases",
+    "subtitle": "Reference data - Known diseases",
+    "newDisease": "New disease",
+    "editDisease": "Edit disease",
+    "deleteDisease": "Delete disease",
+    "noDiseases": "No diseases found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "symptoms": "Symptoms",
+      "treatment": "Treatment",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Rabies",
+      "description": "Disease description",
+      "symptoms": "Common symptoms",
+      "treatment": "Recommended treatment"
+    },
+    "messages": {
+      "created": "Disease created successfully",
+      "updated": "Disease updated successfully",
+      "deleted": "Disease deleted successfully",
+      "createError": "Error creating disease",
+      "updateError": "Error updating disease",
+      "deleteError": "Error deleting disease",
+      "confirmDelete": "Are you sure you want to delete the disease {name}?"
+    }
+  },
+  "medications": {
+    "title": "Medications",
+    "subtitle": "Reference data - Available medications",
+    "newMedication": "New medication",
+    "editMedication": "Edit medication",
+    "deleteMedication": "Delete medication",
+    "noMedications": "No medications found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "manufacturer": "Manufacturer",
+      "activeIngredient": "Active ingredient",
+      "dosage": "Dosage",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "e.g.: Ivermectin",
+      "description": "Medication description",
+      "manufacturer": "e.g.: Bayer",
+      "activeIngredient": "e.g.: Ivermectin 1%",
+      "dosage": "e.g.: 1ml per 50kg"
+    },
+    "messages": {
+      "created": "Medication created successfully",
+      "updated": "Medication updated successfully",
+      "deleted": "Medication deleted successfully",
+      "createError": "Error creating medication",
+      "updateError": "Error updating medication",
+      "deleteError": "Error deleting medication",
+      "confirmDelete": "Are you sure you want to delete the medication {name}?"
     }
   },
   "errors": {
@@ -362,7 +471,7 @@
       "saveError": "Error saving farm",
       "deleteError": "Error deleting farm",
       "deleteConfirmTitle": "Confirm deletion",
-      "deleteConfirmDescription": "Are you sure you want to delete the farm \"{{name}}\"?",
+      "deleteConfirmDescription": "Are you sure you want to delete the farm \"{name}\"?",
       "addDescription": "Add the information for the new farm",
       "editDescription": "Edit the farm information"
     }
@@ -420,6 +529,11 @@
       "name": "Animal name (optional)",
       "currentLocation": "E.g.: North Pasture",
       "notes": "Additional notes..."
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
     },
     "messages": {
       "loadError": "Unable to load animals",
@@ -498,6 +612,627 @@
       "deleteConfirmDescription": "Are you sure you want to delete this event?",
       "addDescription": "Add the information for the new event",
       "editDescription": "Edit the event information"
+    }
+  },
+  "vaccinations": {
+    "title": "Vaccinations",
+    "subtitle": "Manage your herd's vaccination schedule",
+    "newVaccination": "Schedule vaccination",
+    "editVaccination": "Edit vaccination",
+    "deleteVaccination": "Delete vaccination",
+    "noVaccinations": "No vaccinations found",
+    "vaccinationCount": "{count} vaccination",
+    "vaccinationCount_plural": "{count} vaccinations",
+    "filters": {
+      "allStatus": "All statuses",
+      "allTargets": "All targets",
+      "search": "Search..."
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    },
+    "targetType": {
+      "individual": "Individual",
+      "lot": "Lot"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "lotId": "Lot",
+      "targetType": "Target type",
+      "vaccineName": "Vaccine name",
+      "vaccineId": "Vaccine ID",
+      "diseaseTarget": "Disease target",
+      "manufacturer": "Manufacturer",
+      "batchNumber": "Batch number",
+      "expiryDate": "Expiry date",
+      "scheduledDate": "Scheduled date",
+      "administeredDate": "Administered date",
+      "nextDueDate": "Next due date",
+      "administeredBy": "Administered by",
+      "veterinarianId": "Veterinarian",
+      "veterinarianName": "Veterinarian name",
+      "dosage": "Dosage",
+      "administrationRoute": "Administration route",
+      "siteOfInjection": "Injection site",
+      "adverseReactions": "Adverse reactions",
+      "certificateNumber": "Certificate number",
+      "status": "Status",
+      "notes": "Notes",
+      "cost": "Cost"
+    },
+    "routes": {
+      "SC": "Subcutaneous (SC)",
+      "IM": "Intramuscular (IM)",
+      "ID": "Intradermal (ID)",
+      "oral": "Oral",
+      "IV": "Intravenous (IV)"
+    },
+    "sections": {
+      "general": "General information",
+      "vaccine": "Vaccine details",
+      "administration": "Administration",
+      "additional": "Additional information"
+    },
+    "placeholders": {
+      "vaccineName": "E.g.: PPR Vaccine",
+      "diseaseTarget": "E.g.: Peste des Petits Ruminants",
+      "manufacturer": "E.g.: MCI Animal Health",
+      "batchNumber": "E.g.: PPR-2025-A123",
+      "administeredBy": "Person's name",
+      "dosage": "E.g.: 1 ml",
+      "siteOfInjection": "E.g.: Left neck",
+      "notes": "Additional notes..."
+    },
+    "stats": {
+      "total": "Total vaccinations",
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "overdue": "Overdue"
+    },
+    "messages": {
+      "loadError": "Unable to load vaccinations",
+      "created": "Vaccination scheduled successfully",
+      "updated": "Vaccination updated successfully",
+      "deleted": "Vaccination deleted successfully",
+      "createError": "Error scheduling vaccination",
+      "updateError": "Error updating vaccination",
+      "deleteError": "Error deleting vaccination",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete this vaccination?",
+      "addDescription": "Schedule a new vaccination",
+      "editDescription": "Edit the vaccination information"
+    }
+  },
+  "treatments": {
+    "title": "Treatments",
+    "subtitle": "Manage medical treatments for your herd",
+    "newTreatment": "New treatment",
+    "editTreatment": "Edit treatment",
+    "deleteTreatment": "Delete treatment",
+    "noTreatments": "No treatments found",
+    "treatmentCount": "{count} treatment",
+    "treatmentCount_plural": "{count} treatments",
+    "filters": {
+      "allStatus": "All statuses",
+      "allTypes": "All types",
+      "allTargets": "All targets",
+      "search": "Search..."
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "antibiotic": "Antibiotic",
+      "antiparasitic": "Antiparasitic",
+      "anti_inflammatory": "Anti-inflammatory",
+      "vitamin": "Vitamin/Supplement",
+      "other": "Other"
+    },
+    "targetType": {
+      "individual": "Individual",
+      "lot": "Lot"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "lotId": "Lot",
+      "targetType": "Target type",
+      "productName": "Product name",
+      "treatmentType": "Treatment type",
+      "manufacturer": "Manufacturer",
+      "batchNumber": "Batch number",
+      "reason": "Reason",
+      "diagnosis": "Diagnosis",
+      "dosage": "Dosage",
+      "administrationRoute": "Administration route",
+      "frequency": "Frequency",
+      "duration": "Duration (days)",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "administeredBy": "Administered by",
+      "veterinarianId": "Veterinarian",
+      "prescriptionNumber": "Prescription number",
+      "withdrawalPeriodMeat": "Withdrawal period - meat (days)",
+      "withdrawalPeriodMilk": "Withdrawal period - milk (days)",
+      "status": "Status",
+      "notes": "Notes",
+      "adverseReactions": "Adverse reactions",
+      "effectiveness": "Effectiveness",
+      "cost": "Cost"
+    },
+    "routes": {
+      "SC": "Subcutaneous (SC)",
+      "IM": "Intramuscular (IM)",
+      "ID": "Intradermal (ID)",
+      "oral": "Oral",
+      "IV": "Intravenous (IV)",
+      "topical": "Topical"
+    },
+    "sections": {
+      "general": "General information",
+      "product": "Product details",
+      "administration": "Administration",
+      "withdrawal": "Withdrawal periods",
+      "additional": "Additional information"
+    },
+    "placeholders": {
+      "productName": "E.g.: Oxytetracycline",
+      "reason": "E.g.: Respiratory infection",
+      "diagnosis": "E.g.: Pneumonia",
+      "dosage": "E.g.: 1 ml/10 kg",
+      "frequency": "E.g.: 2x per day",
+      "administeredBy": "Person's name",
+      "notes": "Additional notes..."
+    },
+    "stats": {
+      "total": "Total treatments",
+      "scheduled": "Scheduled",
+      "inProgress": "In progress",
+      "completed": "Completed"
+    },
+    "messages": {
+      "loadError": "Unable to load treatments",
+      "created": "Treatment created successfully",
+      "updated": "Treatment updated successfully",
+      "deleted": "Treatment deleted successfully",
+      "createError": "Error creating treatment",
+      "updateError": "Error updating treatment",
+      "deleteError": "Error deleting treatment",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete this treatment?",
+      "addDescription": "Add a new treatment",
+      "editDescription": "Edit the treatment information"
+    }
+  },
+  "weighings": {
+    "title": "Weighings",
+    "subtitle": "Track weight and growth of your herd",
+    "newWeighing": "New weighing",
+    "editWeighing": "Edit weighing",
+    "deleteWeighing": "Delete weighing",
+    "noWeighings": "No weighings found",
+    "weighingCount": "{count} weighing",
+    "weighingCount_plural": "{count} weighings",
+    "filters": "Filters",
+    "purpose": {
+      "routine": "Routine",
+      "medical": "Medical",
+      "sale": "Sale",
+      "growth_monitoring": "Growth monitoring",
+      "other": "Other",
+      "all": "All"
+    },
+    "fields": {
+      "animalId": "Animal",
+      "weight": "Weight",
+      "unit": "Unit",
+      "weighingDate": "Weighing date",
+      "weighingTime": "Time",
+      "purpose": "Purpose",
+      "method": "Method",
+      "location": "Location",
+      "previousWeight": "Previous weight",
+      "weightGain": "Weight gain",
+      "growthRate": "Growth rate (per day)",
+      "age": "Age (days)",
+      "recordedBy": "Recorded by",
+      "notes": "Notes",
+      "conditions": "Conditions"
+    },
+    "sections": {
+      "general": "General information",
+      "weight": "Weight data",
+      "growth": "Growth tracking",
+      "additional": "Additional information",
+      "data": "Weight data"
+    },
+    "placeholders": {
+      "weight": "E.g.: 45.5",
+      "method": "E.g.: Electronic scale",
+      "location": "E.g.: Barn",
+      "recordedBy": "Person's name",
+      "notes": "Additional notes...",
+      "conditions": "E.g.: Fasting, after feeding"
+    },
+    "stats": {
+      "total": "Total weighings",
+      "avgWeight": "Average weight",
+      "avgGrowth": "Average growth",
+      "lastWeighing": "Last weighing",
+      "routine": "Routine",
+      "medical": "Medical"
+    },
+    "messages": {
+      "loadError": "Unable to load weighings",
+      "created": "Weighing recorded successfully",
+      "updated": "Weighing updated successfully",
+      "deleted": "Weighing deleted successfully",
+      "createError": "Error recording weighing",
+      "updateError": "Error updating weighing",
+      "deleteError": "Error deleting weighing",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete this weighing?",
+      "addDescription": "Record a new weighing",
+      "editDescription": "Edit the weighing information",
+      "noWeighings": "No weighings found"
+    },
+    "searchPlaceholder": "Search...",
+    "list": "Weighings list",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "labels": {
+      "animal": "Animal",
+      "gain": "Gain",
+      "rate": "Rate",
+      "method": "Method",
+      "perDay": "kg/day"
+    },
+    "units": {
+      "kg": "kg",
+      "lbs": "lbs"
+    }
+  },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Manage your animal groups by activity",
+    "newLot": "Create a lot",
+    "stats": {
+      "total": "Total lots",
+      "open": "Open lots",
+      "closed": "Closed lots",
+      "totalAnimals": "Animals concerned"
+    },
+    "loading": "Loading...",
+    "noLots": "No lots found",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Name, description, product...",
+      "type": "Lot type",
+      "typePlaceholder": "All types",
+      "allTypes": "All types",
+      "status": "Status",
+      "statusPlaceholder": "All statuses",
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "animals": "Animals",
+      "date": "Date",
+      "product": "Product/Activity",
+      "amount": "Amount",
+      "actions": "Actions",
+      "buyer": "Buyer",
+      "seller": "Seller"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "archived": "Archived"
+    },
+    "type": {
+      "treatment": "Treatment",
+      "vaccination": "Vaccination",
+      "sale": "Sale",
+      "slaughter": "Slaughter",
+      "purchase": "Purchase",
+      "breeding": "Breeding"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Analyze your data with detailed reports",
+    "period": {
+      "label": "Period",
+      "week": "Week",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year"
+    },
+    "generate": "Generate",
+    "export": "Export",
+    "categories": {
+      "health": "Health",
+      "production": "Production",
+      "financial": "Financial"
+    },
+    "settings": {
+      "title": "General Settings",
+      "description": "Select the period for all reports",
+      "applyToAll": "Apply to all",
+      "customPeriod": "Custom period"
+    },
+    "buttons": {
+      "generate": "Generate",
+      "exportPdf": "Export PDF"
+    },
+    "categoryTitles": {
+      "health": "Health & Wellness",
+      "production": "Production & Performance",
+      "financial": "Finance & Regulatory"
+    },
+    "definitions": {
+      "herd-inventory": {
+        "name": "Herd Inventory",
+        "description": "Complete herd status by species, age and status"
+      },
+      "vaccinations-report": {
+        "name": "Vaccination Register",
+        "description": "Vaccination history and upcoming schedule"
+      },
+      "treatments-report": {
+        "name": "Treatment Register",
+        "description": "Treatment history and withdrawal periods"
+      },
+      "movements-report": {
+        "name": "Animal Movements",
+        "description": "Entries, exits, births and deaths"
+      },
+      "growth-report": {
+        "name": "Growth and Performance",
+        "description": "Weight evolution and average daily gains"
+      },
+      "health-report": {
+        "name": "Health Report",
+        "description": "Morbidity, mortality rates and health incidents"
+      },
+      "financial-report": {
+        "name": "Financial Report",
+        "description": "Veterinary care costs and revenue"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and application configuration",
+    "sections": {
+      "title": "Sections",
+      "profile": "Profile",
+      "farm": "Farm",
+      "notifications": "Notifications",
+      "language": "Language & Region",
+      "security": "Security",
+      "data": "Data"
+    },
+    "save": "Save changes",
+    "profile": {
+      "title": "User Profile",
+      "description": "Manage your personal information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "roles": {
+        "owner": "Owner",
+        "manager": "Manager",
+        "veterinarian": "Veterinarian",
+        "worker": "Worker"
+      },
+      "saveButton": "Save changes"
+    },
+    "farm": {
+      "title": "Farm Information",
+      "description": "Configure your farm details",
+      "farmName": "Farm Name",
+      "farmId": "ID Number",
+      "surface": "Surface (hectares)",
+      "address": "Address",
+      "wilaya": "Province",
+      "commune": "Municipality",
+      "species": "Livestock Species",
+      "addSpecies": "+ Add",
+      "selectWilaya": "Select...",
+      "saveButton": "Save changes",
+      "department": "Department",
+      "selectDepartment": "Select..."
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "description": "Choose how you want to be notified",
+      "vaccinations": {
+        "title": "Upcoming Vaccinations",
+        "description": "Receive alert 7 days before"
+      },
+      "treatments": {
+        "title": "Ongoing Treatments",
+        "description": "Daily reminder for treatments"
+      },
+      "waitingPeriods": {
+        "title": "Waiting Periods",
+        "description": "Alert at end of waiting period"
+      },
+      "births": {
+        "title": "Births",
+        "description": "Notification for each birth"
+      },
+      "healthAlerts": {
+        "title": "Health Alerts",
+        "description": "Urgent notifications for health issues"
+      },
+      "saveButton": "Save preferences"
+    },
+    "language": {
+      "title": "Language & Region",
+      "description": "Customize display according to your preferences",
+      "interfaceLanguage": "Interface Language",
+      "timezone": "Timezone",
+      "dateFormat": "Date Format",
+      "currency": "Currency",
+      "darkTheme": {
+        "title": "Dark Theme",
+        "description": "Enable dark mode"
+      },
+      "saveButton": "Save preferences"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Protect your account and data",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "changePasswordButton": "Change password",
+      "twoFactor": {
+        "title": "Two-Factor Authentication",
+        "label": "2FA",
+        "description": "Add an extra layer of security",
+        "disabled": "Disabled",
+        "enable": "Enable 2FA"
+      },
+      "activeSessions": {
+        "title": "Active Sessions",
+        "currentBrowser": "Current Browser",
+        "active": "Active"
+      }
+    },
+    "data": {
+      "title": "Data Management",
+      "description": "Backup, export and data deletion",
+      "autoBackup": {
+        "title": "Automatic Backup",
+        "lastBackup": "Last backup: Today at 3:00 AM",
+        "enabled": "Enabled",
+        "backupNow": "Backup now"
+      },
+      "export": {
+        "title": "Export Data",
+        "description": "Download a complete copy of all your data",
+        "excel": "Export to Excel",
+        "json": "Export to JSON"
+      },
+      "dangerZone": {
+        "title": "Danger Zone",
+        "description": "The following actions are irreversible",
+        "deleteAll": "Delete all data"
+      }
+    }
+  },
+  "homepage": {
+    "title": "Complete Management of Your Livestock",
+    "subtitle": "Track your animals, manage vaccinations, treatments and optimize your production with a modern and intuitive solution.",
+    "getStarted": "Get Started",
+    "accessDashboard": "Access Dashboard",
+    "login": "Login",
+    "features": {
+      "animalTracking": {
+        "title": "Animal Tracking",
+        "description": "Record and track all your animals with their complete history"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Treatments",
+        "description": "Manage vaccination schedules and veterinary treatments"
+      },
+      "reports": {
+        "title": "Detailed Reports",
+        "description": "Analyze your data with comprehensive and exportable reports"
+      },
+      "lotManagement": {
+        "title": "Lot Management",
+        "description": "Organize your animals by lots for better management"
+      },
+      "traceability": {
+        "title": "Complete Traceability",
+        "description": "Ensure traceability of all your products and animals"
+      },
+      "multiUser": {
+        "title": "Multi-user",
+        "description": "Collaborate with your team securely"
+      }
+    },
+    "benefits": {
+      "title": "Why choose our solution?",
+      "modernInterface": "Modern and intuitive interface",
+      "accessAnywhere": "Accessible from any device",
+      "secureData": "Secure and compliant data",
+      "reactiveSupport": "Responsive customer support",
+      "regularUpdates": "Regular updates"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. All rights reserved."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Loading dashboard...",
+    "loadingData": "Fetching data",
+    "loadError": "Unable to load statistics",
+    "kpi": {
+      "totalAnimals": "Total Animals",
+      "births": "Births",
+      "deaths": "Deaths",
+      "vaccinations": "Vaccinations"
+    },
+    "periods": {
+      "thisMonth": "This month",
+      "upcoming": "Upcoming"
+    },
+    "chart": {
+      "evolution": "Herd Evolution"
+    },
+    "alerts": {
+      "title": "Active Alerts"
+    },
+    "activities": {
+      "title": "Recent Activities"
+    },
+    "months": {
+      "jan": "January",
+      "feb": "February",
+      "mar": "March",
+      "apr": "April",
+      "may": "May",
+      "jun": "June",
+      "jul": "July",
+      "aug": "August",
+      "sep": "September",
+      "oct": "October",
+      "nov": "November",
+      "dec": "December"
+    }
+  },
+  "chart": {
+    "periods": {
+      "6months": "6 months",
+      "12months": "12 months",
+      "1year": "1 year",
+      "2years": "2 years",
+      "all": "All"
+    },
+    "types": {
+      "line": "Line",
+      "bar": "Bar",
+      "area": "Area"
+    },
+    "labels": {
+      "selectPeriod": "Select period",
+      "selectType": "Chart type"
     }
   }
 }

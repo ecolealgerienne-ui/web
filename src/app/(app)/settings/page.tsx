@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
   User,
@@ -96,11 +96,16 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label htmlFor="role">Rôle</Label>
-                  <Select id="role" defaultValue="manager">
-                    <option value="owner">Propriétaire</option>
-                    <option value="manager">Gestionnaire</option>
-                    <option value="veterinarian">Vétérinaire</option>
-                    <option value="worker">Employé</option>
+                  <Select defaultValue="manager">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="owner">Propriétaire</SelectItem>
+                      <SelectItem value="manager">Gestionnaire</SelectItem>
+                      <SelectItem value="veterinarian">Vétérinaire</SelectItem>
+                      <SelectItem value="worker">Employé</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <Button>
@@ -142,13 +147,17 @@ export default function SettingsPage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <Label htmlFor="wilaya">Wilaya</Label>
-                    <Select id="wilaya">
-                      <option value="">Sélectionner...</option>
-                      <option value="alger">Alger</option>
-                      <option value="oran">Oran</option>
-                      <option value="constantine">Constantine</option>
-                      <option value="blida">Blida</option>
-                      <option value="setif">Sétif</option>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="alger">Alger</SelectItem>
+                        <SelectItem value="oran">Oran</SelectItem>
+                        <SelectItem value="constantine">Constantine</SelectItem>
+                        <SelectItem value="blida">Blida</SelectItem>
+                        <SelectItem value="setif">Sétif</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                   <div>
@@ -251,32 +260,52 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="language">Langue de l&apos;interface</Label>
-                  <Select id="language" defaultValue="fr">
-                    <option value="fr">Français</option>
-                    <option value="ar">العربية (Arabe)</option>
-                    <option value="en">English</option>
+                  <Select defaultValue="fr">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="ar">العربية (Arabe)</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="timezone">Fuseau horaire</Label>
-                  <Select id="timezone" defaultValue="africa-algiers">
-                    <option value="africa-algiers">Afrique/Alger (GMT+1)</option>
+                  <Select defaultValue="africa-algiers">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="africa-algiers">Afrique/Alger (GMT+1)</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="dateFormat">Format de date</Label>
-                  <Select id="dateFormat" defaultValue="dd/mm/yyyy">
-                    <option value="dd/mm/yyyy">JJ/MM/AAAA</option>
-                    <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
-                    <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
+                  <Select defaultValue="dd/mm/yyyy">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dd/mm/yyyy">JJ/MM/AAAA</SelectItem>
+                      <SelectItem value="mm/dd/yyyy">MM/JJ/AAAA</SelectItem>
+                      <SelectItem value="yyyy-mm-dd">AAAA-MM-JJ</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label htmlFor="currency">Devise</Label>
-                  <Select id="currency" defaultValue="dzd">
-                    <option value="dzd">Dinar Algérien (DA)</option>
-                    <option value="eur">Euro (€)</option>
-                    <option value="usd">Dollar US ($)</option>
+                  <Select defaultValue="dzd">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dzd">Dinar Algérien (DA)</SelectItem>
+                      <SelectItem value="eur">Euro (€)</SelectItem>
+                      <SelectItem value="usd">Dollar US ($)</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
                 <div className="flex items-center justify-between">

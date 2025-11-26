@@ -5,8 +5,8 @@
 import { apiClient } from '@/lib/api/client';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 
-const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e';
 
 class AnimalsService {
   private getBasePath(): string {

@@ -4,16 +4,21 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { useTranslations } from 'next-intl'
 
 export default function HomePage() {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
+  const { theme, setTheme } = useTheme()
+  const t = useTranslations('homepage')
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground">Chargement...</div>
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     )
   }
@@ -27,15 +32,30 @@ export default function HomePage() {
             <div className="h-8 w-8 rounded-lg bg-primary" />
             <span className="text-xl font-bold">École Algérienne</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            {/* Auth Button */}
             {isAuthenticated ? (
               <Button onClick={() => router.push('/dashboard')}>
-                Accéder au tableau de bord
+                {t('accessDashboard')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
               <Link href="/login">
-                <Button>Se connecter</Button>
+                <Button>{t('login')}</Button>
               </Link>
             )}
           </div>
@@ -46,24 +66,23 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h1 className="text-5xl font-bold tracking-tight">
-            Gestion complète de votre élevage
+            {t('title')}
           </h1>
           <p className="text-xl text-muted-foreground">
-            Suivez vos animaux, gérez les vaccinations, traitements et optimisez
-            votre production avec une solution moderne et intuitive.
+            {t('subtitle')}
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
             {isAuthenticated ? (
               <Button size="lg" onClick={() => router.push('/dashboard')}>
-                Accéder au tableau de bord
+                {t('accessDashboard')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             ) : (
               <>
                 <Link href="/login">
                   <Button size="lg">
-                    Commencer
+                    {t('getStarted')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -75,33 +94,33 @@ export default function HomePage() {
         {/* Features */}
         <div className="grid md:grid-cols-3 gap-8 mt-20 max-w-5xl mx-auto">
           <FeatureCard
-            title="Suivi des animaux"
-            description="Enregistrez et suivez tous vos animaux avec leur historique complet"
+            title={t('features.animalTracking.title')}
+            description={t('features.animalTracking.description')}
             icon="🐄"
           />
           <FeatureCard
-            title="Vaccinations & Traitements"
-            description="Gérez les calendriers de vaccination et les traitements vétérinaires"
+            title={t('features.vaccinations.title')}
+            description={t('features.vaccinations.description')}
             icon="💉"
           />
           <FeatureCard
-            title="Rapports détaillés"
-            description="Analysez vos données avec des rapports complets et exportables"
+            title={t('features.reports.title')}
+            description={t('features.reports.description')}
             icon="📊"
           />
           <FeatureCard
-            title="Gestion des lots"
-            description="Organisez vos animaux par lots pour une meilleure gestion"
+            title={t('features.lotManagement.title')}
+            description={t('features.lotManagement.description')}
             icon="📦"
           />
           <FeatureCard
-            title="Traçabilité complète"
-            description="Assurez la traçabilité de tous vos produits et animaux"
+            title={t('features.traceability.title')}
+            description={t('features.traceability.description')}
             icon="🔍"
           />
           <FeatureCard
-            title="Multi-utilisateurs"
-            description="Collaborez avec votre équipe en toute sécurité"
+            title={t('features.multiUser.title')}
+            description={t('features.multiUser.description')}
             icon="👥"
           />
         </div>
@@ -109,14 +128,14 @@ export default function HomePage() {
         {/* Benefits */}
         <div className="mt-20 max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8">
-            Pourquoi choisir notre solution ?
+            {t('benefits.title')}
           </h2>
           <div className="space-y-4">
-            <BenefitItem text="Interface moderne et intuitive" />
-            <BenefitItem text="Accessible depuis n'importe quel appareil" />
-            <BenefitItem text="Données sécurisées et conformes" />
-            <BenefitItem text="Support client réactif" />
-            <BenefitItem text="Mises à jour régulières" />
+            <BenefitItem text={t('benefits.modernInterface')} />
+            <BenefitItem text={t('benefits.accessAnywhere')} />
+            <BenefitItem text={t('benefits.secureData')} />
+            <BenefitItem text={t('benefits.reactiveSupport')} />
+            <BenefitItem text={t('benefits.regularUpdates')} />
           </div>
         </div>
       </main>
@@ -125,7 +144,7 @@ export default function HomePage() {
       <footer className="border-t mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-sm text-muted-foreground">
-            © 2024 École Algérienne. Tous droits réservés.
+            {t('footer.copyright')}
           </div>
         </div>
       </footer>

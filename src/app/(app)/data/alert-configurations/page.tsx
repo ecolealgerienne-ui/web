@@ -5,7 +5,7 @@ import { Bell, Edit2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAlertConfigurations } from '@/lib/hooks/useAlertConfigurations';
 import { AlertConfiguration, AlertType } from '@/lib/types/alert-configuration';
 import { alertConfigurationsService } from '@/lib/services/alert-configurations.service';
@@ -100,13 +100,17 @@ export default function AlertConfigurationsPage() {
       <div className="flex gap-4 items-center flex-wrap">
         <Select
           value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value as AlertType | '')}
-          className="w-full md:w-[200px]"
+          onValueChange={(value) => setSelectedType(value as AlertType | '')}
         >
-          <option value="">{t('filters.allTypes')}</option>
-          <option value="urgent">{t('types.urgent')}</option>
-          <option value="important">{t('types.important')}</option>
-          <option value="routine">{t('types.routine')}</option>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="urgent">{t('types.urgent')}</SelectItem>
+            <SelectItem value="important">{t('types.important')}</SelectItem>
+            <SelectItem value="routine">{t('types.routine')}</SelectItem>
+          </SelectContent>
         </Select>
 
         <div className="text-sm text-muted-foreground">
