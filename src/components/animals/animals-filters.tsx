@@ -28,11 +28,11 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
 
       {/* Filtre Espèce */}
       <Select
-        value={filters.species || ""}
+        value={filters.species || "all"}
         onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            species: value as any || undefined,
+            species: value === "all" ? "" : (value as any),
           })
         }
       >
@@ -40,7 +40,7 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
           <SelectValue placeholder="Toutes espèces" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Toutes espèces</SelectItem>
+          <SelectItem value="all">Toutes espèces</SelectItem>
           <SelectItem value="sheep">Moutons</SelectItem>
           <SelectItem value="goat">Chèvres</SelectItem>
           <SelectItem value="cattle">Bovins</SelectItem>
@@ -49,11 +49,11 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
 
       {/* Filtre Sexe */}
       <Select
-        value={filters.sex || ""}
+        value={filters.sex || "all"}
         onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            sex: value as any || undefined,
+            sex: value === "all" ? "all" : (value as any),
           })
         }
       >
@@ -61,7 +61,7 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
           <SelectValue placeholder="Tous sexes" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Tous sexes</SelectItem>
+          <SelectItem value="all">Tous sexes</SelectItem>
           <SelectItem value="male">Mâles</SelectItem>
           <SelectItem value="female">Femelles</SelectItem>
         </SelectContent>
@@ -69,11 +69,11 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
 
       {/* Filtre Statut */}
       <Select
-        value={filters.status || ""}
+        value={filters.status || "all"}
         onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            status: value as any || undefined,
+            status: value as any,
           })
         }
       >
@@ -81,7 +81,7 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
           <SelectValue placeholder="Tous statuts" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Tous statuts</SelectItem>
+          <SelectItem value="all">Tous statuts</SelectItem>
           <SelectItem value="active">Actifs</SelectItem>
           <SelectItem value="sold">Vendus</SelectItem>
           <SelectItem value="dead">Décédés</SelectItem>
