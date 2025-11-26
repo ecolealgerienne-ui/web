@@ -149,14 +149,14 @@ export default function CampaignsPage() {
       {/* Filtres */}
       <div className="flex gap-4 items-center flex-wrap">
         <Select
-          value={selectedType}
-          onValueChange={(value) => setSelectedType(value as CampaignType | '')}
+          value={selectedType || "all"}
+          onValueChange={(value) => setSelectedType(value === "all" ? '' : (value as CampaignType))}
         >
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
             <SelectItem value="vaccination">{t('types.vaccination')}</SelectItem>
             <SelectItem value="treatment">{t('types.treatment')}</SelectItem>
             <SelectItem value="weighing">{t('types.weighing')}</SelectItem>
@@ -165,14 +165,14 @@ export default function CampaignsPage() {
         </Select>
 
         <Select
-          value={selectedStatus}
-          onValueChange={(value) => setSelectedStatus(value as CampaignStatus | '')}
+          value={selectedStatus || "all"}
+          onValueChange={(value) => setSelectedStatus(value === "all" ? '' : (value as CampaignStatus))}
         >
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('filters.allStatus')}</SelectItem>
+            <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
             <SelectItem value="planned">{t('status.planned')}</SelectItem>
             <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
             <SelectItem value="completed">{t('status.completed')}</SelectItem>
