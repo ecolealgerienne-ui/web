@@ -25,12 +25,12 @@ export default function BreedsPage() {
   const t = useTranslations('breeds');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [selectedSpecies, setSelectedSpecies] = useState('');
+  const [selectedSpecies, setSelectedSpecies] = useState('all');
   const [showInactive, setShowInactive] = useState(true);
-  const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies || undefined);
+  const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies === 'all' ? undefined : selectedSpecies);
 
   const speciesOptions = [
-    { value: '', label: t('filters.allSpecies') },
+    { value: 'all', label: t('filters.allSpecies') },
     { value: 'sheep', label: t('species.sheep') },
     { value: 'goat', label: t('species.goat') },
     { value: 'cattle', label: t('species.cattle') },
