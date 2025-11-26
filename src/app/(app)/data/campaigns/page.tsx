@@ -84,7 +84,7 @@ export default function CampaignsPage() {
         return 'default';
       case 'in_progress':
         return 'secondary';
-      case 'planned':
+      case 'scheduled':
         return 'outline';
       case 'cancelled':
         return 'destructive';
