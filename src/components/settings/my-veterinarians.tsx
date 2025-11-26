@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
 import { Save } from 'lucide-react'
+import { useToast } from '@/lib/hooks/useToast'
+import { useUndo } from '@/lib/hooks/useUndo'
 
 // Mock des vétérinaires du catalogue global
 const MOCK_CATALOG_VETERINARIANS: TransferListItem[] = [
@@ -24,6 +26,9 @@ interface MyVeterinariansProps {
 }
 
 export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
+  const toast = useToast()
+  const { markForDeletion, undoOperation, isPendingDeletion } = useUndo<TransferListItem>()
+
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([
     { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre' },
     { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza', isLocal: true },
@@ -31,15 +36,47 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
+  // Ref pour stocker l'état avant suppression (pour undo)
+  const deletedItemRef = useRef<TransferListItem | null>(null)
+
   const handleSelect = useCallback((item: TransferListItem) => {
     setSelectedItems((prev) => [...prev, item])
     setHasChanges(true)
   }, [])
 
   const handleDeselect = useCallback((itemId: string) => {
+    const itemToRemove = selectedItems.find((item) => item.id === itemId)
+    if (!itemToRemove) return
+
+    // Soft delete - retirer de la liste visible
     setSelectedItems((prev) => prev.filter((item) => item.id !== itemId))
     setHasChanges(true)
-  }, [])
+
+    // Marquer pour suppression avec possibilité d'annuler
+    const operationId = markForDeletion(
+      itemId,
+      itemToRemove,
+      // Fonction de restauration
+      () => {
+        setSelectedItems((prev) => [...prev, itemToRemove])
+      },
+      // Fonction de suppression définitive
+      () => {
+        // La suppression est déjà faite visuellement
+        console.log('Hard delete confirmed:', itemId)
+      }
+    )
+
+    // Afficher le toast avec option Undo
+    toast.undo(
+      `${itemToRemove.name} retiré`,
+      () => {
+        undoOperation(operationId)
+        toast.success('Restauré', `${itemToRemove.name} a été restauré`)
+      },
+      'Cliquez pour annuler'
+    )
+  }, [selectedItems, markForDeletion, undoOperation, toast])
 
   const handleCreateLocal = useCallback((name: string) => {
     const newItem: TransferListItem = {
@@ -50,7 +87,9 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
     }
     setSelectedItems((prev) => [...prev, newItem])
     setHasChanges(true)
-  }, [])
+
+    toast.success('Vétérinaire ajouté', `${name} a été ajouté à votre liste`)
+  }, [toast])
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -67,10 +106,25 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
       }
 
       setHasChanges(false)
+      toast.success('Configuration sauvegardée', 'Vos vétérinaires ont été enregistrés')
+    } catch (error) {
+      toast.error(
+        'Échec de sauvegarde',
+        'Vérifiez votre connexion internet',
+        {
+          label: 'Réessayer',
+          onClick: handleSave,
+        }
+      )
     } finally {
       setIsSaving(false)
     }
   }
+
+  // Filtrer les items en attente de suppression pour l'affichage
+  const visibleSelectedItems = selectedItems.filter(
+    (item) => !isPendingDeletion(item.id)
+  )
 
   return (
     <div className="space-y-6">
