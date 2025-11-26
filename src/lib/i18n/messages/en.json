@@ -449,6 +449,8 @@
       "search": "Search..."
     },
     "types": {
+      "entry": "Entry",
+      "exit": "Exit",
       "birth": "Birth",
       "death": "Death",
       "sale": "Sale",
