@@ -176,7 +176,7 @@ export function VaccinationFormDialog({
             </div>
 
             <div>
-              <Label htmlFor="administrationRoute">Voie d'administration</Label>
+              <Label htmlFor="administrationRoute">Voie d&apos;administration</Label>
               <Select
                 id="administrationRoute"
                 value={formData.administrationRoute}

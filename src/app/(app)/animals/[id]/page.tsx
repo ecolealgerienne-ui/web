@@ -33,7 +33,7 @@ export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-2">Animal non trouvé</h2>
           <p className="text-muted-foreground">
-            L'animal demandé n'existe pas ou a été supprimé.
+            L&apos;animal demandé n&apos;existe pas ou a été supprimé.
           </p>
         </div>
       </div>

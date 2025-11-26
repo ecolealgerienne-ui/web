@@ -30,7 +30,7 @@ export default function DiseasesPage() {
           <div className="text-center py-12 text-muted-foreground">
             Aucune maladie enregistrée.
             <br />
-            Cliquez sur "Nouvelle maladie" pour en ajouter une.
+            Cliquez sur &quot;Nouvelle maladie&quot; pour en ajouter une.
           </div>
         </CardContent>
       </Card>

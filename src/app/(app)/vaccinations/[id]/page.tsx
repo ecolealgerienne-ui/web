@@ -111,14 +111,14 @@ export default function VaccinationDetailPage({ params }: VaccinationDetailPageP
                     <p className="text-sm text-muted-foreground">ID: {vaccination.animalId}</p>
                   </div>
                   <Link href={`/animals/${vaccination.animalId}`}>
-                    <Button variant="outline" size="sm">Voir l'animal</Button>
+                    <Button variant="outline" size="sm">Voir l&apos;animal</Button>
                   </Link>
                 </div>
               )}
               {vaccination.targetType === 'lot' && vaccination.lotId && (
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Lot d'animaux</p>
+                    <p className="font-medium">Lot d&apos;animaux</p>
                     <p className="text-sm text-muted-foreground">ID: {vaccination.lotId}</p>
                   </div>
                   <Link href={`/lots/${vaccination.lotId}`}>

@@ -118,12 +118,12 @@ export function TreatmentInfoCard({ treatment }: TreatmentInfoCardProps) {
           )}
         </div>
 
-        {/* Délais d'attente */}
+        {/* Délais d&apos;attente */}
         {(treatment.withdrawalPeriodMeat || treatment.withdrawalPeriodMilk || treatment.withdrawalEndDate) && (
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              Délais d'attente
+              Délais d&apos;attente
             </div>
             {treatment.withdrawalPeriodMeat && (
               <p className="text-sm">Viande : {treatment.withdrawalPeriodMeat} jours</p>

@@ -151,7 +151,7 @@ export function TreatmentFormDialog({
             </div>
 
             <div>
-              <Label htmlFor="administrationRoute">Voie d'administration</Label>
+              <Label htmlFor="administrationRoute">Voie d&apos;administration</Label>
               <Select
                 id="administrationRoute"
                 value={formData.administrationRoute}
@@ -208,7 +208,7 @@ export function TreatmentFormDialog({
             />
           </div>
 
-          {/* Délais d'attente */}
+          {/* Délais d&apos;attente */}
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Label htmlFor="withdrawalPeriodMeat">Délai viande (jours)</Label>

@@ -36,7 +36,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Paramètres</h1>
         <p className="text-muted-foreground">
-          Gérez vos préférences et la configuration de l'application
+          Gérez vos préférences et la configuration de l&apos;application
         </p>
       </div>
 
@@ -127,7 +127,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="farmId">N° d'identification</Label>
+                    <Label htmlFor="farmId">N° d&apos;identification</Label>
                     <Input id="farmId" placeholder="EL-2023-001" />
                   </div>
                   <div>
@@ -205,9 +205,9 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">Délais d'attente</div>
+                      <div className="font-medium">Délais d&apos;attente</div>
                       <div className="text-sm text-muted-foreground">
-                        Alerte fin de délai d'attente
+                        Alerte fin de délai d&apos;attente
                       </div>
                     </div>
                     <input type="checkbox" defaultChecked className="h-4 w-4" />
@@ -245,12 +245,12 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle>Langue & Région</CardTitle>
                 <CardDescription>
-                  Personnalisez l'affichage selon vos préférences
+                  Personnalisez l&apos;affichage selon vos préférences
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="language">Langue de l'interface</Label>
+                  <Label htmlFor="language">Langue de l&apos;interface</Label>
                   <Select id="language" defaultValue="fr">
                     <option value="fr">Français</option>
                     <option value="ar">العربية (Arabe)</option>
@@ -371,7 +371,7 @@ export default function SettingsPage() {
                   <h3 className="font-medium mb-2">Sauvegarde automatique</h3>
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Dernière sauvegarde : Aujourd'hui à 03:00
+                      Dernière sauvegarde : Aujourd&apos;hui à 03:00
                     </div>
                     <Badge variant="success">Activé</Badge>
                   </div>

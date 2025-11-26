@@ -33,7 +33,7 @@ export function useAnimals(filters?: { status?: string; speciesId?: string; sear
     } finally {
       setLoading(false)
     }
-  }, [filters?.status, filters?.speciesId, filters?.search])
+  }, [filters])
 
   useEffect(() => {
     fetchAnimals()

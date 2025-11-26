@@ -34,7 +34,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
             <div className="space-y-2">
               <h1 className="text-3xl font-bold">Erreur inattendue</h1>
               <p className="text-muted-foreground">
-                Une erreur s'est produite. Nous en avons été informés et travaillons
+                Une erreur s&apos;est produite. Nous en avons été informés et travaillons
                 à résoudre le problème.
               </p>
             </div>
@@ -60,7 +60,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
                 onClick={() => (window.location.href = '/')}
                 variant="outline"
               >
-                Retour à l'accueil
+                Retour à l&apos;accueil
               </Button>
             </div>
           </div>
