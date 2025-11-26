@@ -458,6 +458,8 @@
       "transfer": "Transfert",
       "transfer_in": "Transfert entrant",
       "transfer_out": "Transfert sortant",
+      "temporary_out": "Sortie temporaire",
+      "temporary_return": "Retour temporaire",
       "health_check": "Contrôle santé",
       "vaccination": "Vaccination",
       "treatment": "Traitement",

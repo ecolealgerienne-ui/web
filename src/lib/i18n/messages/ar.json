@@ -458,6 +458,8 @@
       "transfer": "نقل",
       "transfer_in": "نقل وارد",
       "transfer_out": "نقل صادر",
+      "temporary_out": "خروج مؤقت",
+      "temporary_return": "عودة مؤقتة",
       "health_check": "فحص صحي",
       "vaccination": "تطعيم",
       "treatment": "علاج",
