@@ -99,14 +99,14 @@ export default function AlertConfigurationsPage() {
       {/* Filtres */}
       <div className="flex gap-4 items-center flex-wrap">
         <Select
-          value={selectedType}
-          onValueChange={(value) => setSelectedType(value as AlertType | '')}
+          value={selectedType || "all"}
+          onValueChange={(value) => setSelectedType(value === "all" ? '' : (value as AlertType))}
         >
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
             <SelectItem value="urgent">{t('types.urgent')}</SelectItem>
             <SelectItem value="important">{t('types.important')}</SelectItem>
             <SelectItem value="routine">{t('types.routine')}</SelectItem>
