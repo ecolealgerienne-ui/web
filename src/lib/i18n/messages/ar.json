@@ -456,6 +456,8 @@
       "sale": "بيع",
       "purchase": "شراء",
       "transfer": "نقل",
+      "transfer_in": "نقل وارد",
+      "transfer_out": "نقل صادر",
       "health_check": "فحص صحي",
       "vaccination": "تطعيم",
       "treatment": "علاج",

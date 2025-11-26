@@ -456,6 +456,8 @@
       "sale": "Sale",
       "purchase": "Purchase",
       "transfer": "Transfer",
+      "transfer_in": "Transfer In",
+      "transfer_out": "Transfer Out",
       "health_check": "Health Check",
       "vaccination": "Vaccination",
       "treatment": "Treatment",
