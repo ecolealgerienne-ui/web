@@ -3,8 +3,10 @@ export interface User {
   email: string
   name: string
   role: 'super_admin' | 'admin' | 'user' | 'viewer'
+  farmId?: string
   farmName?: string
   avatar?: string
+  isFirstLogin?: boolean
 }
 
 export interface AuthState {

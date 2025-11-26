@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
+import { SmartSelect, SmartSelectItem } from '@/components/ui/smart-select';
+import { useFarmerPreferences } from '@/lib/hooks/useFarmerPreferences';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +17,32 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Treatment } from '@/lib/types/treatment';
+
+// Mock data - À remplacer par les vraies données du catalogue
+const MOCK_MEDICATIONS: SmartSelectItem[] = [
+  { id: 'med-1', name: 'Oxytétracycline 20%', description: 'Antibiotique' },
+  { id: 'med-2', name: 'Pénicilline-Streptomycine', description: 'Antibiotique' },
+  { id: 'med-3', name: 'Amoxicilline', description: 'Antibiotique' },
+  { id: 'med-4', name: 'Enrofloxacine', description: 'Antibiotique' },
+  { id: 'med-5', name: 'Ivermectine 1%', description: 'Antiparasitaire' },
+  { id: 'med-6', name: 'Albendazole', description: 'Antiparasitaire' },
+  { id: 'med-7', name: 'Fenbendazole', description: 'Antiparasitaire' },
+  { id: 'med-8', name: 'Lévamisole', description: 'Antiparasitaire' },
+  { id: 'med-9', name: 'Méloxicam', description: 'Anti-inflammatoire' },
+  { id: 'med-10', name: 'Flunixine', description: 'Anti-inflammatoire' },
+  { id: 'med-11', name: 'Dexaméthasone', description: 'Corticoïde' },
+  { id: 'med-12', name: 'Vitamine AD3E', description: 'Vitamine' },
+  { id: 'med-13', name: 'Complexe B', description: 'Vitamine' },
+  { id: 'med-14', name: 'Calcium Borogluconate', description: 'Minéral' },
+];
+
+const MOCK_VETERINARIANS: SmartSelectItem[] = [
+  { id: 'vet-1', name: 'Dr. Karim Benali', description: 'Médecine générale' },
+  { id: 'vet-2', name: 'Dr. Amira Hadj', description: 'Chirurgie' },
+  { id: 'vet-3', name: 'Dr. Mohamed Saidi', description: 'Médecine bovine' },
+  { id: 'vet-4', name: 'Dr. Fatima Zerrouki', description: 'Médecine ovine' },
+  { id: 'vet-5', name: 'Dr. Youcef Belkacem', description: 'Volaille' },
+];
 
 interface TreatmentFormDialogProps {
   open: boolean;
@@ -29,6 +57,13 @@ export function TreatmentFormDialog({
   treatment,
   onSave,
 }: TreatmentFormDialogProps) {
+  const {
+    enrichItems,
+    toggleFavorite,
+    incrementUsage,
+    addLocalItem,
+  } = useFarmerPreferences();
+
   const [formData, setFormData] = useState<Partial<Treatment>>(
     treatment || {
       productName: '',
@@ -43,6 +78,64 @@ export function TreatmentFormDialog({
       duration: 1,
     }
   );
+
+  // État pour les sélections SmartSelect
+  const [selectedMedicationId, setSelectedMedicationId] = useState<string>('');
+  const [selectedVeterinarianId, setSelectedVeterinarianId] = useState<string>('');
+
+  // Enrichir les items avec favoris et usage
+  const enrichedMedications = useMemo(
+    () => enrichItems('medications', MOCK_MEDICATIONS),
+    [enrichItems]
+  );
+
+  const enrichedVeterinarians = useMemo(
+    () => enrichItems('veterinarians', MOCK_VETERINARIANS),
+    [enrichItems]
+  );
+
+  // Handlers pour les sélections
+  const handleMedicationChange = useCallback((medicationId: string) => {
+    setSelectedMedicationId(medicationId);
+    const medication = enrichedMedications.find((m) => m.id === medicationId);
+    if (medication) {
+      setFormData((prev) => ({ ...prev, productName: medication.name }));
+      incrementUsage('medications', medicationId);
+    }
+  }, [enrichedMedications, incrementUsage]);
+
+  const handleVeterinarianChange = useCallback((vetId: string) => {
+    setSelectedVeterinarianId(vetId);
+    const vet = enrichedVeterinarians.find((v) => v.id === vetId);
+    if (vet) {
+      setFormData((prev) => ({ ...prev, veterinarianName: vet.name }));
+      incrementUsage('veterinarians', vetId);
+    }
+  }, [enrichedVeterinarians, incrementUsage]);
+
+  // Créer un nouveau médicament local
+  const handleCreateMedication = useCallback(async (name: string): Promise<SmartSelectItem | null> => {
+    const newItem: SmartSelectItem = {
+      id: `local-med-${Date.now()}`,
+      name,
+      description: 'Produit local',
+      isLocal: true,
+    };
+    addLocalItem('medications', newItem);
+    return newItem;
+  }, [addLocalItem]);
+
+  // Créer un nouveau vétérinaire local
+  const handleCreateVeterinarian = useCallback(async (name: string): Promise<SmartSelectItem | null> => {
+    const newItem: SmartSelectItem = {
+      id: `local-vet-${Date.now()}`,
+      name,
+      description: 'Vétérinaire local',
+      isLocal: true,
+    };
+    addLocalItem('veterinarians', newItem);
+    return newItem;
+  }, [addLocalItem]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,17 +159,19 @@ export function TreatmentFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          {/* Produit */}
-          <div>
-            <Label htmlFor="productName">Nom du produit *</Label>
-            <Input
-              id="productName"
-              placeholder="Ivermectine 1%"
-              required
-              value={formData.productName}
-              onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-            />
-          </div>
+          {/* Produit - SmartSelect */}
+          <SmartSelect
+            label="Produit *"
+            items={enrichedMedications}
+            value={selectedMedicationId}
+            onChange={handleMedicationChange}
+            onCreateLocal={handleCreateMedication}
+            onToggleFavorite={(id) => toggleFavorite('medications', id)}
+            placeholder="Sélectionner un produit..."
+            createLabel="Ajouter un produit"
+            createDialogTitle="Ajouter un nouveau produit"
+            createInputPlaceholder="Nom du produit..."
+          />
 
           <div className="grid gap-4 md:grid-cols-2">
             {/* Type de traitement */}
@@ -85,8 +180,8 @@ export function TreatmentFormDialog({
               <Select
                 required
                 value={formData.treatmentType}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, treatmentType: value as any })
+                onChange={(e) =>
+                  setFormData({ ...formData, treatmentType: e.target.value as Treatment['treatmentType'] })
                 }
               >
                 <SelectTrigger>
@@ -108,8 +203,8 @@ export function TreatmentFormDialog({
               <Select
                 required
                 value={formData.targetType}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, targetType: value as any })
+                onChange={(e) =>
+                  setFormData({ ...formData, targetType: e.target.value as Treatment['targetType'] })
                 }
               >
                 <SelectTrigger>
@@ -223,7 +318,7 @@ export function TreatmentFormDialog({
             />
           </div>
 
-          {/* Délais d&apos;attente */}
+          {/* Délais d'attente */}
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Label htmlFor="withdrawalPeriodMeat">Délai viande (jours)</Label>
@@ -252,18 +347,19 @@ export function TreatmentFormDialog({
             </div>
           </div>
 
-          {/* Vétérinaire */}
-          <div>
-            <Label htmlFor="veterinarianName">Vétérinaire</Label>
-            <Input
-              id="veterinarianName"
-              placeholder="Dr. Karim Benali"
-              value={formData.veterinarianName}
-              onChange={(e) =>
-                setFormData({ ...formData, veterinarianName: e.target.value })
-              }
-            />
-          </div>
+          {/* Vétérinaire - SmartSelect */}
+          <SmartSelect
+            label="Vétérinaire"
+            items={enrichedVeterinarians}
+            value={selectedVeterinarianId}
+            onChange={handleVeterinarianChange}
+            onCreateLocal={handleCreateVeterinarian}
+            onToggleFavorite={(id) => toggleFavorite('veterinarians', id)}
+            placeholder="Sélectionner un vétérinaire..."
+            createLabel="Ajouter un vétérinaire"
+            createDialogTitle="Ajouter un nouveau vétérinaire"
+            createInputPlaceholder="Nom du vétérinaire..."
+          />
 
           {/* Coût */}
           <div>
@@ -283,7 +379,7 @@ export function TreatmentFormDialog({
             <Select
               required
               value={formData.status}
-              onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as Treatment['status'] })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un statut" />
