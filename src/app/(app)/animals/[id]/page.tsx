@@ -61,9 +61,9 @@ export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold">
-              {animal.name || `Animal ${animal.internalId || animal.eid}`}
+              {animal.name || `Animal ${animal.identificationNumber}`}
             </h1>
-            <p className="text-muted-foreground font-mono">{animal.eid}</p>
+            <p className="text-muted-foreground font-mono">{animal.identificationNumber}</p>
           </div>
         </div>
         <div className="flex gap-2">
