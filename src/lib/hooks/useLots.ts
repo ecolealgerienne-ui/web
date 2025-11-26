@@ -8,9 +8,6 @@ export function useLots(filters?: Partial<LotFilters>) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Stabiliser les filtres pour éviter les boucles infinies
-  const filtersKey = JSON.stringify(filters);
-
   const fetchLots = useCallback(async () => {
     try {
       setLoading(true);
@@ -24,7 +21,7 @@ export function useLots(filters?: Partial<LotFilters>) {
     } finally {
       setLoading(false);
     }
-  }, [filtersKey]);
+  }, [filters?.search, filters?.type, filters?.status, filters?.completed]);
 
   useEffect(() => {
     fetchLots();

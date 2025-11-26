@@ -33,7 +33,7 @@ export function useCampaigns(filters?: { type?: CampaignType; status?: CampaignS
     } finally {
       setLoading(false)
     }
-  }, [filters])
+  }, [filters?.type, filters?.status])
 
   useEffect(() => {
     fetchCampaigns()
