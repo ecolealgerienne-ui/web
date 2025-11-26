@@ -50,7 +50,7 @@ export const mockUser = {
  * En production, cet ID sera récupéré depuis le contexte utilisateur
  * après authentification.
  */
-export const TEMP_FARM_ID = 'd3934abb-13d2-4950-8d1c-f8ab4628e762';
+export const TEMP_FARM_ID = '550e8400-e29b-41d4-a716-446655440000';
 
 // Vérifier si une route est publique
 export function isPublicRoute(pathname: string): boolean {
