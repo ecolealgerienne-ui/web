@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -31,15 +31,15 @@ export function AnimalFormDialog({
 }: AnimalFormDialogProps) {
   const [formData, setFormData] = useState<Partial<Animal>>(
     animal || {
-      eid: '',
-      internalId: '',
+      identificationNumber: '',
+      
       name: '',
-      species: 'sheep',
-      breed: '',
+      speciesId: 'sheep',
+      breedId: '',
       sex: 'female',
       birthDate: '',
-      status: 'active',
-      acquisitionType: 'birth',
+      status: 'alive' as const,
+      
       acquisitionDate: new Date().toISOString().split('T')[0],
     }
   );
@@ -72,8 +72,8 @@ export function AnimalFormDialog({
                 id="eid"
                 placeholder="250268001234567"
                 required
-                value={formData.eid}
-                onChange={(e) => setFormData({ ...formData, eid: e.target.value })}
+                value={formData.identificationNumber}
+                onChange={(e) => setFormData({ ...formData, identificationNumber: e.target.value })}
               />
             </div>
 
@@ -83,8 +83,8 @@ export function AnimalFormDialog({
               <Input
                 id="internalId"
                 placeholder="A-001"
-                value={formData.internalId}
-                onChange={(e) => setFormData({ ...formData, internalId: e.target.value })}
+                value={formData.identificationNumber}
+                onChange={(e) => setFormData({ ...formData, identificationNumber: e.target.value })}
               />
             </div>
           </div>
@@ -105,16 +105,20 @@ export function AnimalFormDialog({
             <div>
               <Label htmlFor="species">Espèce *</Label>
               <Select
-                id="species"
                 required
-                value={formData.species}
-                onChange={(e) =>
-                  setFormData({ ...formData, species: e.target.value as any })
+                value={formData.speciesId}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, speciesId: value as any })
                 }
               >
-                <option value="sheep">Ovin</option>
-                <option value="goat">Caprin</option>
-                <option value="cattle">Bovin</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sheep">Ovin</SelectItem>
+                  <SelectItem value="goat">Caprin</SelectItem>
+                  <SelectItem value="cattle">Bovin</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -122,13 +126,17 @@ export function AnimalFormDialog({
             <div>
               <Label htmlFor="sex">Sexe *</Label>
               <Select
-                id="sex"
                 required
                 value={formData.sex}
-                onChange={(e) => setFormData({ ...formData, sex: e.target.value as any })}
+                onValueChange={(value) => setFormData({ ...formData, sex: value as any })}
               >
-                <option value="female">Femelle</option>
-                <option value="male">Mâle</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="female">Femelle</SelectItem>
+                  <SelectItem value="male">Mâle</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -151,31 +159,35 @@ export function AnimalFormDialog({
             <Input
               id="breed"
               placeholder="Ouled Djellal"
-              value={formData.breed}
-              onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+              value={formData.breedId}
+              onChange={(e) => setFormData({ ...formData, breedId: e.target.value })}
             />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             {/* Type d'acquisition */}
             <div>
-              <Label htmlFor="acquisitionType">Type d'acquisition *</Label>
+              <Label htmlFor="acquisitionType">Type d&apos;acquisition *</Label>
               <Select
-                id="acquisitionType"
                 required
-                value={formData.acquisitionType}
-                onChange={(e) =>
-                  setFormData({ ...formData, acquisitionType: e.target.value as any })
+                value={formData.identificationNumber}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, acquisitionDate: value as any })
                 }
               >
-                <option value="birth">Naissance</option>
-                <option value="purchase">Achat</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="birth">Naissance</SelectItem>
+                  <SelectItem value="purchase">Achat</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
             {/* Date d'acquisition */}
             <div>
-              <Label htmlFor="acquisitionDate">Date d'acquisition *</Label>
+              <Label htmlFor="acquisitionDate">Date d&apos;acquisition *</Label>
               <Input
                 id="acquisitionDate"
                 type="date"
@@ -192,15 +204,19 @@ export function AnimalFormDialog({
           <div>
             <Label htmlFor="status">Statut *</Label>
             <Select
-              id="status"
               required
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+              onValueChange={(value) => setFormData({ ...formData, status: value as any })}
             >
-              <option value="active">Actif</option>
-              <option value="sold">Vendu</option>
-              <option value="dead">Décédé</option>
-              <option value="slaughtered">Abattu</option>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Actif</SelectItem>
+                <SelectItem value="sold">Vendu</SelectItem>
+                <SelectItem value="dead">Décédé</SelectItem>
+                <SelectItem value="slaughtered">Abattu</SelectItem>
+              </SelectContent>
             </Select>
           </div>
 

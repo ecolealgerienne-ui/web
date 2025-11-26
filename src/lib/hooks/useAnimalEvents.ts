@@ -33,7 +33,7 @@ export function useAnimalEvents(filters?: { animalId?: string; eventType?: strin
     } finally {
       setLoading(false)
     }
-  }, [filters?.animalId, filters?.eventType, filters?.fromDate, filters?.toDate])
+  }, [filters])
 
   useEffect(() => {
     fetchEvents()

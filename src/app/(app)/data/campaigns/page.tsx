@@ -5,7 +5,7 @@ import { Plus, Pencil, Trash2, Calendar, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCampaigns } from '@/lib/hooks/useCampaigns';
 import { CampaignFormDialog } from '@/components/data/campaign-form-dialog';
 import { Campaign, CampaignType, CampaignStatus } from '@/lib/types/campaign';
@@ -78,18 +78,18 @@ export default function CampaignsPage() {
     setFormOpen(false);
   };
 
-  const getStatusBadgeVariant = (status: CampaignStatus) => {
+  const getStatusBadgeVariant = (status: CampaignStatus): 'destructive' | 'success' | 'default' | 'warning' => {
     switch (status) {
       case 'completed':
-        return 'default';
+        return 'success';
       case 'in_progress':
-        return 'secondary';
-      case 'planned':
-        return 'outline';
+        return 'warning';
+      case 'scheduled':
+        return 'default';
       case 'cancelled':
         return 'destructive';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
@@ -150,26 +150,34 @@ export default function CampaignsPage() {
       <div className="flex gap-4 items-center flex-wrap">
         <Select
           value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value as CampaignType | '')}
-          className="w-full md:w-[200px]"
+          onValueChange={(value) => setSelectedType(value as CampaignType | '')}
         >
-          <option value="">{t('filters.allTypes')}</option>
-          <option value="vaccination">{t('types.vaccination')}</option>
-          <option value="treatment">{t('types.treatment')}</option>
-          <option value="weighing">{t('types.weighing')}</option>
-          <option value="identification">{t('types.identification')}</option>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="vaccination">{t('types.vaccination')}</SelectItem>
+            <SelectItem value="treatment">{t('types.treatment')}</SelectItem>
+            <SelectItem value="weighing">{t('types.weighing')}</SelectItem>
+            <SelectItem value="identification">{t('types.identification')}</SelectItem>
+          </SelectContent>
         </Select>
 
         <Select
           value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value as CampaignStatus | '')}
-          className="w-full md:w-[200px]"
+          onValueChange={(value) => setSelectedStatus(value as CampaignStatus | '')}
         >
-          <option value="">{t('filters.allStatus')}</option>
-          <option value="planned">{t('status.planned')}</option>
-          <option value="in_progress">{t('status.in_progress')}</option>
-          <option value="completed">{t('status.completed')}</option>
-          <option value="cancelled">{t('status.cancelled')}</option>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{t('filters.allStatus')}</SelectItem>
+            <SelectItem value="planned">{t('status.planned')}</SelectItem>
+            <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
+            <SelectItem value="completed">{t('status.completed')}</SelectItem>
+            <SelectItem value="cancelled">{t('status.cancelled')}</SelectItem>
+          </SelectContent>
         </Select>
 
         <div className="text-sm text-muted-foreground">
@@ -203,7 +211,7 @@ export default function CampaignsPage() {
                       <Badge variant={getStatusBadgeVariant(campaign.status)} className="text-xs">
                         {t(`status.${campaign.status}`)}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="default" className="text-xs">
                         {t(`types.${campaign.type}`)}
                       </Badge>
                     </div>
@@ -315,7 +323,7 @@ export default function CampaignsPage() {
               {tc('actions.cancel')}
             </Button>
             <Button
-              variant="destructive"
+              variant="outline" className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >

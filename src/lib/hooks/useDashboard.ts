@@ -15,7 +15,7 @@ export function useDashboard() {
       const data = await dashboardService.getHerdEvolution(period);
       setHerdEvolution(data);
     } catch (err) {
-      logger.error('Error fetching herd evolution', err);
+      logger.error('Error fetching herd evolution', { error: err });
     }
   }, []);
 
@@ -39,7 +39,7 @@ export function useDashboard() {
       } catch (err) {
         const error = err instanceof Error ? err : new Error('Failed to fetch dashboard data');
         setError(error);
-        logger.error('Error fetching dashboard data', err);
+        logger.error('Error fetching dashboard data', { error: err });
       } finally {
         setLoading(false);
       }

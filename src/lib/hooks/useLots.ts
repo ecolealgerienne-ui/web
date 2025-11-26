@@ -20,7 +20,7 @@ export function useLots(filters?: Partial<LotFilters>) {
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch lots');
       setError(error);
-      logger.error('Error fetching lots', err);
+      logger.error('Error fetching lots', { error: err });
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,7 @@ export function useLot(id: string) {
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch lot');
       setError(error);
-      logger.error('Error fetching lot', err);
+      logger.error('Error fetching lot', { error: err });
     } finally {
       setLoading(false);
     }

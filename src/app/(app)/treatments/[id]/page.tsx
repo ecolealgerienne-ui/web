@@ -36,7 +36,7 @@ export default function TreatmentDetailPage({ params }: TreatmentDetailPageProps
               <h1 className="text-3xl font-bold tracking-tight">{treatment.productName}</h1>
               <p className="text-muted-foreground">
                 Traitement débuté le{' '}
-                {new Date(treatment.startDate).toLocaleDateString('fr-FR')}
+                {new Date(treatment.treatmentDate).toLocaleDateString('fr-FR')}
               </p>
             </div>
           </div>
@@ -70,9 +70,9 @@ export default function TreatmentDetailPage({ params }: TreatmentDetailPageProps
                 Traitement en cours
               </p>
               <p className="text-sm text-orange-700 dark:text-orange-300">
-                {treatment.duration && treatment.startDate ? (
+                {treatment.duration && treatment.treatmentDate ? (
                   <>
-                    Jour {Math.ceil((new Date().getTime() - new Date(treatment.startDate).getTime()) / (1000 * 60 * 60 * 24))} sur {treatment.duration}
+                    Jour {Math.ceil((new Date().getTime() - new Date(treatment.treatmentDate).getTime()) / (1000 * 60 * 60 * 24))} sur {treatment.duration}
                   </>
                 ) : (
                   'En cours d\'administration'
@@ -107,7 +107,7 @@ export default function TreatmentDetailPage({ params }: TreatmentDetailPageProps
             <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             <div>
               <p className="font-medium text-amber-900 dark:text-amber-100">
-                Délai d'attente en cours
+                Délai d&apos;attente en cours
               </p>
               <p className="text-sm text-amber-700 dark:text-amber-300">
                 Fin du délai : {new Date(treatment.withdrawalEndDate).toLocaleDateString('fr-FR')}
@@ -134,14 +134,14 @@ export default function TreatmentDetailPage({ params }: TreatmentDetailPageProps
                     <p className="text-sm text-muted-foreground">ID: {treatment.animalId}</p>
                   </div>
                   <Link href={`/animals/${treatment.animalId}`}>
-                    <Button variant="outline" size="sm">Voir l'animal</Button>
+                    <Button variant="outline" size="sm">Voir l&apos;animal</Button>
                   </Link>
                 </div>
               )}
               {treatment.targetType === 'lot' && treatment.lotId && (
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Lot d'animaux</p>
+                    <p className="font-medium">Lot d&apos;animaux</p>
                     <p className="text-sm text-muted-foreground">ID: {treatment.lotId}</p>
                   </div>
                   <Link href={`/lots/${treatment.lotId}`}>

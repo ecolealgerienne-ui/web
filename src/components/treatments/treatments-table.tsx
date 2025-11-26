@@ -71,8 +71,8 @@ export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
               <TableCell className="font-medium">
                 <div className="space-y-1">
                   <div>{treatment.productName}</div>
-                  {treatment.dosage && (
-                    <div className="text-xs text-muted-foreground">{treatment.dosage}</div>
+                  {treatment.dose && (
+                    <div className="text-xs text-muted-foreground">{treatment.dose}</div>
                   )}
                 </div>
               </TableCell>
@@ -90,7 +90,7 @@ export function TreatmentsTable({ treatments }: TreatmentsTableProps) {
                 {treatment.reason}
               </TableCell>
               <TableCell className="text-sm">
-                {new Date(treatment.startDate).toLocaleDateString('fr-FR')}
+                {new Date(treatment.treatmentDate).toLocaleDateString('fr-FR')}
               </TableCell>
               <TableCell>
                 <Badge variant={getStatusVariant(treatment.status)}>

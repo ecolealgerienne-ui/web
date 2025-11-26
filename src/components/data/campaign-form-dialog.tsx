@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Campaign, CreateCampaignDto, UpdateCampaignDto, CampaignType, CampaignStatus } from '@/lib/types/campaign';
 import { campaignsService } from '@/lib/services/campaigns.service';
 import { useToast } from '@/contexts/toast-context';
@@ -42,7 +42,7 @@ export function CampaignFormDialog({
     productId: '',
     productName: '',
     campaignDate: new Date().toISOString().split('T')[0],
-    status: 'planned' as CampaignStatus,
+    status: 'scheduled' as CampaignStatus,
     targetCount: 0,
     completedCount: 0,
     description: '',
@@ -78,7 +78,7 @@ export function CampaignFormDialog({
         productId: '',
         productName: '',
         campaignDate: new Date().toISOString().split('T')[0],
-        status: 'planned',
+        status: 'in_progress' as const,
         targetCount: 0,
         completedCount: 0,
         description: '',
@@ -151,15 +151,19 @@ export function CampaignFormDialog({
                 {t('fields.type')} <span className="text-destructive">*</span>
               </Label>
               <Select
-                id="type"
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as CampaignType })}
+                onValueChange={(value) => setFormData({ ...formData, type: value as CampaignType })}
                 required
               >
-                <option value="vaccination">{t('types.vaccination')}</option>
-                <option value="treatment">{t('types.treatment')}</option>
-                <option value="weighing">{t('types.weighing')}</option>
-                <option value="identification">{t('types.identification')}</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="vaccination">{t('types.vaccination')}</SelectItem>
+                  <SelectItem value="treatment">{t('types.treatment')}</SelectItem>
+                  <SelectItem value="weighing">{t('types.weighing')}</SelectItem>
+                  <SelectItem value="identification">{t('types.identification')}</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -168,15 +172,19 @@ export function CampaignFormDialog({
                 {t('fields.status')} <span className="text-destructive">*</span>
               </Label>
               <Select
-                id="status"
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as CampaignStatus })}
+                onValueChange={(value) => setFormData({ ...formData, status: value as CampaignStatus })}
                 required
               >
-                <option value="planned">{t('status.planned')}</option>
-                <option value="in_progress">{t('status.in_progress')}</option>
-                <option value="completed">{t('status.completed')}</option>
-                <option value="cancelled">{t('status.cancelled')}</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="planned">{t('status.planned')}</SelectItem>
+                  <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
+                  <SelectItem value="completed">{t('status.completed')}</SelectItem>
+                  <SelectItem value="cancelled">{t('status.cancelled')}</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>

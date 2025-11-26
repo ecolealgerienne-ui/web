@@ -5,7 +5,7 @@ import { Bell, Edit2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAlertConfigurations } from '@/lib/hooks/useAlertConfigurations';
 import { AlertConfiguration, AlertType } from '@/lib/types/alert-configuration';
 import { alertConfigurationsService } from '@/lib/services/alert-configurations.service';
@@ -31,20 +31,20 @@ export default function AlertConfigurationsPage() {
     }
   };
 
-  const getTypeBadgeVariant = (type: AlertType) => {
+  const getTypeBadgeVariant = (type: AlertType): 'destructive' | 'success' | 'default' | 'warning' => {
     switch (type) {
       case 'urgent':
         return 'destructive';
       case 'important':
         return 'default';
       case 'routine':
-        return 'secondary';
+        return 'warning';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
-  const getPriorityBadgeVariant = (priority: string) => {
+  const getPriorityBadgeVariant = (priority: string): 'destructive' | 'success' | 'default' | 'warning' => {
     switch (priority) {
       case 'critical':
       case 'high':
@@ -52,9 +52,9 @@ export default function AlertConfigurationsPage() {
       case 'medium':
         return 'default';
       case 'low':
-        return 'secondary';
+        return 'warning';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
@@ -100,13 +100,17 @@ export default function AlertConfigurationsPage() {
       <div className="flex gap-4 items-center flex-wrap">
         <Select
           value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value as AlertType | '')}
-          className="w-full md:w-[200px]"
+          onValueChange={(value) => setSelectedType(value as AlertType | '')}
         >
-          <option value="">{t('filters.allTypes')}</option>
-          <option value="urgent">{t('types.urgent')}</option>
-          <option value="important">{t('types.important')}</option>
-          <option value="routine">{t('types.routine')}</option>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="urgent">{t('types.urgent')}</SelectItem>
+            <SelectItem value="important">{t('types.important')}</SelectItem>
+            <SelectItem value="routine">{t('types.routine')}</SelectItem>
+          </SelectContent>
         </Select>
 
         <div className="text-sm text-muted-foreground">
@@ -150,11 +154,11 @@ export default function AlertConfigurationsPage() {
                         <Badge variant={getPriorityBadgeVariant(alert.priority)} className="text-xs">
                           {t(`priorities.${alert.priority}`)}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="default" className="text-xs">
                           {alert.category}
                         </Badge>
                         {!alert.enabled && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="warning" className="text-xs">
                             {tc('status.disabled')}
                           </Badge>
                         )}

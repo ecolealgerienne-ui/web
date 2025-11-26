@@ -2,7 +2,7 @@
 
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AnimalFilters } from "@/lib/types/animal";
 
 interface AnimalsFiltersProps {
@@ -29,52 +29,64 @@ export function AnimalsFilters({ filters, onFiltersChange }: AnimalsFiltersProps
       {/* Filtre Espèce */}
       <Select
         value={filters.species || ""}
-        onChange={(e) =>
+        onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            species: e.target.value as any || undefined,
+            species: value as any || undefined,
           })
         }
-        className="w-full md:w-[180px]"
       >
-        <option value="">Toutes espèces</option>
-        <option value="sheep">Moutons</option>
-        <option value="goat">Chèvres</option>
-        <option value="cattle">Bovins</option>
+        <SelectTrigger className="w-full md:w-[180px]">
+          <SelectValue placeholder="Toutes espèces" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">Toutes espèces</SelectItem>
+          <SelectItem value="sheep">Moutons</SelectItem>
+          <SelectItem value="goat">Chèvres</SelectItem>
+          <SelectItem value="cattle">Bovins</SelectItem>
+        </SelectContent>
       </Select>
 
       {/* Filtre Sexe */}
       <Select
         value={filters.sex || ""}
-        onChange={(e) =>
+        onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            sex: e.target.value as any || undefined,
+            sex: value as any || undefined,
           })
         }
-        className="w-full md:w-[180px]"
       >
-        <option value="">Tous sexes</option>
-        <option value="male">Mâles</option>
-        <option value="female">Femelles</option>
+        <SelectTrigger className="w-full md:w-[180px]">
+          <SelectValue placeholder="Tous sexes" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">Tous sexes</SelectItem>
+          <SelectItem value="male">Mâles</SelectItem>
+          <SelectItem value="female">Femelles</SelectItem>
+        </SelectContent>
       </Select>
 
       {/* Filtre Statut */}
       <Select
         value={filters.status || ""}
-        onChange={(e) =>
+        onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            status: e.target.value as any || undefined,
+            status: value as any || undefined,
           })
         }
-        className="w-full md:w-[180px]"
       >
-        <option value="">Tous statuts</option>
-        <option value="active">Actifs</option>
-        <option value="sold">Vendus</option>
-        <option value="dead">Décédés</option>
-        <option value="slaughtered">Abattus</option>
+        <SelectTrigger className="w-full md:w-[180px]">
+          <SelectValue placeholder="Tous statuts" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">Tous statuts</SelectItem>
+          <SelectItem value="active">Actifs</SelectItem>
+          <SelectItem value="sold">Vendus</SelectItem>
+          <SelectItem value="dead">Décédés</SelectItem>
+          <SelectItem value="slaughtered">Abattus</SelectItem>
+        </SelectContent>
       </Select>
     </div>
   );

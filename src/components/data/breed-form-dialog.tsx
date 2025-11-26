@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Breed, CreateBreedDto, UpdateBreedDto } from '@/lib/types/breed';
 import { breedsService } from '@/lib/services/breeds.service';
 import { useToast } from '@/contexts/toast-context';
@@ -164,18 +164,22 @@ export function BreedFormDialog({
                 {t('fields.speciesId')} <span className="text-destructive">*</span>
               </Label>
               <Select
-                id="speciesId"
                 value={formData.speciesId}
-                onChange={(e) =>
-                  setFormData({ ...formData, speciesId: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, speciesId: value })
                 }
                 required
               >
-                {speciesOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {speciesOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
 

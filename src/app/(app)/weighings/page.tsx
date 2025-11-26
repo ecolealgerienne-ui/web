@@ -47,9 +47,9 @@ export default function WeighingsPage() {
     search,
   });
 
-  const handleCreate = async (data: CreateWeighingDto) => {
+  const handleCreate = async (data: CreateWeighingDto | UpdateWeighingDto) => {
     try {
-      await createWeighing(data);
+      await createWeighing(data as CreateWeighingDto);
       toast.success(t('messages.createSuccess'));
       setIsFormOpen(false);
     } catch (error) {

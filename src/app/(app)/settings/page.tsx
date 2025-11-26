@@ -5,15 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useTranslations } from '@/lib/i18n';
 import {
   User,
   Building2,
@@ -26,25 +19,24 @@ import {
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const t = useTranslations('settings');
   const [activeSection, setActiveSection] = useState<string>('profile');
 
   const sections = [
-    { id: 'profile', key: 'profile', label: 'Profil', icon: User },
-    { id: 'farm', key: 'farm', label: 'Ferme', icon: Building2 },
-    { id: 'notifications', key: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'language', key: 'language', label: 'Langue & Région', icon: Globe },
-    { id: 'security', key: 'security', label: 'Sécurité', icon: Shield },
-    { id: 'data', key: 'data', label: 'Données', icon: Database },
+    { id: 'profile', label: 'Profil', icon: User },
+    { id: 'farm', label: 'Ferme', icon: Building2 },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'language', label: 'Langue & Région', icon: Globe },
+    { id: 'security', label: 'Sécurité', icon: Shield },
+    { id: 'data', label: 'Données', icon: Database },
   ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Paramètres</h1>
         <p className="text-muted-foreground">
-          {t('subtitle')}
+          Gérez vos préférences et la configuration de l&apos;application
         </p>
       </div>
 
@@ -52,7 +44,7 @@ export default function SettingsPage() {
         {/* Navigation */}
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-base">{t('sections.title')}</CardTitle>
+            <CardTitle className="text-base">Sections</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
             {sections.map((section) => {
@@ -65,7 +57,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection(section.id)}
                 >
                   <Icon className="mr-2 h-4 w-4" />
-                  {t(`sections.${section.key}`)}
+                  {section.label}
                 </Button>
               );
             })}
@@ -78,47 +70,47 @@ export default function SettingsPage() {
           {activeSection === 'profile' && (
             <Card>
               <CardHeader>
-                <CardTitle>{t('profile.title')}</CardTitle>
+                <CardTitle>Profil utilisateur</CardTitle>
                 <CardDescription>
-                  {t('profile.description')}
+                  Gérez vos informations personnelles
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="firstName">{t('profile.firstName')}</Label>
+                    <Label htmlFor="firstName">Prénom</Label>
                     <Input id="firstName" placeholder="Mohamed" />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">{t('profile.lastName')}</Label>
+                    <Label htmlFor="lastName">Nom</Label>
                     <Input id="lastName" placeholder="Amrani" />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="email">{t('profile.email')}</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input id="email" type="email" placeholder="m.amrani@example.com" />
                 </div>
                 <div>
-                  <Label htmlFor="phone">{t('profile.phone')}</Label>
+                  <Label htmlFor="phone">Téléphone</Label>
                   <Input id="phone" type="tel" placeholder="+213 555 123 456" />
                 </div>
                 <div>
-                  <Label htmlFor="role">{t('profile.role')}</Label>
+                  <Label htmlFor="role">Rôle</Label>
                   <Select defaultValue="manager">
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="owner">{t('profile.roles.owner')}</SelectItem>
-                      <SelectItem value="manager">{t('profile.roles.manager')}</SelectItem>
-                      <SelectItem value="veterinarian">{t('profile.roles.veterinarian')}</SelectItem>
-                      <SelectItem value="worker">{t('profile.roles.worker')}</SelectItem>
+                      <SelectItem value="owner">Propriétaire</SelectItem>
+                      <SelectItem value="manager">Gestionnaire</SelectItem>
+                      <SelectItem value="veterinarian">Vétérinaire</SelectItem>
+                      <SelectItem value="worker">Employé</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <Button>
                   <Save className="mr-2 h-4 w-4" />
-                  {t('profile.saveButton')}
+                  Enregistrer les modifications
                 </Button>
               </CardContent>
             </Card>
@@ -128,100 +120,64 @@ export default function SettingsPage() {
           {activeSection === 'farm' && (
             <Card>
               <CardHeader>
-                <CardTitle>{t('farm.title')}</CardTitle>
+                <CardTitle>Informations de la ferme</CardTitle>
                 <CardDescription>
-                  {t('farm.description')}
+                  Configurez les détails de votre exploitation
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="farmName">{t('farm.farmName')}</Label>
+                  <Label htmlFor="farmName">Nom de la ferme</Label>
                   <Input id="farmName" placeholder="Ferme El Baraka" />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="farmId">{t('farm.farmId')}</Label>
+                    <Label htmlFor="farmId">N° d&apos;identification</Label>
                     <Input id="farmId" placeholder="EL-2023-001" />
                   </div>
                   <div>
-                    <Label htmlFor="surface">{t('farm.surface')}</Label>
+                    <Label htmlFor="surface">Surface (hectares)</Label>
                     <Input id="surface" type="number" placeholder="50" />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="address">{t('farm.address')}</Label>
+                  <Label htmlFor="address">Adresse</Label>
                   <Input id="address" placeholder="Route de Blida, Boufarik" />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <Label htmlFor="department">{t('farm.department')}</Label>
+                    <Label htmlFor="wilaya">Wilaya</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('farm.selectDepartment')} />
+                        <SelectValue placeholder="Sélectionner..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ain">Ain (01)</SelectItem>
-                        <SelectItem value="aisne">Aisne (02)</SelectItem>
-                        <SelectItem value="allier">Allier (03)</SelectItem>
-                        <SelectItem value="alpes-de-haute-provence">Alpes-de-Haute-Provence (04)</SelectItem>
-                        <SelectItem value="hautes-alpes">Hautes-Alpes (05)</SelectItem>
-                        <SelectItem value="alpes-maritimes">Alpes-Maritimes (06)</SelectItem>
-                        <SelectItem value="ardeche">Ardèche (07)</SelectItem>
-                        <SelectItem value="ardennes">Ardennes (08)</SelectItem>
-                        <SelectItem value="ariege">Ariège (09)</SelectItem>
-                        <SelectItem value="aube">Aube (10)</SelectItem>
-                        <SelectItem value="bouches-du-rhone">Bouches-du-Rhône (13)</SelectItem>
-                        <SelectItem value="calvados">Calvados (14)</SelectItem>
-                        <SelectItem value="charente">Charente (16)</SelectItem>
-                        <SelectItem value="cote-dor">Côte-d'Or (21)</SelectItem>
-                        <SelectItem value="dordogne">Dordogne (24)</SelectItem>
-                        <SelectItem value="essonne">Essonne (91)</SelectItem>
-                        <SelectItem value="gironde">Gironde (33)</SelectItem>
-                        <SelectItem value="herault">Hérault (34)</SelectItem>
-                        <SelectItem value="ille-et-vilaine">Ille-et-Vilaine (35)</SelectItem>
-                        <SelectItem value="isere">Isère (38)</SelectItem>
-                        <SelectItem value="loire">Loire (42)</SelectItem>
-                        <SelectItem value="loire-atlantique">Loire-Atlantique (44)</SelectItem>
-                        <SelectItem value="loiret">Loiret (45)</SelectItem>
-                        <SelectItem value="maine-et-loire">Maine-et-Loire (49)</SelectItem>
-                        <SelectItem value="marne">Marne (51)</SelectItem>
-                        <SelectItem value="meurthe-et-moselle">Meurthe-et-Moselle (54)</SelectItem>
-                        <SelectItem value="moselle">Moselle (57)</SelectItem>
-                        <SelectItem value="nord">Nord (59)</SelectItem>
-                        <SelectItem value="paris">Paris (75)</SelectItem>
-                        <SelectItem value="pas-de-calais">Pas-de-Calais (62)</SelectItem>
-                        <SelectItem value="puy-de-dome">Puy-de-Dôme (63)</SelectItem>
-                        <SelectItem value="bas-rhin">Bas-Rhin (67)</SelectItem>
-                        <SelectItem value="haut-rhin">Haut-Rhin (68)</SelectItem>
-                        <SelectItem value="rhone">Rhône (69)</SelectItem>
-                        <SelectItem value="sarthe">Sarthe (72)</SelectItem>
-                        <SelectItem value="savoie">Savoie (73)</SelectItem>
-                        <SelectItem value="haute-savoie">Haute-Savoie (74)</SelectItem>
-                        <SelectItem value="paris">Paris (75)</SelectItem>
-                        <SelectItem value="var">Var (83)</SelectItem>
-                        <SelectItem value="vaucluse">Vaucluse (84)</SelectItem>
-                        <SelectItem value="vienne">Vienne (86)</SelectItem>
+                        <SelectItem value="alger">Alger</SelectItem>
+                        <SelectItem value="oran">Oran</SelectItem>
+                        <SelectItem value="constantine">Constantine</SelectItem>
+                        <SelectItem value="blida">Blida</SelectItem>
+                        <SelectItem value="setif">Sétif</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="commune">{t('farm.commune')}</Label>
+                    <Label htmlFor="commune">Commune</Label>
                     <Input id="commune" placeholder="Boufarik" />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="species">{t('farm.species')}</Label>
+                  <Label htmlFor="species">Espèces élevées</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <Badge>Ovins</Badge>
                     <Badge>Caprins</Badge>
                     <Badge className="border border-dashed border-primary text-primary bg-transparent">
-                      {t('farm.addSpecies')}
+                      + Ajouter
                     </Badge>
                   </div>
                 </div>
                 <Button>
                   <Save className="mr-2 h-4 w-4" />
-                  {t('farm.saveButton')}
+                  Enregistrer les modifications
                 </Button>
               </CardContent>
             </Card>
@@ -231,54 +187,54 @@ export default function SettingsPage() {
           {activeSection === 'notifications' && (
             <Card>
               <CardHeader>
-                <CardTitle>{t('notifications.title')}</CardTitle>
+                <CardTitle>Préférences de notifications</CardTitle>
                 <CardDescription>
-                  {t('notifications.description')}
+                  Choisissez comment vous souhaitez être alerté
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">{t('notifications.vaccinations.title')}</div>
+                      <div className="font-medium">Vaccinations à venir</div>
                       <div className="text-sm text-muted-foreground">
-                        {t('notifications.vaccinations.description')}
+                        Recevoir une alerte 7 jours avant
                       </div>
                     </div>
                     <input type="checkbox" defaultChecked className="h-4 w-4" />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">{t('notifications.treatments.title')}</div>
+                      <div className="font-medium">Traitements en cours</div>
                       <div className="text-sm text-muted-foreground">
-                        {t('notifications.treatments.description')}
+                        Rappel quotidien pour les traitements
                       </div>
                     </div>
                     <input type="checkbox" defaultChecked className="h-4 w-4" />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">{t('notifications.waitingPeriods.title')}</div>
+                      <div className="font-medium">Délais d&apos;attente</div>
                       <div className="text-sm text-muted-foreground">
-                        {t('notifications.waitingPeriods.description')}
+                        Alerte fin de délai d&apos;attente
                       </div>
                     </div>
                     <input type="checkbox" defaultChecked className="h-4 w-4" />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">{t('notifications.births.title')}</div>
+                      <div className="font-medium">Naissances</div>
                       <div className="text-sm text-muted-foreground">
-                        {t('notifications.births.description')}
+                        Notification à chaque naissance
                       </div>
                     </div>
                     <input type="checkbox" className="h-4 w-4" />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">{t('notifications.healthAlerts.title')}</div>
+                      <div className="font-medium">Alertes sanitaires</div>
                       <div className="text-sm text-muted-foreground">
-                        {t('notifications.healthAlerts.description')}
+                        Notifications urgentes pour problèmes de santé
                       </div>
                     </div>
                     <input type="checkbox" defaultChecked className="h-4 w-4" />
@@ -286,7 +242,7 @@ export default function SettingsPage() {
                 </div>
                 <Button>
                   <Save className="mr-2 h-4 w-4" />
-                  {t('notifications.saveButton')}
+                  Enregistrer les préférences
                 </Button>
               </CardContent>
             </Card>
@@ -296,14 +252,14 @@ export default function SettingsPage() {
           {activeSection === 'language' && (
             <Card>
               <CardHeader>
-                <CardTitle>{t('language.title')}</CardTitle>
+                <CardTitle>Langue & Région</CardTitle>
                 <CardDescription>
-                  {t('language.description')}
+                  Personnalisez l&apos;affichage selon vos préférences
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="language">{t('language.interfaceLanguage')}</Label>
+                  <Label htmlFor="language">Langue de l&apos;interface</Label>
                   <Select defaultValue="fr">
                     <SelectTrigger>
                       <SelectValue />
@@ -316,21 +272,18 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="timezone">{t('language.timezone')}</Label>
-                  <Select defaultValue="europe-paris">
+                  <Label htmlFor="timezone">Fuseau horaire</Label>
+                  <Select defaultValue="africa-algiers">
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="europe-paris">Europe/Paris (GMT+1)</SelectItem>
-                      <SelectItem value="europe-london">Europe/London (GMT+0)</SelectItem>
-                      <SelectItem value="america-new-york">America/New York (GMT-5)</SelectItem>
-                      <SelectItem value="asia-tokyo">Asia/Tokyo (GMT+9)</SelectItem>
+                      <SelectItem value="africa-algiers">Afrique/Alger (GMT+1)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="dateFormat">{t('language.dateFormat')}</Label>
+                  <Label htmlFor="dateFormat">Format de date</Label>
                   <Select defaultValue="dd/mm/yyyy">
                     <SelectTrigger>
                       <SelectValue />
@@ -343,16 +296,15 @@ export default function SettingsPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="currency">{t('language.currency')}</Label>
-                  <Select defaultValue="eur">
+                  <Label htmlFor="currency">Devise</Label>
+                  <Select defaultValue="dzd">
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="dzd">Dinar Algérien (DA)</SelectItem>
                       <SelectItem value="eur">Euro (€)</SelectItem>
                       <SelectItem value="usd">Dollar US ($)</SelectItem>
-                      <SelectItem value="gbp">Livre Sterling (£)</SelectItem>
-                      <SelectItem value="chf">Franc Suisse (CHF)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -360,17 +312,17 @@ export default function SettingsPage() {
                   <div>
                     <div className="font-medium flex items-center gap-2">
                       <Moon className="h-4 w-4" />
-                      {t('language.darkTheme.title')}
+                      Thème sombre
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {t('language.darkTheme.description')}
+                      Activer le mode sombre
                     </div>
                   </div>
                   <input type="checkbox" className="h-4 w-4" />
                 </div>
                 <Button>
                   <Save className="mr-2 h-4 w-4" />
-                  {t('language.saveButton')}
+                  Enregistrer les préférences
                 </Button>
               </CardContent>
             </Card>
@@ -380,53 +332,53 @@ export default function SettingsPage() {
           {activeSection === 'security' && (
             <Card>
               <CardHeader>
-                <CardTitle>{t('security.title')}</CardTitle>
+                <CardTitle>Sécurité</CardTitle>
                 <CardDescription>
-                  {t('security.description')}
+                  Protégez votre compte et vos données
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="currentPassword">{t('security.currentPassword')}</Label>
+                  <Label htmlFor="currentPassword">Mot de passe actuel</Label>
                   <Input id="currentPassword" type="password" />
                 </div>
                 <div>
-                  <Label htmlFor="newPassword">{t('security.newPassword')}</Label>
+                  <Label htmlFor="newPassword">Nouveau mot de passe</Label>
                   <Input id="newPassword" type="password" />
                 </div>
                 <div>
-                  <Label htmlFor="confirmPassword">{t('security.confirmPassword')}</Label>
+                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
                   <Input id="confirmPassword" type="password" />
                 </div>
-                <Button>{t('security.changePasswordButton')}</Button>
+                <Button>Changer le mot de passe</Button>
 
                 <div className="border-t pt-4 mt-6">
-                  <h3 className="font-medium mb-4">{t('security.twoFactor.title')}</h3>
+                  <h3 className="font-medium mb-4">Authentification à deux facteurs</h3>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">{t('security.twoFactor.label')}</div>
+                      <div className="font-medium">2FA</div>
                       <div className="text-sm text-muted-foreground">
-                        {t('security.twoFactor.description')}
+                        Ajouter une couche de sécurité supplémentaire
                       </div>
                     </div>
-                    <Badge variant="warning">{t('security.twoFactor.disabled')}</Badge>
+                    <Badge variant="warning">Désactivé</Badge>
                   </div>
                   <Button variant="outline" className="mt-4">
-                    {t('security.twoFactor.enable')}
+                    Activer 2FA
                   </Button>
                 </div>
 
                 <div className="border-t pt-4 mt-6">
-                  <h3 className="font-medium mb-4">{t('security.activeSessions.title')}</h3>
+                  <h3 className="font-medium mb-4">Sessions actives</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between p-2 border rounded">
                       <div>
-                        <div className="font-medium">{t('security.activeSessions.currentBrowser')}</div>
+                        <div className="font-medium">Navigateur actuel</div>
                         <div className="text-muted-foreground">
                           Chrome sur Windows • Alger, Algérie
                         </div>
                       </div>
-                      <Badge variant="success">{t('security.activeSessions.active')}</Badge>
+                      <Badge variant="success">Active</Badge>
                     </div>
                   </div>
                 </div>
@@ -438,49 +390,49 @@ export default function SettingsPage() {
           {activeSection === 'data' && (
             <Card>
               <CardHeader>
-                <CardTitle>{t('data.title')}</CardTitle>
+                <CardTitle>Gestion des données</CardTitle>
                 <CardDescription>
-                  {t('data.description')}
+                  Sauvegarde, export et suppression de données
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-medium mb-2">{t('data.autoBackup.title')}</h3>
+                  <h3 className="font-medium mb-2">Sauvegarde automatique</h3>
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      {t('data.autoBackup.lastBackup')}
+                      Dernière sauvegarde : Aujourd&apos;hui à 03:00
                     </div>
-                    <Badge variant="success">{t('data.autoBackup.enabled')}</Badge>
+                    <Badge variant="success">Activé</Badge>
                   </div>
                   <Button variant="outline" className="mt-2">
-                    {t('data.autoBackup.backupNow')}
+                    Sauvegarder maintenant
                   </Button>
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="font-medium mb-2">{t('data.export.title')}</h3>
+                  <h3 className="font-medium mb-2">Exporter les données</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {t('data.export.description')}
+                    Téléchargez une copie complète de toutes vos données
                   </p>
                   <div className="space-y-2">
                     <Button variant="outline" className="w-full justify-start">
                       <Database className="mr-2 h-4 w-4" />
-                      {t('data.export.excel')}
+                      Exporter en Excel
                     </Button>
                     <Button variant="outline" className="w-full justify-start">
                       <Database className="mr-2 h-4 w-4" />
-                      {t('data.export.json')}
+                      Exporter en JSON
                     </Button>
                   </div>
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="font-medium mb-2 text-destructive">{t('data.dangerZone.title')}</h3>
+                  <h3 className="font-medium mb-2 text-destructive">Zone de danger</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {t('data.dangerZone.description')}
+                    Les actions suivantes sont irréversibles
                   </p>
-                  <Button variant="destructive">
-                    {t('data.dangerZone.deleteAll')}
+                  <Button variant="outline" className="text-destructive">
+                    Supprimer toutes les données
                   </Button>
                 </div>
               </CardContent>

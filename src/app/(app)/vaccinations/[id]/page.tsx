@@ -37,7 +37,7 @@ export default function VaccinationDetailPage({ params }: VaccinationDetailPageP
               <h1 className="text-3xl font-bold tracking-tight">{vaccination.vaccineName}</h1>
               <p className="text-muted-foreground">
                 Vaccination programmée le{' '}
-                {new Date(vaccination.scheduledDate).toLocaleDateString('fr-FR')}
+                {new Date(vaccination.vaccinationDate).toLocaleDateString('fr-FR')}
               </p>
             </div>
           </div>
@@ -111,14 +111,14 @@ export default function VaccinationDetailPage({ params }: VaccinationDetailPageP
                     <p className="text-sm text-muted-foreground">ID: {vaccination.animalId}</p>
                   </div>
                   <Link href={`/animals/${vaccination.animalId}`}>
-                    <Button variant="outline" size="sm">Voir l'animal</Button>
+                    <Button variant="outline" size="sm">Voir l&apos;animal</Button>
                   </Link>
                 </div>
               )}
               {vaccination.targetType === 'lot' && vaccination.lotId && (
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Lot d'animaux</p>
+                    <p className="font-medium">Lot d&apos;animaux</p>
                     <p className="text-sm text-muted-foreground">ID: {vaccination.lotId}</p>
                   </div>
                   <Link href={`/lots/${vaccination.lotId}`}>

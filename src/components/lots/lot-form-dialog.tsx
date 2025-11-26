@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -73,17 +73,21 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
             <div>
               <Label htmlFor="type">Type de lot *</Label>
               <Select
-                id="type"
                 required
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                onValueChange={(value) => setFormData({ ...formData, type: value as any })}
               >
-                <option value="treatment">Traitement</option>
-                <option value="vaccination">Vaccination</option>
-                <option value="sale">Vente</option>
-                <option value="slaughter">Abattage</option>
-                <option value="purchase">Achat</option>
-                <option value="breeding">Reproduction</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="treatment">Traitement</SelectItem>
+                  <SelectItem value="vaccination">Vaccination</SelectItem>
+                  <SelectItem value="sale">Vente</SelectItem>
+                  <SelectItem value="slaughter">Abattage</SelectItem>
+                  <SelectItem value="purchase">Achat</SelectItem>
+                  <SelectItem value="breeding">Reproduction</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -91,14 +95,18 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
             <div>
               <Label htmlFor="status">Statut *</Label>
               <Select
-                id="status"
                 required
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onValueChange={(value) => setFormData({ ...formData, status: value as any })}
               >
-                <option value="open">Ouvert</option>
-                <option value="closed">Fermé</option>
-                <option value="archived">Archivé</option>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Ouvert</SelectItem>
+                  <SelectItem value="closed">Fermé</SelectItem>
+                  <SelectItem value="archived">Archivé</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -145,7 +153,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
           {/* Date de traitement */}
           {(formData.type === 'treatment' || formData.type === 'vaccination') && (
             <div>
-              <Label htmlFor="treatmentDate">Date d'intervention</Label>
+              <Label htmlFor="treatmentDate">Date d&apos;intervention</Label>
               <Input
                 id="treatmentDate"
                 type="date"

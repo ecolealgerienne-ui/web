@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useBreeds } from '@/lib/hooks/useBreeds';
@@ -145,14 +145,18 @@ export default function BreedsPage() {
       <div className="flex gap-4 items-center flex-wrap">
         <Select
           value={selectedSpecies}
-          onChange={(e) => setSelectedSpecies(e.target.value)}
-          className="w-full md:w-[200px]"
+          onValueChange={setSelectedSpecies}
         >
-          {speciesOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {speciesOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
         <div className="flex items-center space-x-2">
@@ -197,7 +201,7 @@ export default function BreedsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="font-semibold text-lg flex-1">{breed.nameFr}</div>
                     {breed.isActive === false && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="warning" className="text-xs">
                         {tc('status.disabled')}
                       </Badge>
                     )}
@@ -288,7 +292,7 @@ export default function BreedsPage() {
               {tc('actions.cancel')}
             </Button>
             <Button
-              variant="destructive"
+              variant="outline" className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >

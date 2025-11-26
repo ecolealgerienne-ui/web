@@ -85,7 +85,7 @@ export function TreatmentInfoCard({ treatment }: TreatmentInfoCardProps) {
             <Package className="h-4 w-4 text-muted-foreground" />
             Posologie
           </div>
-          <p className="text-sm">{treatment.dosage}</p>
+          <p className="text-sm">{treatment.dose}</p>
           {treatment.administrationRoute && (
             <p className="text-xs text-muted-foreground">Voie : {treatment.administrationRoute}</p>
           )}
@@ -104,7 +104,7 @@ export function TreatmentInfoCard({ treatment }: TreatmentInfoCardProps) {
             Dates
           </div>
           <p className="text-sm">
-            Début : {new Date(treatment.startDate).toLocaleDateString('fr-FR')}
+            Début : {new Date(treatment.treatmentDate).toLocaleDateString('fr-FR')}
           </p>
           {treatment.endDate && (
             <p className="text-sm">
@@ -118,12 +118,12 @@ export function TreatmentInfoCard({ treatment }: TreatmentInfoCardProps) {
           )}
         </div>
 
-        {/* Délais d'attente */}
+        {/* Délais d&apos;attente */}
         {(treatment.withdrawalPeriodMeat || treatment.withdrawalPeriodMilk || treatment.withdrawalEndDate) && (
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              Délais d'attente
+              Délais d&apos;attente
             </div>
             {treatment.withdrawalPeriodMeat && (
               <p className="text-sm">Viande : {treatment.withdrawalPeriodMeat} jours</p>

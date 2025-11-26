@@ -54,10 +54,6 @@ export function WeighingFormDialog({
       purpose: 'routine',
       method: '',
       location: '',
-      previousWeight: undefined,
-      weightGain: undefined,
-      growthRate: undefined,
-      age: undefined,
       recordedBy: '',
       notes: '',
       conditions: '',
@@ -75,10 +71,6 @@ export function WeighingFormDialog({
         purpose: weighing.purpose,
         method: weighing.method || '',
         location: weighing.location || '',
-        previousWeight: weighing.previousWeight,
-        weightGain: weighing.weightGain,
-        growthRate: weighing.growthRate,
-        age: weighing.age,
         recordedBy: weighing.recordedBy || '',
         notes: weighing.notes || '',
         conditions: weighing.conditions || '',
@@ -93,10 +85,6 @@ export function WeighingFormDialog({
         purpose: 'routine',
         method: '',
         location: '',
-        previousWeight: undefined,
-        weightGain: undefined,
-        growthRate: undefined,
-        age: undefined,
         recordedBy: '',
         notes: '',
         conditions: '',
@@ -233,51 +221,7 @@ export function WeighingFormDialog({
             </div>
           </div>
 
-          {/* Section 3: Growth Tracking */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium border-b pb-2">{t('sections.growth')}</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="previousWeight">{t('fields.previousWeight')}</Label>
-                <Input
-                  id="previousWeight"
-                  type="number"
-                  step="0.01"
-                  {...register('previousWeight', { valueAsNumber: true })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="weightGain">{t('fields.weightGain')}</Label>
-                <Input
-                  id="weightGain"
-                  type="number"
-                  step="0.01"
-                  {...register('weightGain', { valueAsNumber: true })}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="growthRate">{t('fields.growthRate')}</Label>
-                <Input
-                  id="growthRate"
-                  type="number"
-                  step="0.01"
-                  {...register('growthRate', { valueAsNumber: true })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="age">{t('fields.age')}</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  {...register('age', { valueAsNumber: true })}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Section 4: Additional Information */}
+          {/* Section 3: Additional Information */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
             <div className="grid grid-cols-2 gap-4">

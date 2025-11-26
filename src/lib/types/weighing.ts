@@ -53,6 +53,8 @@ export interface WeighingFilters {
   dateTo?: string;
   minWeight?: number;
   maxWeight?: number;
+  animalId?: string;
+  source?: string;
 }
 
 export const WEIGHING_PURPOSE_LABELS: Record<WeighingPurpose, string> = {

@@ -27,19 +27,16 @@ export interface DashboardStats {
 }
 
 export interface Alert {
-  id: string;
-  type: 'warning' | 'info' | 'error';
-  title: string;
-  message: string;
-  date: string;
+  id: number;
+  type: 'destructive' | 'warning' | 'success' | 'default';
+  count: number;
+  label: string;
 }
 
 export interface Activity {
-  id: string;
-  type: string;
-  description: string;
-  date: string;
-  user?: string;
+  id: number;
+  label: string;
+  time: string;
 }
 
 export interface HerdEvolutionDataPoint {

@@ -109,7 +109,7 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              Date d'intervention
+              Date d&apos;intervention
             </div>
             <p className="text-sm">
               {new Date(lot.treatmentDate).toLocaleDateString('fr-FR', {
@@ -126,7 +126,7 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              Fin délai d'attente
+              Fin délai d&apos;attente
             </div>
             <p className="text-sm">
               {new Date(lot.withdrawalEndDate).toLocaleDateString('fr-FR', {

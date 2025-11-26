@@ -30,7 +30,7 @@ export function useWeighings(filters?: Partial<WeighingFilters>): UseWeighingsRe
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch weighings');
       setError(error);
-      logger.error('Error fetching weighings', err);
+      logger.error('Error fetching weighings', { error: err });
     } finally {
       setLoading(false);
     }

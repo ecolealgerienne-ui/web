@@ -1,69 +1,50 @@
+/**
+ * Hook React pour la gestion des vaccinations
+ */
+
 import { useState, useEffect, useCallback } from 'react';
+import { Vaccination, VaccinationFilters } from '@/lib/types/vaccination';
 import { vaccinationsService } from '@/lib/services/vaccinations.service';
-import type { Vaccination, CreateVaccinationDto, UpdateVaccinationDto, VaccinationFilters } from '@/lib/types/vaccination';
 import { logger } from '@/lib/utils/logger';
 
 interface UseVaccinationsResult {
   vaccinations: Vaccination[];
   loading: boolean;
   error: Error | null;
-  refresh: () => Promise<void>;
-  createVaccination: (data: CreateVaccinationDto) => Promise<Vaccination>;
-  updateVaccination: (id: string, data: UpdateVaccinationDto) => Promise<Vaccination>;
-  deleteVaccination: (id: string) => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
-export function useVaccinations(filters?: Partial<VaccinationFilters>): UseVaccinationsResult {
+export function useVaccinations(
+  filters?: Partial<VaccinationFilters> & { animalId?: string }
+): UseVaccinationsResult {
   const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Stabiliser les filtres pour éviter les boucles infinies
-  const filtersKey = JSON.stringify(filters);
-
   const fetchVaccinations = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
       const data = await vaccinationsService.getAll(filters);
       setVaccinations(data);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to fetch vaccinations');
+      const error = err as Error;
       setError(error);
-      logger.error('Error fetching vaccinations', err);
+      logger.error('Failed to fetch vaccinations in hook', { error });
     } finally {
       setLoading(false);
     }
-  }, [filtersKey]);
+  }, [filters]);
 
   useEffect(() => {
     fetchVaccinations();
-  }, [fetchVaccinations]);
-
-  const createVaccination = useCallback(async (data: CreateVaccinationDto) => {
-    const vaccination = await vaccinationsService.create(data);
-    await fetchVaccinations();
-    return vaccination;
-  }, [fetchVaccinations]);
-
-  const updateVaccination = useCallback(async (id: string, data: UpdateVaccinationDto) => {
-    const vaccination = await vaccinationsService.update(id, data);
-    await fetchVaccinations();
-    return vaccination;
-  }, [fetchVaccinations]);
-
-  const deleteVaccination = useCallback(async (id: string) => {
-    await vaccinationsService.delete(id);
-    await fetchVaccinations();
   }, [fetchVaccinations]);
 
   return {
     vaccinations,
     loading,
     error,
-    refresh: fetchVaccinations,
-    createVaccination,
-    updateVaccination,
-    deleteVaccination,
+    refetch: fetchVaccinations,
   };
 }

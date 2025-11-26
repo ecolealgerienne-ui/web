@@ -23,13 +23,14 @@ export interface Treatment {
   // Administration
   reason: string;
   diagnosis?: string;
-  dosage: string;
+  dose: number; // Changed from dosage: string to dose: number
+  dosageUnit: string; // Séparé : ml, mg, g, comprimé, etc.
   administrationRoute?: string; // IM, SC, oral, IV, etc.
   frequency?: string; // Ex: "2x par jour"
   duration?: number; // Nombre de jours
 
   // Dates
-  startDate: string;
+  treatmentDate: string; // Renamed from startDate
   endDate?: string;
   administeredDate?: string;
 
@@ -42,7 +43,7 @@ export interface Treatment {
   // Délai d'attente
   withdrawalPeriodMeat?: number; // Jours
   withdrawalPeriodMilk?: number; // Jours
-  withdrawalEndDate?: string;
+  withdrawalEndDate: string; // REQUIRED selon API (removed ?)
 
   // Statut
   status: TreatmentStatus;

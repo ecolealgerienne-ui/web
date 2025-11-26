@@ -33,7 +33,7 @@ export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-2">Animal non trouvé</h2>
           <p className="text-muted-foreground">
-            L'animal demandé n'existe pas ou a été supprimé.
+            L&apos;animal demandé n&apos;existe pas ou a été supprimé.
           </p>
         </div>
       </div>
@@ -61,9 +61,9 @@ export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold">
-              {animal.name || `Animal ${animal.internalId || animal.eid}`}
+              {animal.name || `Animal ${animal.identificationNumber}`}
             </h1>
-            <p className="text-muted-foreground font-mono">{animal.eid}</p>
+            <p className="text-muted-foreground font-mono">{animal.identificationNumber}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -77,10 +77,10 @@ export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
 
       {/* Grid 2 colonnes pour les autres infos */}
       <div className="grid gap-6 md:grid-cols-2">
-        <AnimalWeightsCard weights={animalDetail.weights} />
+        <AnimalWeightsCard weights={animalDetail.weights || []} />
         <div className="space-y-6">
-          <AnimalTreatmentsCard treatments={animalDetail.treatments} />
-          <AnimalVaccinationsCard vaccinations={animalDetail.vaccinations} />
+          <AnimalTreatmentsCard treatments={animalDetail.treatments || []} />
+          <AnimalVaccinationsCard vaccinations={animalDetail.vaccinations || []} />
         </div>
       </div>
     </div>

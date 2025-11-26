@@ -108,7 +108,10 @@ class LotsService {
 
   async removeAnimal(lotId: string, animalId: string): Promise<void> {
     // API expects DELETE with body containing animalIds array
-    await apiClient.delete(`${this.getBasePath()}/${lotId}/animals`, { animalIds: [animalId] });
+    await apiClient.delete(`${this.getBasePath()}/${lotId}/animals`, {
+      body: JSON.stringify({ animalIds: [animalId] }),
+      headers: { 'Content-Type': 'application/json' }
+    });
     logger.info('Animal removed from lot', { lotId, animalId });
   }
 }

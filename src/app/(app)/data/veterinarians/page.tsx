@@ -185,7 +185,7 @@ export default function VeterinariansPage() {
                     </div>
                     <div className="flex flex-col gap-1">
                       {vet.isActive === false && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="warning" className="text-xs">
                           {tc('status.disabled')}
                         </Badge>
                       )}
@@ -239,12 +239,12 @@ export default function VeterinariansPage() {
                   {/* Tarifs */}
                   {(vet.consultationFee || vet.emergencyFee) && (
                     <div className="text-xs text-muted-foreground mb-3 pt-2 border-t">
-                      {vet.consultationFee > 0 && (
+                      {vet.consultationFee && vet.consultationFee > 0 && (
                         <div>
                           {t('fields.consultationFee')}: {vet.consultationFee} {vet.currency || 'EUR'}
                         </div>
                       )}
-                      {vet.emergencyFee > 0 && (
+                      {vet.emergencyFee && vet.emergencyFee > 0 && (
                         <div>
                           {t('fields.emergencyFee')}: {vet.emergencyFee} {vet.currency || 'EUR'}
                         </div>
@@ -316,7 +316,7 @@ export default function VeterinariansPage() {
               {tc('actions.cancel')}
             </Button>
             <Button
-              variant="destructive"
+              variant="outline" className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >
