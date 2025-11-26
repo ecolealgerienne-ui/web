@@ -563,6 +563,8 @@
       "search": "Rechercher..."
     },
     "types": {
+      "entry": "Entrée",
+      "exit": "Sortie",
       "birth": "Naissance",
       "death": "Décès",
       "sale": "Vente",
