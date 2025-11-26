@@ -3,7 +3,7 @@
  */
 
 export type CampaignType = 'vaccination' | 'treatment' | 'weighing' | 'identification'
-export type CampaignStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled'
+export type CampaignStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
 
 export interface Campaign {
   id: string

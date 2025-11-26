@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { VaccinationsFilters } from '@/components/vaccinations/vaccinations-filters';
 import { VaccinationsTable } from '@/components/vaccinations/vaccinations-table';
-import { mockVaccinations } from '@/lib/data/vaccinations.mock';
+import { useVaccinations } from '@/lib/hooks/useVaccinations';
 import { VaccinationFilters } from '@/lib/types/vaccination';
 
 export default function VaccinationsPage() {
@@ -15,42 +15,24 @@ export default function VaccinationsPage() {
     targetType: 'all',
   });
 
-  // Filtrage des vaccinations
-  const filteredVaccinations = useMemo(() => {
-    return mockVaccinations.filter((vaccination) => {
-      // Recherche
-      if (filters.search) {
-        const search = filters.search.toLowerCase();
-        const matchesSearch =
-          vaccination.vaccineName.toLowerCase().includes(search) ||
-          vaccination.diseaseTarget.toLowerCase().includes(search) ||
-          vaccination.veterinarianName?.toLowerCase().includes(search);
-        if (!matchesSearch) return false;
-      }
+  // Fetch vaccinations with real API
+  const { vaccinations, loading, error } = useVaccinations({
+    search: filters.search || undefined,
+    status: filters.status,
+    targetType: filters.targetType,
+  });
 
-      // Filtre par statut
-      if (filters.status !== 'all' && vaccination.status !== filters.status) {
-        return false;
-      }
-
-      // Filtre par type de cible
-      if (filters.targetType !== 'all' && vaccination.targetType !== filters.targetType) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [filters]);
+  const filteredVaccinations = vaccinations;
 
   // Statistiques
   const stats = useMemo(() => {
     return {
-      total: mockVaccinations.length,
-      scheduled: mockVaccinations.filter((v) => v.status === 'scheduled').length,
-      completed: mockVaccinations.filter((v) => v.status === 'completed').length,
-      overdue: mockVaccinations.filter((v) => v.status === 'overdue').length,
+      total: vaccinations.length,
+      scheduled: vaccinations.filter((v) => v.status === 'scheduled').length,
+      completed: vaccinations.filter((v) => v.status === 'completed').length,
+      overdue: vaccinations.filter((v) => v.status === 'overdue').length,
     };
-  }, []);
+  }, [vaccinations]);
 
   return (
     <div className="space-y-6">
