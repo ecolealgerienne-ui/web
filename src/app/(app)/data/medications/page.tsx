@@ -148,13 +148,13 @@ export default function MedicationsPage() {
                       </td>
                       <td className="py-3 px-4">
                         {product.category && (
-                          <Badge variant="outline">
+                          <Badge variant="default">
                             {MEDICAL_PRODUCT_CATEGORY_LABELS[product.category]}
                           </Badge>
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant={product.scope === 'global' ? 'default' : 'secondary'}>
+                        <Badge variant={product.scope === 'global' ? 'default' : 'warning'}>
                           {MEDICAL_PRODUCT_SCOPE_LABELS[product.scope]}
                         </Badge>
                       </td>

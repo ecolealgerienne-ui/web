@@ -78,18 +78,18 @@ export default function CampaignsPage() {
     setFormOpen(false);
   };
 
-  const getStatusBadgeVariant = (status: CampaignStatus) => {
+  const getStatusBadgeVariant = (status: CampaignStatus): 'destructive' | 'success' | 'default' | 'warning' => {
     switch (status) {
       case 'completed':
-        return 'default';
+        return 'success';
       case 'in_progress':
-        return 'secondary';
+        return 'warning';
       case 'scheduled':
-        return 'outline';
+        return 'default';
       case 'cancelled':
         return 'destructive';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
@@ -203,7 +203,7 @@ export default function CampaignsPage() {
                       <Badge variant={getStatusBadgeVariant(campaign.status)} className="text-xs">
                         {t(`status.${campaign.status}`)}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="default" className="text-xs">
                         {t(`types.${campaign.type}`)}
                       </Badge>
                     </div>
@@ -315,7 +315,7 @@ export default function CampaignsPage() {
               {tc('actions.cancel')}
             </Button>
             <Button
-              variant="destructive"
+              variant="outline" className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >

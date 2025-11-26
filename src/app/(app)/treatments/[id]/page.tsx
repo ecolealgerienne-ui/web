@@ -36,7 +36,7 @@ export default function TreatmentDetailPage({ params }: TreatmentDetailPageProps
               <h1 className="text-3xl font-bold tracking-tight">{treatment.productName}</h1>
               <p className="text-muted-foreground">
                 Traitement débuté le{' '}
-                {new Date(treatment.startDate).toLocaleDateString('fr-FR')}
+                {new Date(treatment.treatmentDate).toLocaleDateString('fr-FR')}
               </p>
             </div>
           </div>
@@ -70,9 +70,9 @@ export default function TreatmentDetailPage({ params }: TreatmentDetailPageProps
                 Traitement en cours
               </p>
               <p className="text-sm text-orange-700 dark:text-orange-300">
-                {treatment.duration && treatment.startDate ? (
+                {treatment.duration && treatment.treatmentDate ? (
                   <>
-                    Jour {Math.ceil((new Date().getTime() - new Date(treatment.startDate).getTime()) / (1000 * 60 * 60 * 24))} sur {treatment.duration}
+                    Jour {Math.ceil((new Date().getTime() - new Date(treatment.treatmentDate).getTime()) / (1000 * 60 * 60 * 24))} sur {treatment.duration}
                   </>
                 ) : (
                   'En cours d\'administration'

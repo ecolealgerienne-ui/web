@@ -65,3 +65,38 @@ export interface UpdateAnimalDto {
   notes?: string;
   isActive?: boolean;
 }
+
+// Helper types for animal details and related data
+export interface Weight {
+  id: string;
+  animalId: string;
+  weight: number;
+  weighDate: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Movement {
+  id: string;
+  animalId: string;
+  fromLocation: string;
+  toLocation: string;
+  movementDate: string;
+  reason?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface AnimalDetail extends Animal {
+  weights?: Weight[];
+  treatments?: any[]; // Import from treatment.ts in components
+  vaccinations?: any[]; // Import from vaccination.ts in components
+  movements?: Movement[];
+}
+
+export interface AnimalFilters {
+  search: string;
+  species: string;
+  status: AnimalStatus | 'all';
+  sex: AnimalSex | 'all';
+}

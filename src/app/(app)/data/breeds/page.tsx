@@ -197,7 +197,7 @@ export default function BreedsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="font-semibold text-lg flex-1">{breed.nameFr}</div>
                     {breed.isActive === false && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="warning" className="text-xs">
                         {tc('status.disabled')}
                       </Badge>
                     )}
@@ -288,7 +288,7 @@ export default function BreedsPage() {
               {tc('actions.cancel')}
             </Button>
             <Button
-              variant="destructive"
+              variant="outline" className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >

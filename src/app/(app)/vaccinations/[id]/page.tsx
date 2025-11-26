@@ -37,7 +37,7 @@ export default function VaccinationDetailPage({ params }: VaccinationDetailPageP
               <h1 className="text-3xl font-bold tracking-tight">{vaccination.vaccineName}</h1>
               <p className="text-muted-foreground">
                 Vaccination programmée le{' '}
-                {new Date(vaccination.scheduledDate).toLocaleDateString('fr-FR')}
+                {new Date(vaccination.vaccinationDate).toLocaleDateString('fr-FR')}
               </p>
             </div>
           </div>

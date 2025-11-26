@@ -77,10 +77,10 @@ export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
 
       {/* Grid 2 colonnes pour les autres infos */}
       <div className="grid gap-6 md:grid-cols-2">
-        <AnimalWeightsCard weights={animalDetail.weights} />
+        <AnimalWeightsCard weights={animalDetail.weights || []} />
         <div className="space-y-6">
-          <AnimalTreatmentsCard treatments={animalDetail.treatments} />
-          <AnimalVaccinationsCard vaccinations={animalDetail.vaccinations} />
+          <AnimalTreatmentsCard treatments={animalDetail.treatments || []} />
+          <AnimalVaccinationsCard vaccinations={animalDetail.vaccinations || []} />
         </div>
       </div>
     </div>

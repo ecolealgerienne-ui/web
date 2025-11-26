@@ -78,7 +78,7 @@ export function CampaignFormDialog({
         productId: '',
         productName: '',
         campaignDate: new Date().toISOString().split('T')[0],
-        status: 'planned',
+        status: 'in_progress' as const,
         targetCount: 0,
         completedCount: 0,
         description: '',

@@ -28,12 +28,12 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
 
   const getStatusVariant = (status: Animal["status"]) => {
     switch (status) {
-      case "active":
+      case "alive":
         return "success";
       case "sold":
         return "default";
       case "dead":
-      case "slaughtered":
+      case "missing":
         return "destructive";
       default:
         return "default";
@@ -72,10 +72,10 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
               >
                 <TableCell className="font-mono text-sm">
                   <div className="flex flex-col">
-                    <span className="font-medium">{animal.eid}</span>
-                    {animal.internalId && (
+                    <span className="font-medium">{animal.identificationNumber}</span>
+                    {animal.identificationNumber && (
                       <span className="text-xs text-muted-foreground">
-                        {animal.internalId}
+                        {animal.identificationNumber}
                       </span>
                     )}
                   </div>
@@ -85,15 +85,15 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
-                <TableCell>{speciesLabels[animal.species]}</TableCell>
+                <TableCell>{speciesLabels[animal.speciesId]}</TableCell>
                 <TableCell>
-                  {animal.breed || (
+                  {animal.breedId || (
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
                 <TableCell>{sexLabels[animal.sex]}</TableCell>
                 <TableCell className="text-sm">
-                  {calculateAge(animal.birthDate)}
+                  {animal.birthDate ? calculateAge(animal.birthDate) : '-'}
                 </TableCell>
                 <TableCell>
                   {animal.currentWeight ? (

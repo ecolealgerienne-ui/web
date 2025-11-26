@@ -63,7 +63,7 @@ export function VaccinationsTable({ vaccinations }: VaccinationsTableProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-sm">
-                {new Date(vaccination.scheduledDate).toLocaleDateString('fr-FR')}
+                {new Date(vaccination.vaccinationDate).toLocaleDateString('fr-FR')}
               </TableCell>
               <TableCell className="text-sm">
                 {vaccination.veterinarianName || '-'}

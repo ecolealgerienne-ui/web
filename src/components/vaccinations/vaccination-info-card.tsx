@@ -66,10 +66,10 @@ export function VaccinationInfoCard({ vaccination }: VaccinationInfoCardProps) {
         )}
 
         {/* Dosage et administration */}
-        {(vaccination.dosage || vaccination.administrationRoute) && (
+        {(vaccination.dose || vaccination.administrationRoute) && (
           <div className="space-y-1">
             <div className="text-sm font-medium">Posologie</div>
-            {vaccination.dosage && <p className="text-sm">{vaccination.dosage}</p>}
+            {vaccination.dose && <p className="text-sm">{vaccination.dose}</p>}
             {vaccination.administrationRoute && (
               <p className="text-xs text-muted-foreground">
                 Voie : {vaccination.administrationRoute}
@@ -85,7 +85,7 @@ export function VaccinationInfoCard({ vaccination }: VaccinationInfoCardProps) {
             Date programmée
           </div>
           <p className="text-sm">
-            {new Date(vaccination.scheduledDate).toLocaleDateString('fr-FR', {
+            {new Date(vaccination.vaccinationDate).toLocaleDateString('fr-FR', {
               day: 'numeric',
               month: 'long',
               year: 'numeric',

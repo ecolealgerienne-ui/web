@@ -402,7 +402,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground mb-4">
                     Les actions suivantes sont irréversibles
                   </p>
-                  <Button variant="destructive">
+                  <Button variant="outline" className="text-destructive">
                     Supprimer toutes les données
                   </Button>
                 </div>

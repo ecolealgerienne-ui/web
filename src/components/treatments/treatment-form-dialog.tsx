@@ -35,9 +35,10 @@ export function TreatmentFormDialog({
       treatmentType: 'antiparasitic',
       targetType: 'individual',
       reason: '',
-      dosage: '',
+      dose: 0,
+      dosageUnit: 'ml',
       administrationRoute: 'IM',
-      startDate: new Date().toISOString().split('T')[0] + 'T00:00:00Z',
+      treatmentDate: new Date().toISOString().split('T')[0] + 'T00:00:00Z',
       status: 'scheduled',
       duration: 1,
     }
@@ -143,10 +144,12 @@ export function TreatmentFormDialog({
               <Label htmlFor="dosage">Dosage *</Label>
               <Input
                 id="dosage"
-                placeholder="0.2 mg/kg"
+                type="number"
+                step="0.01"
+                placeholder="0.2"
                 required
-                value={formData.dosage}
-                onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
+                value={formData.dose}
+                onChange={(e) => setFormData({ ...formData, dose: parseFloat(e.target.value) || 0 })}
               />
             </div>
 
@@ -201,9 +204,9 @@ export function TreatmentFormDialog({
               id="startDate"
               type="date"
               required
-              value={formData.startDate?.split('T')[0]}
+              value={formData.treatmentDate?.split('T')[0]}
               onChange={(e) =>
-                setFormData({ ...formData, startDate: e.target.value + 'T00:00:00Z' })
+                setFormData({ ...formData, treatmentDate: e.target.value + 'T00:00:00Z' })
               }
             />
           </div>

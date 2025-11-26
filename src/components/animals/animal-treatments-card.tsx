@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Treatment } from "@/lib/types/animal";
+import { Treatment } from "@/lib/types/treatment";
 
 interface AnimalTreatmentsCardProps {
   treatments: Treatment[];
@@ -9,7 +9,7 @@ export function AnimalTreatmentsCard({
   treatments,
 }: AnimalTreatmentsCardProps) {
   const sortedTreatments = [...treatments].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.treatmentDate).getTime() - new Date(a.treatmentDate).getTime()
   );
 
   return (
@@ -31,26 +31,26 @@ export function AnimalTreatmentsCard({
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium">{treatment.product}</p>
+                    <p className="font-medium">{treatment.productName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(treatment.date).toLocaleDateString("fr-FR")} •{" "}
+                      {new Date(treatment.treatmentDate).toLocaleDateString("fr-FR")} •{" "}
                       {treatment.administeredBy}
                     </p>
                   </div>
-                  {treatment.withdrawalPeriod && (
+                  {treatment.withdrawalPeriodMeat && (
                     <div className="text-right">
                       <p className="text-sm font-medium">
                         Délai d&apos;attente
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {treatment.withdrawalPeriod} jours
+                        {treatment.withdrawalPeriodMeat} jours
                       </p>
                     </div>
                   )}
                 </div>
-                {treatment.note && (
+                {treatment.notes && (
                   <p className="text-sm text-muted-foreground">
-                    {treatment.note}
+                    {treatment.notes}
                   </p>
                 )}
               </div>

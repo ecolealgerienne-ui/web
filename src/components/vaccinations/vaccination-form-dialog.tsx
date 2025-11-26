@@ -34,9 +34,9 @@ export function VaccinationFormDialog({
       vaccineName: '',
       diseaseTarget: '',
       targetType: 'individual',
-      scheduledDate: new Date().toISOString().split('T')[0] + 'T09:00:00Z',
+      vaccinationDate: new Date().toISOString().split('T')[0] + 'T09:00:00Z',
       status: 'scheduled',
-      dosage: '',
+      dose: '',
       administrationRoute: 'SC',
     }
   );
@@ -156,9 +156,9 @@ export function VaccinationFormDialog({
               id="scheduledDate"
               type="datetime-local"
               required
-              value={formData.scheduledDate?.slice(0, 16)}
+              value={formData.vaccinationDate?.slice(0, 16)}
               onChange={(e) =>
-                setFormData({ ...formData, scheduledDate: e.target.value + ':00Z' })
+                setFormData({ ...formData, vaccinationDate: e.target.value + ':00Z' })
               }
             />
           </div>
@@ -170,8 +170,8 @@ export function VaccinationFormDialog({
               <Input
                 id="dosage"
                 placeholder="1 ml"
-                value={formData.dosage}
-                onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
+                value={formData.dose}
+                onChange={(e) => setFormData({ ...formData, dose: e.target.value })}
               />
             </div>
 
