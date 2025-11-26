@@ -87,13 +87,13 @@ export function AnimalInfoCard({ animal }: AnimalInfoCardProps) {
             </Badge>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Type d'Acquisition</p>
+            <p className="text-sm text-muted-foreground">Type d&apos;Acquisition</p>
             <p className="font-medium">
               {animal.acquisitionType === "birth" ? "Naissance" : "Achat"}
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Date d'Acquisition</p>
+            <p className="text-sm text-muted-foreground">Date d&apos;Acquisition</p>
             <p className="font-medium">
               {new Date(animal.acquisitionDate).toLocaleDateString("fr-FR")}
             </p>

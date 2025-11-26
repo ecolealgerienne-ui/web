@@ -159,7 +159,7 @@ export function AnimalFormDialog({
           <div className="grid gap-4 md:grid-cols-2">
             {/* Type d'acquisition */}
             <div>
-              <Label htmlFor="acquisitionType">Type d'acquisition *</Label>
+              <Label htmlFor="acquisitionType">Type d&apos;acquisition *</Label>
               <Select
                 id="acquisitionType"
                 required
@@ -175,7 +175,7 @@ export function AnimalFormDialog({
 
             {/* Date d'acquisition */}
             <div>
-              <Label htmlFor="acquisitionDate">Date d'acquisition *</Label>
+              <Label htmlFor="acquisitionDate">Date d&apos;acquisition *</Label>
               <Input
                 id="acquisitionDate"
                 type="date"

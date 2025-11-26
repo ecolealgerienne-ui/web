@@ -109,7 +109,7 @@ export function TreatmentFormDialog({
                 }
               >
                 <option value="individual">Animal individuel</option>
-                <option value="lot">Lot d'animaux</option>
+                <option value="lot">Lot d&apos;animaux</option>
               </Select>
             </div>
           </div>

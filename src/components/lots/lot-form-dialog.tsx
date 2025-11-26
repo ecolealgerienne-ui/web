@@ -145,7 +145,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
           {/* Date de traitement */}
           {(formData.type === 'treatment' || formData.type === 'vaccination') && (
             <div>
-              <Label htmlFor="treatmentDate">Date d'intervention</Label>
+              <Label htmlFor="treatmentDate">Date d&apos;intervention</Label>
               <Input
                 id="treatmentDate"
                 type="date"

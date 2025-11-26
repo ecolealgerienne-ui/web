@@ -40,7 +40,7 @@ export function AnimalTreatmentsCard({
                   {treatment.withdrawalPeriod && (
                     <div className="text-right">
                       <p className="text-sm font-medium">
-                        Délai d'attente
+                        Délai d&apos;attente
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {treatment.withdrawalPeriod} jours
