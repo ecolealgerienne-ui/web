@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { TreatmentsFilters } from '@/components/treatments/treatments-filters';
 import { TreatmentsTable } from '@/components/treatments/treatments-table';
-import { mockTreatments } from '@/lib/data/treatments.mock';
+import { useTreatments } from '@/lib/hooks/useTreatments';
 import { TreatmentFilters } from '@/lib/types/treatment';
 
 export default function TreatmentsPage() {
@@ -16,51 +16,29 @@ export default function TreatmentsPage() {
     targetType: 'all',
   });
 
-  // Filtrage des traitements
-  const filteredTreatments = useMemo(() => {
-    return mockTreatments.filter((treatment) => {
-      // Recherche
-      if (filters.search) {
-        const search = filters.search.toLowerCase();
-        const matchesSearch =
-          treatment.productName.toLowerCase().includes(search) ||
-          treatment.reason.toLowerCase().includes(search) ||
-          treatment.veterinarianName?.toLowerCase().includes(search);
-        if (!matchesSearch) return false;
-      }
+  // Fetch treatments with real API
+  const { treatments, loading, error } = useTreatments({
+    search: filters.search || undefined,
+    status: filters.status,
+    type: filters.type,
+    targetType: filters.targetType,
+  });
 
-      // Filtre par statut
-      if (filters.status !== 'all' && treatment.status !== filters.status) {
-        return false;
-      }
-
-      // Filtre par type
-      if (filters.type !== 'all' && treatment.treatmentType !== filters.type) {
-        return false;
-      }
-
-      // Filtre par type de cible
-      if (filters.targetType !== 'all' && treatment.targetType !== filters.targetType) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [filters]);
+  const filteredTreatments = treatments;
 
   // Statistiques
   const stats = useMemo(() => {
-    const totalCost = mockTreatments
+    const totalCost = treatments
       .filter((t) => t.cost)
       .reduce((sum, t) => sum + (t.cost || 0), 0);
 
     return {
-      total: mockTreatments.length,
-      in_progress: mockTreatments.filter((t) => t.status === 'in_progress').length,
-      completed: mockTreatments.filter((t) => t.status === 'completed').length,
+      total: treatments.length,
+      in_progress: treatments.filter((t) => t.status === 'in_progress').length,
+      completed: treatments.filter((t) => t.status === 'completed').length,
       cost: totalCost,
     };
-  }, []);
+  }, [treatments]);
 
   return (
     <div className="space-y-6">
