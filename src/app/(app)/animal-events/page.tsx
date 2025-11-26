@@ -91,16 +91,14 @@ export default function AnimalEventsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="entry">{t('types.entry')}</SelectItem>
+            <SelectItem value="exit">{t('types.exit')}</SelectItem>
             <SelectItem value="birth">{t('types.birth')}</SelectItem>
             <SelectItem value="death">{t('types.death')}</SelectItem>
             <SelectItem value="sale">{t('types.sale')}</SelectItem>
             <SelectItem value="purchase">{t('types.purchase')}</SelectItem>
-            <SelectItem value="transfer">{t('types.transfer')}</SelectItem>
-            <SelectItem value="health_check">{t('types.health_check')}</SelectItem>
-            <SelectItem value="vaccination">{t('types.vaccination')}</SelectItem>
-            <SelectItem value="treatment">{t('types.treatment')}</SelectItem>
-            <SelectItem value="weighing">{t('types.weighing')}</SelectItem>
-            <SelectItem value="other">{t('types.other')}</SelectItem>
+            <SelectItem value="transfer_in">{t('types.transfer_in')}</SelectItem>
+            <SelectItem value="transfer_out">{t('types.transfer_out')}</SelectItem>
           </SelectContent>
         </Select>
         <Button onClick={handleAdd} className="ml-auto"><Plus className="mr-2 h-4 w-4" />{t('newEvent')}</Button>
