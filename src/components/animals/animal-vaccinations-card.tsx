@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Vaccination } from "@/lib/types/animal";
+import { Vaccination } from "@/lib/types/vaccination";
 
 interface AnimalVaccinationsCardProps {
   vaccinations: Vaccination[];
@@ -10,7 +10,7 @@ export function AnimalVaccinationsCard({
   vaccinations,
 }: AnimalVaccinationsCardProps) {
   const sortedVaccinations = [...vaccinations].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.vaccinationDate).getTime() - new Date(a.vaccinationDate).getTime()
   );
 
   const isUpcoming = (nextDate?: string) => {
@@ -47,32 +47,32 @@ export function AnimalVaccinationsCard({
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium">{vaccination.vaccine}</p>
+                    <p className="font-medium">{vaccination.vaccineName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(vaccination.date).toLocaleDateString("fr-FR")}{" "}
+                      {new Date(vaccination.vaccinationDate).toLocaleDateString("fr-FR")}{" "}
                       • {vaccination.administeredBy}
                     </p>
                   </div>
-                  {vaccination.nextDate && (
+                  {vaccination.nextDueDate && (
                     <div className="text-right">
                       <p className="text-sm font-medium mb-1">Prochain rappel</p>
                       <p className="text-sm text-muted-foreground mb-1">
-                        {new Date(vaccination.nextDate).toLocaleDateString(
+                        {new Date(vaccination.nextDueDate).toLocaleDateString(
                           "fr-FR"
                         )}
                       </p>
-                      {isOverdue(vaccination.nextDate) && (
+                      {isOverdue(vaccination.nextDueDate) && (
                         <Badge variant="destructive">En retard</Badge>
                       )}
-                      {isUpcoming(vaccination.nextDate) && (
+                      {isUpcoming(vaccination.nextDueDate) && (
                         <Badge variant="warning">À venir</Badge>
                       )}
                     </div>
                   )}
                 </div>
-                {vaccination.note && (
+                {vaccination.notes && (
                   <p className="text-sm text-muted-foreground">
-                    {vaccination.note}
+                    {vaccination.notes}
                   </p>
                 )}
               </div>

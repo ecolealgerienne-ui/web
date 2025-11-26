@@ -7,9 +7,10 @@ export type Locale = (typeof locales)[number];
 
 export default getRequestConfig(async ({ locale }) => {
   // Valider que la locale est supportée
-  if (!locales.includes(locale as Locale)) notFound();
+  if (!locale || !locales.includes(locale as Locale)) notFound();
 
   return {
+    locale,
     messages: (await import(`./src/lib/i18n/messages/${locale}.json`)).default,
   };
 });

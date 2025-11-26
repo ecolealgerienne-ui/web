@@ -33,7 +33,7 @@ export function useVaccines(filters?: VaccineFilters): UseVaccinesResult {
     } finally {
       setLoading(false);
     }
-  }, [filters?.search, filters?.scope, filters?.targetDisease, filters?.isActive]);
+  }, [filters]);
 
   useEffect(() => {
     fetchVaccines();

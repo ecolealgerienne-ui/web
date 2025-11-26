@@ -18,7 +18,7 @@ export default function NotFound() {
           <h1 className="text-6xl font-bold text-primary">404</h1>
           <h2 className="text-2xl font-semibold">Page non trouvée</h2>
           <p className="text-muted-foreground">
-            La page que vous recherchez n'existe pas ou a été déplacée.
+            La page que vous recherchez n&apos;existe pas ou a été déplacée.
           </p>
         </div>
 
@@ -26,7 +26,7 @@ export default function NotFound() {
           <Link href="/">
             <Button variant="default">
               <Home className="mr-2 h-4 w-4" />
-              Retour à l'accueil
+              Retour à l&apos;accueil
             </Button>
           </Link>
           <Button onClick={() => window.history.back()} variant="outline">
@@ -37,7 +37,7 @@ export default function NotFound() {
 
         <div className="pt-8 text-sm text-muted-foreground">
           <p>
-            Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le
+            Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, veuillez contacter le
             support.
           </p>
         </div>

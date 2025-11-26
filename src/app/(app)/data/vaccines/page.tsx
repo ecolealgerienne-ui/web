@@ -117,7 +117,7 @@ export default function VaccinesPage() {
             <div className="text-center py-12 text-muted-foreground">
               Aucun vaccin trouvé.
               <br />
-              Cliquez sur "Nouveau vaccin" pour en ajouter un.
+              Cliquez sur &quot;Nouveau vaccin&quot; pour en ajouter un.
             </div>
           )}
 
@@ -147,13 +147,13 @@ export default function VaccinesPage() {
                       </td>
                       <td className="py-3 px-4">
                         {vaccine.targetDisease && (
-                          <Badge variant="outline">
+                          <Badge variant="default">
                             {VACCINE_TARGET_DISEASE_LABELS[vaccine.targetDisease]}
                           </Badge>
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant={vaccine.scope === 'global' ? 'default' : 'secondary'}>
+                        <Badge variant={vaccine.scope === 'global' ? 'default' : 'warning'}>
                           {VACCINE_SCOPE_LABELS[vaccine.scope]}
                         </Badge>
                       </td>

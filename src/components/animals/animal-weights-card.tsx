@@ -19,12 +19,12 @@ interface AnimalWeightsCardProps {
 export function AnimalWeightsCard({ weights }: AnimalWeightsCardProps) {
   // Trier par date
   const sortedWeights = [...weights].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    (a, b) => new Date(a.weighDate).getTime() - new Date(b.weighDate).getTime()
   );
 
   // Préparer les données pour le graphique
   const chartData = sortedWeights.map((w) => ({
-    date: new Date(w.date).toLocaleDateString("fr-FR", {
+    date: new Date(w.weighDate).toLocaleDateString("fr-FR", {
       month: "short",
       year: "numeric",
     }),
@@ -79,11 +79,11 @@ export function AnimalWeightsCard({ weights }: AnimalWeightsCardProps) {
                   <div>
                     <p className="font-medium">{weight.weight} kg</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(weight.date).toLocaleDateString("fr-FR")}
+                      {new Date(weight.weighDate).toLocaleDateString("fr-FR")}
                     </p>
                   </div>
-                  {weight.note && (
-                    <p className="text-sm text-muted-foreground">{weight.note}</p>
+                  {weight.notes && (
+                    <p className="text-sm text-muted-foreground">{weight.notes}</p>
                   )}
                 </div>
               ))}

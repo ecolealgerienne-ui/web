@@ -84,18 +84,18 @@ export default function AnimalsPage() {
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'success' | 'warning' => {
     switch (status) {
       case 'alive':
-        return 'default';
+        return 'success';
       case 'sold':
-        return 'secondary';
+        return 'warning';
       case 'dead':
         return 'destructive';
       case 'missing':
-        return 'outline';
+        return 'warning';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 

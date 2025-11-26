@@ -64,7 +64,7 @@ export default function LotsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Lots</h1>
           <p className="text-muted-foreground">
-            Gérez vos groupes d'animaux par activité
+            Gérez vos groupes d&apos;animaux par activité
           </p>
         </div>
         <Button>

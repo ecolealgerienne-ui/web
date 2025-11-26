@@ -33,7 +33,7 @@ export function useAlertConfigurations(filters?: { type?: AlertType; enabled?: b
     } finally {
       setLoading(false)
     }
-  }, [filters?.type, filters?.enabled])
+  }, [filters])
 
   useEffect(() => {
     fetchAlertConfigurations()

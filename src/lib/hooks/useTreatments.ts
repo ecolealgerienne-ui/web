@@ -35,15 +35,7 @@ export function useTreatments(
     } finally {
       setLoading(false);
     }
-  }, [
-    filters?.animalId,
-    filters?.status,
-    filters?.type,
-    filters?.dateFrom,
-    filters?.dateTo,
-    filters?.search,
-    filters?.targetType,
-  ]);
+  }, [filters]);
 
   useEffect(() => {
     fetchTreatments();

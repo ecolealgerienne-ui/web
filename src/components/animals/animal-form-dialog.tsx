@@ -31,15 +31,15 @@ export function AnimalFormDialog({
 }: AnimalFormDialogProps) {
   const [formData, setFormData] = useState<Partial<Animal>>(
     animal || {
-      eid: '',
-      internalId: '',
+      identificationNumber: '',
+      
       name: '',
-      species: 'sheep',
-      breed: '',
+      speciesId: 'sheep',
+      breedId: '',
       sex: 'female',
       birthDate: '',
-      status: 'active',
-      acquisitionType: 'birth',
+      status: 'alive' as const,
+      
       acquisitionDate: new Date().toISOString().split('T')[0],
     }
   );
@@ -72,8 +72,8 @@ export function AnimalFormDialog({
                 id="eid"
                 placeholder="250268001234567"
                 required
-                value={formData.eid}
-                onChange={(e) => setFormData({ ...formData, eid: e.target.value })}
+                value={formData.identificationNumber}
+                onChange={(e) => setFormData({ ...formData, identificationNumber: e.target.value })}
               />
             </div>
 
@@ -83,8 +83,8 @@ export function AnimalFormDialog({
               <Input
                 id="internalId"
                 placeholder="A-001"
-                value={formData.internalId}
-                onChange={(e) => setFormData({ ...formData, internalId: e.target.value })}
+                value={formData.identificationNumber}
+                onChange={(e) => setFormData({ ...formData, identificationNumber: e.target.value })}
               />
             </div>
           </div>
@@ -107,9 +107,9 @@ export function AnimalFormDialog({
               <Select
                 id="species"
                 required
-                value={formData.species}
+                value={formData.speciesId}
                 onChange={(e) =>
-                  setFormData({ ...formData, species: e.target.value as any })
+                  setFormData({ ...formData, speciesId: e.target.value as any })
                 }
               >
                 <option value="sheep">Ovin</option>
@@ -151,21 +151,21 @@ export function AnimalFormDialog({
             <Input
               id="breed"
               placeholder="Ouled Djellal"
-              value={formData.breed}
-              onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+              value={formData.breedId}
+              onChange={(e) => setFormData({ ...formData, breedId: e.target.value })}
             />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             {/* Type d'acquisition */}
             <div>
-              <Label htmlFor="acquisitionType">Type d'acquisition *</Label>
+              <Label htmlFor="acquisitionType">Type d&apos;acquisition *</Label>
               <Select
                 id="acquisitionType"
                 required
-                value={formData.acquisitionType}
+                value={formData.identificationNumber}
                 onChange={(e) =>
-                  setFormData({ ...formData, acquisitionType: e.target.value as any })
+                  setFormData({ ...formData, acquisitionDate: e.target.value as any })
                 }
               >
                 <option value="birth">Naissance</option>
@@ -175,7 +175,7 @@ export function AnimalFormDialog({
 
             {/* Date d'acquisition */}
             <div>
-              <Label htmlFor="acquisitionDate">Date d'acquisition *</Label>
+              <Label htmlFor="acquisitionDate">Date d&apos;acquisition *</Label>
               <Input
                 id="acquisitionDate"
                 type="date"

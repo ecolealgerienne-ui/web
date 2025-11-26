@@ -53,7 +53,7 @@ export default function LoginPage() {
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
         </div>
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
             <Alert className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
               <div className="text-sm">
                 <strong>Mode DEV:</strong> La sécurité est désactivée. Cliquez sur
-                "Se connecter" pour accéder à l'application.
+                &quot;Se connecter&quot; pour accéder à l&apos;application.
               </div>
             </Alert>
           )}

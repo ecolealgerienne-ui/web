@@ -117,7 +117,7 @@ export default function MedicationsPage() {
             <div className="text-center py-12 text-muted-foreground">
               Aucun produit médical trouvé.
               <br />
-              Cliquez sur "Nouveau produit" pour en ajouter un.
+              Cliquez sur &quot;Nouveau produit&quot; pour en ajouter un.
             </div>
           )}
 
@@ -148,13 +148,13 @@ export default function MedicationsPage() {
                       </td>
                       <td className="py-3 px-4">
                         {product.category && (
-                          <Badge variant="outline">
+                          <Badge variant="default">
                             {MEDICAL_PRODUCT_CATEGORY_LABELS[product.category]}
                           </Badge>
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant={product.scope === 'global' ? 'default' : 'secondary'}>
+                        <Badge variant={product.scope === 'global' ? 'default' : 'warning'}>
                           {MEDICAL_PRODUCT_SCOPE_LABELS[product.scope]}
                         </Badge>
                       </td>

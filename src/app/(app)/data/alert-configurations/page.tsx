@@ -31,20 +31,20 @@ export default function AlertConfigurationsPage() {
     }
   };
 
-  const getTypeBadgeVariant = (type: AlertType) => {
+  const getTypeBadgeVariant = (type: AlertType): 'destructive' | 'success' | 'default' | 'warning' => {
     switch (type) {
       case 'urgent':
         return 'destructive';
       case 'important':
         return 'default';
       case 'routine':
-        return 'secondary';
+        return 'warning';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
-  const getPriorityBadgeVariant = (priority: string) => {
+  const getPriorityBadgeVariant = (priority: string): 'destructive' | 'success' | 'default' | 'warning' => {
     switch (priority) {
       case 'critical':
       case 'high':
@@ -52,9 +52,9 @@ export default function AlertConfigurationsPage() {
       case 'medium':
         return 'default';
       case 'low':
-        return 'secondary';
+        return 'warning';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
@@ -150,11 +150,11 @@ export default function AlertConfigurationsPage() {
                         <Badge variant={getPriorityBadgeVariant(alert.priority)} className="text-xs">
                           {t(`priorities.${alert.priority}`)}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="default" className="text-xs">
                           {alert.category}
                         </Badge>
                         {!alert.enabled && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="warning" className="text-xs">
                             {tc('status.disabled')}
                           </Badge>
                         )}

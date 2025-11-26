@@ -33,7 +33,7 @@ export function useFarms(filters?: { ownerId?: string; groupId?: string; isDefau
     } finally {
       setLoading(false)
     }
-  }, [filters?.ownerId, filters?.groupId, filters?.isDefault, filters?.search])
+  }, [filters])
 
   useEffect(() => {
     fetchFarms()

@@ -33,7 +33,7 @@ export function useMedicalProducts(filters?: MedicalProductFilters): UseMedicalP
     } finally {
       setLoading(false);
     }
-  }, [filters?.search, filters?.scope, filters?.category, filters?.isActive]);
+  }, [filters]);
 
   useEffect(() => {
     fetchMedicalProducts();
