@@ -162,7 +162,6 @@ export default function AnimalsPage() {
             <SelectItem value="alive">{t('status.alive')}</SelectItem>
             <SelectItem value="sold">{t('status.sold')}</SelectItem>
             <SelectItem value="dead">{t('status.dead')}</SelectItem>
-            <SelectItem value="missing">{t('status.missing')}</SelectItem>
           </SelectContent>
         </Select>
 
