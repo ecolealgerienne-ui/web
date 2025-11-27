@@ -620,622 +620,74 @@
       "editDescription": "عدل معلومات الحدث"
     }
   },
-  "vaccinations": {
-    "title": "التطعيمات",
-    "subtitle": "إدارة جدول التطعيم للقطيع",
-    "newVaccination": "جدولة تطعيم",
-    "editVaccination": "تعديل التطعيم",
-    "deleteVaccination": "حذف التطعيم",
-    "noVaccinations": "لا توجد تطعيمات",
-    "vaccinationCount": "{count} تطعيم",
-    "vaccinationCount_plural": "{count} تطعيمات",
-    "filters": {
-      "allStatus": "جميع الحالات",
-      "allTargets": "جميع الأهداف",
-      "search": "بحث..."
+  "onboarding": {
+    "welcome": "مرحباً بك في AniTra",
+    "steps": {
+      "identity": "الهوية",
+      "species": "الأنواع",
+      "veterinarians": "الأطباء البيطريون",
+      "summary": "الملخص"
     },
-    "status": {
-      "scheduled": "مجدول",
-      "completed": "مكتمل",
-      "overdue": "متأخر",
-      "cancelled": "ملغى"
-    },
-    "targetType": {
-      "individual": "فردي",
-      "lot": "مجموعة"
-    },
-    "fields": {
-      "animalId": "الحيوان",
-      "lotId": "المجموعة",
-      "targetType": "نوع الهدف",
-      "vaccineName": "اسم اللقاح",
-      "vaccineId": "معرف اللقاح",
-      "diseaseTarget": "المرض المستهدف",
-      "manufacturer": "الشركة المصنعة",
-      "batchNumber": "رقم الدفعة",
-      "expiryDate": "تاريخ الانتهاء",
-      "scheduledDate": "التاريخ المجدول",
-      "administeredDate": "تاريخ الإعطاء",
-      "nextDueDate": "الموعد التالي",
-      "administeredBy": "أعطي بواسطة",
-      "veterinarianId": "الطبيب البيطري",
-      "veterinarianName": "اسم الطبيب البيطري",
-      "dosage": "الجرعة",
-      "administrationRoute": "طريقة الإعطاء",
-      "siteOfInjection": "موقع الحقن",
-      "adverseReactions": "ردود الفعل السلبية",
-      "certificateNumber": "رقم الشهادة",
-      "status": "الحالة",
-      "notes": "ملاحظات",
-      "cost": "التكلفة"
-    },
-    "routes": {
-      "SC": "تحت الجلد (SC)",
-      "IM": "في العضل (IM)",
-      "ID": "داخل الأدمة (ID)",
-      "oral": "فموي",
-      "IV": "في الوريد (IV)"
-    },
-    "sections": {
-      "general": "معلومات عامة",
-      "vaccine": "تفاصيل اللقاح",
-      "administration": "الإعطاء",
-      "additional": "معلومات إضافية"
-    },
-    "placeholders": {
-      "vaccineName": "مثال: لقاح PPR",
-      "diseaseTarget": "مثال: طاعون المجترات الصغيرة",
-      "manufacturer": "مثال: MCI لصحة الحيوان",
-      "batchNumber": "مثال: PPR-2025-A123",
-      "administeredBy": "اسم الشخص",
-      "dosage": "مثال: 1 مل",
-      "siteOfInjection": "مثال: الرقبة اليسرى",
-      "notes": "ملاحظات إضافية..."
-    },
-    "stats": {
-      "total": "إجمالي التطعيمات",
-      "scheduled": "مجدولة",
-      "completed": "مكتملة",
-      "overdue": "متأخرة"
-    },
-    "messages": {
-      "loadError": "تعذر تحميل التطعيمات",
-      "created": "تم جدولة التطعيم بنجاح",
-      "updated": "تم تحديث التطعيم بنجاح",
-      "deleted": "تم حذف التطعيم بنجاح",
-      "createError": "خطأ في جدولة التطعيم",
-      "updateError": "خطأ في تحديث التطعيم",
-      "deleteError": "خطأ في حذف التطعيم",
-      "deleteConfirmTitle": "تأكيد الحذف",
-      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا التطعيم؟",
-      "addDescription": "جدولة تطعيم جديد",
-      "editDescription": "تعديل معلومات التطعيم"
-    }
-  },
-  "treatments": {
-    "title": "العلاجات",
-    "subtitle": "إدارة العلاجات الطبية للقطيع",
-    "newTreatment": "علاج جديد",
-    "editTreatment": "تعديل العلاج",
-    "deleteTreatment": "حذف العلاج",
-    "noTreatments": "لا توجد علاجات",
-    "treatmentCount": "{count} علاج",
-    "treatmentCount_plural": "{count} علاجات",
-    "filters": {
-      "allStatus": "جميع الحالات",
-      "allTypes": "جميع الأنواع",
-      "allTargets": "جميع الأهداف",
-      "search": "بحث..."
-    },
-    "status": {
-      "scheduled": "مجدول",
-      "in_progress": "قيد التنفيذ",
-      "completed": "مكتمل",
-      "cancelled": "ملغى"
-    },
-    "type": {
-      "antibiotic": "مضاد حيوي",
-      "antiparasitic": "مضاد طفيليات",
-      "anti_inflammatory": "مضاد التهاب",
-      "vitamin": "فيتامين/مكمل",
-      "other": "آخر"
-    },
-    "targetType": {
-      "individual": "فردي",
-      "lot": "مجموعة"
-    },
-    "fields": {
-      "animalId": "الحيوان",
-      "lotId": "المجموعة",
-      "targetType": "نوع الهدف",
-      "productName": "اسم المنتج",
-      "treatmentType": "نوع العلاج",
-      "manufacturer": "الشركة المصنعة",
-      "batchNumber": "رقم الدفعة",
-      "reason": "السبب",
-      "diagnosis": "التشخيص",
-      "dosage": "الجرعة",
-      "administrationRoute": "طريقة الإعطاء",
-      "frequency": "التكرار",
-      "duration": "المدة (أيام)",
-      "startDate": "تاريخ البدء",
-      "endDate": "تاريخ الانتهاء",
-      "administeredBy": "أعطي بواسطة",
-      "veterinarianId": "الطبيب البيطري",
-      "prescriptionNumber": "رقم الوصفة",
-      "withdrawalPeriodMeat": "فترة السحب - لحم (أيام)",
-      "withdrawalPeriodMilk": "فترة السحب - حليب (أيام)",
-      "status": "الحالة",
-      "notes": "ملاحظات",
-      "adverseReactions": "ردود الفعل السلبية",
-      "effectiveness": "الفعالية",
-      "cost": "التكلفة"
-    },
-    "routes": {
-      "SC": "تحت الجلد (SC)",
-      "IM": "في العضل (IM)",
-      "ID": "داخل الأدمة (ID)",
-      "oral": "فموي",
-      "IV": "في الوريد (IV)",
-      "topical": "موضعي"
-    },
-    "sections": {
-      "general": "معلومات عامة",
-      "product": "تفاصيل المنتج",
-      "administration": "الإعطاء",
-      "withdrawal": "فترات السحب",
-      "additional": "معلومات إضافية"
-    },
-    "placeholders": {
-      "productName": "مثال: أوكسيتتراسيكلين",
-      "reason": "مثال: عدوى تنفسية",
-      "diagnosis": "مثال: التهاب رئوي",
-      "dosage": "مثال: 1 مل/10 كغ",
-      "frequency": "مثال: مرتين يومياً",
-      "administeredBy": "اسم الشخص",
-      "notes": "ملاحظات إضافية..."
-    },
-    "stats": {
-      "total": "إجمالي العلاجات",
-      "scheduled": "مجدولة",
-      "inProgress": "قيد التنفيذ",
-      "completed": "مكتملة"
-    },
-    "messages": {
-      "loadError": "تعذر تحميل العلاجات",
-      "created": "تم إنشاء العلاج بنجاح",
-      "updated": "تم تحديث العلاج بنجاح",
-      "deleted": "تم حذف العلاج بنجاح",
-      "createError": "خطأ في إنشاء العلاج",
-      "updateError": "خطأ في تحديث العلاج",
-      "deleteError": "خطأ في حذف العلاج",
-      "deleteConfirmTitle": "تأكيد الحذف",
-      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا العلاج؟",
-      "addDescription": "إضافة علاج جديد",
-      "editDescription": "تعديل معلومات العلاج"
-    }
-  },
-  "weighings": {
-    "title": "الوزن",
-    "subtitle": "تتبع وزن ونمو قطيعك",
-    "newWeighing": "وزن جديد",
-    "fields": {
-      "animalId": "الحيوان",
-      "weight": "الوزن",
-      "unit": "الوحدة",
-      "weighingDate": "تاريخ الوزن",
-      "weighingTime": "الوقت",
-      "purpose": "الغرض",
-      "method": "الطريقة",
-      "location": "الموقع",
-      "previousWeight": "الوزن السابق",
-      "weightGain": "زيادة الوزن",
-      "growthRate": "معدل النمو (يوميًا)",
-      "age": "العمر (أيام)",
-      "recordedBy": "سجل بواسطة",
-      "notes": "ملاحظات",
-      "conditions": "الظروف",
-      "dateFrom": "من تاريخ",
-      "dateTo": "إلى تاريخ",
-      "minWeight": "الوزن الأدنى",
-      "maxWeight": "الوزن الأقصى"
-    },
-    "purpose": {
-      "all": "الكل",
-      "routine": "روتيني",
-      "medical": "طبي",
-      "sale": "بيع",
-      "growth_monitoring": "مراقبة النمو",
-      "other": "أخرى"
-    },
-    "units": {
-      "kg": "كجم",
-      "lbs": "رطل"
-    },
-    "sections": {
-      "general": "معلومات عامة",
-      "data": "بيانات الوزن",
-      "growth": "تتبع النمو",
-      "additional": "معلومات إضافية"
-    },
-    "placeholders": {
-      "weight": "أدخل الوزن",
-      "method": "مثال: ميزان إلكتروني، ميزان، شريط",
-      "location": "مثال: الحظيرة، المرعى",
-      "recordedBy": "اسم الشخص",
-      "notes": "ملاحظات أو ملاحظات إضافية",
-      "conditions": "مثال: على معدة فارغة، بعد الوجبة",
-      "minWeight": "الوزن الأدنى",
-      "maxWeight": "الوزن الأقصى"
-    },
-    "stats": {
-      "total": "إجمالي الوزن",
-      "routine": "روتيني",
-      "medical": "طبي",
-      "avgWeight": "متوسط ​​الوزن"
-    },
-    "messages": {
-      "noWeighings": "لم يتم العثور على وزن",
-      "createSuccess": "تم إنشاء الوزن بنجاح",
-      "createError": "خطأ في إنشاء الوزن",
-      "updateSuccess": "تم تحديث الوزن بنجاح",
-      "updateError": "خطأ في تحديث الوزن",
-      "deleteSuccess": "تم حذف الوزن بنجاح",
-      "deleteError": "خطأ في حذف الوزن",
-      "deleteConfirmTitle": "تأكيد الحذف",
-      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
-      "addDescription": "إضافة وزن جديد",
-      "editDescription": "تعديل معلومات الوزن"
-    },
-    "filters": "الفلاتر",
-    "searchPlaceholder": "بحث...",
-    "list": "قائمة الوزن",
-    "loading": "جاري التحميل...",
-    "cancel": "إلغاء",
-    "delete": "حذف",
-    "labels": {
-      "animal": "الحيوان",
-      "gain": "الزيادة",
-      "rate": "المعدل",
-      "method": "الطريقة",
-      "perDay": "كغ/يوم"
-    }
-  },
-  "homepage": {
-    "title": "إدارة شاملة لمزرعتك",
-    "subtitle": "تتبع حيواناتك، وإدارة التطعيمات والعلاجات وتحسين إنتاجك بحل حديث وسهل الاستخدام.",
-    "getStarted": "ابدأ الآن",
-    "accessDashboard": "الوصول إلى لوحة التحكم",
-    "login": "تسجيل الدخول",
-    "features": {
-      "animalTracking": {
-        "title": "تتبع الحيوانات",
-        "description": "سجل وتتبع جميع حيواناتك مع سجلها الكامل"
-      },
-      "vaccinations": {
-        "title": "التطعيمات والعلاجات",
-        "description": "إدارة جداول التطعيم والعلاجات البيطرية"
-      },
-      "reports": {
-        "title": "تقارير مفصلة",
-        "description": "تحليل بياناتك بتقارير شاملة وقابلة للتصدير"
-      },
-      "lotManagement": {
-        "title": "إدارة المجموعات",
-        "description": "نظم حيواناتك حسب المجموعات لإدارة أفضل"
-      },
-      "traceability": {
-        "title": "تتبع كامل",
-        "description": "ضمان تتبع جميع منتجاتك وحيواناتك"
-      },
-      "multiUser": {
-        "title": "متعدد المستخدمين",
-        "description": "تعاون مع فريقك بأمان"
-      }
-    },
-    "benefits": {
-      "title": "لماذا تختار حلنا؟",
-      "modernInterface": "واجهة حديثة وسهلة الاستخدام",
-      "accessAnywhere": "يمكن الوصول إليه من أي جهاز",
-      "secureData": "بيانات آمنة ومتوافقة",
-      "reactiveSupport": "دعم عملاء سريع الاستجابة",
-      "regularUpdates": "تحديثات منتظمة"
-    },
-    "footer": {
-      "copyright": "© 2024 المدرسة الجزائرية. جميع الحقوق محفوظة."
-    }
-  },
-  "lots": {
-    "title": "القطعان",
-    "subtitle": "إدارة مجموعات الحيوانات حسب النشاط",
-    "newLot": "إنشاء قطيع",
-    "stats": {
-      "total": "إجمالي القطعان",
-      "open": "القطعان المفتوحة",
-      "closed": "القطعان المغلقة",
-      "totalAnimals": "الحيوانات المعنية"
-    },
-    "loading": "جاري التحميل...",
-    "noLots": "لم يتم العثور على قطعان",
-    "filters": {
-      "search": "بحث",
-      "searchPlaceholder": "الاسم، الوصف، المنتج...",
-      "type": "نوع القطيع",
-      "typePlaceholder": "جميع الأنواع",
-      "allTypes": "جميع الأنواع",
-      "status": "الحالة",
-      "statusPlaceholder": "جميع الحالات",
-      "allStatuses": "جميع الحالات"
-    },
-    "table": {
-      "name": "الاسم",
-      "type": "النوع",
-      "status": "الحالة",
-      "animals": "الحيوانات",
-      "date": "التاريخ",
-      "product": "المنتج/النشاط",
-      "amount": "المبلغ",
-      "actions": "الإجراءات",
-      "buyer": "المشتري",
-      "seller": "البائع"
-    },
-    "status": {
-      "open": "مفتوح",
-      "closed": "مغلق",
-      "archived": "مؤرشف"
-    },
-    "type": {
-      "treatment": "علاج",
-      "vaccination": "تطعيم",
-      "sale": "بيع",
-      "slaughter": "ذبح",
-      "purchase": "شراء",
-      "breeding": "تكاثر"
-    }
-  },
-  "reports": {
-    "title": "التقارير",
-    "subtitle": "تحليل بياناتك بتقارير مفصلة",
-    "period": {
-      "label": "الفترة",
-      "week": "أسبوع",
-      "month": "شهر",
-      "quarter": "ربع سنة",
-      "year": "سنة"
-    },
-    "generate": "إنشاء",
-    "export": "تصدير",
-    "categories": {
-      "health": "الصحة",
-      "production": "الإنتاج",
-      "financial": "المالية"
-    },
-    "settings": {
-      "title": "الإعدادات العامة",
-      "description": "حدد الفترة لجميع التقارير",
-      "applyToAll": "تطبيق على الكل",
-      "customPeriod": "فترة مخصصة"
-    },
-    "buttons": {
-      "generate": "توليد",
-      "exportPdf": "تصدير PDF"
-    },
-    "categoryTitles": {
-      "health": "الصحة والرفاهية",
-      "production": "الإنتاج والأداء",
-      "financial": "المالية والتنظيمية"
-    },
-    "definitions": {
-      "herd-inventory": {
-        "name": "جرد القطيع",
-        "description": "الحالة الكاملة للقطيع حسب النوع والعمر والحالة"
-      },
-      "vaccinations-report": {
-        "name": "سجل التطعيمات",
-        "description": "تاريخ التطعيمات والجدول القادم"
-      },
-      "treatments-report": {
-        "name": "سجل العلاجات",
-        "description": "تاريخ العلاجات وفترات الانتظار"
-      },
-      "movements-report": {
-        "name": "حركات الحيوانات",
-        "description": "المداخل والمخارج والولادات والوفيات"
-      },
-      "growth-report": {
-        "name": "النمو والأداء",
-        "description": "تطور الأوزان والمكاسب اليومية المتوسطة"
-      },
-      "health-report": {
-        "name": "التقرير الصحي",
-        "description": "معدلات المرض والوفيات والحوادث الصحية"
-      },
-      "financial-report": {
-        "name": "التقرير المالي",
-        "description": "تكاليف الرعاية البيطرية والإيرادات"
-      }
-    }
-  },
-  "settings": {
-    "title": "الإعدادات",
-    "subtitle": "إدارة تفضيلاتك وإعدادات التطبيق",
-    "sections": {
-      "title": "الأقسام",
-      "profile": "الملف الشخصي",
-      "farm": "المزرعة",
-      "notifications": "الإشعارات",
-      "language": "اللغة والمنطقة",
-      "security": "الأمان",
-      "data": "البيانات"
-    },
-    "save": "حفظ التغييرات",
-    "profile": {
-      "title": "الملف الشخصي",
-      "description": "إدارة معلوماتك الشخصية",
-      "firstName": "الاسم الأول",
-      "lastName": "اسم العائلة",
-      "email": "البريد الإلكتروني",
-      "phone": "الهاتف",
-      "role": "الدور",
-      "roles": {
-        "owner": "مالك",
-        "manager": "مدير",
-        "veterinarian": "طبيب بيطري",
-        "worker": "موظف"
-      },
-      "saveButton": "حفظ التغييرات"
-    },
-    "farm": {
-      "title": "معلومات المزرعة",
-      "description": "قم بتكوين تفاصيل مزرعتك",
+    "step1": {
+      "title": "مرحباً بك في AniTra",
+      "subtitle": "لنبدأ ببعض المعلومات عن مزرعتك",
       "farmName": "اسم المزرعة",
-      "farmId": "رقم التعريف",
-      "surface": "المساحة (هكتار)",
-      "address": "العنوان",
-      "wilaya": "الولاية",
-      "commune": "البلدية",
-      "species": "الأنواع المربّاة",
-      "addSpecies": "+ إضافة",
-      "selectWilaya": "اختر...",
-      "saveButton": "حفظ التغييرات",
-      "department": "المقاطعة",
-      "selectDepartment": "اختر..."
+      "farmNamePlaceholder": "مثال: مزرعة بنعلي",
+      "country": "البلد",
+      "selectCountry": "اختر البلد",
+      "region": "المنطقة",
+      "selectRegion": "اختر المنطقة",
+      "selectCountryFirst": "اختر البلد أولاً",
+      "whyInfo": "لماذا هذه المعلومات؟",
+      "whyInfoText": "تتيح لنا منطقتك اقتراح الأطباء البيطريين والسلالات والمنتجات المناسبة لمنطقتك الجغرافية."
     },
-    "notifications": {
-      "title": "تفضيلات الإشعارات",
-      "description": "اختر كيف تريد أن يتم إعلامك",
-      "vaccinations": {
-        "title": "التطعيمات القادمة",
-        "description": "تلقي تنبيه قبل 7 أيام"
-      },
-      "treatments": {
-        "title": "العلاجات الجارية",
-        "description": "تذكير يومي للعلاجات"
-      },
-      "waitingPeriods": {
-        "title": "فترات الانتظار",
-        "description": "تنبيه في نهاية فترة الانتظار"
-      },
-      "births": {
-        "title": "الولادات",
-        "description": "إشعار لكل ولادة"
-      },
-      "healthAlerts": {
-        "title": "التنبيهات الصحية",
-        "description": "إشعارات عاجلة للمشاكل الصحية"
-      },
-      "saveButton": "حفظ التفضيلات"
+    "step2": {
+      "title": "أنواعك",
+      "subtitle": "ما هي الأنواع التي تربيها؟",
+      "selectSpecies": "اختر الأنواع الموجودة في مزرعتك",
+      "bovine": "أبقار",
+      "ovine": "أغنام",
+      "caprine": "ماعز",
+      "poultry": "دواجن",
+      "equine": "خيول",
+      "camelid": "جمال"
     },
-    "language": {
-      "title": "اللغة والمنطقة",
-      "description": "قم بتخصيص العرض وفقًا لتفضيلاتك",
-      "interfaceLanguage": "لغة الواجهة",
-      "timezone": "المنطقة الزمنية",
-      "dateFormat": "تنسيق التاريخ",
-      "currency": "العملة",
-      "darkTheme": {
-        "title": "المظهر الداكن",
-        "description": "تمكين الوضع الداكن"
-      },
-      "saveButton": "حفظ التفضيلات"
+    "step3": {
+      "title": "أطباؤك البيطريون",
+      "subtitle": "اختر أطباءك البيطريين المعتادين للعثور عليهم بسهولة",
+      "searchPlaceholder": "البحث بالاسم أو المنطقة...",
+      "noResults": "لم يتم العثور على طبيب بيطري",
+      "addVet": "لا أجد طبيبي البيطري",
+      "addVetTitle": "إضافة طبيب بيطري",
+      "vetName": "اسم الطبيب البيطري",
+      "vetNamePlaceholder": "مثال: د. مارتن",
+      "vetRegion": "المنطقة",
+      "vetRegionPlaceholder": "مثال: الجزائر",
+      "vetPhone": "الهاتف",
+      "vetPhonePlaceholder": "مثال: 0555 12 34 56",
+      "optional": "اختياري",
+      "localVetInfo": "سيتم إضافة هذا الطبيب البيطري كبيانات خاصة مرئية لك فقط.",
+      "optionalStep": "هذه الخطوة اختيارية.",
+      "optionalStepInfo": "يمكنك إضافة أو تعديل أطبائك البيطريين في أي وقت من الإعدادات.",
+      "selectedVets": "الأطباء البيطريون المختارون",
+      "localVet": "طبيب بيطري محلي",
+      "private": "خاص"
     },
-    "security": {
-      "title": "الأمان",
-      "description": "احمِ حسابك وبياناتك",
-      "currentPassword": "كلمة المرور الحالية",
-      "newPassword": "كلمة مرور جديدة",
-      "confirmPassword": "تأكيد كلمة المرور",
-      "changePasswordButton": "تغيير كلمة المرور",
-      "twoFactor": {
-        "title": "المصادقة الثنائية",
-        "label": "2FA",
-        "description": "إضافة طبقة أمان إضافية",
-        "disabled": "معطل",
-        "enable": "تمكين 2FA"
-      },
-      "activeSessions": {
-        "title": "الجلسات النشطة",
-        "currentBrowser": "المتصفح الحالي",
-        "active": "نشط"
-      }
+    "step4": {
+      "title": "كل شيء جاهز!",
+      "subtitle": "ملخص التكوين الخاص بك",
+      "farmInfo": "مزرعتك",
+      "speciesInfo": "الأنواع المربّاة",
+      "veterinariansInfo": "الأطباء البيطريون",
+      "noVetSelected": "لم يتم اختيار طبيب بيطري",
+      "launchApp": "تشغيل التطبيق",
+      "modifyConfig": "تعديل التكوين"
     },
-    "data": {
-      "title": "إدارة البيانات",
-      "description": "النسخ الاحتياطي والتصدير وحذف البيانات",
-      "autoBackup": {
-        "title": "النسخ الاحتياطي التلقائي",
-        "lastBackup": "آخر نسخة احتياطية: اليوم الساعة 03:00",
-        "enabled": "مفعّل",
-        "backupNow": "نسخ احتياطي الآن"
-      },
-      "export": {
-        "title": "تصدير البيانات",
-        "description": "قم بتنزيل نسخة كاملة من جميع بياناتك",
-        "excel": "تصدير إلى Excel",
-        "json": "تصدير إلى JSON"
-      },
-      "dangerZone": {
-        "title": "منطقة الخطر",
-        "description": "الإجراءات التالية لا رجعة فيها",
-        "deleteAll": "حذف جميع البيانات"
-      }
-    }
-  },
-  "dashboard": {
-    "title": "لوحة القيادة",
-    "loading": "جاري تحميل لوحة القيادة...",
-    "loadingData": "جاري جلب البيانات",
-    "loadError": "تعذر تحميل الإحصائيات",
-    "kpi": {
-      "totalAnimals": "إجمالي الحيوانات",
-      "births": "الولادات",
-      "deaths": "الوفيات",
-      "vaccinations": "التطعيمات"
-    },
-    "periods": {
-      "thisMonth": "هذا الشهر",
-      "upcoming": "قادمة"
-    },
-    "chart": {
-      "evolution": "تطور القطيع"
-    },
-    "alerts": {
-      "title": "التنبيهات النشطة"
-    },
-    "activities": {
-      "title": "الأنشطة الأخيرة"
-    },
-    "months": {
-      "jan": "يناير",
-      "feb": "فبراير",
-      "mar": "مارس",
-      "apr": "أبريل",
-      "may": "مايو",
-      "jun": "يونيو",
-      "jul": "يوليو",
-      "aug": "أغسطس",
-      "sep": "سبتمبر",
-      "oct": "أكتوبر",
-      "nov": "نوفمبر",
-      "dec": "ديسمبر"
-    }
-  },
-  "chart": {
-    "periods": {
-      "6months": "6 أشهر",
-      "12months": "12 شهر",
-      "1year": "سنة واحدة",
-      "2years": "سنتان",
-      "all": "الكل"
-    },
-    "types": {
-      "line": "خطي",
-      "bar": "أعمدة",
-      "area": "مساحة"
-    },
-    "labels": {
-      "selectPeriod": "اختر الفترة",
-      "selectType": "نوع الرسم البياني"
+    "navigation": {
+      "next": "التالي",
+      "previous": "السابق",
+      "skip": "تخطي",
+      "finish": "إنهاء"
     }
   }
 }

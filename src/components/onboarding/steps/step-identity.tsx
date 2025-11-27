@@ -3,6 +3,7 @@
 import { MapPin, Building2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslations } from 'next-intl'
 import type { OnboardingData } from '@/app/onboarding/page'
 
 interface StepIdentityProps {
@@ -18,7 +19,7 @@ const COUNTRIES = [
   { code: 'FR', name: 'France' },
 ]
 
-// Régions par pays (wilayas pour l'Algérie)
+// Régions par pays
 const REGIONS: Record<string, { code: string; name: string }[]> = {
   DZ: [
     { code: 'ALG', name: 'Alger' },
@@ -52,6 +53,8 @@ const REGIONS: Record<string, { code: string; name: string }[]> = {
 }
 
 export function StepIdentity({ data, onDataChange }: StepIdentityProps) {
+  const t = useTranslations('onboarding.step1')
+
   const handleChange = (field: keyof OnboardingData, value: string) => {
     const updates: Partial<OnboardingData> = { [field]: value }
 
@@ -71,19 +74,19 @@ export function StepIdentity({ data, onDataChange }: StepIdentityProps) {
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
           <Building2 className="w-8 h-8 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold">Bienvenue sur AniTra</h2>
+        <h2 className="text-2xl font-bold">{t('title')}</h2>
         <p className="text-muted-foreground mt-2">
-          Commençons par quelques informations sur votre exploitation
+          {t('subtitle')}
         </p>
       </div>
 
       <div className="space-y-4">
         {/* Nom de l'exploitation */}
         <div className="space-y-2">
-          <Label htmlFor="farmName">Nom de l'exploitation *</Label>
+          <Label htmlFor="farmName">{t('farmName')} *</Label>
           <Input
             id="farmName"
-            placeholder="Ex: Ferme Benali"
+            placeholder={t('farmNamePlaceholder')}
             value={data.farmName}
             onChange={(e) => handleChange('farmName', e.target.value)}
             className="h-12"
@@ -92,14 +95,14 @@ export function StepIdentity({ data, onDataChange }: StepIdentityProps) {
 
         {/* Pays */}
         <div className="space-y-2">
-          <Label htmlFor="country">Pays *</Label>
+          <Label htmlFor="country">{t('country')} *</Label>
           <select
             id="country"
             value={data.country}
             onChange={(e) => handleChange('country', e.target.value)}
             className="w-full h-12 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="">Sélectionner un pays</option>
+            <option value="">{t('selectCountry')}</option>
             {COUNTRIES.map((country) => (
               <option key={country.code} value={country.code}>
                 {country.name}
@@ -112,7 +115,7 @@ export function StepIdentity({ data, onDataChange }: StepIdentityProps) {
         <div className="space-y-2">
           <Label htmlFor="region" className="flex items-center gap-2">
             <MapPin className="w-4 h-4" />
-            Région / Wilaya *
+            {t('region')} *
           </Label>
           <select
             id="region"
@@ -122,7 +125,7 @@ export function StepIdentity({ data, onDataChange }: StepIdentityProps) {
             className="w-full h-12 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="">
-              {data.country ? 'Sélectionner une région' : 'Sélectionnez d\'abord un pays'}
+              {data.country ? t('selectRegion') : t('selectCountryFirst')}
             </option>
             {availableRegions.map((region) => (
               <option key={region.code} value={region.code}>
@@ -135,10 +138,9 @@ export function StepIdentity({ data, onDataChange }: StepIdentityProps) {
 
       <div className="mt-6 p-4 bg-muted/50 rounded-lg">
         <p className="text-sm text-muted-foreground">
-          <strong>Pourquoi ces informations ?</strong>
+          <strong>{t('whyInfo')}</strong>
           <br />
-          Votre région nous permet de vous proposer les vétérinaires, races et produits
-          adaptés à votre zone géographique.
+          {t('whyInfoText')}
         </p>
       </div>
     </div>
