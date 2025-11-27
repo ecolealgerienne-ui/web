@@ -1,6 +1,7 @@
 'use client'
 
 import { Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Species } from '@/lib/types/farm'
 import type { OnboardingData } from '@/app/onboarding/page'
 
@@ -11,51 +12,23 @@ interface StepSpeciesProps {
 
 interface SpeciesOption {
   id: Species
-  name: string
+  nameKey: string
+  descKey: string
   icon: string
-  description: string
 }
 
 const SPECIES_OPTIONS: SpeciesOption[] = [
-  {
-    id: 'bovine',
-    name: 'Bovins',
-    icon: '🐮',
-    description: 'Vaches, taureaux, veaux',
-  },
-  {
-    id: 'ovine',
-    name: 'Ovins',
-    icon: '🐑',
-    description: 'Moutons, brebis, agneaux',
-  },
-  {
-    id: 'caprine',
-    name: 'Caprins',
-    icon: '🐐',
-    description: 'Chèvres, boucs, chevreaux',
-  },
-  {
-    id: 'poultry',
-    name: 'Volaille',
-    icon: '🐔',
-    description: 'Poulets, poules, dindes',
-  },
-  {
-    id: 'equine',
-    name: 'Équins',
-    icon: '🐴',
-    description: 'Chevaux, juments, poulains',
-  },
-  {
-    id: 'camelid',
-    name: 'Camélidés',
-    icon: '🐪',
-    description: 'Chameaux, dromadaires',
-  },
+  { id: 'bovine', nameKey: 'bovine', descKey: 'bovineDesc', icon: '🐮' },
+  { id: 'ovine', nameKey: 'ovine', descKey: 'ovineDesc', icon: '🐑' },
+  { id: 'caprine', nameKey: 'caprine', descKey: 'caprineDesc', icon: '🐐' },
+  { id: 'poultry', nameKey: 'poultry', descKey: 'poultryDesc', icon: '🐔' },
+  { id: 'equine', nameKey: 'equine', descKey: 'equineDesc', icon: '🐴' },
+  { id: 'camelid', nameKey: 'camelid', descKey: 'camelidDesc', icon: '🐪' },
 ]
 
 export function StepSpecies({ data, onDataChange }: StepSpeciesProps) {
+  const t = useTranslations('onboarding.step2')
+
   const toggleSpecies = (speciesId: Species) => {
     const isSelected = data.species.includes(speciesId)
     const newSpecies = isSelected
@@ -71,9 +44,9 @@ export function StepSpecies({ data, onDataChange }: StepSpeciesProps) {
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
           <span className="text-3xl">🐄</span>
         </div>
-        <h2 className="text-2xl font-bold">Quelles espèces élevez-vous ?</h2>
+        <h2 className="text-2xl font-bold">{t('title')}</h2>
         <p className="text-muted-foreground mt-2">
-          Sélectionnez une ou plusieurs espèces pour personnaliser votre expérience
+          {t('selectSpecies')}
         </p>
       </div>
 
@@ -108,11 +81,11 @@ export function StepSpecies({ data, onDataChange }: StepSpeciesProps) {
               <span className="text-4xl mb-2">{species.icon}</span>
 
               {/* Name */}
-              <span className="font-semibold text-sm">{species.name}</span>
+              <span className="font-semibold text-sm">{t(species.nameKey)}</span>
 
               {/* Description */}
               <span className="text-xs text-muted-foreground mt-1">
-                {species.description}
+                {t(species.descKey)}
               </span>
             </button>
           )
@@ -121,16 +94,20 @@ export function StepSpecies({ data, onDataChange }: StepSpeciesProps) {
 
       {data.species.length === 0 && (
         <p className="text-center text-sm text-amber-600 dark:text-amber-400">
-          Veuillez sélectionner au moins une espèce pour continuer
+          {t('selectAtLeast')}
         </p>
       )}
 
       {data.species.length > 0 && (
         <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
           <p className="text-sm text-green-700 dark:text-green-300">
-            <strong>{data.species.length} espèce{data.species.length > 1 ? 's' : ''} sélectionnée{data.species.length > 1 ? 's' : ''}</strong>
+            <strong>
+              {data.species.length > 1
+                ? t('speciesSelectedPlural', { count: data.species.length })
+                : t('speciesSelected', { count: data.species.length })}
+            </strong>
             <br />
-            Vous pourrez modifier cette sélection plus tard dans les paramètres.
+            {t('canModifyLater')}
           </p>
         </div>
       )}

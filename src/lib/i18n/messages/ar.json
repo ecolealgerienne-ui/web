@@ -530,13 +530,23 @@
     "step2": {
       "title": "أنواعك",
       "subtitle": "ما هي الأنواع التي تربيها؟",
-      "selectSpecies": "اختر الأنواع الموجودة في مزرعتك",
+      "selectSpecies": "اختر نوعًا واحدًا أو أكثر لتخصيص تجربتك",
       "bovine": "أبقار",
+      "bovineDesc": "أبقار، ثيران، عجول",
       "ovine": "أغنام",
+      "ovineDesc": "أغنام، نعاج، حملان",
       "caprine": "ماعز",
+      "caprineDesc": "ماعز، تيوس، جداء",
       "poultry": "دواجن",
+      "poultryDesc": "دجاج، ديوك رومية",
       "equine": "خيول",
-      "camelid": "جمال"
+      "equineDesc": "خيول، أفراس، مهور",
+      "camelid": "جمال",
+      "camelidDesc": "جمال، إبل",
+      "selectAtLeast": "يرجى اختيار نوع واحد على الأقل للمتابعة",
+      "speciesSelected": "تم اختيار {count} نوع",
+      "speciesSelectedPlural": "تم اختيار {count} أنواع",
+      "canModifyLater": "يمكنك تعديل هذا الاختيار لاحقًا في الإعدادات."
     },
     "step3": {
       "title": "أطباؤك البيطريون",
@@ -560,13 +570,18 @@
       "private": "خاص"
     },
     "step4": {
-      "title": "كل شيء جاهز!",
-      "subtitle": "ملخص التكوين الخاص بك",
-      "farmInfo": "مزرعتك",
+      "title": "اكتمل الإعداد!",
+      "subtitle": "إليك ملخص التكوين الخاص بك",
+      "farmInfo": "المزرعة",
+      "locationInfo": "الموقع",
       "speciesInfo": "الأنواع المربّاة",
       "veterinariansInfo": "الأطباء البيطريون",
-      "noVetSelected": "لم يتم اختيار طبيب بيطري",
-      "launchApp": "تشغيل التطبيق",
+      "noVetSelected": "لم يتم اختيار أي",
+      "vetSelected": "تم اختيار {count}",
+      "vetsSelected": "تم اختيار {count}",
+      "readyTitle": "أنت جاهز للبدء!",
+      "readyMessage": "انقر على \"الذهاب إلى مزرعتي\" لاكتشاف لوحة التحكم وتسجيل أول حيوان.",
+      "launchApp": "الذهاب إلى مزرعتي",
       "modifyConfig": "تعديل التكوين"
     },
     "navigation": {
