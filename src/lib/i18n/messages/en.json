@@ -505,5 +505,75 @@
       "addDescription": "Add the information for the new event",
       "editDescription": "Edit the event information"
     }
+  },
+  "onboarding": {
+    "welcome": "Welcome to AniTra",
+    "steps": {
+      "identity": "Identity",
+      "species": "Species",
+      "veterinarians": "Veterinarians",
+      "summary": "Summary"
+    },
+    "step1": {
+      "title": "Welcome to AniTra",
+      "subtitle": "Let's start with some information about your farm",
+      "farmName": "Farm name",
+      "farmNamePlaceholder": "Ex: Benali Farm",
+      "country": "Country",
+      "selectCountry": "Select a country",
+      "region": "Region",
+      "selectRegion": "Select a region",
+      "selectCountryFirst": "Select a country first",
+      "whyInfo": "Why this information?",
+      "whyInfoText": "Your region allows us to suggest veterinarians, breeds and products adapted to your geographical area."
+    },
+    "step2": {
+      "title": "Your species",
+      "subtitle": "What species do you raise?",
+      "selectSpecies": "Select the species present on your farm",
+      "bovine": "Cattle",
+      "ovine": "Sheep",
+      "caprine": "Goats",
+      "poultry": "Poultry",
+      "equine": "Horses",
+      "camelid": "Camelids"
+    },
+    "step3": {
+      "title": "Your veterinarians",
+      "subtitle": "Select your usual veterinarians to find them easily",
+      "searchPlaceholder": "Search by name or region...",
+      "noResults": "No veterinarian found",
+      "addVet": "I can't find my veterinarian",
+      "addVetTitle": "Add a veterinarian",
+      "vetName": "Veterinarian name",
+      "vetNamePlaceholder": "Ex: Dr. Smith",
+      "vetRegion": "Region",
+      "vetRegionPlaceholder": "Ex: Algiers",
+      "vetPhone": "Phone",
+      "vetPhonePlaceholder": "Ex: 0555 12 34 56",
+      "optional": "optional",
+      "localVetInfo": "This veterinarian will be added as private data visible only to you.",
+      "optionalStep": "This step is optional.",
+      "optionalStepInfo": "You can add or modify your veterinarians at any time in the settings.",
+      "selectedVets": "Selected veterinarians",
+      "localVet": "Local veterinarian",
+      "private": "Private"
+    },
+    "step4": {
+      "title": "All set!",
+      "subtitle": "Summary of your configuration",
+      "farmInfo": "Your farm",
+      "speciesInfo": "Species raised",
+      "veterinariansInfo": "Veterinarians",
+      "noVetSelected": "No veterinarian selected",
+      "launchApp": "Launch the application",
+      "modifyConfig": "Modify configuration"
+    },
+    "navigation": {
+      "next": "Next",
+      "previous": "Previous",
+      "skip": "Skip",
+      "finish": "Finish"
+    }
   }
 }

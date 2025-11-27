@@ -505,5 +505,75 @@
       "addDescription": "Ajoutez les informations du nouvel événement",
       "editDescription": "Modifiez les informations de l'événement"
     }
+  },
+  "onboarding": {
+    "welcome": "Bienvenue sur AniTra",
+    "steps": {
+      "identity": "Identité",
+      "species": "Espèces",
+      "veterinarians": "Vétérinaires",
+      "summary": "Récapitulatif"
+    },
+    "step1": {
+      "title": "Bienvenue sur AniTra",
+      "subtitle": "Commençons par quelques informations sur votre exploitation",
+      "farmName": "Nom de l'exploitation",
+      "farmNamePlaceholder": "Ex: Ferme Benali",
+      "country": "Pays",
+      "selectCountry": "Sélectionner un pays",
+      "region": "Région",
+      "selectRegion": "Sélectionner une région",
+      "selectCountryFirst": "Sélectionnez d'abord un pays",
+      "whyInfo": "Pourquoi ces informations ?",
+      "whyInfoText": "Votre région nous permet de vous proposer les vétérinaires, races et produits adaptés à votre zone géographique."
+    },
+    "step2": {
+      "title": "Vos espèces",
+      "subtitle": "Quelles espèces élevez-vous ?",
+      "selectSpecies": "Sélectionnez les espèces présentes sur votre exploitation",
+      "bovine": "Bovins",
+      "ovine": "Ovins",
+      "caprine": "Caprins",
+      "poultry": "Volaille",
+      "equine": "Équins",
+      "camelid": "Camélidés"
+    },
+    "step3": {
+      "title": "Vos vétérinaires",
+      "subtitle": "Sélectionnez vos vétérinaires habituels pour les retrouver facilement",
+      "searchPlaceholder": "Rechercher par nom ou région...",
+      "noResults": "Aucun vétérinaire trouvé",
+      "addVet": "Je ne trouve pas mon vétérinaire",
+      "addVetTitle": "Ajouter un vétérinaire",
+      "vetName": "Nom du vétérinaire",
+      "vetNamePlaceholder": "Ex: Dr. Martin",
+      "vetRegion": "Région",
+      "vetRegionPlaceholder": "Ex: Alger",
+      "vetPhone": "Téléphone",
+      "vetPhonePlaceholder": "Ex: 0555 12 34 56",
+      "optional": "optionnel",
+      "localVetInfo": "Ce vétérinaire sera ajouté comme donnée privée visible uniquement par vous.",
+      "optionalStep": "Cette étape est optionnelle.",
+      "optionalStepInfo": "Vous pourrez ajouter ou modifier vos vétérinaires à tout moment dans les paramètres.",
+      "selectedVets": "Vétérinaires sélectionnés",
+      "localVet": "Vétérinaire local",
+      "private": "Privé"
+    },
+    "step4": {
+      "title": "Tout est prêt !",
+      "subtitle": "Récapitulatif de votre configuration",
+      "farmInfo": "Votre exploitation",
+      "speciesInfo": "Espèces élevées",
+      "veterinariansInfo": "Vétérinaires",
+      "noVetSelected": "Aucun vétérinaire sélectionné",
+      "launchApp": "Lancer l'application",
+      "modifyConfig": "Modifier la configuration"
+    },
+    "navigation": {
+      "next": "Suivant",
+      "previous": "Précédent",
+      "skip": "Passer",
+      "finish": "Terminer"
+    }
   }
 }

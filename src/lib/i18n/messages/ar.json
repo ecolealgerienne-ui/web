@@ -505,5 +505,75 @@
       "addDescription": "أضف معلومات الحدث الجديد",
       "editDescription": "عدل معلومات الحدث"
     }
+  },
+  "onboarding": {
+    "welcome": "مرحباً بك في AniTra",
+    "steps": {
+      "identity": "الهوية",
+      "species": "الأنواع",
+      "veterinarians": "الأطباء البيطريون",
+      "summary": "الملخص"
+    },
+    "step1": {
+      "title": "مرحباً بك في AniTra",
+      "subtitle": "لنبدأ ببعض المعلومات عن مزرعتك",
+      "farmName": "اسم المزرعة",
+      "farmNamePlaceholder": "مثال: مزرعة بنعلي",
+      "country": "البلد",
+      "selectCountry": "اختر البلد",
+      "region": "المنطقة",
+      "selectRegion": "اختر المنطقة",
+      "selectCountryFirst": "اختر البلد أولاً",
+      "whyInfo": "لماذا هذه المعلومات؟",
+      "whyInfoText": "تتيح لنا منطقتك اقتراح الأطباء البيطريين والسلالات والمنتجات المناسبة لمنطقتك الجغرافية."
+    },
+    "step2": {
+      "title": "أنواعك",
+      "subtitle": "ما هي الأنواع التي تربيها؟",
+      "selectSpecies": "اختر الأنواع الموجودة في مزرعتك",
+      "bovine": "أبقار",
+      "ovine": "أغنام",
+      "caprine": "ماعز",
+      "poultry": "دواجن",
+      "equine": "خيول",
+      "camelid": "جمال"
+    },
+    "step3": {
+      "title": "أطباؤك البيطريون",
+      "subtitle": "اختر أطباءك البيطريين المعتادين للعثور عليهم بسهولة",
+      "searchPlaceholder": "البحث بالاسم أو المنطقة...",
+      "noResults": "لم يتم العثور على طبيب بيطري",
+      "addVet": "لا أجد طبيبي البيطري",
+      "addVetTitle": "إضافة طبيب بيطري",
+      "vetName": "اسم الطبيب البيطري",
+      "vetNamePlaceholder": "مثال: د. مارتن",
+      "vetRegion": "المنطقة",
+      "vetRegionPlaceholder": "مثال: الجزائر",
+      "vetPhone": "الهاتف",
+      "vetPhonePlaceholder": "مثال: 0555 12 34 56",
+      "optional": "اختياري",
+      "localVetInfo": "سيتم إضافة هذا الطبيب البيطري كبيانات خاصة مرئية لك فقط.",
+      "optionalStep": "هذه الخطوة اختيارية.",
+      "optionalStepInfo": "يمكنك إضافة أو تعديل أطبائك البيطريين في أي وقت من الإعدادات.",
+      "selectedVets": "الأطباء البيطريون المختارون",
+      "localVet": "طبيب بيطري محلي",
+      "private": "خاص"
+    },
+    "step4": {
+      "title": "كل شيء جاهز!",
+      "subtitle": "ملخص التكوين الخاص بك",
+      "farmInfo": "مزرعتك",
+      "speciesInfo": "الأنواع المربّاة",
+      "veterinariansInfo": "الأطباء البيطريون",
+      "noVetSelected": "لم يتم اختيار طبيب بيطري",
+      "launchApp": "تشغيل التطبيق",
+      "modifyConfig": "تعديل التكوين"
+    },
+    "navigation": {
+      "next": "التالي",
+      "previous": "السابق",
+      "skip": "تخطي",
+      "finish": "إنهاء"
+    }
   }
 }
