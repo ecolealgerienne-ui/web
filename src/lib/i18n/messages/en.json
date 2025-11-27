@@ -644,13 +644,23 @@
     "step2": {
       "title": "Your species",
       "subtitle": "What species do you raise?",
-      "selectSpecies": "Select the species present on your farm",
+      "selectSpecies": "Select one or more species to personalize your experience",
       "bovine": "Cattle",
+      "bovineDesc": "Cows, bulls, calves",
       "ovine": "Sheep",
+      "ovineDesc": "Sheep, ewes, lambs",
       "caprine": "Goats",
+      "caprineDesc": "Goats, bucks, kids",
       "poultry": "Poultry",
+      "poultryDesc": "Chickens, hens, turkeys",
       "equine": "Horses",
-      "camelid": "Camelids"
+      "equineDesc": "Horses, mares, foals",
+      "camelid": "Camelids",
+      "camelidDesc": "Camels, dromedaries",
+      "selectAtLeast": "Please select at least one species to continue",
+      "speciesSelected": "{count} species selected",
+      "speciesSelectedPlural": "{count} species selected",
+      "canModifyLater": "You can modify this selection later in the settings."
     },
     "step3": {
       "title": "Your veterinarians",
@@ -674,13 +684,18 @@
       "private": "Private"
     },
     "step4": {
-      "title": "All set!",
-      "subtitle": "Summary of your configuration",
-      "farmInfo": "Your farm",
+      "title": "Setup complete!",
+      "subtitle": "Here is your configuration summary",
+      "farmInfo": "Farm",
+      "locationInfo": "Location",
       "speciesInfo": "Species raised",
       "veterinariansInfo": "Veterinarians",
-      "noVetSelected": "No veterinarian selected",
-      "launchApp": "Launch the application",
+      "noVetSelected": "None selected",
+      "vetSelected": "{count} selected",
+      "vetsSelected": "{count} selected",
+      "readyTitle": "You're ready to start!",
+      "readyMessage": "Click \"Go to my farm\" to discover your dashboard and register your first animal.",
+      "launchApp": "Go to my farm",
       "modifyConfig": "Modify configuration"
     },
     "navigation": {
