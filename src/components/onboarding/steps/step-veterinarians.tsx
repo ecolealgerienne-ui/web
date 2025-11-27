@@ -57,6 +57,39 @@ const REGION_NAMES: Record<string, string> = {
   TLE: 'Tlemcen',
 }
 
+// Régions par pays (même structure que step-identity)
+const REGIONS: Record<string, { code: string; name: string }[]> = {
+  DZ: [
+    { code: 'ALG', name: 'Alger' },
+    { code: 'ORA', name: 'Oran' },
+    { code: 'CON', name: 'Constantine' },
+    { code: 'BLI', name: 'Blida' },
+    { code: 'SET', name: 'Sétif' },
+    { code: 'BAT', name: 'Batna' },
+    { code: 'TIP', name: 'Tipaza' },
+    { code: 'TIZ', name: 'Tizi Ouzou' },
+    { code: 'BEJ', name: 'Béjaïa' },
+    { code: 'MSI', name: 'M\'Sila' },
+    { code: 'MED', name: 'Médéa' },
+    { code: 'TLE', name: 'Tlemcen' },
+  ],
+  TN: [
+    { code: 'TUN', name: 'Tunis' },
+    { code: 'SFA', name: 'Sfax' },
+    { code: 'SOU', name: 'Sousse' },
+  ],
+  MA: [
+    { code: 'CAS', name: 'Casablanca' },
+    { code: 'RAB', name: 'Rabat' },
+    { code: 'MAR', name: 'Marrakech' },
+  ],
+  FR: [
+    { code: 'IDF', name: 'Île-de-France' },
+    { code: 'ARA', name: 'Auvergne-Rhône-Alpes' },
+    { code: 'NAQ', name: 'Nouvelle-Aquitaine' },
+  ],
+}
+
 export function StepVeterinarians({ data, onDataChange }: StepVeterinariansProps) {
   const t = useTranslations('onboarding.step3')
 
@@ -273,12 +306,19 @@ export function StepVeterinarians({ data, onDataChange }: StepVeterinariansProps
             <Label htmlFor="newVetRegion" className="text-sm">
               {t('vetRegion')} <span className="text-muted-foreground">({t('optional')})</span>
             </Label>
-            <Input
+            <select
               id="newVetRegion"
-              placeholder={t('vetRegionPlaceholder')}
               value={newVetRegion}
               onChange={(e) => setNewVetRegion(e.target.value)}
-            />
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">{t('vetRegionPlaceholder')}</option>
+              {(REGIONS[data.country] || []).map((region) => (
+                <option key={region.code} value={region.code}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Téléphone */}
