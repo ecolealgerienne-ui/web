@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTranslations } from 'next-intl'
 import { StepIdentity } from './steps/step-identity'
 import { StepSpecies } from './steps/step-species'
 import { StepVeterinarians } from './steps/step-veterinarians'
@@ -16,12 +17,9 @@ interface OnboardingWizardProps {
   onSkip: () => void
 }
 
-const STEPS = [
-  { id: 1, title: 'Identité & Région', description: 'Informations de base' },
-  { id: 2, title: 'Production', description: 'Vos espèces' },
-  { id: 3, title: 'Partenaires', description: 'Vos vétérinaires' },
-  { id: 4, title: 'Résumé', description: 'Confirmation' },
-]
+type StepKey = 'identity' | 'species' | 'veterinarians' | 'summary'
+
+const STEP_KEYS: StepKey[] = ['identity', 'species', 'veterinarians', 'summary']
 
 export function OnboardingWizard({
   data,
@@ -29,6 +27,7 @@ export function OnboardingWizard({
   onComplete,
   onSkip,
 }: OnboardingWizardProps) {
+  const t = useTranslations('onboarding')
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -99,8 +98,8 @@ export function OnboardingWizard({
           onClick={onSkip}
           className="text-muted-foreground hover:text-foreground"
         >
-          <X className="w-4 h-4 mr-1" />
-          <span className="hidden sm:inline">Configurer plus tard</span>
+          <X className="w-4 h-4 me-1" />
+          <span className="hidden sm:inline">{t('skipConfig')}</span>
         </Button>
       </header>
 
@@ -109,41 +108,44 @@ export function OnboardingWizard({
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-muted-foreground">
-              Étape {currentStep} sur {STEPS.length}
+              {t('stepOf', { current: currentStep, total: STEP_KEYS.length })}
             </span>
             <span className="text-sm font-medium">
-              {STEPS[currentStep - 1].title}
+              {t(`steps.${STEP_KEYS[currentStep - 1]}`)}
             </span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-300 ease-out"
-              style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+              style={{ width: `${(currentStep / STEP_KEYS.length) * 100}%` }}
             />
           </div>
           {/* Step indicators */}
           <div className="flex justify-between mt-3">
-            {STEPS.map((step) => (
-              <div
-                key={step.id}
-                className={`flex flex-col items-center ${
-                  step.id <= currentStep ? 'text-primary' : 'text-muted-foreground'
-                }`}
-              >
+            {STEP_KEYS.map((stepKey, index) => {
+              const stepId = index + 1
+              return (
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                    step.id < currentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : step.id === currentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                  key={stepKey}
+                  className={`flex flex-col items-center ${
+                    stepId <= currentStep ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
-                  {step.id < currentStep ? '✓' : step.id}
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                      stepId < currentStep
+                        ? 'bg-primary text-primary-foreground'
+                        : stepId === currentStep
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {stepId < currentStep ? '✓' : stepId}
+                  </div>
+                  <span className="text-xs mt-1 hidden sm:block">{t(`steps.${stepKey}`)}</span>
                 </div>
-                <span className="text-xs mt-1 hidden sm:block">{step.title}</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
@@ -165,16 +167,16 @@ export function OnboardingWizard({
             className="gap-1"
           >
             <ChevronLeft className="w-4 h-4" />
-            Précédent
+            {t('navigation.previous')}
           </Button>
 
-          {currentStep < STEPS.length ? (
+          {currentStep < STEP_KEYS.length ? (
             <Button
               onClick={handleNext}
               disabled={!canGoNext()}
               className="gap-1"
             >
-              Suivant
+              {t('navigation.next')}
               <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
@@ -186,11 +188,11 @@ export function OnboardingWizard({
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Configuration...
+                  {t('configuring')}
                 </>
               ) : (
                 <>
-                  Accéder à ma ferme
+                  {t('step4.launchApp')}
                   <ChevronRight className="w-4 h-4" />
                 </>
               )}

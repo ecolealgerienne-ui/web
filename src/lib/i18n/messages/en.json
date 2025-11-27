@@ -622,11 +622,18 @@
   },
   "onboarding": {
     "welcome": "Welcome to AniTra",
+    "skipConfig": "Configure later",
+    "stepOf": "Step {current} of {total}",
+    "configuring": "Configuring...",
     "steps": {
-      "identity": "Identity",
-      "species": "Species",
-      "veterinarians": "Veterinarians",
-      "summary": "Summary"
+      "identity": "Identity & Region",
+      "identityDesc": "Basic information",
+      "species": "Production",
+      "speciesDesc": "Your species",
+      "veterinarians": "Partners",
+      "veterinariansDesc": "Your veterinarians",
+      "summary": "Summary",
+      "summaryDesc": "Confirmation"
     },
     "step1": {
       "title": "Welcome to AniTra",

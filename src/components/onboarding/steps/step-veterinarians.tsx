@@ -213,7 +213,7 @@ export function StepVeterinarians({ data, onDataChange }: StepVeterinariansProps
                   {vet.phone && (
                     <span className="flex items-center gap-1">
                       <Phone className="w-3 h-3" />
-                      {vet.phone}
+                      <span dir="ltr">{vet.phone}</span>
                     </span>
                   )}
                 </div>

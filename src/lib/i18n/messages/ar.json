@@ -622,11 +622,18 @@
   },
   "onboarding": {
     "welcome": "مرحباً بك في AniTra",
+    "skipConfig": "تكوين لاحقاً",
+    "stepOf": "الخطوة {current} من {total}",
+    "configuring": "جاري التكوين...",
     "steps": {
-      "identity": "الهوية",
-      "species": "الأنواع",
-      "veterinarians": "الأطباء البيطريون",
-      "summary": "الملخص"
+      "identity": "الهوية والمنطقة",
+      "identityDesc": "معلومات أساسية",
+      "species": "الإنتاج",
+      "speciesDesc": "أنواعك",
+      "veterinarians": "الشركاء",
+      "veterinariansDesc": "أطباؤك البيطريون",
+      "summary": "الملخص",
+      "summaryDesc": "التأكيد"
     },
     "step1": {
       "title": "مرحباً بك في AniTra",
