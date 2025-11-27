@@ -612,5 +612,149 @@
     "births": "Births",
     "deaths": "Deaths",
     "vaccinations": "Vaccinations"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and farm configuration",
+    "groups": {
+      "general": "General",
+      "myData": "My Data",
+      "preferences": "Preferences",
+      "system": "System"
+    },
+    "sections": {
+      "profile": "Profile",
+      "farm": "Farm",
+      "myVeterinarians": "My Veterinarians",
+      "myBreeds": "My Breeds",
+      "myVaccines": "My Vaccines",
+      "myMedications": "My Medications",
+      "myAlerts": "My Alerts",
+      "language": "Language & Region",
+      "security": "Security",
+      "data": "Data"
+    },
+    "profile": {
+      "title": "User Profile",
+      "subtitle": "Manage your personal information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "roles": {
+        "owner": "Owner",
+        "manager": "Manager",
+        "veterinarian": "Veterinarian",
+        "worker": "Worker"
+      },
+      "selectRole": "Select a role"
+    },
+    "farm": {
+      "title": "Farm Information",
+      "subtitle": "Configure your farm details",
+      "farmName": "Farm Name",
+      "farmId": "Identification Number",
+      "surface": "Surface (hectares)",
+      "address": "Address",
+      "country": "Country",
+      "region": "Region",
+      "selectCountry": "Select a country",
+      "selectRegion": "Select a region",
+      "commune": "Municipality",
+      "species": "Species raised",
+      "addSpecies": "+ Add"
+    },
+    "veterinarians": {
+      "title": "My Veterinarians",
+      "subtitle": "Select the veterinarians you consult regularly. They will appear first in your forms.",
+      "available": "Available veterinarians",
+      "selected": "My veterinarians",
+      "searchPlaceholder": "Search by name, city or region...",
+      "addLocal": "Add a local veterinarian",
+      "emptySelected": "Select your regular veterinarians",
+      "name": "Name",
+      "region": "Region",
+      "phone": "Phone",
+      "optional": "optional",
+      "localNote": "This veterinarian will be private and visible only to you.",
+      "removed": "removed",
+      "restored": "has been restored",
+      "clickToUndo": "Click to undo",
+      "added": "Veterinarian added",
+      "addedTo": "has been added to your list",
+      "saved": "Configuration saved",
+      "savedMessage": "Your veterinarians have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry"
+    },
+    "language": {
+      "title": "Language & Region",
+      "subtitle": "Customize display according to your preferences",
+      "interfaceLanguage": "Interface Language",
+      "timezone": "Timezone",
+      "dateFormat": "Date Format",
+      "currency": "Currency",
+      "darkTheme": "Dark Theme",
+      "enableDarkMode": "Enable dark mode",
+      "languages": {
+        "fr": "Français",
+        "ar": "العربية (Arabic)",
+        "en": "English"
+      },
+      "timezones": {
+        "africaAlgiers": "Africa/Algiers (GMT+1)",
+        "europeParis": "Europe/Paris (GMT+1)",
+        "utc": "UTC (GMT+0)"
+      },
+      "dateFormats": {
+        "ddmmyyyy": "DD/MM/YYYY",
+        "mmddyyyy": "MM/DD/YYYY",
+        "yyyymmdd": "YYYY-MM-DD"
+      },
+      "currencies": {
+        "dzd": "Algerian Dinar (DA)",
+        "eur": "Euro (€)",
+        "usd": "US Dollar ($)",
+        "mad": "Moroccan Dirham (DH)",
+        "tnd": "Tunisian Dinar (DT)"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Protect your account and data",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "twoFactor": "Two-Factor Authentication",
+      "twoFactorDescription": "Add an extra layer of security",
+      "enable2FA": "Enable 2FA",
+      "activeSessions": "Active Sessions",
+      "currentBrowser": "Current Browser",
+      "disabled": "Disabled",
+      "active": "Active"
+    },
+    "data": {
+      "title": "Data Management",
+      "subtitle": "Backup, export and delete data",
+      "autoBackup": "Automatic Backup",
+      "lastBackup": "Last backup",
+      "backupNow": "Backup Now",
+      "exportData": "Export Data",
+      "exportDescription": "Download a complete copy of all your data",
+      "exportExcel": "Export to Excel",
+      "exportJson": "Export to JSON",
+      "dangerZone": "Danger Zone",
+      "dangerDescription": "The following actions are irreversible",
+      "deleteAllData": "Delete All Data",
+      "enabled": "Enabled"
+    },
+    "actions": {
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "savePreferences": "Save Preferences"
+    }
   }
 }
