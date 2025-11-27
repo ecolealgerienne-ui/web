@@ -166,7 +166,7 @@ export function OnboardingWizard({
             disabled={currentStep === 1}
             className="gap-1"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
             {t('navigation.previous')}
           </Button>
 
@@ -177,7 +177,7 @@ export function OnboardingWizard({
               className="gap-1"
             >
               {t('navigation.next')}
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 rtl:rotate-180" />
             </Button>
           ) : (
             <Button
@@ -193,7 +193,7 @@ export function OnboardingWizard({
               ) : (
                 <>
                   {t('step4.launchApp')}
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 rtl:rotate-180" />
                 </>
               )}
             </Button>
