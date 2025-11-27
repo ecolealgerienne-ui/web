@@ -47,7 +47,7 @@ export function OnboardingWizard({
   }
 
   const handleNext = () => {
-    if (currentStep < STEPS.length) {
+    if (currentStep < STEP_KEYS.length) {
       setCurrentStep(currentStep + 1)
     }
   }
