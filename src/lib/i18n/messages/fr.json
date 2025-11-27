@@ -711,5 +711,164 @@
       "skip": "Passer",
       "finish": "Terminer"
     }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "welcome": "Bienvenue sur votre espace de gestion !",
+    "welcomeDescription": "Commencez par enregistrer votre premier animal pour accéder à toutes les fonctionnalités de suivi et de gestion.",
+    "registerFirstAnimal": "Enregistrer mon premier animal",
+    "importFromExcel": "Importer depuis Excel",
+    "configAdvice": "Conseil : Complétez votre configuration",
+    "configAdviceDescription": "Pour saisir vos soins plus rapidement, configurez vos vaccins et vétérinaires habituels.",
+    "configure": "Configurer",
+    "totalAnimals": "Total Animaux",
+    "births": "Naissances",
+    "deaths": "Décès",
+    "vaccinations": "Vaccinations"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez vos préférences et la configuration de votre exploitation",
+    "groups": {
+      "general": "Général",
+      "myData": "Mes Données",
+      "preferences": "Préférences",
+      "system": "Système"
+    },
+    "sections": {
+      "profile": "Profil",
+      "farm": "Ferme",
+      "myVeterinarians": "Mes Vétérinaires",
+      "myBreeds": "Mes Races",
+      "myVaccines": "Mes Vaccins",
+      "myMedications": "Ma Pharmacie",
+      "myAlerts": "Mes Alertes",
+      "language": "Langue & Région",
+      "security": "Sécurité",
+      "data": "Données"
+    },
+    "profile": {
+      "title": "Profil utilisateur",
+      "subtitle": "Gérez vos informations personnelles",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "role": "Rôle",
+      "roles": {
+        "owner": "Propriétaire",
+        "manager": "Gestionnaire",
+        "veterinarian": "Vétérinaire",
+        "worker": "Employé"
+      },
+      "selectRole": "Sélectionner un rôle"
+    },
+    "farm": {
+      "title": "Informations de la ferme",
+      "subtitle": "Configurez les détails de votre exploitation",
+      "farmName": "Nom de la ferme",
+      "farmId": "N° d'identification",
+      "surface": "Surface (hectares)",
+      "address": "Adresse",
+      "country": "Pays",
+      "region": "Région",
+      "selectCountry": "Sélectionner un pays",
+      "selectRegion": "Sélectionner une région",
+      "commune": "Commune",
+      "species": "Espèces élevées",
+      "addSpecies": "+ Ajouter"
+    },
+    "veterinarians": {
+      "title": "Mes Vétérinaires",
+      "subtitle": "Sélectionnez les vétérinaires que vous consultez régulièrement. Ils apparaîtront en priorité dans vos formulaires de saisie.",
+      "available": "Vétérinaires disponibles",
+      "selected": "Mes vétérinaires",
+      "searchPlaceholder": "Rechercher par nom, ville ou région...",
+      "addLocal": "Ajouter un vétérinaire local",
+      "emptySelected": "Sélectionnez vos vétérinaires habituels",
+      "name": "Nom",
+      "region": "Région",
+      "phone": "Téléphone",
+      "optional": "optionnel",
+      "localNote": "Ce vétérinaire sera privé et visible uniquement par vous.",
+      "removed": "retiré",
+      "restored": "a été restauré",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Vétérinaire ajouté",
+      "addedTo": "a été ajouté à votre liste",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos vétérinaires ont été enregistrés",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer"
+    },
+    "language": {
+      "title": "Langue & Région",
+      "subtitle": "Personnalisez l'affichage selon vos préférences",
+      "interfaceLanguage": "Langue de l'interface",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date",
+      "currency": "Devise",
+      "darkTheme": "Thème sombre",
+      "enableDarkMode": "Activer le mode sombre",
+      "languages": {
+        "fr": "Français",
+        "ar": "العربية (Arabe)",
+        "en": "English"
+      },
+      "timezones": {
+        "africaAlgiers": "Afrique/Alger (GMT+1)",
+        "europeParis": "Europe/Paris (GMT+1)",
+        "utc": "UTC (GMT+0)"
+      },
+      "dateFormats": {
+        "ddmmyyyy": "JJ/MM/AAAA",
+        "mmddyyyy": "MM/JJ/AAAA",
+        "yyyymmdd": "AAAA-MM-JJ"
+      },
+      "currencies": {
+        "dzd": "Dinar Algérien (DA)",
+        "eur": "Euro (€)",
+        "usd": "Dollar US ($)",
+        "mad": "Dirham Marocain (DH)",
+        "tnd": "Dinar Tunisien (DT)"
+      }
+    },
+    "security": {
+      "title": "Sécurité",
+      "subtitle": "Protégez votre compte et vos données",
+      "changePassword": "Changer le mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "twoFactor": "Authentification à deux facteurs",
+      "twoFactorDescription": "Ajouter une couche de sécurité supplémentaire",
+      "enable2FA": "Activer 2FA",
+      "activeSessions": "Sessions actives",
+      "currentBrowser": "Navigateur actuel",
+      "disabled": "Désactivé",
+      "active": "Active"
+    },
+    "data": {
+      "title": "Gestion des données",
+      "subtitle": "Sauvegarde, export et suppression de données",
+      "autoBackup": "Sauvegarde automatique",
+      "lastBackup": "Dernière sauvegarde",
+      "backupNow": "Sauvegarder maintenant",
+      "exportData": "Exporter les données",
+      "exportDescription": "Téléchargez une copie complète de toutes vos données",
+      "exportExcel": "Exporter en Excel",
+      "exportJson": "Exporter en JSON",
+      "dangerZone": "Zone de danger",
+      "dangerDescription": "Les actions suivantes sont irréversibles",
+      "deleteAllData": "Supprimer toutes les données",
+      "enabled": "Activé"
+    },
+    "actions": {
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement...",
+      "savePreferences": "Enregistrer les préférences"
+    }
   }
 }

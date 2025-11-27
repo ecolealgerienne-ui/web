@@ -1,16 +1,32 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Trash2, Home, GripVertical } from 'lucide-react'
+import { Search, Plus, Trash2, Home, GripVertical, Phone, MapPin } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 
 export interface TransferListItem {
   id: string
   name: string
   description?: string
+  region?: string
+  phone?: string
   isLocal?: boolean
   metadata?: Record<string, unknown>
+}
+
+interface Region {
+  code: string
+  name: string
+}
+
+interface LocalFormLabels {
+  name: string
+  region: string
+  phone: string
+  optional: string
+  note: string
 }
 
 interface TransferListProps {
@@ -22,6 +38,7 @@ interface TransferListProps {
   onSelect: (item: TransferListItem) => void
   onDeselect: (itemId: string) => void
   onCreateLocal?: (name: string) => void
+  onCreateLocalWithDetails?: (name: string, region?: string, phone?: string) => void
 
   // Labels
   availableTitle?: string
@@ -33,8 +50,27 @@ interface TransferListProps {
 
   // Options
   showCreateLocal?: boolean
+  showLocalFormWithDetails?: boolean
   filters?: React.ReactNode
   isLoading?: boolean
+  regions?: Region[]
+  localFormLabels?: LocalFormLabels
+}
+
+// Mapping région code -> nom pour la recherche
+const REGION_NAMES: Record<string, string> = {
+  ALG: 'Alger',
+  ORA: 'Oran',
+  CON: 'Constantine',
+  BLI: 'Blida',
+  SET: 'Sétif',
+  BAT: 'Batna',
+  TIP: 'Tipaza',
+  TIZ: 'Tizi Ouzou',
+  BEJ: 'Béjaïa',
+  MSI: 'M\'Sila',
+  MED: 'Médéa',
+  TLE: 'Tlemcen',
 }
 
 export function TransferList({
@@ -43,6 +79,7 @@ export function TransferList({
   onSelect,
   onDeselect,
   onCreateLocal,
+  onCreateLocalWithDetails,
   availableTitle = 'Catalogue disponible',
   selectedTitle = 'Ma sélection',
   searchPlaceholder = 'Rechercher...',
@@ -50,12 +87,17 @@ export function TransferList({
   emptyAvailableMessage = 'Aucun élément disponible',
   emptySelectedMessage = 'Aucun élément sélectionné',
   showCreateLocal = true,
+  showLocalFormWithDetails = false,
   filters,
   isLoading = false,
+  regions = [],
+  localFormLabels,
 }: TransferListProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newItemName, setNewItemName] = useState('')
+  const [newItemRegion, setNewItemRegion] = useState('')
+  const [newItemPhone, setNewItemPhone] = useState('')
 
   // Filtrer les items disponibles (exclure ceux déjà sélectionnés)
   const selectedIds = useMemo(() => new Set(selectedItems.map((item) => item.id)), [selectedItems])
@@ -65,12 +107,15 @@ export function TransferList({
       // Exclure les items déjà sélectionnés
       if (selectedIds.has(item.id)) return false
 
-      // Filtrer par recherche
+      // Filtrer par recherche (nom, description, région)
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase()
+        const regionName = item.region ? REGION_NAMES[item.region]?.toLowerCase() || '' : ''
         return (
           item.name.toLowerCase().includes(query) ||
-          item.description?.toLowerCase().includes(query)
+          item.description?.toLowerCase().includes(query) ||
+          regionName.includes(query) ||
+          item.region?.toLowerCase().includes(query)
         )
       }
       return true
@@ -78,12 +123,33 @@ export function TransferList({
   }, [availableItems, selectedIds, searchQuery])
 
   const handleCreateLocal = () => {
-    if (newItemName.trim() && onCreateLocal) {
+    if (!newItemName.trim()) return
+
+    if (showLocalFormWithDetails && onCreateLocalWithDetails) {
+      onCreateLocalWithDetails(
+        newItemName.trim(),
+        newItemRegion || undefined,
+        newItemPhone.trim() || undefined
+      )
+    } else if (onCreateLocal) {
       onCreateLocal(newItemName.trim())
-      setNewItemName('')
-      setShowCreateForm(false)
     }
+
+    setNewItemName('')
+    setNewItemRegion('')
+    setNewItemPhone('')
+    setShowCreateForm(false)
   }
+
+  const defaultLabels: LocalFormLabels = {
+    name: 'Nom',
+    region: 'Région',
+    phone: 'Téléphone',
+    optional: 'optionnel',
+    note: 'Cette entrée sera privée et visible uniquement par vous.',
+  }
+
+  const labels = localFormLabels || defaultLabels
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -96,12 +162,12 @@ export function TransferList({
 
           {/* Barre de recherche */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="ps-9"
             />
           </div>
 
@@ -130,11 +196,20 @@ export function TransferList({
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {item.description}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {item.description && (
+                          <span className="flex items-center gap-1 truncate">
+                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                            {item.description}
+                          </span>
+                        )}
+                        {item.phone && (
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-3 h-3 flex-shrink-0" />
+                            <span dir="ltr">{item.phone}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -147,7 +222,7 @@ export function TransferList({
         </div>
 
         {/* Zone création locale */}
-        {showCreateLocal && onCreateLocal && (
+        {showCreateLocal && (onCreateLocal || onCreateLocalWithDetails) && (
           <div className="p-3 border-t bg-muted/30">
             {!showCreateForm ? (
               <button
@@ -158,25 +233,70 @@ export function TransferList({
                 {createLocalLabel}
               </button>
             ) : (
-              <div className="space-y-2">
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                {/* Nom */}
+                <div className="space-y-1">
+                  <Label className="text-sm">{labels.name} *</Label>
                   <Input
-                    placeholder="Nom..."
+                    placeholder={`${labels.name}...`}
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateLocal()}
-                    className="flex-1"
                     autoFocus
                   />
-                  <Button onClick={handleCreateLocal} disabled={!newItemName.trim()} size="sm">
+                </div>
+
+                {/* Région et Téléphone (si formulaire détaillé) */}
+                {showLocalFormWithDetails && regions.length > 0 && (
+                  <>
+                    <div className="space-y-1">
+                      <Label className="text-sm">
+                        {labels.region} <span className="text-muted-foreground text-xs">({labels.optional})</span>
+                      </Label>
+                      <select
+                        value={newItemRegion}
+                        onChange={(e) => setNewItemRegion(e.target.value)}
+                        className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <option value="">{labels.region}...</option>
+                        {regions.map((region) => (
+                          <option key={region.code} value={region.code}>
+                            {region.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-sm">
+                        {labels.phone} <span className="text-muted-foreground text-xs">({labels.optional})</span>
+                      </Label>
+                      <Input
+                        placeholder={`${labels.phone}...`}
+                        value={newItemPhone}
+                        onChange={(e) => setNewItemPhone(e.target.value)}
+                        type="tel"
+                        dir="ltr"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div className="flex gap-2">
+                  <Button onClick={handleCreateLocal} disabled={!newItemName.trim()} size="sm" className="flex-1">
                     Ajouter
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setShowCreateForm(false)}>
+                  <Button variant="ghost" size="sm" onClick={() => {
+                    setShowCreateForm(false)
+                    setNewItemName('')
+                    setNewItemRegion('')
+                    setNewItemPhone('')
+                  }}>
                     ✕
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Cette entrée sera privée et visible uniquement par vous.
+                  {labels.note}
                 </p>
               </div>
             )}
@@ -217,11 +337,20 @@ export function TransferList({
                           </span>
                         )}
                       </div>
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {item.description}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {item.description && (
+                          <span className="flex items-center gap-1 truncate">
+                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                            {item.description}
+                          </span>
+                        )}
+                        {item.phone && (
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-3 h-3 flex-shrink-0" />
+                            <span dir="ltr">{item.phone}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <Button

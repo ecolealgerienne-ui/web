@@ -1,24 +1,38 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
 import { Save } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
+import { useTranslations } from 'next-intl'
 
-// Mock des vétérinaires du catalogue global
+// Mock des vétérinaires du catalogue global avec région
 const MOCK_CATALOG_VETERINARIANS: TransferListItem[] = [
-  { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre' },
-  { id: 'vet-2', name: 'Dr. Kaci Farid', description: 'Blida' },
-  { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza' },
-  { id: 'vet-4', name: 'Dr. Hamdi Sara', description: 'Oran' },
-  { id: 'vet-5', name: 'Dr. Boudjema Karim', description: 'Alger Est' },
-  { id: 'vet-6', name: 'Dr. Taleb Nadia', description: 'Blida' },
-  { id: 'vet-7', name: 'Dr. Cherif Mohamed', description: 'Tizi Ouzou' },
-  { id: 'vet-8', name: 'Dr. Amrani Fatima', description: 'Béjaïa' },
-  { id: 'vet-9', name: 'Dr. Belkacem Omar', description: 'Sétif' },
-  { id: 'vet-10', name: 'Dr. Hadjadj Kamel', description: 'Constantine' },
+  { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre', region: 'ALG', phone: '0555 12 34 56' },
+  { id: 'vet-2', name: 'Dr. Kaci Farid', description: 'Blida', region: 'BLI', phone: '0555 23 45 67' },
+  { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza', region: 'TIP', phone: '0555 34 56 78' },
+  { id: 'vet-4', name: 'Dr. Hamdi Sara', description: 'Oran', region: 'ORA', phone: '0555 45 67 89' },
+  { id: 'vet-5', name: 'Dr. Boudjema Karim', description: 'Alger Est', region: 'ALG' },
+  { id: 'vet-6', name: 'Dr. Taleb Nadia', description: 'Blida', region: 'BLI', phone: '0555 56 78 90' },
+  { id: 'vet-7', name: 'Dr. Cherif Mohamed', description: 'Tizi Ouzou', region: 'TIZ' },
+  { id: 'vet-8', name: 'Dr. Amrani Fatima', description: 'Béjaïa', region: 'BEJ', phone: '0555 67 89 01' },
+  { id: 'vet-9', name: 'Dr. Belkacem Omar', description: 'Sétif', region: 'SET' },
+  { id: 'vet-10', name: 'Dr. Hadjadj Kamel', description: 'Constantine', region: 'CON', phone: '0555 78 90 12' },
+]
+
+// Régions disponibles
+const REGIONS = [
+  { code: 'ALG', name: 'Alger' },
+  { code: 'ORA', name: 'Oran' },
+  { code: 'CON', name: 'Constantine' },
+  { code: 'BLI', name: 'Blida' },
+  { code: 'SET', name: 'Sétif' },
+  { code: 'BAT', name: 'Batna' },
+  { code: 'TIP', name: 'Tipaza' },
+  { code: 'TIZ', name: 'Tizi Ouzou' },
+  { code: 'BEJ', name: 'Béjaïa' },
 ]
 
 interface MyVeterinariansProps {
@@ -26,18 +40,17 @@ interface MyVeterinariansProps {
 }
 
 export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
+  const t = useTranslations('settings.veterinarians')
+  const ta = useTranslations('settings.actions')
   const toast = useToast()
   const { markForDeletion, undoOperation, isPendingDeletion } = useUndo<TransferListItem>()
 
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([
-    { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre' },
-    { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza', isLocal: true },
+    { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre', region: 'ALG', phone: '0555 12 34 56' },
+    { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza', region: 'TIP', isLocal: true },
   ])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
-
-  // Ref pour stocker l'état avant suppression (pour undo)
-  const deletedItemRef = useRef<TransferListItem | null>(null)
 
   const handleSelect = useCallback((item: TransferListItem) => {
     setSelectedItems((prev) => [...prev, item])
@@ -62,34 +75,36 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
       },
       // Fonction de suppression définitive
       () => {
-        // La suppression est déjà faite visuellement
         console.log('Hard delete confirmed:', itemId)
       }
     )
 
     // Afficher le toast avec option Undo
     toast.undo(
-      `${itemToRemove.name} retiré`,
+      `${itemToRemove.name} ${t('removed')}`,
       () => {
         undoOperation(operationId)
-        toast.success('Restauré', `${itemToRemove.name} a été restauré`)
+        toast.success(t('added'), `${itemToRemove.name} ${t('restored')}`)
       },
-      'Cliquez pour annuler'
+      t('clickToUndo')
     )
-  }, [selectedItems, markForDeletion, undoOperation, toast])
+  }, [selectedItems, markForDeletion, undoOperation, toast, t])
 
-  const handleCreateLocal = useCallback((name: string) => {
+  const handleCreateLocal = useCallback((name: string, region?: string, phone?: string) => {
+    const regionName = region ? REGIONS.find(r => r.code === region)?.name : undefined
     const newItem: TransferListItem = {
       id: `local-vet-${Date.now()}`,
       name: name,
-      description: 'Vétérinaire local',
+      description: regionName || t('emptySelected'),
+      region: region,
+      phone: phone,
       isLocal: true,
     }
     setSelectedItems((prev) => [...prev, newItem])
     setHasChanges(true)
 
-    toast.success('Vétérinaire ajouté', `${name} a été ajouté à votre liste`)
-  }, [toast])
+    toast.success(t('added'), `${name} ${t('addedTo')}`)
+  }, [toast, t])
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -106,13 +121,13 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
       }
 
       setHasChanges(false)
-      toast.success('Configuration sauvegardée', 'Vos vétérinaires ont été enregistrés')
-    } catch (error) {
+      toast.success(t('saved'), t('savedMessage'))
+    } catch {
       toast.error(
-        'Échec de sauvegarde',
-        'Vérifiez votre connexion internet',
+        t('saveFailed'),
+        t('saveFailedMessage'),
         {
-          label: 'Réessayer',
+          label: t('retry'),
           onClick: handleSave,
         }
       )
@@ -129,11 +144,8 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Mes Vétérinaires</h2>
-        <p className="text-sm text-muted-foreground">
-          Sélectionnez les vétérinaires que vous consultez régulièrement.
-          Ils apparaîtront en priorité dans vos formulaires de saisie.
-        </p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <TransferList
@@ -141,25 +153,34 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
         selectedItems={selectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
-        onCreateLocal={handleCreateLocal}
-        availableTitle="Vétérinaires disponibles"
-        selectedTitle="Mes vétérinaires"
-        searchPlaceholder="Rechercher un vétérinaire..."
-        createLocalLabel="Ajouter un vétérinaire local"
-        emptySelectedMessage="Sélectionnez vos vétérinaires habituels"
+        onCreateLocalWithDetails={handleCreateLocal}
+        availableTitle={t('available')}
+        selectedTitle={t('selected')}
+        searchPlaceholder={t('searchPlaceholder')}
+        createLocalLabel={t('addLocal')}
+        emptySelectedMessage={t('emptySelected')}
+        regions={REGIONS}
+        showLocalFormWithDetails={true}
+        localFormLabels={{
+          name: t('name'),
+          region: t('region'),
+          phone: t('phone'),
+          optional: t('optional'),
+          note: t('localNote'),
+        }}
       />
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
           {isSaving ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Enregistrement...
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+              {ta('saving')}
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-2" />
-              Enregistrer les modifications
+              <Save className="w-4 h-4 me-2" />
+              {ta('save')}
             </>
           )}
         </Button>
