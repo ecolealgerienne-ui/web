@@ -508,11 +508,18 @@
   },
   "onboarding": {
     "welcome": "Bienvenue sur AniTra",
+    "skipConfig": "Configurer plus tard",
+    "stepOf": "Étape {current} sur {total}",
+    "configuring": "Configuration...",
     "steps": {
-      "identity": "Identité",
-      "species": "Espèces",
-      "veterinarians": "Vétérinaires",
-      "summary": "Récapitulatif"
+      "identity": "Identité & Région",
+      "identityDesc": "Informations de base",
+      "species": "Production",
+      "speciesDesc": "Vos espèces",
+      "veterinarians": "Partenaires",
+      "veterinariansDesc": "Vos vétérinaires",
+      "summary": "Résumé",
+      "summaryDesc": "Confirmation"
     },
     "step1": {
       "title": "Bienvenue sur AniTra",
