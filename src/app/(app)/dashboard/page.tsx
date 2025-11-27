@@ -1,57 +1,46 @@
-import { Beef, Plus, X, Syringe } from "lucide-react";
-import { KpiCard } from "@/components/dashboard/kpi-card";
-import { ChartEvolution } from "@/components/dashboard/chart-evolution";
-import { AlertsCard } from "@/components/dashboard/alerts-card";
-import { ActivitiesCard } from "@/components/dashboard/activities-card";
-import {
-  mockDashboardStats,
-  mockChartData,
-  mockAlerts,
-  mockRecentActivities,
-} from "@/lib/data/mock";
+'use client'
+
+import { useState, useEffect } from 'react'
+import { DashboardContent } from '@/components/dashboard/dashboard-content'
+import { SkeletonDashboard } from '@/components/ui/skeleton'
+
+// Simuler le chargement des stats (à remplacer par un vrai appel API)
+async function fetchDashboardStats() {
+  // Simuler un délai réseau
+  await new Promise((resolve) => setTimeout(resolve, 500))
+
+  // Pour le MVP, retourner des données mock
+  // En production, ces données viendraient de l'API
+  return {
+    totalAnimals: 156, // Mettre à 0 pour voir l'état vide
+    configuredVaccines: 5,
+    configuredVeterinarians: 2,
+  }
+}
 
 export default function DashboardPage() {
-  return (
-    <div className="space-y-6">
-      {/* KPI Cards Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <KpiCard
-          icon={Beef}
-          value={mockDashboardStats.totalAnimals.toLocaleString("fr-FR")}
-          label="Total Animaux"
-          iconColor="text-primary"
-        />
-        <KpiCard
-          icon={Plus}
-          value={mockDashboardStats.births.count}
-          label="Naissances"
-          subtitle={mockDashboardStats.births.period}
-          iconColor="text-green-600"
-        />
-        <KpiCard
-          icon={X}
-          value={mockDashboardStats.deaths.count}
-          label="Décès"
-          subtitle={mockDashboardStats.deaths.period}
-          iconColor="text-red-600"
-        />
-        <KpiCard
-          icon={Syringe}
-          value={mockDashboardStats.vaccinations.upcoming}
-          label="Vaccinations"
-          subtitle={mockDashboardStats.vaccinations.label}
-          iconColor="text-blue-600"
-        />
-      </div>
+  const [isLoading, setIsLoading] = useState(true)
+  const [stats, setStats] = useState<{
+    totalAnimals: number
+    configuredVaccines: number
+    configuredVeterinarians: number
+  } | undefined>(undefined)
 
-      {/* Chart */}
-      <ChartEvolution data={mockChartData} />
+  useEffect(() => {
+    fetchDashboardStats()
+      .then((data) => {
+        setStats(data)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error('Error fetching dashboard stats:', error)
+        setIsLoading(false)
+      })
+  }, [])
 
-      {/* Bottom Grid - Alerts & Activities */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <AlertsCard alerts={mockAlerts} />
-        <ActivitiesCard activities={mockRecentActivities} />
-      </div>
-    </div>
-  );
+  if (isLoading) {
+    return <SkeletonDashboard />
+  }
+
+  return <DashboardContent stats={stats} />
 }
