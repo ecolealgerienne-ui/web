@@ -597,5 +597,20 @@
       "skip": "Passer",
       "finish": "Terminer"
     }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "welcome": "Bienvenue sur votre espace de gestion !",
+    "welcomeDescription": "Commencez par enregistrer votre premier animal pour accéder à toutes les fonctionnalités de suivi et de gestion.",
+    "registerFirstAnimal": "Enregistrer mon premier animal",
+    "importFromExcel": "Importer depuis Excel",
+    "configAdvice": "Conseil : Complétez votre configuration",
+    "configAdviceDescription": "Pour saisir vos soins plus rapidement, configurez vos vaccins et vétérinaires habituels.",
+    "configure": "Configurer",
+    "totalAnimals": "Total Animaux",
+    "births": "Naissances",
+    "deaths": "Décès",
+    "vaccinations": "Vaccinations"
   }
 }

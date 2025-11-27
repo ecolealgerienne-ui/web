@@ -597,5 +597,20 @@
       "skip": "Skip",
       "finish": "Finish"
     }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "welcome": "Welcome to your management space!",
+    "welcomeDescription": "Start by registering your first animal to access all tracking and management features.",
+    "registerFirstAnimal": "Register my first animal",
+    "importFromExcel": "Import from Excel",
+    "configAdvice": "Tip: Complete your configuration",
+    "configAdviceDescription": "To enter your treatments more quickly, configure your usual vaccines and veterinarians.",
+    "configure": "Configure",
+    "totalAnimals": "Total Animals",
+    "births": "Births",
+    "deaths": "Deaths",
+    "vaccinations": "Vaccinations"
   }
 }

@@ -597,5 +597,20 @@
       "skip": "تخطي",
       "finish": "إنهاء"
     }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "overview": "نظرة عامة",
+    "welcome": "مرحباً بك في مساحة الإدارة الخاصة بك!",
+    "welcomeDescription": "ابدأ بتسجيل أول حيوان للوصول إلى جميع ميزات التتبع والإدارة.",
+    "registerFirstAnimal": "تسجيل أول حيوان",
+    "importFromExcel": "استيراد من Excel",
+    "configAdvice": "نصيحة: أكمل التكوين الخاص بك",
+    "configAdviceDescription": "لإدخال العلاجات بشكل أسرع، قم بتكوين اللقاحات والأطباء البيطريين المعتادين.",
+    "configure": "تكوين",
+    "totalAnimals": "إجمالي الحيوانات",
+    "births": "الولادات",
+    "deaths": "الوفيات",
+    "vaccinations": "التطعيمات"
   }
 }
