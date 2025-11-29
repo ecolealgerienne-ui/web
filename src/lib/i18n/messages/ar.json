@@ -725,7 +725,10 @@
     "totalAnimals": "إجمالي الحيوانات",
     "births": "الولادات",
     "deaths": "الوفيات",
-    "vaccinations": "التطعيمات"
+    "vaccinations": "التطعيمات",
+    "chart": {
+      "evolution": "تطور القطيع"
+    }
   },
   "settings": {
     "title": "الإعدادات",

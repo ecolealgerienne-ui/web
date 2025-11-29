@@ -725,7 +725,10 @@
     "totalAnimals": "Total Animals",
     "births": "Births",
     "deaths": "Deaths",
-    "vaccinations": "Vaccinations"
+    "vaccinations": "Vaccinations",
+    "chart": {
+      "evolution": "Herd Evolution"
+    }
   },
   "settings": {
     "title": "Settings",
