@@ -661,6 +661,81 @@
       "editDescription": "Modifiez les informations de l'événement"
     }
   },
+  "weighings": {
+    "title": "Pesées",
+    "subtitle": "Suivez le poids et la croissance de vos animaux",
+    "newWeighing": "Nouvelle pesée",
+    "stats": {
+      "total": "Total pesées",
+      "routine": "Pesées de routine",
+      "medical": "Pesées médicales",
+      "avgWeight": "Poids moyen"
+    },
+    "filters": "Filtres",
+    "searchPlaceholder": "Rechercher...",
+    "purpose": {
+      "all": "Tous les types",
+      "routine": "Routine",
+      "medical": "Médical",
+      "sale": "Vente",
+      "growth_monitoring": "Suivi croissance",
+      "other": "Autre"
+    },
+    "list": "Liste des pesées",
+    "loading": "Chargement...",
+    "labels": {
+      "animal": "Animal",
+      "gain": "Gain",
+      "rate": "Taux",
+      "perDay": "kg/jour",
+      "method": "Méthode"
+    },
+    "messages": {
+      "noWeighings": "Aucune pesée enregistrée",
+      "createSuccess": "Pesée créée avec succès",
+      "createError": "Erreur lors de la création de la pesée",
+      "updateSuccess": "Pesée modifiée avec succès",
+      "updateError": "Erreur lors de la modification de la pesée",
+      "deleteSuccess": "Pesée supprimée avec succès",
+      "deleteError": "Erreur lors de la suppression de la pesée",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
+      "addDescription": "Ajouter une nouvelle pesée",
+      "editDescription": "Modifier la pesée"
+    },
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "sections": {
+      "general": "Informations générales",
+      "data": "Données de pesée",
+      "additional": "Informations complémentaires"
+    },
+    "fields": {
+      "animalId": "ID Animal",
+      "weighingDate": "Date de pesée",
+      "weighingTime": "Heure",
+      "purpose": "Objectif",
+      "weight": "Poids",
+      "unit": "Unité",
+      "method": "Méthode",
+      "location": "Emplacement",
+      "recordedBy": "Enregistré par",
+      "conditions": "Conditions",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "weight": "ex: 45.5",
+      "method": "ex: Balance électronique",
+      "location": "ex: Étable 1",
+      "recordedBy": "ex: Jean Dupont",
+      "conditions": "ex: À jeun",
+      "notes": "Notes additionnelles..."
+    },
+    "units": {
+      "kg": "Kilogrammes (kg)",
+      "lbs": "Livres (lbs)"
+    }
+  },
   "onboarding": {
     "welcome": "Bienvenue sur AniTra",
     "skipConfig": "Configurer plus tard",

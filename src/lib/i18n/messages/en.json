@@ -661,6 +661,81 @@
       "editDescription": "Edit the event information"
     }
   },
+  "weighings": {
+    "title": "Weighings",
+    "subtitle": "Track the weight and growth of your animals",
+    "newWeighing": "New weighing",
+    "stats": {
+      "total": "Total weighings",
+      "routine": "Routine weighings",
+      "medical": "Medical weighings",
+      "avgWeight": "Average weight"
+    },
+    "filters": "Filters",
+    "searchPlaceholder": "Search...",
+    "purpose": {
+      "all": "All types",
+      "routine": "Routine",
+      "medical": "Medical",
+      "sale": "Sale",
+      "growth_monitoring": "Growth monitoring",
+      "other": "Other"
+    },
+    "list": "Weighings list",
+    "loading": "Loading...",
+    "labels": {
+      "animal": "Animal",
+      "gain": "Gain",
+      "rate": "Rate",
+      "perDay": "kg/day",
+      "method": "Method"
+    },
+    "messages": {
+      "noWeighings": "No weighings recorded",
+      "createSuccess": "Weighing created successfully",
+      "createError": "Error creating weighing",
+      "updateSuccess": "Weighing updated successfully",
+      "updateError": "Error updating weighing",
+      "deleteSuccess": "Weighing deleted successfully",
+      "deleteError": "Error deleting weighing",
+      "deleteConfirmTitle": "Confirm deletion",
+      "deleteConfirmDescription": "Are you sure you want to delete this weighing?",
+      "addDescription": "Add a new weighing",
+      "editDescription": "Edit weighing"
+    },
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "sections": {
+      "general": "General information",
+      "data": "Weight data",
+      "additional": "Additional information"
+    },
+    "fields": {
+      "animalId": "Animal ID",
+      "weighingDate": "Weighing date",
+      "weighingTime": "Time",
+      "purpose": "Purpose",
+      "weight": "Weight",
+      "unit": "Unit",
+      "method": "Method",
+      "location": "Location",
+      "recordedBy": "Recorded by",
+      "conditions": "Conditions",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "weight": "e.g.: 45.5",
+      "method": "e.g.: Electronic scale",
+      "location": "e.g.: Barn 1",
+      "recordedBy": "e.g.: John Doe",
+      "conditions": "e.g.: Fasting",
+      "notes": "Additional notes..."
+    },
+    "units": {
+      "kg": "Kilograms (kg)",
+      "lbs": "Pounds (lbs)"
+    }
+  },
   "onboarding": {
     "welcome": "Welcome to AniTra",
     "skipConfig": "Configure later",

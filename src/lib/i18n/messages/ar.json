@@ -661,6 +661,81 @@
       "editDescription": "عدل معلومات الحدث"
     }
   },
+  "weighings": {
+    "title": "الوزن",
+    "subtitle": "تتبع وزن ونمو حيواناتك",
+    "newWeighing": "وزن جديد",
+    "stats": {
+      "total": "إجمالي الأوزان",
+      "routine": "أوزان روتينية",
+      "medical": "أوزان طبية",
+      "avgWeight": "متوسط الوزن"
+    },
+    "filters": "الفلاتر",
+    "searchPlaceholder": "بحث...",
+    "purpose": {
+      "all": "جميع الأنواع",
+      "routine": "روتيني",
+      "medical": "طبي",
+      "sale": "بيع",
+      "growth_monitoring": "متابعة النمو",
+      "other": "أخرى"
+    },
+    "list": "قائمة الأوزان",
+    "loading": "جاري التحميل...",
+    "labels": {
+      "animal": "الحيوان",
+      "gain": "الزيادة",
+      "rate": "المعدل",
+      "perDay": "كغ/يوم",
+      "method": "الطريقة"
+    },
+    "messages": {
+      "noWeighings": "لا توجد أوزان مسجلة",
+      "createSuccess": "تم إنشاء الوزن بنجاح",
+      "createError": "خطأ في إنشاء الوزن",
+      "updateSuccess": "تم تحديث الوزن بنجاح",
+      "updateError": "خطأ في تحديث الوزن",
+      "deleteSuccess": "تم حذف الوزن بنجاح",
+      "deleteError": "خطأ في حذف الوزن",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
+      "addDescription": "إضافة وزن جديد",
+      "editDescription": "تعديل الوزن"
+    },
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "sections": {
+      "general": "معلومات عامة",
+      "data": "بيانات الوزن",
+      "additional": "معلومات إضافية"
+    },
+    "fields": {
+      "animalId": "معرف الحيوان",
+      "weighingDate": "تاريخ الوزن",
+      "weighingTime": "الوقت",
+      "purpose": "الهدف",
+      "weight": "الوزن",
+      "unit": "الوحدة",
+      "method": "الطريقة",
+      "location": "الموقع",
+      "recordedBy": "سجله",
+      "conditions": "الظروف",
+      "notes": "ملاحظات"
+    },
+    "placeholders": {
+      "weight": "مثال: 45.5",
+      "method": "مثال: ميزان إلكتروني",
+      "location": "مثال: الحظيرة 1",
+      "recordedBy": "مثال: أحمد محمد",
+      "conditions": "مثال: على معدة فارغة",
+      "notes": "ملاحظات إضافية..."
+    },
+    "units": {
+      "kg": "كيلوغرام (كغ)",
+      "lbs": "رطل"
+    }
+  },
   "onboarding": {
     "welcome": "مرحباً بك في AniTra",
     "skipConfig": "تكوين لاحقاً",
