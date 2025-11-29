@@ -18,11 +18,9 @@ import {
 } from '@/components/ui/dialog';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { Treatment } from '@/lib/types/treatment';
-import { Vaccination } from '@/lib/types/vaccination';
 import { useTranslations } from '@/lib/i18n';
 import { useBreeds } from '@/lib/hooks/useBreeds';
 import { treatmentsService } from '@/lib/services/treatments.service';
-import { vaccinationsService } from '@/lib/services/vaccinations.service';
 import { Pill, Syringe } from 'lucide-react';
 
 interface AnimalFormDialogProps {
@@ -61,9 +59,12 @@ export function AnimalFormDialog({
   const { breeds } = useBreeds(selectedSpeciesId);
 
   // Care data (only for editing existing animals)
-  const [treatments, setTreatments] = useState<Treatment[]>([]);
-  const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+  const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
   const [loadingCare, setLoadingCare] = useState(false);
+
+  // Séparer les treatments en deux catégories selon le type
+  const treatments = allTreatments.filter(t => t.type !== 'vaccination');
+  const vaccinations = allTreatments.filter(t => t.type === 'vaccination');
 
   useEffect(() => {
     if (animal) {
@@ -101,14 +102,17 @@ export function AnimalFormDialog({
     setLoadingCare(true);
     console.log('[Animal Form] Loading care data for animal:', animal.id);
     try {
-      const [treatmentsData, vaccinationsData] = await Promise.all([
-        treatmentsService.getAll({ animalId: animal.id }),
-        vaccinationsService.getAll({ animalId: animal.id }),
-      ]);
-      console.log('[Animal Form] Treatments loaded:', treatmentsData.length, treatmentsData);
-      console.log('[Animal Form] Vaccinations loaded:', vaccinationsData.length, vaccinationsData);
-      setTreatments(treatmentsData);
-      setVaccinations(vaccinationsData);
+      // Charger tous les treatments (inclus vaccinations avec type='vaccination')
+      const treatmentsData = await treatmentsService.getAll({ animalId: animal.id });
+      console.log('[Animal Form] All treatments loaded:', treatmentsData.length, treatmentsData);
+
+      // Séparer les résultats
+      const regularTreatments = treatmentsData.filter(t => t.type !== 'vaccination');
+      const vaccinationTreatments = treatmentsData.filter(t => t.type === 'vaccination');
+      console.log('[Animal Form] Regular treatments:', regularTreatments.length);
+      console.log('[Animal Form] Vaccinations:', vaccinationTreatments.length);
+
+      setAllTreatments(treatmentsData);
     } catch (error) {
       console.error('[Animal Form] Failed to load care data:', error);
     } finally {
@@ -140,21 +144,6 @@ export function AnimalFormDialog({
         return 'bg-green-500';
       case 'scheduled':
         return 'bg-yellow-500';
-      case 'cancelled':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-400';
-    }
-  };
-
-  const getVaccinationStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-500';
-      case 'scheduled':
-        return 'bg-yellow-500';
-      case 'overdue':
-        return 'bg-red-500';
       case 'cancelled':
         return 'bg-gray-500';
       default:
@@ -406,7 +395,7 @@ export function AnimalFormDialog({
                   )}
                 </div>
 
-                {/* Vaccinations */}
+                {/* Vaccinations (treatments avec type='vaccination') */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Syringe className="h-5 w-5" />
@@ -428,11 +417,11 @@ export function AnimalFormDialog({
                         >
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="font-medium">{vaccination.vaccineName}</p>
-                              <p className="text-sm text-muted-foreground">{vaccination.diseaseTarget}</p>
+                              <p className="font-medium">{vaccination.productName}</p>
+                              <p className="text-sm text-muted-foreground">{vaccination.reason}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <div className={`h-2 w-2 rounded-full ${getVaccinationStatusColor(vaccination.status)}`} />
+                              <div className={`h-2 w-2 rounded-full ${getTreatmentStatusColor(vaccination.status)}`} />
                               <span className="text-xs text-muted-foreground capitalize">
                                 {vaccination.status}
                               </span>
@@ -441,14 +430,12 @@ export function AnimalFormDialog({
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
                               <span className="text-muted-foreground">Date:</span>
-                              <p>{new Date(vaccination.vaccinationDate).toLocaleDateString()}</p>
+                              <p>{new Date(vaccination.treatmentDate).toLocaleDateString()}</p>
                             </div>
-                            {vaccination.nextDueDate && (
-                              <div>
-                                <span className="text-muted-foreground">Prochain rappel:</span>
-                                <p>{new Date(vaccination.nextDueDate).toLocaleDateString()}</p>
-                              </div>
-                            )}
+                            <div>
+                              <span className="text-muted-foreground">Dose:</span>
+                              <p>{vaccination.dose} {vaccination.dosageUnit}</p>
+                            </div>
                           </div>
                           {vaccination.notes && (
                             <p className="text-xs text-muted-foreground italic">{vaccination.notes}</p>
