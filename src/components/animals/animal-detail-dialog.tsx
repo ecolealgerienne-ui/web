@@ -69,16 +69,16 @@ export function AnimalDetailDialog({
 
   if (!animal) return null;
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): "default" | "destructive" | "success" | "warning" => {
     switch (status) {
       case 'alive':
-        return 'default';
+        return 'success';
       case 'sold':
-        return 'secondary';
+        return 'warning';
       case 'dead':
         return 'destructive';
       default:
-        return 'outline';
+        return 'default';
     }
   };
 
