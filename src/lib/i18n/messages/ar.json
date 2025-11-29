@@ -549,6 +549,47 @@
       "editDescription": "عدل معلومات الحيوان"
     }
   },
+  "lots": {
+    "title": "القطعان",
+    "subtitle": "إدارة قطعان العلاج والبيع والعمليات الجماعية الأخرى",
+    "newLot": "قطيع جديد",
+    "noLots": "لم يتم العثور على قطعان",
+    "filters": {
+      "search": "البحث",
+      "searchPlaceholder": "البحث عن قطيع...",
+      "type": "النوع",
+      "typePlaceholder": "جميع الأنواع",
+      "allTypes": "جميع الأنواع",
+      "status": "الحالة",
+      "statusPlaceholder": "جميع الحالات",
+      "allStatuses": "جميع الحالات"
+    },
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "status": "الحالة",
+      "animals": "الحيوانات",
+      "date": "التاريخ",
+      "product": "المنتج/التفاصيل",
+      "amount": "المبلغ",
+      "actions": "الإجراءات",
+      "buyer": "المشتري",
+      "seller": "البائع"
+    },
+    "type": {
+      "treatment": "علاج",
+      "vaccination": "تطعيم",
+      "sale": "بيع",
+      "slaughter": "ذبح",
+      "purchase": "شراء",
+      "breeding": "تكاثر"
+    },
+    "status": {
+      "open": "مفتوح",
+      "closed": "مغلق",
+      "archived": "مؤرشف"
+    }
+  },
   "animalEvents": {
     "title": "أحداث الحيوانات",
     "subtitle": "سجل وتتبع جميع أحداث حيواناتك",
@@ -618,6 +659,81 @@
       "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الحدث؟",
       "addDescription": "أضف معلومات الحدث الجديد",
       "editDescription": "عدل معلومات الحدث"
+    }
+  },
+  "weighings": {
+    "title": "الوزن",
+    "subtitle": "تتبع وزن ونمو حيواناتك",
+    "newWeighing": "وزن جديد",
+    "stats": {
+      "total": "إجمالي الأوزان",
+      "routine": "أوزان روتينية",
+      "medical": "أوزان طبية",
+      "avgWeight": "متوسط الوزن"
+    },
+    "filters": "الفلاتر",
+    "searchPlaceholder": "بحث...",
+    "purpose": {
+      "all": "جميع الأنواع",
+      "routine": "روتيني",
+      "medical": "طبي",
+      "sale": "بيع",
+      "growth_monitoring": "متابعة النمو",
+      "other": "أخرى"
+    },
+    "list": "قائمة الأوزان",
+    "loading": "جاري التحميل...",
+    "labels": {
+      "animal": "الحيوان",
+      "gain": "الزيادة",
+      "rate": "المعدل",
+      "perDay": "كغ/يوم",
+      "method": "الطريقة"
+    },
+    "messages": {
+      "noWeighings": "لا توجد أوزان مسجلة",
+      "createSuccess": "تم إنشاء الوزن بنجاح",
+      "createError": "خطأ في إنشاء الوزن",
+      "updateSuccess": "تم تحديث الوزن بنجاح",
+      "updateError": "خطأ في تحديث الوزن",
+      "deleteSuccess": "تم حذف الوزن بنجاح",
+      "deleteError": "خطأ في حذف الوزن",
+      "deleteConfirmTitle": "تأكيد الحذف",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف هذا الوزن؟",
+      "addDescription": "إضافة وزن جديد",
+      "editDescription": "تعديل الوزن"
+    },
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "sections": {
+      "general": "معلومات عامة",
+      "data": "بيانات الوزن",
+      "additional": "معلومات إضافية"
+    },
+    "fields": {
+      "animalId": "معرف الحيوان",
+      "weighingDate": "تاريخ الوزن",
+      "weighingTime": "الوقت",
+      "purpose": "الهدف",
+      "weight": "الوزن",
+      "unit": "الوحدة",
+      "method": "الطريقة",
+      "location": "الموقع",
+      "recordedBy": "سجله",
+      "conditions": "الظروف",
+      "notes": "ملاحظات"
+    },
+    "placeholders": {
+      "weight": "مثال: 45.5",
+      "method": "مثال: ميزان إلكتروني",
+      "location": "مثال: الحظيرة 1",
+      "recordedBy": "مثال: أحمد محمد",
+      "conditions": "مثال: على معدة فارغة",
+      "notes": "ملاحظات إضافية..."
+    },
+    "units": {
+      "kg": "كيلوغرام (كغ)",
+      "lbs": "رطل"
     }
   },
   "onboarding": {
