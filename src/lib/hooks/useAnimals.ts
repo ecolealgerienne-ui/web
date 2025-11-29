@@ -14,7 +14,7 @@ interface UseAnimalsResult {
   refetch: () => Promise<void>
 }
 
-export function useAnimals(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; offset?: number }): UseAnimalsResult {
+export function useAnimals(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; page?: number }): UseAnimalsResult {
   const [animals, setAnimals] = useState<Animal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -24,15 +24,15 @@ export function useAnimals(filters?: { status?: string; speciesId?: string; sear
   const filterSpeciesId = filters?.speciesId
   const filterSearch = filters?.search
   const filterLimit = filters?.limit
-  const filterOffset = filters?.offset
+  const filterPage = filters?.page
 
   const memoizedFilters = useMemo(() => ({
     status: filterStatus,
     speciesId: filterSpeciesId,
     search: filterSearch,
     limit: filterLimit,
-    offset: filterOffset,
-  }), [filterStatus, filterSpeciesId, filterSearch, filterLimit, filterOffset])
+    page: filterPage,
+  }), [filterStatus, filterSpeciesId, filterSearch, filterLimit, filterPage])
 
   const fetchAnimals = useCallback(async () => {
     setLoading(true)

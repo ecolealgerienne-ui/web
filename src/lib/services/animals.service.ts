@@ -13,17 +13,17 @@ class AnimalsService {
     return `/farms/${TEMP_FARM_ID}/animals`;
   }
 
-  async getAll(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; offset?: number }): Promise<Animal[]> {
+  async getAll(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; page?: number }): Promise<Animal[]> {
     try {
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
       if (filters?.search) params.append('search', filters.search);
 
-      // Ajouter la pagination - par défaut récupérer un maximum d'animaux
-      // L'API backend a une limite maximale, on utilise 1000 pour rester en dessous
-      params.append('limit', String(filters?.limit || 1000));
-      if (filters?.offset) params.append('offset', String(filters.offset));
+      // L'API backend a une limite maximale de 100 et utilise 'page' pour la pagination
+      const limit = Math.min(filters?.limit || 100, 100); // Max 100
+      params.append('limit', String(limit));
+      if (filters?.page) params.append('page', String(filters.page));
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
       const response = await apiClient.get<{ data: Animal[] }>(url);
