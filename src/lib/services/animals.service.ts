@@ -13,12 +13,16 @@ class AnimalsService {
     return `/farms/${TEMP_FARM_ID}/animals`;
   }
 
-  async getAll(filters?: { status?: string; speciesId?: string; search?: string }): Promise<Animal[]> {
+  async getAll(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; offset?: number }): Promise<Animal[]> {
     try {
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
       if (filters?.search) params.append('search', filters.search);
+
+      // Ajouter la pagination - par défaut récupérer tous les animaux (limite très haute)
+      params.append('limit', String(filters?.limit || 10000));
+      if (filters?.offset) params.append('offset', String(filters.offset));
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
       const response = await apiClient.get<{ data: Animal[] }>(url);
