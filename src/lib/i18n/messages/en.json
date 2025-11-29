@@ -549,6 +549,47 @@
       "editDescription": "Edit the animal information"
     }
   },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Manage your treatment lots, sales and other grouped operations",
+    "newLot": "New lot",
+    "noLots": "No lots found",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search for a lot...",
+      "type": "Type",
+      "typePlaceholder": "All types",
+      "allTypes": "All types",
+      "status": "Status",
+      "statusPlaceholder": "All statuses",
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "animals": "Animals",
+      "date": "Date",
+      "product": "Product/Details",
+      "amount": "Amount",
+      "actions": "Actions",
+      "buyer": "Buyer",
+      "seller": "Seller"
+    },
+    "type": {
+      "treatment": "Treatment",
+      "vaccination": "Vaccination",
+      "sale": "Sale",
+      "slaughter": "Slaughter",
+      "purchase": "Purchase",
+      "breeding": "Breeding"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "archived": "Archived"
+    }
+  },
   "animalEvents": {
     "title": "Animal Events",
     "subtitle": "Record and track all events for your animals",

@@ -549,6 +549,47 @@
       "editDescription": "عدل معلومات الحيوان"
     }
   },
+  "lots": {
+    "title": "القطعان",
+    "subtitle": "إدارة قطعان العلاج والبيع والعمليات الجماعية الأخرى",
+    "newLot": "قطيع جديد",
+    "noLots": "لم يتم العثور على قطعان",
+    "filters": {
+      "search": "البحث",
+      "searchPlaceholder": "البحث عن قطيع...",
+      "type": "النوع",
+      "typePlaceholder": "جميع الأنواع",
+      "allTypes": "جميع الأنواع",
+      "status": "الحالة",
+      "statusPlaceholder": "جميع الحالات",
+      "allStatuses": "جميع الحالات"
+    },
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "status": "الحالة",
+      "animals": "الحيوانات",
+      "date": "التاريخ",
+      "product": "المنتج/التفاصيل",
+      "amount": "المبلغ",
+      "actions": "الإجراءات",
+      "buyer": "المشتري",
+      "seller": "البائع"
+    },
+    "type": {
+      "treatment": "علاج",
+      "vaccination": "تطعيم",
+      "sale": "بيع",
+      "slaughter": "ذبح",
+      "purchase": "شراء",
+      "breeding": "تكاثر"
+    },
+    "status": {
+      "open": "مفتوح",
+      "closed": "مغلق",
+      "archived": "مؤرشف"
+    }
+  },
   "animalEvents": {
     "title": "أحداث الحيوانات",
     "subtitle": "سجل وتتبع جميع أحداث حيواناتك",

@@ -549,6 +549,47 @@
       "editDescription": "Modifiez les informations de l'animal"
     }
   },
+  "lots": {
+    "title": "Lots",
+    "subtitle": "Gérez vos lots de traitement, vente et autres opérations groupées",
+    "newLot": "Nouveau lot",
+    "noLots": "Aucun lot trouvé",
+    "filters": {
+      "search": "Recherche",
+      "searchPlaceholder": "Rechercher un lot...",
+      "type": "Type",
+      "typePlaceholder": "Tous les types",
+      "allTypes": "Tous les types",
+      "status": "Statut",
+      "statusPlaceholder": "Tous les statuts",
+      "allStatuses": "Tous les statuts"
+    },
+    "table": {
+      "name": "Nom",
+      "type": "Type",
+      "status": "Statut",
+      "animals": "Animaux",
+      "date": "Date",
+      "product": "Produit/Détails",
+      "amount": "Montant",
+      "actions": "Actions",
+      "buyer": "Acheteur",
+      "seller": "Vendeur"
+    },
+    "type": {
+      "treatment": "Traitement",
+      "vaccination": "Vaccination",
+      "sale": "Vente",
+      "slaughter": "Abattage",
+      "purchase": "Achat",
+      "breeding": "Reproduction"
+    },
+    "status": {
+      "open": "Ouvert",
+      "closed": "Fermé",
+      "archived": "Archivé"
+    }
+  },
   "animalEvents": {
     "title": "Événements des animaux",
     "subtitle": "Enregistrez et suivez tous les événements de vos animaux",
