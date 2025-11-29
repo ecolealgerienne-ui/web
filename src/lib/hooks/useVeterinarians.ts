@@ -2,7 +2,7 @@
  * Hook React pour la gestion des vétérinaires
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
 import { veterinariansService, VeterinarianFilters } from '@/lib/services/veterinarians.service'
 import { logger } from '@/lib/utils/logger'
@@ -21,12 +21,20 @@ export function useVeterinarians(filters?: VeterinarianFilters): UseVeterinarian
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // Mémoriser les filtres pour éviter les re-renders inutiles
+  const memoizedFilters = useMemo(() => filters, [
+    filters?.isActive,
+    filters?.search,
+    filters?.region,
+    filters?.specialties,
+  ])
+
   const fetchVeterinarians = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await veterinariansService.getAll(filters)
+      const data = await veterinariansService.getAll(memoizedFilters)
       setVeterinarians(data)
     } catch (err) {
       const error = err as Error
@@ -35,7 +43,7 @@ export function useVeterinarians(filters?: VeterinarianFilters): UseVeterinarian
     } finally {
       setLoading(false)
     }
-  }, [filters?.isActive, filters?.search, filters?.region, filters?.specialties])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchVeterinarians()
