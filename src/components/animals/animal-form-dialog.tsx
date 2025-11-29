@@ -96,19 +96,13 @@ export function AnimalFormDialog({
     }
   }, [animal]);
 
-  useEffect(() => {
-    if (animal && activeTab === 'care') {
-      loadCareData();
-    }
-  }, [animal, activeTab]);
-
-  const loadCareData = async () => {
+  const loadCareData = React.useCallback(async () => {
     if (!animal) return;
     setLoadingCare(true);
     try {
       const [treatmentsData, vaccinationsData] = await Promise.all([
-        treatmentsService.getByAnimal(animal.id),
-        vaccinationsService.getByAnimal(animal.id),
+        treatmentsService.getAll({ animalId: animal.id }),
+        vaccinationsService.getAll({ animalId: animal.id }),
       ]);
       setTreatments(treatmentsData);
       setVaccinations(vaccinationsData);
@@ -117,7 +111,13 @@ export function AnimalFormDialog({
     } finally {
       setLoadingCare(false);
     }
-  };
+  }, [animal]);
+
+  useEffect(() => {
+    if (animal && activeTab === 'care') {
+      loadCareData();
+    }
+  }, [animal, activeTab, loadCareData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
