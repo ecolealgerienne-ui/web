@@ -801,7 +801,24 @@
       "savedMessage": "Your veterinarians have been saved",
       "saveFailed": "Save failed",
       "saveFailedMessage": "Check your internet connection",
-      "retry": "Retry"
+      "retry": "Retry",
+      "filters": {
+        "allRegions": "All regions",
+        "allSpecialties": "All specialties",
+        "specialty": "Specialty"
+      },
+      "specialties": {
+        "bovine": "Cattle",
+        "ovine": "Sheep",
+        "caprine": "Goats",
+        "poultry": "Poultry",
+        "equine": "Equine",
+        "camelid": "Camelids",
+        "general": "General",
+        "other": "Other"
+      },
+      "noVeterinarians": "No veterinarians available",
+      "loadError": "Error loading veterinarians"
     },
     "language": {
       "title": "Language & Region",

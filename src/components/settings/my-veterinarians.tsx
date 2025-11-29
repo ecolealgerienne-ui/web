@@ -1,28 +1,16 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save } from 'lucide-react'
+import { Save, AlertCircle } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
+import { useVeterinarians } from '@/lib/hooks/useVeterinarians'
+import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
 
-// Mock des vétérinaires du catalogue global avec région
-const MOCK_CATALOG_VETERINARIANS: TransferListItem[] = [
-  { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre', region: 'ALG', phone: '0555 12 34 56' },
-  { id: 'vet-2', name: 'Dr. Kaci Farid', description: 'Blida', region: 'BLI', phone: '0555 23 45 67' },
-  { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza', region: 'TIP', phone: '0555 34 56 78' },
-  { id: 'vet-4', name: 'Dr. Hamdi Sara', description: 'Oran', region: 'ORA', phone: '0555 45 67 89' },
-  { id: 'vet-5', name: 'Dr. Boudjema Karim', description: 'Alger Est', region: 'ALG' },
-  { id: 'vet-6', name: 'Dr. Taleb Nadia', description: 'Blida', region: 'BLI', phone: '0555 56 78 90' },
-  { id: 'vet-7', name: 'Dr. Cherif Mohamed', description: 'Tizi Ouzou', region: 'TIZ' },
-  { id: 'vet-8', name: 'Dr. Amrani Fatima', description: 'Béjaïa', region: 'BEJ', phone: '0555 67 89 01' },
-  { id: 'vet-9', name: 'Dr. Belkacem Omar', description: 'Sétif', region: 'SET' },
-  { id: 'vet-10', name: 'Dr. Hadjadj Kamel', description: 'Constantine', region: 'CON', phone: '0555 78 90 12' },
-]
-
-// Régions disponibles
+// Régions disponibles (Algérie)
 const REGIONS = [
   { code: 'ALG', name: 'Alger' },
   { code: 'ORA', name: 'Oran' },
@@ -35,22 +23,91 @@ const REGIONS = [
   { code: 'BEJ', name: 'Béjaïa' },
 ]
 
+// Spécialités vétérinaires
+const SPECIALTIES = [
+  { code: 'bovine', key: 'bovine' },
+  { code: 'ovine', key: 'ovine' },
+  { code: 'caprine', key: 'caprine' },
+  { code: 'poultry', key: 'poultry' },
+  { code: 'equine', key: 'equine' },
+  { code: 'camelid', key: 'camelid' },
+  { code: 'general', key: 'general' },
+  { code: 'other', key: 'other' },
+]
+
 interface MyVeterinariansProps {
+  initialSelectedIds?: string[]
   onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
 }
 
-export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
+// Convertir un Veterinarian API en TransferListItem
+function vetToTransferItem(vet: Veterinarian): TransferListItem {
+  return {
+    id: vet.id,
+    name: `Dr. ${vet.firstName} ${vet.lastName}`,
+    description: vet.city || vet.clinic || '',
+    region: vet.city?.substring(0, 3).toUpperCase(),
+    phone: vet.phone,
+    metadata: {
+      specialties: vet.specialties,
+      licenseNumber: vet.licenseNumber,
+      email: vet.email,
+    },
+  }
+}
+
+export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinariansProps) {
   const t = useTranslations('settings.veterinarians')
   const ta = useTranslations('settings.actions')
   const toast = useToast()
   const { markForDeletion, undoOperation, isPendingDeletion } = useUndo<TransferListItem>()
 
-  const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([
-    { id: 'vet-1', name: 'Dr. Benali Ahmed', description: 'Alger Centre', region: 'ALG', phone: '0555 12 34 56' },
-    { id: 'vet-3', name: 'Dr. Mansouri Leila', description: 'Tipaza', region: 'TIP', isLocal: true },
-  ])
+  // Filtres
+  const [filterRegion, setFilterRegion] = useState<string>('')
+  const [filterSpecialty, setFilterSpecialty] = useState<string>('')
+
+  // Charger les vétérinaires depuis l'API
+  const { veterinarians, loading, error, createVeterinarian } = useVeterinarians({
+    isActive: true,
+  })
+
+  // Convertir les vétérinaires API en items de transfert
+  const availableItems = useMemo(() => {
+    return veterinarians.map(vetToTransferItem)
+  }, [veterinarians])
+
+  // Items sélectionnés (initialisés depuis les props)
+  const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
+
+  // Initialiser les sélections depuis initialSelectedIds
+  useEffect(() => {
+    if (initialSelectedIds.length > 0 && veterinarians.length > 0) {
+      const initialSelected = veterinarians
+        .filter(v => initialSelectedIds.includes(v.id))
+        .map(vetToTransferItem)
+      setSelectedItems(initialSelected)
+    }
+  }, [initialSelectedIds, veterinarians])
+
+  // Filtrer les items disponibles
+  const filteredAvailableItems = useMemo(() => {
+    return availableItems.filter(item => {
+      // Filtre par région
+      if (filterRegion && item.region !== filterRegion) {
+        return false
+      }
+      // Filtre par spécialité
+      if (filterSpecialty) {
+        const specialties = (item.metadata?.specialties as string) || ''
+        if (!specialties.toLowerCase().includes(filterSpecialty.toLowerCase())) {
+          return false
+        }
+      }
+      return true
+    })
+  }, [availableItems, filterRegion, filterSpecialty])
 
   const handleSelect = useCallback((item: TransferListItem) => {
     setSelectedItems((prev) => [...prev, item])
@@ -61,25 +118,20 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
     const itemToRemove = selectedItems.find((item) => item.id === itemId)
     if (!itemToRemove) return
 
-    // Soft delete - retirer de la liste visible
     setSelectedItems((prev) => prev.filter((item) => item.id !== itemId))
     setHasChanges(true)
 
-    // Marquer pour suppression avec possibilité d'annuler
     const operationId = markForDeletion(
       itemId,
       itemToRemove,
-      // Fonction de restauration
       () => {
         setSelectedItems((prev) => [...prev, itemToRemove])
       },
-      // Fonction de suppression définitive
       () => {
         console.log('Hard delete confirmed:', itemId)
       }
     )
 
-    // Afficher le toast avec option Undo
     toast.undo(
       `${itemToRemove.name} ${t('removed')}`,
       () => {
@@ -90,21 +142,47 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
     )
   }, [selectedItems, markForDeletion, undoOperation, toast, t])
 
-  const handleCreateLocal = useCallback((name: string, region?: string, phone?: string) => {
-    const regionName = region ? REGIONS.find(r => r.code === region)?.name : undefined
-    const newItem: TransferListItem = {
-      id: `local-vet-${Date.now()}`,
-      name: name,
-      description: regionName || t('emptySelected'),
-      region: region,
-      phone: phone,
-      isLocal: true,
-    }
-    setSelectedItems((prev) => [...prev, newItem])
-    setHasChanges(true)
+  const handleCreateLocal = useCallback(async (name: string, region?: string, phone?: string) => {
+    try {
+      // Créer le vétérinaire via l'API
+      const nameParts = name.split(' ')
+      const firstName = nameParts[0] || name
+      const lastName = nameParts.slice(1).join(' ') || ''
 
-    toast.success(t('added'), `${name} ${t('addedTo')}`)
-  }, [toast, t])
+      const createDto: CreateVeterinarianDto = {
+        firstName,
+        lastName,
+        phone: phone || '',
+        licenseNumber: `LOCAL-${Date.now()}`,
+        specialties: 'general',
+        city: region ? REGIONS.find(r => r.code === region)?.name : undefined,
+        isActive: true,
+      }
+
+      const newVet = await createVeterinarian(createDto)
+      const newItem = vetToTransferItem(newVet)
+      newItem.isLocal = true
+
+      setSelectedItems((prev) => [...prev, newItem])
+      setHasChanges(true)
+
+      toast.success(t('added'), `${name} ${t('addedTo')}`)
+    } catch {
+      // Fallback: créer localement si l'API échoue
+      const regionName = region ? REGIONS.find(r => r.code === region)?.name : undefined
+      const newItem: TransferListItem = {
+        id: `local-vet-${Date.now()}`,
+        name: name,
+        description: regionName || '',
+        region: region,
+        phone: phone,
+        isLocal: true,
+      }
+      setSelectedItems((prev) => [...prev, newItem])
+      setHasChanges(true)
+      toast.success(t('added'), `${name} ${t('addedTo')}`)
+    }
+  }, [createVeterinarian, toast, t])
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -115,7 +193,6 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
       if (onSave) {
         await onSave(selectedIds, localItems)
       } else {
-        // Simulation de sauvegarde
         await new Promise((resolve) => setTimeout(resolve, 500))
         console.log('Saved veterinarians:', selectedIds)
       }
@@ -136,9 +213,54 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
     }
   }
 
-  // Filtrer les items en attente de suppression pour l'affichage
   const visibleSelectedItems = selectedItems.filter(
     (item) => !isPendingDeletion(item.id)
+  )
+
+  // Afficher l'erreur si le chargement a échoué
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-lg">
+          <AlertCircle className="w-5 h-5" />
+          <span>{t('loadError')}</span>
+        </div>
+      </div>
+    )
+  }
+
+  // Composant de filtres
+  const FiltersComponent = (
+    <div className="flex gap-2">
+      <select
+        value={filterRegion}
+        onChange={(e) => setFilterRegion(e.target.value)}
+        className="h-9 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        <option value="">{t('filters.allRegions')}</option>
+        {REGIONS.map((region) => (
+          <option key={region.code} value={region.code}>
+            {region.name}
+          </option>
+        ))}
+      </select>
+      <select
+        value={filterSpecialty}
+        onChange={(e) => setFilterSpecialty(e.target.value)}
+        className="h-9 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        <option value="">{t('filters.allSpecialties')}</option>
+        {SPECIALTIES.map((spec) => (
+          <option key={spec.code} value={spec.code}>
+            {t(`specialties.${spec.key}`)}
+          </option>
+        ))}
+      </select>
+    </div>
   )
 
   return (
@@ -149,8 +271,8 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
       </div>
 
       <TransferList
-        availableItems={MOCK_CATALOG_VETERINARIANS}
-        selectedItems={selectedItems}
+        availableItems={filteredAvailableItems}
+        selectedItems={visibleSelectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
         onCreateLocalWithDetails={handleCreateLocal}
@@ -159,8 +281,11 @@ export function MyVeterinarians({ onSave }: MyVeterinariansProps) {
         searchPlaceholder={t('searchPlaceholder')}
         createLocalLabel={t('addLocal')}
         emptySelectedMessage={t('emptySelected')}
+        emptyAvailableMessage={t('noVeterinarians')}
         regions={REGIONS}
         showLocalFormWithDetails={true}
+        isLoading={loading}
+        filters={FiltersComponent}
         localFormLabels={{
           name: t('name'),
           region: t('region'),

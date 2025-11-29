@@ -801,7 +801,24 @@
       "savedMessage": "Vos vétérinaires ont été enregistrés",
       "saveFailed": "Échec de sauvegarde",
       "saveFailedMessage": "Vérifiez votre connexion internet",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "filters": {
+        "allRegions": "Toutes les régions",
+        "allSpecialties": "Toutes les spécialités",
+        "specialty": "Spécialité"
+      },
+      "specialties": {
+        "bovine": "Bovins",
+        "ovine": "Ovins",
+        "caprine": "Caprins",
+        "poultry": "Volaille",
+        "equine": "Équins",
+        "camelid": "Camélidés",
+        "general": "Généraliste",
+        "other": "Autre"
+      },
+      "noVeterinarians": "Aucun vétérinaire disponible",
+      "loadError": "Erreur lors du chargement des vétérinaires"
     },
     "language": {
       "title": "Langue & Région",

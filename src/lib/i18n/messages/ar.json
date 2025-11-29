@@ -801,7 +801,24 @@
       "savedMessage": "تم حفظ أطبائك البيطريين",
       "saveFailed": "فشل الحفظ",
       "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
-      "retry": "إعادة المحاولة"
+      "retry": "إعادة المحاولة",
+      "filters": {
+        "allRegions": "جميع المناطق",
+        "allSpecialties": "جميع التخصصات",
+        "specialty": "التخصص"
+      },
+      "specialties": {
+        "bovine": "أبقار",
+        "ovine": "أغنام",
+        "caprine": "ماعز",
+        "poultry": "دواجن",
+        "equine": "خيول",
+        "camelid": "إبل",
+        "general": "عام",
+        "other": "أخرى"
+      },
+      "noVeterinarians": "لا يوجد أطباء بيطريين متاحين",
+      "loadError": "خطأ في تحميل الأطباء البيطريين"
     },
     "language": {
       "title": "اللغة والمنطقة",
