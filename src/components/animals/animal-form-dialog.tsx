@@ -357,7 +357,7 @@ export function AnimalFormDialog({
                   <div className="flex items-center gap-2 mb-3">
                     <Pill className="h-5 w-5" />
                     <h3 className="text-sm font-semibold">Traitements</h3>
-                    <Badge variant="outline" className="ml-auto">
+                    <Badge variant="default" className="ml-auto">
                       {treatments.length}
                     </Badge>
                   </div>
@@ -408,7 +408,7 @@ export function AnimalFormDialog({
                   <div className="flex items-center gap-2 mb-3">
                     <Syringe className="h-5 w-5" />
                     <h3 className="text-sm font-semibold">Vaccinations</h3>
-                    <Badge variant="outline" className="ml-auto">
+                    <Badge variant="default" className="ml-auto">
                       {vaccinations.length}
                     </Badge>
                   </div>
