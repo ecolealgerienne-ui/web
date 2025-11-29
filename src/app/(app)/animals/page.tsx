@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Pill, Syringe, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +47,17 @@ export default function AnimalsPage() {
   const handleViewDetail = (animal: Animal) => {
     setSelectedAnimal(animal);
     setIsDetailDialogOpen(true);
+  };
+
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    if (!selectedAnimal) return;
+    const currentIndex = animals.findIndex((a) => a.id === selectedAnimal.id);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex >= 0 && newIndex < animals.length) {
+      setSelectedAnimal(animals[newIndex]);
+    }
   };
 
   const handleEdit = (animal: Animal, e?: React.MouseEvent) => {
@@ -215,9 +226,20 @@ export default function AnimalsPage() {
                             </div>
                           )}
                         </div>
-                        <Badge variant={getStatusBadgeVariant(animal.status)}>
-                          {t(`status.${animal.status}`)}
-                        </Badge>
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge variant={getStatusBadgeVariant(animal.status)}>
+                            {t(`status.${animal.status}`)}
+                          </Badge>
+                          {/* Health indicators - shown on hover or always */}
+                          <div className="flex gap-1">
+                            <div className="p-1 rounded bg-blue-50 dark:bg-blue-950" title="Voir les traitements et vaccinations">
+                              <Pill className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div className="p-1 rounded bg-green-50 dark:bg-green-950" title="Voir les vaccinations">
+                              <Syringe className="h-3 w-3 text-green-600 dark:text-green-400" />
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
                     {/* Informations */}
@@ -298,6 +320,8 @@ export default function AnimalsPage() {
         animal={selectedAnimal}
         open={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
+        animals={animals}
+        onNavigate={handleNavigate}
       />
 
       {/* Dialog formulaire */}
