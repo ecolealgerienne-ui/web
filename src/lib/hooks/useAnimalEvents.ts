@@ -2,7 +2,7 @@
  * Hook React pour la gestion des événements d'animaux
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { AnimalEvent } from '@/lib/types/animal-event'
 import { animalEventsService } from '@/lib/services/animal-events.service'
 import { logger } from '@/lib/utils/logger'
@@ -19,12 +19,25 @@ export function useAnimalEvents(filters?: { animalId?: string; eventType?: strin
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterAnimalId = filters?.animalId
+  const filterEventType = filters?.eventType
+  const filterFromDate = filters?.fromDate
+  const filterToDate = filters?.toDate
+
+  const memoizedFilters = useMemo(() => ({
+    animalId: filterAnimalId,
+    eventType: filterEventType,
+    fromDate: filterFromDate,
+    toDate: filterToDate,
+  }), [filterAnimalId, filterEventType, filterFromDate, filterToDate])
+
   const fetchEvents = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await animalEventsService.getAll(filters)
+      const data = await animalEventsService.getAll(memoizedFilters)
       setEvents(data)
     } catch (err) {
       const error = err as Error
@@ -33,7 +46,7 @@ export function useAnimalEvents(filters?: { animalId?: string; eventType?: strin
     } finally {
       setLoading(false)
     }
-  }, [filters?.animalId, filters?.eventType, filters?.fromDate, filters?.toDate])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchEvents()

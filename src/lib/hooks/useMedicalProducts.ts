@@ -20,13 +20,18 @@ export function useMedicalProducts(filters?: MedicalProductFilters): UseMedicalP
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Mémoiser les filtres pour éviter les re-renders inutiles
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.search,
-    filters?.scope,
-    filters?.category,
-    filters?.isActive,
-  ]);
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterSearch = filters?.search;
+  const filterScope = filters?.scope;
+  const filterCategory = filters?.category;
+  const filterIsActive = filters?.isActive;
+
+  const memoizedFilters = useMemo(() => ({
+    search: filterSearch,
+    scope: filterScope,
+    category: filterCategory,
+    isActive: filterIsActive,
+  }), [filterSearch, filterScope, filterCategory, filterIsActive]);
 
   const fetchMedicalProducts = useCallback(async () => {
     setLoading(true);

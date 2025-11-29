@@ -2,7 +2,7 @@
  * Hook React pour la gestion des fermes
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Farm } from '@/lib/types/farm'
 import { farmsService } from '@/lib/services/farms.service'
 import { logger } from '@/lib/utils/logger'
@@ -19,12 +19,25 @@ export function useFarms(filters?: { ownerId?: string; groupId?: string; isDefau
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterOwnerId = filters?.ownerId
+  const filterGroupId = filters?.groupId
+  const filterIsDefault = filters?.isDefault
+  const filterSearch = filters?.search
+
+  const memoizedFilters = useMemo(() => ({
+    ownerId: filterOwnerId,
+    groupId: filterGroupId,
+    isDefault: filterIsDefault,
+    search: filterSearch,
+  }), [filterOwnerId, filterGroupId, filterIsDefault, filterSearch])
+
   const fetchFarms = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await farmsService.getAll(filters)
+      const data = await farmsService.getAll(memoizedFilters)
       setFarms(data)
     } catch (err) {
       const error = err as Error
@@ -33,7 +46,7 @@ export function useFarms(filters?: { ownerId?: string; groupId?: string; isDefau
     } finally {
       setLoading(false)
     }
-  }, [filters?.ownerId, filters?.groupId, filters?.isDefault, filters?.search])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchFarms()

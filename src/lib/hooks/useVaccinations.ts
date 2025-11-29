@@ -2,7 +2,7 @@
  * Hook React pour la gestion des vaccinations
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Vaccination, VaccinationFilters } from '@/lib/types/vaccination';
 import { vaccinationsService } from '@/lib/services/vaccinations.service';
 import { logger } from '@/lib/utils/logger';
@@ -21,12 +21,29 @@ export function useVaccinations(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterAnimalId = filters?.animalId;
+  const filterSearch = filters?.search;
+  const filterStatus = filters?.status;
+  const filterTargetType = filters?.targetType;
+  const filterDateFrom = filters?.dateFrom;
+  const filterDateTo = filters?.dateTo;
+
+  const memoizedFilters = useMemo(() => ({
+    animalId: filterAnimalId,
+    search: filterSearch,
+    status: filterStatus,
+    targetType: filterTargetType,
+    dateFrom: filterDateFrom,
+    dateTo: filterDateTo,
+  }), [filterAnimalId, filterSearch, filterStatus, filterTargetType, filterDateFrom, filterDateTo]);
+
   const fetchVaccinations = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await vaccinationsService.getAll(filters);
+      const data = await vaccinationsService.getAll(memoizedFilters);
       setVaccinations(data);
     } catch (err) {
       const error = err as Error;
@@ -35,7 +52,7 @@ export function useVaccinations(
     } finally {
       setLoading(false);
     }
-  }, [filters?.animalId, filters?.search, filters?.status, filters?.targetType, filters?.dateFrom, filters?.dateTo]);
+  }, [memoizedFilters]);
 
   useEffect(() => {
     fetchVaccinations();

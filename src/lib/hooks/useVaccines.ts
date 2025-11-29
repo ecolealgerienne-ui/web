@@ -20,13 +20,18 @@ export function useVaccines(filters?: VaccineFilters): UseVaccinesResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Mémoiser les filtres pour éviter les re-renders inutiles
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.search,
-    filters?.scope,
-    filters?.targetDisease,
-    filters?.isActive,
-  ]);
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterSearch = filters?.search;
+  const filterScope = filters?.scope;
+  const filterTargetDisease = filters?.targetDisease;
+  const filterIsActive = filters?.isActive;
+
+  const memoizedFilters = useMemo(() => ({
+    search: filterSearch,
+    scope: filterScope,
+    targetDisease: filterTargetDisease,
+    isActive: filterIsActive,
+  }), [filterSearch, filterScope, filterTargetDisease, filterIsActive]);
 
   const fetchVaccines = useCallback(async () => {
     setLoading(true);

@@ -21,13 +21,18 @@ export function useVeterinarians(filters?: VeterinarianFilters): UseVeterinarian
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  // Mémoriser les filtres pour éviter les re-renders inutiles
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.isActive,
-    filters?.search,
-    filters?.region,
-    filters?.specialties,
-  ])
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterIsActive = filters?.isActive
+  const filterSearch = filters?.search
+  const filterRegion = filters?.region
+  const filterSpecialties = filters?.specialties
+
+  const memoizedFilters = useMemo(() => ({
+    isActive: filterIsActive,
+    search: filterSearch,
+    region: filterRegion,
+    specialties: filterSpecialties,
+  }), [filterIsActive, filterSearch, filterRegion, filterSpecialties])
 
   const fetchVeterinarians = useCallback(async () => {
     setLoading(true)
