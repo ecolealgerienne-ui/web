@@ -10,7 +10,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { useAnimals } from '@/lib/hooks/useAnimals';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { animalsService } from '@/lib/services/animals.service';
-import { AnimalFormDialog } from '@/components/data/animal-form-dialog';
+import { AnimalFormDialog } from '@/components/animals/animal-form-dialog';
+import { AnimalDetailDialog } from '@/components/animals/animal-detail-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import {
@@ -32,22 +33,30 @@ export default function AnimalsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedAnimal, setSelectedAnimal] = useState<Animal | undefined>();
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [animalToDelete, setAnimalToDelete] = useState<Animal | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAdd = () => {
-    setSelectedAnimal(undefined);
+    setSelectedAnimal(null);
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (animal: Animal) => {
+  const handleViewDetail = (animal: Animal) => {
+    setSelectedAnimal(animal);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleEdit = (animal: Animal, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setSelectedAnimal(animal);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (animal: Animal) => {
+  const handleDelete = (animal: Animal, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setAnimalToDelete(animal);
     setIsDeleteDialogOpen(true);
   };
@@ -185,28 +194,31 @@ export default function AnimalsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {animals.map((animal) => (
-                <div
-                  key={animal.id}
-                  className="p-4 border rounded-lg hover:bg-accent transition-colors"
-                >
-                  <div className="space-y-3">
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-lg truncate">
-                          {animal.identificationNumber}
-                        </div>
-                        {animal.name && (
-                          <div className="text-sm text-muted-foreground truncate">
-                            {animal.name}
+              {animals.map((animal) => {
+                const displayId = animal.currentEid || animal.officialNumber || animal.visualId || animal.id.substring(0, 8);
+                return (
+                  <div
+                    key={animal.id}
+                    className="p-4 border rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                    onClick={() => handleViewDetail(animal)}
+                  >
+                    <div className="space-y-3">
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-lg truncate">
+                            {displayId}
                           </div>
-                        )}
+                          {animal.breed && (
+                            <div className="text-sm text-muted-foreground truncate">
+                              {animal.breed.name}
+                            </div>
+                          )}
+                        </div>
+                        <Badge variant={getStatusBadgeVariant(animal.status)}>
+                          {t(`status.${animal.status}`)}
+                        </Badge>
                       </div>
-                      <Badge variant={getStatusBadgeVariant(animal.status)}>
-                        {t(`status.${animal.status}`)}
-                      </Badge>
-                    </div>
 
                     {/* Informations */}
                     <div className="text-sm text-muted-foreground space-y-1">
@@ -257,7 +269,7 @@ export default function AnimalsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleEdit(animal)}
+                        onClick={(e) => handleEdit(animal, e)}
                         className="flex-1"
                       >
                         <Edit2 className="mr-1 h-3 w-3" />
@@ -266,7 +278,7 @@ export default function AnimalsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDelete(animal)}
+                        onClick={(e) => handleDelete(animal, e)}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -274,11 +286,19 @@ export default function AnimalsPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog de détail */}
+      <AnimalDetailDialog
+        animal={selectedAnimal}
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+      />
 
       {/* Dialog formulaire */}
       <AnimalFormDialog
@@ -295,7 +315,9 @@ export default function AnimalsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('messages.deleteConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('messages.deleteConfirmDescription', { id: animalToDelete?.identificationNumber || '' })}
+              {t('messages.deleteConfirmDescription', {
+                id: animalToDelete?.currentEid || animalToDelete?.officialNumber || animalToDelete?.visualId || animalToDelete?.id?.substring(0, 8) || ''
+              })}
               <br />
               <span className="text-destructive font-medium">
                 {tc('messages.actionIrreversible')}

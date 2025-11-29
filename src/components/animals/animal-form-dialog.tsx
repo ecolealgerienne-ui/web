@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog,
@@ -12,219 +13,255 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from '@/components/ui/dialog';
-import { Animal } from '@/lib/types/animal';
+import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
+import { useTranslations } from '@/lib/i18n';
+import { useBreeds } from '@/lib/hooks/useBreeds';
 
 interface AnimalFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  animal?: Animal;
-  onSave?: (animal: Partial<Animal>) => void;
+  animal?: Animal | null;
+  onSubmit: (data: CreateAnimalDto | UpdateAnimalDto) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export function AnimalFormDialog({
   open,
   onOpenChange,
   animal,
-  onSave,
+  onSubmit,
+  isLoading,
 }: AnimalFormDialogProps) {
-  const [formData, setFormData] = useState<Partial<Animal>>(
-    animal || {
-      identificationNumber: '',
-      
-      name: '',
-      speciesId: 'sheep',
-      breedId: '',
-      sex: 'female',
-      birthDate: '',
-      status: 'alive' as const,
-      
-      acquisitionDate: new Date().toISOString().split('T')[0],
-    }
-  );
+  const t = useTranslations('animals');
+  const tc = useTranslations('common');
+  const isEditing = !!animal;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState<CreateAnimalDto>({
+    birthDate: '',
+    sex: 'female',
+    currentEid: '',
+    officialNumber: '',
+    visualId: '',
+    speciesId: '',
+    breedId: '',
+    status: 'alive',
+    notes: '',
+  });
+
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('');
+  const { breeds } = useBreeds(selectedSpeciesId);
+
+  useEffect(() => {
+    if (animal) {
+      setFormData({
+        birthDate: animal.birthDate || '',
+        sex: animal.sex,
+        currentEid: animal.currentEid || '',
+        officialNumber: animal.officialNumber || '',
+        visualId: animal.visualId || '',
+        speciesId: animal.speciesId || '',
+        breedId: animal.breedId || '',
+        status: animal.status,
+        notes: animal.notes || '',
+      });
+      setSelectedSpeciesId(animal.speciesId || '');
+    } else {
+      setFormData({
+        birthDate: '',
+        sex: 'female',
+        currentEid: '',
+        officialNumber: '',
+        visualId: '',
+        speciesId: '',
+        breedId: '',
+        status: 'alive',
+        notes: '',
+      });
+      setSelectedSpeciesId('');
+    }
+  }, [animal]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave?.(formData);
-    onOpenChange(false);
+    try {
+      await onSubmit(formData);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogClose onClose={() => onOpenChange(false)} />
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{animal ? 'Modifier l\'animal' : 'Ajouter un animal'}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? t('editAnimal') : t('newAnimal')}
+          </DialogTitle>
           <DialogDescription>
-            {animal
-              ? 'Modifiez les informations de l\'animal'
-              : 'Remplissez les informations pour ajouter un nouvel animal'}
+            {isEditing ? t('messages.editDescription') : t('messages.addDescription')}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* EID */}
-            <div>
-              <Label htmlFor="eid">EID (Électronique) *</Label>
-              <Input
-                id="eid"
-                placeholder="250268001234567"
-                required
-                value={formData.identificationNumber}
-                onChange={(e) => setFormData({ ...formData, identificationNumber: e.target.value })}
+        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+          {/* Section: Identification */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentEid">{t('fields.currentEid')}</Label>
+                <Input
+                  id="currentEid"
+                  value={formData.currentEid}
+                  onChange={(e) => setFormData({ ...formData, currentEid: e.target.value })}
+                  placeholder="Ex: 250268001234567"
+                  maxLength={15}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="officialNumber">{t('fields.officialNumber')}</Label>
+                <Input
+                  id="officialNumber"
+                  value={formData.officialNumber}
+                  onChange={(e) => setFormData({ ...formData, officialNumber: e.target.value })}
+                  placeholder="Ex: DZ-2024-001"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="visualId">{t('fields.visualId')}</Label>
+                <Input
+                  id="visualId"
+                  value={formData.visualId}
+                  onChange={(e) => setFormData({ ...formData, visualId: e.target.value })}
+                  placeholder="Ex: A-001"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Basic Info */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium border-b pb-2">Informations de base</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="sex">{t('fields.sex')} *</Label>
+                <Select
+                  value={formData.sex}
+                  onValueChange={(value) => setFormData({ ...formData, sex: value as 'male' | 'female' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="female">{t('sex.female')}</SelectItem>
+                    <SelectItem value="male">{t('sex.male')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="birthDate">{t('fields.birthDate')} *</Label>
+                <Input
+                  id="birthDate"
+                  type="date"
+                  required
+                  value={formData.birthDate}
+                  onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">{t('fields.status')} *</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alive">{t('status.alive')}</SelectItem>
+                    <SelectItem value="sold">{t('status.sold')}</SelectItem>
+                    <SelectItem value="dead">{t('status.dead')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Species & Breed */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium border-b pb-2">Espèce et Race</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="speciesId">{t('fields.speciesId')}</Label>
+                <Input
+                  id="speciesId"
+                  value={formData.speciesId}
+                  onChange={(e) => {
+                    setFormData({ ...formData, speciesId: e.target.value, breedId: '' });
+                    setSelectedSpeciesId(e.target.value);
+                  }}
+                  placeholder="Ex: UUID de l'espèce"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="breedId">{t('fields.breedId')}</Label>
+                {breeds.length > 0 ? (
+                  <Select
+                    value={formData.breedId}
+                    onValueChange={(value) => setFormData({ ...formData, breedId: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une race" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {breeds.map((breed) => (
+                        <SelectItem key={breed.id} value={breed.id}>
+                          {breed.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id="breedId"
+                    value={formData.breedId}
+                    onChange={(e) => setFormData({ ...formData, breedId: e.target.value })}
+                    placeholder="Ex: UUID de la race"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Notes */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium border-b pb-2">Notes</h3>
+            <div className="space-y-2">
+              <Label htmlFor="notes">{t('fields.notes')}</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder={t('placeholders.notes')}
+                rows={3}
+                maxLength={1000}
               />
             </div>
-
-            {/* ID Interne */}
-            <div>
-              <Label htmlFor="internalId">ID Interne</Label>
-              <Input
-                id="internalId"
-                placeholder="A-001"
-                value={formData.identificationNumber}
-                onChange={(e) => setFormData({ ...formData, identificationNumber: e.target.value })}
-              />
-            </div>
-          </div>
-
-          {/* Nom */}
-          <div>
-            <Label htmlFor="name">Nom (optionnel)</Label>
-            <Input
-              id="name"
-              placeholder="Bella"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {/* Espèce */}
-            <div>
-              <Label htmlFor="species">Espèce *</Label>
-              <Select
-                required
-                value={formData.speciesId}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, speciesId: value as any })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sheep">Ovin</SelectItem>
-                  <SelectItem value="goat">Caprin</SelectItem>
-                  <SelectItem value="cattle">Bovin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Sexe */}
-            <div>
-              <Label htmlFor="sex">Sexe *</Label>
-              <Select
-                required
-                value={formData.sex}
-                onValueChange={(value) => setFormData({ ...formData, sex: value as any })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="female">Femelle</SelectItem>
-                  <SelectItem value="male">Mâle</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Date de naissance */}
-            <div>
-              <Label htmlFor="birthDate">Date de naissance *</Label>
-              <Input
-                id="birthDate"
-                type="date"
-                required
-                value={formData.birthDate}
-                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-              />
-            </div>
-          </div>
-
-          {/* Race */}
-          <div>
-            <Label htmlFor="breed">Race</Label>
-            <Input
-              id="breed"
-              placeholder="Ouled Djellal"
-              value={formData.breedId}
-              onChange={(e) => setFormData({ ...formData, breedId: e.target.value })}
-            />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Type d'acquisition */}
-            <div>
-              <Label htmlFor="acquisitionType">Type d&apos;acquisition *</Label>
-              <Select
-                required
-                value={formData.identificationNumber}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, acquisitionDate: value as any })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="birth">Naissance</SelectItem>
-                  <SelectItem value="purchase">Achat</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Date d'acquisition */}
-            <div>
-              <Label htmlFor="acquisitionDate">Date d&apos;acquisition *</Label>
-              <Input
-                id="acquisitionDate"
-                type="date"
-                required
-                value={formData.acquisitionDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, acquisitionDate: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          {/* Statut */}
-          <div>
-            <Label htmlFor="status">Statut *</Label>
-            <Select
-              required
-              value={formData.status}
-              onValueChange={(value) => setFormData({ ...formData, status: value as any })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Actif</SelectItem>
-                <SelectItem value="sold">Vendu</SelectItem>
-                <SelectItem value="dead">Décédé</SelectItem>
-                <SelectItem value="slaughtered">Abattu</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              {tc('actions.cancel')}
             </Button>
-            <Button type="submit">{animal ? 'Mettre à jour' : 'Ajouter'}</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? t('actions.saving') : isEditing ? tc('actions.save') : tc('actions.create')}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
