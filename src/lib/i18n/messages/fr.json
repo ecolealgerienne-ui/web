@@ -1043,5 +1043,49 @@
       "saving": "Enregistrement...",
       "savePreferences": "Enregistrer les préférences"
     }
+  },
+  "homepage": {
+    "title": "Gestion de cheptel moderne et intuitive",
+    "subtitle": "Une plateforme complète pour gérer votre élevage avec efficacité et simplicité",
+    "login": "Se connecter",
+    "getStarted": "Commencer",
+    "accessDashboard": "Accéder au tableau de bord",
+    "features": {
+      "animalTracking": {
+        "title": "Suivi des animaux",
+        "description": "Gérez vos animaux avec traçabilité complète de la naissance à la sortie"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Soins",
+        "description": "Planifiez et enregistrez tous les soins vétérinaires de votre troupeau"
+      },
+      "reports": {
+        "title": "Rapports & Statistiques",
+        "description": "Analysez vos données pour optimiser la gestion de votre exploitation"
+      },
+      "lotManagement": {
+        "title": "Gestion des lots",
+        "description": "Organisez vos animaux en lots pour une gestion simplifiée"
+      },
+      "traceability": {
+        "title": "Traçabilité complète",
+        "description": "Respectez les normes et réglementations avec un historique détaillé"
+      },
+      "multiUser": {
+        "title": "Multi-utilisateurs",
+        "description": "Collaborez avec votre équipe avec des rôles et permissions adaptés"
+      }
+    },
+    "benefits": {
+      "title": "Pourquoi choisir notre solution ?",
+      "modernInterface": "Interface moderne et intuitive pour une prise en main facile",
+      "accessAnywhere": "Accès depuis n'importe où via votre navigateur web",
+      "secureData": "Vos données sont sécurisées et sauvegardées automatiquement",
+      "reactiveSupport": "Support réactif pour vous accompagner au quotidien",
+      "regularUpdates": "Mises à jour régulières avec de nouvelles fonctionnalités"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. Tous droits réservés."
+    }
   }
 }

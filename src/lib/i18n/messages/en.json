@@ -1043,5 +1043,49 @@
       "saving": "Saving...",
       "savePreferences": "Save Preferences"
     }
+  },
+  "homepage": {
+    "title": "Modern and Intuitive Herd Management",
+    "subtitle": "A complete platform to manage your farm with efficiency and simplicity",
+    "login": "Log In",
+    "getStarted": "Get Started",
+    "accessDashboard": "Access Dashboard",
+    "features": {
+      "animalTracking": {
+        "title": "Animal Tracking",
+        "description": "Manage your animals with complete traceability from birth to exit"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Care",
+        "description": "Plan and record all veterinary care for your herd"
+      },
+      "reports": {
+        "title": "Reports & Statistics",
+        "description": "Analyze your data to optimize farm management"
+      },
+      "lotManagement": {
+        "title": "Lot Management",
+        "description": "Organize your animals in lots for simplified management"
+      },
+      "traceability": {
+        "title": "Complete Traceability",
+        "description": "Comply with standards and regulations with detailed history"
+      },
+      "multiUser": {
+        "title": "Multi-User",
+        "description": "Collaborate with your team with appropriate roles and permissions"
+      }
+    },
+    "benefits": {
+      "title": "Why choose our solution?",
+      "modernInterface": "Modern and intuitive interface for easy handling",
+      "accessAnywhere": "Access from anywhere via your web browser",
+      "secureData": "Your data is secure and automatically backed up",
+      "reactiveSupport": "Responsive support to accompany you daily",
+      "regularUpdates": "Regular updates with new features"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. All rights reserved."
+    }
   }
 }
