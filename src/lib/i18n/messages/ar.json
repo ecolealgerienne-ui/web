@@ -515,6 +515,9 @@
       "currentWeight": "الوزن الحالي",
       "currentLocation": "الموقع الحالي",
       "healthStatus": "الحالة الصحية",
+      "currentEid": "معرف EID الحالي",
+      "officialNumber": "الرقم الرسمي",
+      "visualId": "المعرف المرئي",
       "notes": "ملاحظات",
       "isActive": "نشط"
     },

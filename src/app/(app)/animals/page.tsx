@@ -226,6 +226,30 @@ export default function AnimalsPage() {
                           <span>{animal.currentWeight} kg</span>
                         </div>
                       )}
+                      {animal.currentEid && (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{t('fields.currentEid')}:</span>
+                          <span>{animal.currentEid}</span>
+                        </div>
+                      )}
+                      {animal.officialNumber && (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{t('fields.officialNumber')}:</span>
+                          <span>{animal.officialNumber}</span>
+                        </div>
+                      )}
+                      {animal.visualId && (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{t('fields.visualId')}:</span>
+                          <span>{animal.visualId}</span>
+                        </div>
+                      )}
+                      {animal.notes && (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{t('fields.notes')}:</span>
+                          <span className="text-xs italic line-clamp-2">{animal.notes}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Actions */}
