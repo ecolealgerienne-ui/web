@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -94,15 +94,19 @@ export function VaccinationFormDialog({
             <div>
               <Label htmlFor="targetType">Cible *</Label>
               <Select
-                id="targetType"
                 required
                 value={formData.targetType}
-                onChange={(e) =>
-                  setFormData({ ...formData, targetType: e.target.value as any })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, targetType: value as any })
                 }
               >
-                <option value="individual">Animal individuel</option>
-                <option value="lot">Lot d&apos;animaux</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une cible" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="individual">Animal individuel</SelectItem>
+                  <SelectItem value="lot">Lot d&apos;animaux</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -110,15 +114,19 @@ export function VaccinationFormDialog({
             <div>
               <Label htmlFor="status">Statut *</Label>
               <Select
-                id="status"
                 required
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onValueChange={(value) => setFormData({ ...formData, status: value as any })}
               >
-                <option value="scheduled">Programmée</option>
-                <option value="completed">Effectuée</option>
-                <option value="overdue">En retard</option>
-                <option value="cancelled">Annulée</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="scheduled">Programmée</SelectItem>
+                  <SelectItem value="completed">Effectuée</SelectItem>
+                  <SelectItem value="overdue">En retard</SelectItem>
+                  <SelectItem value="cancelled">Annulée</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -178,17 +186,21 @@ export function VaccinationFormDialog({
             <div>
               <Label htmlFor="administrationRoute">Voie d&apos;administration</Label>
               <Select
-                id="administrationRoute"
                 value={formData.administrationRoute}
-                onChange={(e) =>
-                  setFormData({ ...formData, administrationRoute: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, administrationRoute: value })
                 }
               >
-                <option value="SC">Sous-cutanée (SC)</option>
-                <option value="IM">Intramusculaire (IM)</option>
-                <option value="ID">Intradermique (ID)</option>
-                <option value="oral">Orale</option>
-                <option value="IV">Intraveineuse (IV)</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une voie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SC">Sous-cutanée (SC)</SelectItem>
+                  <SelectItem value="IM">Intramusculaire (IM)</SelectItem>
+                  <SelectItem value="ID">Intradermique (ID)</SelectItem>
+                  <SelectItem value="oral">Orale</SelectItem>
+                  <SelectItem value="IV">Intraveineuse (IV)</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>

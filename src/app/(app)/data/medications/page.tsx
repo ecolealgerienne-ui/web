@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useMedicalProducts } from '@/lib/hooks/useMedicalProducts';
 import { MedicalProductScope, MedicalProductCategory } from '@/lib/types/medical-product';
 import { MEDICAL_PRODUCT_CATEGORY_LABELS, MEDICAL_PRODUCT_SCOPE_LABELS } from '@/lib/types/medical-product';
@@ -63,31 +64,39 @@ export default function MedicationsPage() {
 
             <div>
               <label className="text-sm font-medium mb-2 block">Scope</label>
-              <select
+              <Select
                 value={scopeFilter}
-                onChange={(e) => setScopeFilter(e.target.value as MedicalProductScope | 'all')}
-                className="w-full px-3 py-2 border rounded-md"
+                onValueChange={(value) => setScopeFilter(value as MedicalProductScope | 'all')}
               >
-                <option value="all">Tous</option>
-                <option value="global">Global</option>
-                <option value="local">Local</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un scope" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="global">Global</SelectItem>
+                  <SelectItem value="local">Local</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className="text-sm font-medium mb-2 block">Catégorie</label>
-              <select
+              <Select
                 value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value as MedicalProductCategory | 'all')}
-                className="w-full px-3 py-2 border rounded-md"
+                onValueChange={(value) => setCategoryFilter(value as MedicalProductCategory | 'all')}
               >
-                <option value="all">Toutes</option>
-                {Object.entries(MEDICAL_PRODUCT_CATEGORY_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes</SelectItem>
+                  {Object.entries(MEDICAL_PRODUCT_CATEGORY_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -102,7 +111,8 @@ export default function MedicationsPage() {
         </CardHeader>
         <CardContent>
           {loading && (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Chargement des produits médicaux...
             </div>
           )}

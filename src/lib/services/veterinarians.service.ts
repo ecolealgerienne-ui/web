@@ -5,19 +5,28 @@
 import { apiClient } from '@/lib/api/client'
 import { Veterinarian, CreateVeterinarianDto, UpdateVeterinarianDto } from '@/lib/types/veterinarian'
 import { logger } from '@/lib/utils/logger'
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 
-const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e'
+
+export interface VeterinarianFilters {
+  isActive?: boolean
+  search?: string
+  region?: string
+  specialties?: string
+}
 
 class VeterinariansService {
   private getBasePath() {
     return `/farms/${TEMP_FARM_ID}/veterinarians`
   }
 
-  async getAll(filters?: { isActive?: boolean; search?: string }): Promise<Veterinarian[]> {
+  async getAll(filters?: VeterinarianFilters): Promise<Veterinarian[]> {
     try {
       const params = new URLSearchParams()
       if (filters?.isActive !== undefined) params.append('isActive', String(filters.isActive))
       if (filters?.search) params.append('search', filters.search)
+      if (filters?.region) params.append('region', filters.region)
+      if (filters?.specialties) params.append('specialties', filters.specialties)
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath()
       const response = await apiClient.get<{ data: Veterinarian[] }>(url)
@@ -30,6 +39,19 @@ class VeterinariansService {
         return []
       }
       logger.error('Failed to fetch veterinarians', { error })
+      throw error
+    }
+  }
+
+  async getById(id: string): Promise<Veterinarian | null> {
+    try {
+      const response = await apiClient.get<{ data: Veterinarian }>(`${this.getBasePath()}/${id}`)
+      return response.data || null
+    } catch (error: any) {
+      if (error.status === 404) {
+        return null
+      }
+      logger.error('Failed to fetch veterinarian', { id, error })
       throw error
     }
   }

@@ -17,7 +17,8 @@ import {
   speciesLabels,
   sexLabels,
   statusLabels,
-} from "@/lib/data/animals.mock";
+  getStatusVariant,
+} from "@/lib/utils/animal-helpers";
 
 interface AnimalsTableProps {
   animals: Animal[];
@@ -25,20 +26,6 @@ interface AnimalsTableProps {
 
 export function AnimalsTable({ animals }: AnimalsTableProps) {
   const router = useRouter();
-
-  const getStatusVariant = (status: Animal["status"]) => {
-    switch (status) {
-      case "alive":
-        return "success";
-      case "sold":
-        return "default";
-      case "dead":
-      case "missing":
-        return "destructive";
-      default:
-        return "default";
-    }
-  };
 
   return (
     <div className="rounded-md border bg-card">

@@ -5,26 +5,30 @@ import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/auth-context";
 import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { useTranslations } from "@/lib/i18n";
+import Link from "next/link";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { user, logout, isAuthenticated } = useAuth();
+  const t = useTranslations('header.dashboard');
 
   return (
     <header className="border-b bg-card">
       <div className="flex h-16 items-center px-4 md:px-6 justify-between">
         <div className="flex items-center gap-4">
           {/* Mobile Logo */}
-          <div className="flex md:hidden items-center gap-2">
+          <Link href="/" className="flex md:hidden items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Beef className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold">AniTra</span>
-          </div>
+          </Link>
           {/* Desktop Title */}
           <div className="hidden md:block">
-            <h1 className="text-xl font-semibold">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Vue d&apos;ensemble</p>
+            <h1 className="text-xl font-semibold">{t('title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
@@ -41,8 +45,8 @@ export function Header() {
             </div>
           )}
 
-          {/* Language */}
-          <div className="text-sm font-medium">FR</div>
+          {/* Language Switcher */}
+          <LanguageSwitcher />
 
           {/* Theme Toggle */}
           <Button

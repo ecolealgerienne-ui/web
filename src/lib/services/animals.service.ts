@@ -5,8 +5,8 @@
 import { apiClient } from '@/lib/api/client';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 
-const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e';
 
 class AnimalsService {
   private getBasePath(): string {
@@ -16,7 +16,7 @@ class AnimalsService {
   async getAll(filters?: { status?: string; speciesId?: string; search?: string }): Promise<Animal[]> {
     try {
       const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
       if (filters?.search) params.append('search', filters.search);
 

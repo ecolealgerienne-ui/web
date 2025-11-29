@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useBreeds } from '@/lib/hooks/useBreeds';
@@ -25,12 +25,12 @@ export default function BreedsPage() {
   const t = useTranslations('breeds');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [selectedSpecies, setSelectedSpecies] = useState('');
+  const [selectedSpecies, setSelectedSpecies] = useState('all');
   const [showInactive, setShowInactive] = useState(true);
-  const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies || undefined);
+  const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies === 'all' ? undefined : selectedSpecies);
 
   const speciesOptions = [
-    { value: '', label: t('filters.allSpecies') },
+    { value: 'all', label: t('filters.allSpecies') },
     { value: 'sheep', label: t('species.sheep') },
     { value: 'goat', label: t('species.goat') },
     { value: 'cattle', label: t('species.cattle') },
@@ -145,14 +145,18 @@ export default function BreedsPage() {
       <div className="flex gap-4 items-center flex-wrap">
         <Select
           value={selectedSpecies}
-          onChange={(e) => setSelectedSpecies(e.target.value)}
-          className="w-full md:w-[200px]"
+          onValueChange={setSelectedSpecies}
         >
-          {speciesOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {speciesOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
         <div className="flex items-center space-x-2">

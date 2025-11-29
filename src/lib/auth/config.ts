@@ -37,8 +37,20 @@ export const mockUser = {
   email: 'dev@ecole-algerienne.dz',
   name: 'Utilisateur Dev',
   role: 'super_admin' as const, // Super admin pour accès complet en dev
-  farmName: 'Ferme de développement',
+  farmName: 'Ferme du Val Fleuri',
 }
+
+/**
+ * ID de la ferme pour le mode développement
+ *
+ * IMPORTANT: Cette valeur est centralisée ici pour éviter la duplication
+ * dans tous les fichiers de services. Modifier uniquement cette valeur
+ * pour changer l'ID de la ferme dans toute l'application.
+ *
+ * En production, cet ID sera récupéré depuis le contexte utilisateur
+ * après authentification.
+ */
+export const TEMP_FARM_ID = '550e8400-e29b-41d4-a716-446655440000';
 
 // Vérifier si une route est publique
 export function isPublicRoute(pathname: string): boolean {

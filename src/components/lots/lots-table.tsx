@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useTranslations } from '@/lib/i18n';
 
 interface LotsTableProps {
   lots: Lot[];
@@ -19,11 +20,12 @@ interface LotsTableProps {
 
 export function LotsTable({ lots }: LotsTableProps) {
   const router = useRouter();
+  const t = useTranslations('lots');
 
   if (lots.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-12 text-center">
-        <p className="text-muted-foreground">Aucun lot trouvé</p>
+        <p className="text-muted-foreground">{t('noLots')}</p>
       </div>
     );
   }
@@ -65,14 +67,14 @@ export function LotsTable({ lots }: LotsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nom</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Animaux</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Produit/Activité</TableHead>
-            <TableHead className="text-right">Montant</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('table.name')}</TableHead>
+            <TableHead>{t('table.type')}</TableHead>
+            <TableHead>{t('table.status')}</TableHead>
+            <TableHead className="text-right">{t('table.animals')}</TableHead>
+            <TableHead>{t('table.date')}</TableHead>
+            <TableHead>{t('table.product')}</TableHead>
+            <TableHead className="text-right">{t('table.amount')}</TableHead>
+            <TableHead className="text-right">{t('table.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -94,12 +96,12 @@ export function LotsTable({ lots }: LotsTableProps) {
               </TableCell>
               <TableCell>
                 <Badge className={getTypeColor(lot.type)}>
-                  {LOT_TYPE_LABELS[lot.type]}
+                  {t(`type.${lot.type}`)}
                 </Badge>
               </TableCell>
               <TableCell>
                 <Badge variant={getStatusVariant(lot.status)}>
-                  {LOT_STATUS_LABELS[lot.status]}
+                  {t(`status.${lot.status}`)}
                 </Badge>
               </TableCell>
               <TableCell className="text-right font-medium">
@@ -120,12 +122,12 @@ export function LotsTable({ lots }: LotsTableProps) {
                   )}
                   {lot.buyerName && (
                     <div className="text-xs text-muted-foreground">
-                      Acheteur: {lot.buyerName}
+                      {t('table.buyer')}: {lot.buyerName}
                     </div>
                   )}
                   {lot.sellerName && (
                     <div className="text-xs text-muted-foreground">
-                      Vendeur: {lot.sellerName}
+                      {t('table.seller')}: {lot.sellerName}
                     </div>
                   )}
                   {!lot.productName &&

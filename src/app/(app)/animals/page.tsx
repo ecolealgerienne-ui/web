@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useAnimals } from '@/lib/hooks/useAnimals';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { animalsService } from '@/lib/services/animals.service';
@@ -28,7 +29,7 @@ export default function AnimalsPage() {
   const tc = useCommonTranslations();
   const toast = useToast();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -149,17 +150,20 @@ export default function AnimalsPage() {
           />
         </div>
 
-        <select
+        <Select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+          onValueChange={(value) => setStatusFilter(value)}
         >
-          <option value="">{t('filters.allStatus')}</option>
-          <option value="alive">{t('status.alive')}</option>
-          <option value="sold">{t('status.sold')}</option>
-          <option value="dead">{t('status.dead')}</option>
-          <option value="missing">{t('status.missing')}</option>
-        </select>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder={t('filters.allStatus')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
+            <SelectItem value="alive">{t('status.alive')}</SelectItem>
+            <SelectItem value="sold">{t('status.sold')}</SelectItem>
+            <SelectItem value="dead">{t('status.dead')}</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Button onClick={handleAdd} className="ml-auto">
           <Plus className="mr-2 h-4 w-4" />

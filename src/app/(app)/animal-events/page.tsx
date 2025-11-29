@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useAnimalEvents } from '@/lib/hooks/useAnimalEvents';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { animalEventsService } from '@/lib/services/animal-events.service';
@@ -18,7 +19,7 @@ export default function AnimalEventsPage() {
   const t = useTranslations('animalEvents');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
   const { events, loading, error, refetch } = useAnimalEvents({ eventType: typeFilter });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -84,19 +85,22 @@ export default function AnimalEventsPage() {
       </div>
 
       <div className="flex gap-4 items-center">
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
-          <option value="">{t('filters.allTypes')}</option>
-          <option value="birth">{t('types.birth')}</option>
-          <option value="death">{t('types.death')}</option>
-          <option value="sale">{t('types.sale')}</option>
-          <option value="purchase">{t('types.purchase')}</option>
-          <option value="transfer">{t('types.transfer')}</option>
-          <option value="health_check">{t('types.health_check')}</option>
-          <option value="vaccination">{t('types.vaccination')}</option>
-          <option value="treatment">{t('types.treatment')}</option>
-          <option value="weighing">{t('types.weighing')}</option>
-          <option value="other">{t('types.other')}</option>
-        </select>
+        <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value)}>
+          <SelectTrigger className="w-[250px]">
+            <SelectValue placeholder={t('filters.allTypes')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
+            <SelectItem value="entry">{t('types.entry')}</SelectItem>
+            <SelectItem value="exit">{t('types.exit')}</SelectItem>
+            <SelectItem value="birth">{t('types.birth')}</SelectItem>
+            <SelectItem value="death">{t('types.death')}</SelectItem>
+            <SelectItem value="sale">{t('types.sale')}</SelectItem>
+            <SelectItem value="purchase">{t('types.purchase')}</SelectItem>
+            <SelectItem value="transfer_in">{t('types.transfer_in')}</SelectItem>
+            <SelectItem value="transfer_out">{t('types.transfer_out')}</SelectItem>
+          </SelectContent>
+        </Select>
         <Button onClick={handleAdd} className="ml-auto"><Plus className="mr-2 h-4 w-4" />{t('newEvent')}</Button>
       </div>
 

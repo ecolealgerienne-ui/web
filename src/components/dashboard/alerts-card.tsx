@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 interface Alert {
   id: number;
@@ -14,6 +15,7 @@ interface AlertsCardProps {
 }
 
 export function AlertsCard({ alerts }: AlertsCardProps) {
+  const t = useTranslations('dashboard');
   const totalAlerts = alerts.reduce((sum, alert) => sum + alert.count, 0);
 
   return (
@@ -21,7 +23,7 @@ export function AlertsCard({ alerts }: AlertsCardProps) {
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          Alertes Actives ({totalAlerts})
+          {t('alerts.title')} ({totalAlerts})
         </CardTitle>
       </CardHeader>
       <CardContent>

@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { useTranslations } from 'next-intl'
 import {
   User,
   Building2,
@@ -41,41 +41,82 @@ type SectionId =
   | 'security'
   | 'data'
 
+type GroupId = 'general' | 'my-data' | 'preferences' | 'system'
+
 interface Section {
   id: SectionId
-  label: string
+  labelKey: string
   icon: typeof User
-  group: 'general' | 'my-data' | 'preferences' | 'system'
+  group: GroupId
 }
 
 const sections: Section[] = [
   // Général
-  { id: 'profile', label: 'Profil', icon: User, group: 'general' },
-  { id: 'farm', label: 'Ferme', icon: Building2, group: 'general' },
+  { id: 'profile', labelKey: 'profile', icon: User, group: 'general' },
+  { id: 'farm', labelKey: 'farm', icon: Building2, group: 'general' },
 
-  // Mes Données (nouveau groupe)
-  { id: 'my-veterinarians', label: 'Mes Vétérinaires', icon: Stethoscope, group: 'my-data' },
-  { id: 'my-breeds', label: 'Mes Races', icon: Dna, group: 'my-data' },
-  { id: 'my-vaccines', label: 'Mes Vaccins', icon: Syringe, group: 'my-data' },
-  { id: 'my-medications', label: 'Ma Pharmacie', icon: Pill, group: 'my-data' },
-  { id: 'my-alerts', label: 'Mes Alertes', icon: Bell, group: 'my-data' },
+  // Mes Données
+  { id: 'my-veterinarians', labelKey: 'myVeterinarians', icon: Stethoscope, group: 'my-data' },
+  { id: 'my-breeds', labelKey: 'myBreeds', icon: Dna, group: 'my-data' },
+  { id: 'my-vaccines', labelKey: 'myVaccines', icon: Syringe, group: 'my-data' },
+  { id: 'my-medications', labelKey: 'myMedications', icon: Pill, group: 'my-data' },
+  { id: 'my-alerts', labelKey: 'myAlerts', icon: Bell, group: 'my-data' },
 
   // Préférences
-  { id: 'language', label: 'Langue & Région', icon: Globe, group: 'preferences' },
+  { id: 'language', labelKey: 'language', icon: Globe, group: 'preferences' },
 
   // Système
-  { id: 'security', label: 'Sécurité', icon: Shield, group: 'system' },
-  { id: 'data', label: 'Données', icon: Database, group: 'system' },
+  { id: 'security', labelKey: 'security', icon: Shield, group: 'system' },
+  { id: 'data', labelKey: 'data', icon: Database, group: 'system' },
 ]
 
-const groupLabels: Record<string, string> = {
-  general: 'Général',
-  'my-data': 'Mes Données',
-  preferences: 'Préférences',
-  system: 'Système',
+const groupKeys: Record<GroupId, string> = {
+  general: 'general',
+  'my-data': 'myData',
+  preferences: 'preferences',
+  system: 'system',
+}
+
+// Données de référence pour les pays et régions
+const REGIONS: Record<string, { code: string; name: string }[]> = {
+  DZ: [
+    { code: 'ALG', name: 'Alger' },
+    { code: 'ORA', name: 'Oran' },
+    { code: 'CON', name: 'Constantine' },
+    { code: 'BLI', name: 'Blida' },
+    { code: 'SET', name: 'Sétif' },
+    { code: 'BAT', name: 'Batna' },
+    { code: 'TIP', name: 'Tipaza' },
+    { code: 'TIZ', name: 'Tizi Ouzou' },
+    { code: 'BEJ', name: 'Béjaïa' },
+  ],
+  TN: [
+    { code: 'TUN', name: 'Tunis' },
+    { code: 'SFA', name: 'Sfax' },
+    { code: 'SOU', name: 'Sousse' },
+  ],
+  MA: [
+    { code: 'CAS', name: 'Casablanca' },
+    { code: 'RAB', name: 'Rabat' },
+    { code: 'MAR', name: 'Marrakech' },
+  ],
+  FR: [
+    { code: 'IDF', name: 'Île-de-France' },
+    { code: 'ARA', name: 'Auvergne-Rhône-Alpes' },
+    { code: 'NAQ', name: 'Nouvelle-Aquitaine' },
+  ],
+}
+
+// Noms des pays pour l'affichage
+const COUNTRY_NAMES: Record<string, string> = {
+  DZ: 'Algérie',
+  TN: 'Tunisie',
+  MA: 'Maroc',
+  FR: 'France',
 }
 
 export default function SettingsPage() {
+  const t = useTranslations('settings')
   const [activeSection, setActiveSection] = useState<SectionId>('profile')
 
   // Grouper les sections
@@ -121,10 +162,8 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Paramètres</h1>
-        <p className="text-muted-foreground">
-          Gérez vos préférences et la configuration de votre exploitation
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-4">
@@ -134,7 +173,7 @@ export default function SettingsPage() {
             {Object.entries(groupedSections).map(([group, items]) => (
               <div key={group}>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
-                  {groupLabels[group]}
+                  {t(`groups.${groupKeys[group as GroupId]}`)}
                 </p>
                 <div className="space-y-1">
                   {items.map((section) => {
@@ -147,8 +186,8 @@ export default function SettingsPage() {
                         className="w-full justify-start"
                         onClick={() => setActiveSection(section.id)}
                       >
-                        <Icon className="mr-2 h-4 w-4" />
-                        {section.label}
+                        <Icon className="me-2 h-4 w-4" />
+                        {t(`sections.${section.labelKey}`)}
                       </Button>
                     )
                   })}
@@ -169,47 +208,55 @@ export default function SettingsPage() {
   )
 }
 
-// ==================== Sections existantes ====================
+// ==================== Sections ====================
 
 function ProfileSection() {
+  const t = useTranslations('settings.profile')
+  const ta = useTranslations('settings.actions')
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Profil utilisateur</h2>
-        <p className="text-sm text-muted-foreground">Gérez vos informations personnelles</p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="firstName">Prénom</Label>
+            <Label htmlFor="firstName">{t('firstName')}</Label>
             <Input id="firstName" placeholder="Mohamed" />
           </div>
           <div>
-            <Label htmlFor="lastName">Nom</Label>
+            <Label htmlFor="lastName">{t('lastName')}</Label>
             <Input id="lastName" placeholder="Amrani" />
           </div>
         </div>
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t('email')}</Label>
           <Input id="email" type="email" placeholder="m.amrani@example.com" />
         </div>
         <div>
-          <Label htmlFor="phone">Téléphone</Label>
-          <Input id="phone" type="tel" placeholder="+213 555 123 456" />
+          <Label htmlFor="phone">{t('phone')}</Label>
+          <Input id="phone" type="tel" placeholder="+213 555 123 456" dir="ltr" />
         </div>
         <div>
-          <Label htmlFor="role">Rôle</Label>
-          <Select id="role" defaultValue="manager">
-            <option value="owner">Propriétaire</option>
-            <option value="manager">Gestionnaire</option>
-            <option value="veterinarian">Vétérinaire</option>
-            <option value="worker">Employé</option>
-          </Select>
+          <Label htmlFor="role">{t('role')}</Label>
+          <select
+            id="role"
+            defaultValue="manager"
+            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="">{t('selectRole')}</option>
+            <option value="owner">{t('roles.owner')}</option>
+            <option value="manager">{t('roles.manager')}</option>
+            <option value="veterinarian">{t('roles.veterinarian')}</option>
+            <option value="worker">{t('roles.worker')}</option>
+          </select>
         </div>
         <Button>
-          <Save className="mr-2 h-4 w-4" />
-          Enregistrer les modifications
+          <Save className="me-2 h-4 w-4" />
+          {ta('save')}
         </Button>
       </div>
     </div>
@@ -217,64 +264,88 @@ function ProfileSection() {
 }
 
 function FarmSection() {
+  const t = useTranslations('settings.farm')
+  const ta = useTranslations('settings.actions')
+  const [selectedCountry, setSelectedCountry] = useState('DZ')
+
+  const availableRegions = selectedCountry ? REGIONS[selectedCountry] || [] : []
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Informations de la ferme</h2>
-        <p className="text-sm text-muted-foreground">
-          Configurez les détails de votre exploitation
-        </p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="farmName">Nom de la ferme</Label>
+          <Label htmlFor="farmName">{t('farmName')}</Label>
           <Input id="farmName" placeholder="Ferme El Baraka" />
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="farmId">N° d&apos;identification</Label>
+            <Label htmlFor="farmId">{t('farmId')}</Label>
             <Input id="farmId" placeholder="EL-2023-001" />
           </div>
           <div>
-            <Label htmlFor="surface">Surface (hectares)</Label>
-            <Input id="surface" type="number" placeholder="50" />
+            <Label htmlFor="surface">{t('surface')}</Label>
+            <Input id="surface" type="number" placeholder="50" dir="ltr" />
           </div>
         </div>
         <div>
-          <Label htmlFor="address">Adresse</Label>
+          <Label htmlFor="address">{t('address')}</Label>
           <Input id="address" placeholder="Route de Blida, Boufarik" />
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="wilaya">Wilaya</Label>
-            <Select id="wilaya">
-              <option value="">Sélectionner...</option>
-              <option value="alger">Alger</option>
-              <option value="oran">Oran</option>
-              <option value="constantine">Constantine</option>
-              <option value="blida">Blida</option>
-              <option value="setif">Sétif</option>
-            </Select>
+            <Label htmlFor="country">{t('country')}</Label>
+            <select
+              id="country"
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">{t('selectCountry')}</option>
+              {Object.entries(COUNTRY_NAMES).map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
-            <Label htmlFor="commune">Commune</Label>
-            <Input id="commune" placeholder="Boufarik" />
+            <Label htmlFor="region">{t('region')}</Label>
+            <select
+              id="region"
+              disabled={!selectedCountry}
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+            >
+              <option value="">{t('selectRegion')}</option>
+              {availableRegions.map((region) => (
+                <option key={region.code} value={region.code}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <div>
-          <Label>Espèces élevées</Label>
+          <Label htmlFor="commune">{t('commune')}</Label>
+          <Input id="commune" placeholder="Boufarik" />
+        </div>
+        <div>
+          <Label>{t('species')}</Label>
           <div className="flex flex-wrap gap-2 mt-2">
             <Badge>Ovins</Badge>
             <Badge>Caprins</Badge>
             <Badge className="border border-dashed border-primary text-primary bg-transparent cursor-pointer hover:bg-primary/10">
-              + Ajouter
+              {t('addSpecies')}
             </Badge>
           </div>
         </div>
         <Button>
-          <Save className="mr-2 h-4 w-4" />
-          Enregistrer les modifications
+          <Save className="me-2 h-4 w-4" />
+          {ta('save')}
         </Button>
       </div>
     </div>
@@ -282,59 +353,80 @@ function FarmSection() {
 }
 
 function LanguageSection() {
+  const t = useTranslations('settings.language')
+  const ta = useTranslations('settings.actions')
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Langue & Région</h2>
-        <p className="text-sm text-muted-foreground">
-          Personnalisez l&apos;affichage selon vos préférences
-        </p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="language">Langue de l&apos;interface</Label>
-          <Select id="language" defaultValue="fr">
-            <option value="fr">Français</option>
-            <option value="ar">العربية (Arabe)</option>
-            <option value="en">English</option>
-          </Select>
+          <Label htmlFor="language">{t('interfaceLanguage')}</Label>
+          <select
+            id="language"
+            defaultValue="fr"
+            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="fr">{t('languages.fr')}</option>
+            <option value="ar">{t('languages.ar')}</option>
+            <option value="en">{t('languages.en')}</option>
+          </select>
         </div>
         <div>
-          <Label htmlFor="timezone">Fuseau horaire</Label>
-          <Select id="timezone" defaultValue="africa-algiers">
-            <option value="africa-algiers">Afrique/Alger (GMT+1)</option>
-          </Select>
+          <Label htmlFor="timezone">{t('timezone')}</Label>
+          <select
+            id="timezone"
+            defaultValue="africa-algiers"
+            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="africa-algiers">{t('timezones.africaAlgiers')}</option>
+            <option value="europe-paris">{t('timezones.europeParis')}</option>
+            <option value="utc">{t('timezones.utc')}</option>
+          </select>
         </div>
         <div>
-          <Label htmlFor="dateFormat">Format de date</Label>
-          <Select id="dateFormat" defaultValue="dd/mm/yyyy">
-            <option value="dd/mm/yyyy">JJ/MM/AAAA</option>
-            <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
-            <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
-          </Select>
+          <Label htmlFor="dateFormat">{t('dateFormat')}</Label>
+          <select
+            id="dateFormat"
+            defaultValue="dd/mm/yyyy"
+            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="dd/mm/yyyy">{t('dateFormats.ddmmyyyy')}</option>
+            <option value="mm/dd/yyyy">{t('dateFormats.mmddyyyy')}</option>
+            <option value="yyyy-mm-dd">{t('dateFormats.yyyymmdd')}</option>
+          </select>
         </div>
         <div>
-          <Label htmlFor="currency">Devise</Label>
-          <Select id="currency" defaultValue="dzd">
-            <option value="dzd">Dinar Algérien (DA)</option>
-            <option value="eur">Euro (€)</option>
-            <option value="usd">Dollar US ($)</option>
-          </Select>
+          <Label htmlFor="currency">{t('currency')}</Label>
+          <select
+            id="currency"
+            defaultValue="dzd"
+            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="dzd">{t('currencies.dzd')}</option>
+            <option value="eur">{t('currencies.eur')}</option>
+            <option value="usd">{t('currencies.usd')}</option>
+            <option value="mad">{t('currencies.mad')}</option>
+            <option value="tnd">{t('currencies.tnd')}</option>
+          </select>
         </div>
         <div className="flex items-center justify-between p-4 border rounded-lg">
           <div>
             <div className="font-medium flex items-center gap-2">
               <Moon className="h-4 w-4" />
-              Thème sombre
+              {t('darkTheme')}
             </div>
-            <div className="text-sm text-muted-foreground">Activer le mode sombre</div>
+            <div className="text-sm text-muted-foreground">{t('enableDarkMode')}</div>
           </div>
           <input type="checkbox" className="h-4 w-4" />
         </div>
         <Button>
-          <Save className="mr-2 h-4 w-4" />
-          Enregistrer les préférences
+          <Save className="me-2 h-4 w-4" />
+          {ta('savePreferences')}
         </Button>
       </div>
     </div>
@@ -342,57 +434,57 @@ function LanguageSection() {
 }
 
 function SecuritySection() {
+  const t = useTranslations('settings.security')
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Sécurité</h2>
-        <p className="text-sm text-muted-foreground">Protégez votre compte et vos données</p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="space-y-6">
         {/* Changement de mot de passe */}
         <div className="space-y-4">
-          <h3 className="font-medium">Changer le mot de passe</h3>
+          <h3 className="font-medium">{t('changePassword')}</h3>
           <div>
-            <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+            <Label htmlFor="currentPassword">{t('currentPassword')}</Label>
             <Input id="currentPassword" type="password" />
           </div>
           <div>
-            <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+            <Label htmlFor="newPassword">{t('newPassword')}</Label>
             <Input id="newPassword" type="password" />
           </div>
           <div>
-            <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+            <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
             <Input id="confirmPassword" type="password" />
           </div>
-          <Button>Changer le mot de passe</Button>
+          <Button>{t('changePassword')}</Button>
         </div>
 
         <div className="border-t pt-6">
-          <h3 className="font-medium mb-4">Authentification à deux facteurs</h3>
+          <h3 className="font-medium mb-4">{t('twoFactor')}</h3>
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <div className="font-medium">2FA</div>
-              <div className="text-sm text-muted-foreground">
-                Ajouter une couche de sécurité supplémentaire
-              </div>
+              <div className="text-sm text-muted-foreground">{t('twoFactorDescription')}</div>
             </div>
-            <Badge variant="warning">Désactivé</Badge>
+            <Badge variant="warning">{t('disabled')}</Badge>
           </div>
           <Button variant="outline" className="mt-4">
-            Activer 2FA
+            {t('enable2FA')}
           </Button>
         </div>
 
         <div className="border-t pt-6">
-          <h3 className="font-medium mb-4">Sessions actives</h3>
+          <h3 className="font-medium mb-4">{t('activeSessions')}</h3>
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
-                <div className="font-medium">Navigateur actuel</div>
+                <div className="font-medium">{t('currentBrowser')}</div>
                 <div className="text-muted-foreground">Chrome sur Windows • Alger, Algérie</div>
               </div>
-              <Badge variant="success">Active</Badge>
+              <Badge variant="success">{t('active')}</Badge>
             </div>
           </div>
         </div>
@@ -402,56 +494,52 @@ function SecuritySection() {
 }
 
 function DataSection() {
+  const t = useTranslations('settings.data')
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Gestion des données</h2>
-        <p className="text-sm text-muted-foreground">
-          Sauvegarde, export et suppression de données
-        </p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="space-y-6">
         <div>
-          <h3 className="font-medium mb-3">Sauvegarde automatique</h3>
+          <h3 className="font-medium mb-3">{t('autoBackup')}</h3>
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="text-sm text-muted-foreground">
-              Dernière sauvegarde : Aujourd&apos;hui à 03:00
+              {t('lastBackup')}: Aujourd&apos;hui à 03:00
             </div>
-            <Badge variant="success">Activé</Badge>
+            <Badge variant="success">{t('enabled')}</Badge>
           </div>
           <Button variant="outline" className="mt-3">
-            Sauvegarder maintenant
+            {t('backupNow')}
           </Button>
         </div>
 
         <div className="border-t pt-6">
-          <h3 className="font-medium mb-3">Exporter les données</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Téléchargez une copie complète de toutes vos données
-          </p>
+          <h3 className="font-medium mb-3">{t('exportData')}</h3>
+          <p className="text-sm text-muted-foreground mb-4">{t('exportDescription')}</p>
           <div className="space-y-2">
             <Button variant="outline" className="w-full justify-start">
-              <Database className="mr-2 h-4 w-4" />
-              Exporter en Excel
+              <Database className="me-2 h-4 w-4" />
+              {t('exportExcel')}
             </Button>
             <Button variant="outline" className="w-full justify-start">
-              <Database className="mr-2 h-4 w-4" />
-              Exporter en JSON
+              <Database className="me-2 h-4 w-4" />
+              {t('exportJson')}
             </Button>
           </div>
         </div>
 
         <div className="border-t pt-6">
-          <h3 className="font-medium mb-2 text-destructive">Zone de danger</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Les actions suivantes sont irréversibles
-          </p>
+          <h3 className="font-medium mb-2 text-destructive">{t('dangerZone')}</h3>
+          <p className="text-sm text-muted-foreground mb-4">{t('dangerDescription')}</p>
           <Button
             variant="outline"
             className="text-destructive border-destructive hover:bg-destructive/10"
           >
-            Supprimer toutes les données
+            {t('deleteAllData')}
           </Button>
         </div>
       </div>

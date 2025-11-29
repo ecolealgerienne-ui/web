@@ -178,18 +178,22 @@ export function TreatmentFormDialog({
             <div>
               <Label htmlFor="treatmentType">Type de traitement *</Label>
               <Select
-                id="treatmentType"
                 required
                 value={formData.treatmentType}
                 onChange={(e) =>
                   setFormData({ ...formData, treatmentType: e.target.value as Treatment['treatmentType'] })
                 }
               >
-                <option value="antibiotic">Antibiotique</option>
-                <option value="antiparasitic">Antiparasitaire</option>
-                <option value="anti_inflammatory">Anti-inflammatoire</option>
-                <option value="vitamin">Vitamine/Complément</option>
-                <option value="other">Autre</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="antibiotic">Antibiotique</SelectItem>
+                  <SelectItem value="antiparasitic">Antiparasitaire</SelectItem>
+                  <SelectItem value="anti_inflammatory">Anti-inflammatoire</SelectItem>
+                  <SelectItem value="vitamin">Vitamine/Complément</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -197,15 +201,19 @@ export function TreatmentFormDialog({
             <div>
               <Label htmlFor="targetType">Cible *</Label>
               <Select
-                id="targetType"
                 required
                 value={formData.targetType}
                 onChange={(e) =>
                   setFormData({ ...formData, targetType: e.target.value as Treatment['targetType'] })
                 }
               >
-                <option value="individual">Animal individuel</option>
-                <option value="lot">Lot d&apos;animaux</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une cible" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="individual">Animal individuel</SelectItem>
+                  <SelectItem value="lot">Lot d&apos;animaux</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -251,17 +259,21 @@ export function TreatmentFormDialog({
             <div>
               <Label htmlFor="administrationRoute">Voie d&apos;administration</Label>
               <Select
-                id="administrationRoute"
                 value={formData.administrationRoute}
-                onChange={(e) =>
-                  setFormData({ ...formData, administrationRoute: e.target.value })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, administrationRoute: value })
                 }
               >
-                <option value="IM">Intramusculaire (IM)</option>
-                <option value="SC">Sous-cutanée (SC)</option>
-                <option value="oral">Orale</option>
-                <option value="IV">Intraveineuse (IV)</option>
-                <option value="topical">Topique</option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une voie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="IM">Intramusculaire (IM)</SelectItem>
+                  <SelectItem value="SC">Sous-cutanée (SC)</SelectItem>
+                  <SelectItem value="oral">Orale</SelectItem>
+                  <SelectItem value="IV">Intraveineuse (IV)</SelectItem>
+                  <SelectItem value="topical">Topique</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -365,15 +377,19 @@ export function TreatmentFormDialog({
           <div>
             <Label htmlFor="status">Statut *</Label>
             <Select
-              id="status"
               required
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as Treatment['status'] })}
             >
-              <option value="scheduled">Programmé</option>
-              <option value="in_progress">En cours</option>
-              <option value="completed">Terminé</option>
-              <option value="cancelled">Annulé</option>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="scheduled">Programmé</SelectItem>
+                <SelectItem value="in_progress">En cours</SelectItem>
+                <SelectItem value="completed">Terminé</SelectItem>
+                <SelectItem value="cancelled">Annulé</SelectItem>
+              </SelectContent>
             </Select>
           </div>
 
