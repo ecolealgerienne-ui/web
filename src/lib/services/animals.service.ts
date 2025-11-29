@@ -20,8 +20,9 @@ class AnimalsService {
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
       if (filters?.search) params.append('search', filters.search);
 
-      // Ajouter la pagination - par défaut récupérer tous les animaux (limite très haute)
-      params.append('limit', String(filters?.limit || 10000));
+      // Ajouter la pagination - par défaut récupérer un maximum d'animaux
+      // L'API backend a une limite maximale, on utilise 1000 pour rester en dessous
+      params.append('limit', String(filters?.limit || 1000));
       if (filters?.offset) params.append('offset', String(filters.offset));
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
