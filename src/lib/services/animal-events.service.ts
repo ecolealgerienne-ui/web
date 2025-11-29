@@ -24,10 +24,13 @@ class AnimalEventsService {
       if (filters?.toDate) params.append('toDate', filters.toDate);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      console.log('[Animal Events] Fetching movements from:', url);
       const response = await apiClient.get<{ data: AnimalEvent[] }>(url);
+      console.log('[Animal Events] Response:', response);
       logger.info('Animal events (movements) fetched', { count: response.data?.length || 0 });
       return response.data || [];
     } catch (error: any) {
+      console.error('[Animal Events] Failed to fetch movements:', error);
       if (error.status === 404) {
         logger.info('No movements found (404)');
         return [];
