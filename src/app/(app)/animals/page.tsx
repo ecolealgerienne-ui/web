@@ -230,15 +230,6 @@ export default function AnimalsPage() {
                           <Badge variant={getStatusBadgeVariant(animal.status)}>
                             {t(`status.${animal.status}`)}
                           </Badge>
-                          {/* Health indicators - shown on hover or always */}
-                          <div className="flex gap-1">
-                            <div className="p-1 rounded bg-blue-50 dark:bg-blue-950" title="Voir les traitements et vaccinations">
-                              <Pill className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div className="p-1 rounded bg-green-50 dark:bg-green-950" title="Voir les vaccinations">
-                              <Syringe className="h-3 w-3 text-green-600 dark:text-green-400" />
-                            </div>
-                          </div>
                         </div>
                       </div>
 

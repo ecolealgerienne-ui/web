@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { Animal } from '@/lib/types/animal';
 import { Treatment } from '@/lib/types/treatment';
-import { Vaccination } from '@/lib/types/vaccination';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +16,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslations } from '@/lib/i18n';
 import { ChevronLeft, ChevronRight, Syringe, Pill } from 'lucide-react';
 import { treatmentsService } from '@/lib/services/treatments.service';
-import { vaccinationsService } from '@/lib/services/vaccinations.service';
 
 interface AnimalDetailDialogProps {
   animal: Animal | null;
@@ -36,26 +34,35 @@ export function AnimalDetailDialog({
 }: AnimalDetailDialogProps) {
   const t = useTranslations('animals');
   const [activeTab, setActiveTab] = useState('info');
-  const [treatments, setTreatments] = useState<Treatment[]>([]);
-  const [vaccinations, setVaccinations] = useState<Vaccination[]>([]);
+  const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
   const [loadingCare, setLoadingCare] = useState(false);
 
   const currentIndex = animal ? animals.findIndex((a) => a.id === animal.id) : -1;
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < animals.length - 1 && currentIndex !== -1;
 
+  // Séparer les treatments en deux catégories selon le type
+  const treatments = allTreatments.filter(t => t.type !== 'vaccination');
+  const vaccinations = allTreatments.filter(t => t.type === 'vaccination');
+
   const loadCareData = React.useCallback(async () => {
     if (!animal) return;
     setLoadingCare(true);
+    console.log('[Animal Detail] Loading care data for animal:', animal.id);
     try {
-      const [treatmentsData, vaccinationsData] = await Promise.all([
-        treatmentsService.getAll({ animalId: animal.id }),
-        vaccinationsService.getAll({ animalId: animal.id }),
-      ]);
-      setTreatments(treatmentsData);
-      setVaccinations(vaccinationsData);
+      // Charger tous les treatments (inclus vaccinations avec type='vaccination')
+      const treatmentsData = await treatmentsService.getAll({ animalId: animal.id });
+      console.log('[Animal Detail] All treatments loaded:', treatmentsData.length, treatmentsData);
+
+      // Séparer les résultats
+      const regularTreatments = treatmentsData.filter(t => t.type !== 'vaccination');
+      const vaccinationTreatments = treatmentsData.filter(t => t.type === 'vaccination');
+      console.log('[Animal Detail] Regular treatments:', regularTreatments.length);
+      console.log('[Animal Detail] Vaccinations:', vaccinationTreatments.length);
+
+      setAllTreatments(treatmentsData);
     } catch (error) {
-      console.error('Failed to load care data:', error);
+      console.error('[Animal Detail] Failed to load care data:', error);
     } finally {
       setLoadingCare(false);
     }
@@ -90,21 +97,6 @@ export function AnimalDetailDialog({
         return 'bg-green-500';
       case 'scheduled':
         return 'bg-yellow-500';
-      case 'cancelled':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-400';
-    }
-  };
-
-  const getVaccinationStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-500';
-      case 'scheduled':
-        return 'bg-yellow-500';
-      case 'overdue':
-        return 'bg-red-500';
       case 'cancelled':
         return 'bg-gray-500';
       default:
@@ -334,7 +326,7 @@ export function AnimalDetailDialog({
                   )}
                 </div>
 
-                {/* Vaccinations */}
+                {/* Vaccinations (treatments avec type='vaccination') */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Syringe className="h-5 w-5" />
@@ -356,11 +348,11 @@ export function AnimalDetailDialog({
                         >
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="font-medium">{vaccination.vaccineName}</p>
-                              <p className="text-sm text-muted-foreground">{vaccination.diseaseTarget}</p>
+                              <p className="font-medium">{vaccination.productName}</p>
+                              <p className="text-sm text-muted-foreground">{vaccination.reason}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <div className={`h-2 w-2 rounded-full ${getVaccinationStatusColor(vaccination.status)}`} />
+                              <div className={`h-2 w-2 rounded-full ${getTreatmentStatusColor(vaccination.status)}`} />
                               <span className="text-xs text-muted-foreground capitalize">
                                 {vaccination.status}
                               </span>
@@ -369,14 +361,12 @@ export function AnimalDetailDialog({
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
                               <span className="text-muted-foreground">Date:</span>
-                              <p>{new Date(vaccination.vaccinationDate).toLocaleDateString()}</p>
+                              <p>{new Date(vaccination.treatmentDate).toLocaleDateString()}</p>
                             </div>
-                            {vaccination.nextDueDate && (
-                              <div>
-                                <span className="text-muted-foreground">Prochain rappel:</span>
-                                <p>{new Date(vaccination.nextDueDate).toLocaleDateString()}</p>
-                              </div>
-                            )}
+                            <div>
+                              <span className="text-muted-foreground">Dose:</span>
+                              <p>{vaccination.dose} {vaccination.dosageUnit}</p>
+                            </div>
                           </div>
                           {vaccination.notes && (
                             <p className="text-xs text-muted-foreground italic">{vaccination.notes}</p>

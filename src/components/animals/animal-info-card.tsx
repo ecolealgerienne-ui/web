@@ -14,6 +14,7 @@ interface AnimalInfoCardProps {
 }
 
 export function AnimalInfoCard({ animal }: AnimalInfoCardProps) {
+  const displayId = animal.currentEid || animal.officialNumber || animal.visualId || animal.id;
 
   return (
     <Card>
@@ -22,30 +23,34 @@ export function AnimalInfoCard({ animal }: AnimalInfoCardProps) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground">EID</p>
-            <p className="font-mono font-medium">{animal.identificationNumber}</p>
-          </div>
-          {animal.identificationNumber && (
+          {animal.currentEid && (
             <div>
-              <p className="text-sm text-muted-foreground">ID Interne</p>
-              <p className="font-medium">{animal.identificationNumber}</p>
+              <p className="text-sm text-muted-foreground">EID</p>
+              <p className="font-mono font-medium">{animal.currentEid}</p>
             </div>
           )}
-          {animal.name && (
+          {animal.officialNumber && (
             <div>
-              <p className="text-sm text-muted-foreground">Nom</p>
-              <p className="font-medium">{animal.name}</p>
+              <p className="text-sm text-muted-foreground">N° Officiel</p>
+              <p className="font-medium">{animal.officialNumber}</p>
             </div>
           )}
-          <div>
-            <p className="text-sm text-muted-foreground">Espèce</p>
-            <p className="font-medium">{speciesLabels[animal.speciesId]}</p>
-          </div>
+          {animal.visualId && (
+            <div>
+              <p className="text-sm text-muted-foreground">ID Visuel</p>
+              <p className="font-medium">{animal.visualId}</p>
+            </div>
+          )}
+          {animal.speciesId && (
+            <div>
+              <p className="text-sm text-muted-foreground">Espèce</p>
+              <p className="font-medium">{animal.species?.name || speciesLabels[animal.speciesId] || animal.speciesId}</p>
+            </div>
+          )}
           {animal.breedId && (
             <div>
               <p className="text-sm text-muted-foreground">Race</p>
-              <p className="font-medium">{animal.breedId}</p>
+              <p className="font-medium">{animal.breed?.name || animal.breedId}</p>
             </div>
           )}
           <div>

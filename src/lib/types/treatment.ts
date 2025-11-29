@@ -1,6 +1,7 @@
 // Types pour les traitements basés sur les specs backend
 
 export type TreatmentStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+export type TreatmentCategory = 'treatment' | 'vaccination'; // Backend type: treatment vs vaccination
 export type TreatmentType = 'antibiotic' | 'antiparasitic' | 'anti_inflammatory' | 'vitamin' | 'other';
 export type TreatmentTarget = 'individual' | 'lot';
 
@@ -12,6 +13,9 @@ export interface Treatment {
   animalId?: string;
   lotId?: string;
   targetType: TreatmentTarget;
+
+  // Type: treatment ou vaccination (selon backend API)
+  type?: TreatmentCategory;
 
   // Détails traitement
   productId?: string;

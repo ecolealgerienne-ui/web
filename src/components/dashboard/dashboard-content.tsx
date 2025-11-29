@@ -7,12 +7,19 @@ import { ChartEvolution } from './chart-evolution'
 import { AlertsCard } from './alerts-card'
 import { ActivitiesCard } from './activities-card'
 import { EmptyState, EmptyStateIllustration, ConfigWarningCard } from '@/components/ui/empty-state'
-import {
-  mockDashboardStats,
-  mockChartData,
-  mockAlerts,
-  mockRecentActivities,
-} from '@/lib/data/mock'
+
+// Default mock data for development
+const mockDashboardStats = {
+  totalAnimals: 0,
+  births: { count: 0, period: 'Ce mois' },
+  deaths: { count: 0, period: 'Ce mois' },
+  vaccinations: { upcoming: 0, label: 'À venir' },
+}
+
+const mockChartData: Array<{ month: string; animals: number }> = []
+
+const mockAlerts: any[] = []
+const mockRecentActivities: any[] = []
 
 interface DashboardStats {
   totalAnimals: number
