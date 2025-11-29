@@ -736,6 +736,62 @@
       "lbs": "رطل"
     }
   },
+  "reports": {
+    "title": "التقارير",
+    "subtitle": "إنشاء تقارير مفصلة لمزرعتك",
+    "settings": {
+      "title": "الإعدادات العامة",
+      "description": "حدد الفترة الافتراضية لجميع التقارير",
+      "customPeriod": "فترة مخصصة",
+      "applyToAll": "تطبيق على الجميع"
+    },
+    "period": {
+      "label": "الفترة",
+      "week": "أسبوع",
+      "month": "شهر",
+      "quarter": "ربع سنة",
+      "year": "سنة"
+    },
+    "categoryTitles": {
+      "health": "التقارير الصحية",
+      "production": "تقارير الإنتاج",
+      "financial": "التقارير المالية والتنظيمية"
+    },
+    "buttons": {
+      "generate": "إنشاء",
+      "exportPdf": "تصدير إلى PDF"
+    },
+    "definitions": {
+      "herd-inventory": {
+        "name": "جرد القطيع",
+        "description": "الحالة الكاملة للقطيع حسب النوع والعمر والحالة"
+      },
+      "vaccinations-report": {
+        "name": "سجل التطعيمات",
+        "description": "سجل التطعيمات والجدول الزمني القادم"
+      },
+      "treatments-report": {
+        "name": "سجل العلاجات",
+        "description": "سجل العلاجات وفترات الانتظار"
+      },
+      "movements-report": {
+        "name": "حركات الحيوانات",
+        "description": "الدخول والخروج والولادات والوفيات"
+      },
+      "growth-report": {
+        "name": "النمو والأداء",
+        "description": "تطور الأوزان ومتوسط الزيادة اليومية"
+      },
+      "health-report": {
+        "name": "التقرير الصحي",
+        "description": "معدلات الإصابة والوفيات والحوادث الصحية"
+      },
+      "financial-report": {
+        "name": "التقرير المالي",
+        "description": "تكاليف الرعاية البيطرية والإيرادات"
+      }
+    }
+  },
   "onboarding": {
     "welcome": "مرحباً بك في AniTra",
     "skipConfig": "تكوين لاحقاً",
