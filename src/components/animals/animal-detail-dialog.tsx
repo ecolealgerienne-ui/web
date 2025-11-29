@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animal } from '@/lib/types/animal';
 import { Treatment } from '@/lib/types/treatment';
 import { Vaccination } from '@/lib/types/vaccination';
