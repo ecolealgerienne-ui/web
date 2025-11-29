@@ -47,15 +47,18 @@ export function AnimalDetailDialog({
   const loadCareData = React.useCallback(async () => {
     if (!animal) return;
     setLoadingCare(true);
+    console.log('[Animal Detail] Loading care data for animal:', animal.id);
     try {
       const [treatmentsData, vaccinationsData] = await Promise.all([
         treatmentsService.getAll({ animalId: animal.id }),
         vaccinationsService.getAll({ animalId: animal.id }),
       ]);
+      console.log('[Animal Detail] Treatments loaded:', treatmentsData.length, treatmentsData);
+      console.log('[Animal Detail] Vaccinations loaded:', vaccinationsData.length, vaccinationsData);
       setTreatments(treatmentsData);
       setVaccinations(vaccinationsData);
     } catch (error) {
-      console.error('Failed to load care data:', error);
+      console.error('[Animal Detail] Failed to load care data:', error);
     } finally {
       setLoadingCare(false);
     }
