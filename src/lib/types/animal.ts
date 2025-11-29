@@ -3,7 +3,7 @@
  */
 
 export type AnimalSex = 'male' | 'female';
-export type AnimalStatus = 'alive' | 'sold' | 'dead' | 'missing';
+export type AnimalStatus = 'alive' | 'sold' | 'dead'; // 'missing' not supported by backend API
 
 export interface Animal {
   id: string;

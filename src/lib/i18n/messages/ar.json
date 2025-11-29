@@ -30,7 +30,8 @@
       "noData": "لا توجد بيانات متاحة",
       "loading": "جاري التحميل...",
       "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
-      "actionIrreversible": "هذا الإجراء لا رجعة فيه."
+      "actionIrreversible": "هذا الإجراء لا رجعة فيه.",
+      "loadError": "خطأ في تحميل البيانات"
     },
     "fields": {
       "name": "الاسم",
@@ -42,11 +43,23 @@
       "required": "مطلوب"
     }
   },
+  "header": {
+    "dashboard": {
+      "title": "لوحة القيادة",
+      "subtitle": "نظرة عامة"
+    }
+  },
   "navigation": {
     "menu": {
       "dashboard": "لوحة القيادة",
       "animals": "الحيوانات",
+      "events": "الأحداث",
+      "lots": "القطعان",
+      "vaccinations": "التطعيمات",
+      "treatments": "العلاجات",
+      "weighings": "الوزن",
       "data": "البيانات",
+      "reports": "التقارير",
       "settings": "الإعدادات"
     },
     "data": {
@@ -54,7 +67,12 @@
       "breeds": "السلالات",
       "vaccines": "اللقاحات",
       "diseases": "الأمراض",
-      "medications": "الأدوية"
+      "medications": "الأدوية",
+      "veterinarians": "الأطباء البيطريون",
+      "campaigns": "الحملات",
+      "preferences": "التفضيلات",
+      "alerts": "التنبيهات",
+      "farms": "المزارع"
     }
   },
   "breeds": {
@@ -102,6 +120,97 @@
       "deleteError": "خطأ في حذف السلالة",
       "confirmDelete": "هل أنت متأكد أنك تريد حذف السلالة {name}؟",
       "infoMessage": "السلالات هي بيانات مرجعية يديرها المسؤولون الفائقون. يمكنك إنشاء أو تعديل أو حذف السلالات. السلالات المحذوفة لم تعد مرئية في الواجهة."
+    }
+  },
+  "vaccines": {
+    "title": "اللقاحات",
+    "subtitle": "بيانات مرجعية - اللقاحات المتاحة",
+    "newVaccine": "لقاح جديد",
+    "editVaccine": "تعديل اللقاح",
+    "deleteVaccine": "حذف اللقاح",
+    "noVaccines": "لم يتم العثور على لقاحات",
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "manufacturer": "الشركة المصنعة",
+      "diseaseId": "المرض",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: لقاح ضد داء الكلب",
+      "description": "وصف اللقاح",
+      "manufacturer": "مثال: MSD لصحة الحيوان"
+    },
+    "messages": {
+      "created": "تم إنشاء اللقاح بنجاح",
+      "updated": "تم تحديث اللقاح بنجاح",
+      "deleted": "تم حذف اللقاح بنجاح",
+      "createError": "خطأ في إنشاء اللقاح",
+      "updateError": "خطأ في تحديث اللقاح",
+      "deleteError": "خطأ في حذف اللقاح",
+      "confirmDelete": "هل أنت متأكد من حذف اللقاح {name}؟"
+    }
+  },
+  "diseases": {
+    "title": "الأمراض",
+    "subtitle": "بيانات مرجعية - الأمراض المعروفة",
+    "newDisease": "مرض جديد",
+    "editDisease": "تعديل المرض",
+    "deleteDisease": "حذف المرض",
+    "noDiseases": "لم يتم العثور على أمراض",
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "symptoms": "الأعراض",
+      "treatment": "العلاج",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: داء الكلب",
+      "description": "وصف المرض",
+      "symptoms": "الأعراض الشائعة",
+      "treatment": "العلاج الموصى به"
+    },
+    "messages": {
+      "created": "تم إنشاء المرض بنجاح",
+      "updated": "تم تحديث المرض بنجاح",
+      "deleted": "تم حذف المرض بنجاح",
+      "createError": "خطأ في إنشاء المرض",
+      "updateError": "خطأ في تحديث المرض",
+      "deleteError": "خطأ في حذف المرض",
+      "confirmDelete": "هل أنت متأكد من حذف المرض {name}؟"
+    }
+  },
+  "medications": {
+    "title": "الأدوية",
+    "subtitle": "بيانات مرجعية - الأدوية المتاحة",
+    "newMedication": "دواء جديد",
+    "editMedication": "تعديل الدواء",
+    "deleteMedication": "حذف الدواء",
+    "noMedications": "لم يتم العثور على أدوية",
+    "fields": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "manufacturer": "الشركة المصنعة",
+      "activeIngredient": "المادة الفعالة",
+      "dosage": "الجرعة",
+      "isActive": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: إيفرمكتين",
+      "description": "وصف الدواء",
+      "manufacturer": "مثال: باير",
+      "activeIngredient": "مثال: إيفرمكتين 1%",
+      "dosage": "مثال: 1 مل لكل 50 كجم"
+    },
+    "messages": {
+      "created": "تم إنشاء الدواء بنجاح",
+      "updated": "تم تحديث الدواء بنجاح",
+      "deleted": "تم حذف الدواء بنجاح",
+      "createError": "خطأ في إنشاء الدواء",
+      "updateError": "خطأ في تحديث الدواء",
+      "deleteError": "خطأ في حذف الدواء",
+      "confirmDelete": "هل أنت متأكد من حذف الدواء {name}؟"
     }
   },
   "errors": {
@@ -362,7 +471,7 @@
       "saveError": "خطأ في حفظ المزرعة",
       "deleteError": "خطأ في حذف المزرعة",
       "deleteConfirmTitle": "تأكيد الحذف",
-      "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{{name}}»؟",
+      "deleteConfirmDescription": "هل أنت متأكد من حذف المزرعة «{name}»؟",
       "addDescription": "أضف معلومات المزرعة الجديدة",
       "editDescription": "عدل معلومات المزرعة"
     }
@@ -420,6 +529,11 @@
       "name": "اسم الحيوان (اختياري)",
       "currentLocation": "مثال: المرعى الشمالي",
       "notes": "ملاحظات إضافية..."
+    },
+    "actions": {
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ..."
     },
     "messages": {
       "loadError": "تعذر تحميل الحيوانات",
@@ -596,6 +710,165 @@
       "previous": "السابق",
       "skip": "تخطي",
       "finish": "إنهاء"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "overview": "نظرة عامة",
+    "welcome": "مرحباً بك في مساحة الإدارة الخاصة بك!",
+    "welcomeDescription": "ابدأ بتسجيل أول حيوان للوصول إلى جميع ميزات التتبع والإدارة.",
+    "registerFirstAnimal": "تسجيل أول حيوان",
+    "importFromExcel": "استيراد من Excel",
+    "configAdvice": "نصيحة: أكمل التكوين الخاص بك",
+    "configAdviceDescription": "لإدخال العلاجات بشكل أسرع، قم بتكوين اللقاحات والأطباء البيطريين المعتادين.",
+    "configure": "تكوين",
+    "totalAnimals": "إجمالي الحيوانات",
+    "births": "الولادات",
+    "deaths": "الوفيات",
+    "vaccinations": "التطعيمات"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "إدارة التفضيلات وتكوين المزرعة",
+    "groups": {
+      "general": "عام",
+      "myData": "بياناتي",
+      "preferences": "التفضيلات",
+      "system": "النظام"
+    },
+    "sections": {
+      "profile": "الملف الشخصي",
+      "farm": "المزرعة",
+      "myVeterinarians": "أطبائي البيطريون",
+      "myBreeds": "سلالاتي",
+      "myVaccines": "لقاحاتي",
+      "myMedications": "صيدليتي",
+      "myAlerts": "تنبيهاتي",
+      "language": "اللغة والمنطقة",
+      "security": "الأمان",
+      "data": "البيانات"
+    },
+    "profile": {
+      "title": "الملف الشخصي",
+      "subtitle": "إدارة معلوماتك الشخصية",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "role": "الدور",
+      "roles": {
+        "owner": "مالك",
+        "manager": "مدير",
+        "veterinarian": "طبيب بيطري",
+        "worker": "عامل"
+      },
+      "selectRole": "اختر دوراً"
+    },
+    "farm": {
+      "title": "معلومات المزرعة",
+      "subtitle": "تكوين تفاصيل مزرعتك",
+      "farmName": "اسم المزرعة",
+      "farmId": "رقم التعريف",
+      "surface": "المساحة (هكتار)",
+      "address": "العنوان",
+      "country": "البلد",
+      "region": "المنطقة",
+      "selectCountry": "اختر بلداً",
+      "selectRegion": "اختر منطقة",
+      "commune": "البلدية",
+      "species": "الأنواع المربّاة",
+      "addSpecies": "+ إضافة"
+    },
+    "veterinarians": {
+      "title": "أطبائي البيطريون",
+      "subtitle": "اختر الأطباء البيطريين الذين تستشيرهم بانتظام. سيظهرون أولاً في نماذجك.",
+      "available": "الأطباء المتاحون",
+      "selected": "أطبائي",
+      "searchPlaceholder": "البحث بالاسم أو المدينة أو المنطقة...",
+      "addLocal": "إضافة طبيب بيطري محلي",
+      "emptySelected": "اختر أطباءك المعتادين",
+      "name": "الاسم",
+      "region": "المنطقة",
+      "phone": "الهاتف",
+      "optional": "اختياري",
+      "localNote": "سيكون هذا الطبيب خاصاً ومرئياً لك فقط.",
+      "removed": "تمت إزالته",
+      "restored": "تمت استعادته",
+      "clickToUndo": "انقر للتراجع",
+      "added": "تمت إضافة الطبيب",
+      "addedTo": "تمت إضافته إلى قائمتك",
+      "saved": "تم حفظ التكوين",
+      "savedMessage": "تم حفظ أطبائك البيطريين",
+      "saveFailed": "فشل الحفظ",
+      "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
+      "retry": "إعادة المحاولة"
+    },
+    "language": {
+      "title": "اللغة والمنطقة",
+      "subtitle": "تخصيص العرض حسب تفضيلاتك",
+      "interfaceLanguage": "لغة الواجهة",
+      "timezone": "المنطقة الزمنية",
+      "dateFormat": "تنسيق التاريخ",
+      "currency": "العملة",
+      "darkTheme": "المظهر الداكن",
+      "enableDarkMode": "تفعيل الوضع الداكن",
+      "languages": {
+        "fr": "Français (الفرنسية)",
+        "ar": "العربية",
+        "en": "English (الإنجليزية)"
+      },
+      "timezones": {
+        "africaAlgiers": "أفريقيا/الجزائر (GMT+1)",
+        "europeParis": "أوروبا/باريس (GMT+1)",
+        "utc": "UTC (GMT+0)"
+      },
+      "dateFormats": {
+        "ddmmyyyy": "يي/شش/سسسس",
+        "mmddyyyy": "شش/يي/سسسس",
+        "yyyymmdd": "سسسس-شش-يي"
+      },
+      "currencies": {
+        "dzd": "دينار جزائري (دج)",
+        "eur": "يورو (€)",
+        "usd": "دولار أمريكي ($)",
+        "mad": "درهم مغربي (DH)",
+        "tnd": "دينار تونسي (DT)"
+      }
+    },
+    "security": {
+      "title": "الأمان",
+      "subtitle": "حماية حسابك وبياناتك",
+      "changePassword": "تغيير كلمة المرور",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "twoFactor": "المصادقة الثنائية",
+      "twoFactorDescription": "إضافة طبقة أمان إضافية",
+      "enable2FA": "تفعيل 2FA",
+      "activeSessions": "الجلسات النشطة",
+      "currentBrowser": "المتصفح الحالي",
+      "disabled": "معطّل",
+      "active": "نشط"
+    },
+    "data": {
+      "title": "إدارة البيانات",
+      "subtitle": "النسخ الاحتياطي والتصدير والحذف",
+      "autoBackup": "النسخ الاحتياطي التلقائي",
+      "lastBackup": "آخر نسخة احتياطية",
+      "backupNow": "نسخ احتياطي الآن",
+      "exportData": "تصدير البيانات",
+      "exportDescription": "تحميل نسخة كاملة من جميع بياناتك",
+      "exportExcel": "تصدير إلى Excel",
+      "exportJson": "تصدير إلى JSON",
+      "dangerZone": "منطقة الخطر",
+      "dangerDescription": "الإجراءات التالية لا رجعة فيها",
+      "deleteAllData": "حذف جميع البيانات",
+      "enabled": "مُفعّل"
+    },
+    "actions": {
+      "save": "حفظ التغييرات",
+      "saving": "جاري الحفظ...",
+      "savePreferences": "حفظ التفضيلات"
     }
   }
 }

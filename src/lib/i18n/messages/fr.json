@@ -30,7 +30,8 @@
       "noData": "Aucune donnée disponible",
       "loading": "Chargement en cours...",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
-      "actionIrreversible": "Cette action est irréversible."
+      "actionIrreversible": "Cette action est irréversible.",
+      "loadError": "Erreur lors du chargement des données"
     },
     "fields": {
       "name": "Nom",
@@ -42,11 +43,23 @@
       "required": "Requis"
     }
   },
+  "header": {
+    "dashboard": {
+      "title": "Tableau de bord",
+      "subtitle": "Vue d'ensemble"
+    }
+  },
   "navigation": {
     "menu": {
       "dashboard": "Tableau de bord",
       "animals": "Animaux",
+      "events": "Événements",
+      "lots": "Lots",
+      "vaccinations": "Vaccinations",
+      "treatments": "Traitements",
+      "weighings": "Pesées",
       "data": "Données",
+      "reports": "Rapports",
       "settings": "Paramètres"
     },
     "data": {
@@ -54,7 +67,12 @@
       "breeds": "Races",
       "vaccines": "Vaccins",
       "diseases": "Maladies",
-      "medications": "Médicaments"
+      "medications": "Médicaments",
+      "veterinarians": "Vétérinaires",
+      "campaigns": "Campagnes",
+      "preferences": "Préférences",
+      "alerts": "Alertes",
+      "farms": "Fermes"
     }
   },
   "breeds": {
@@ -102,6 +120,97 @@
       "deleteError": "Erreur lors de la suppression de la race",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer la race {name} ?",
       "infoMessage": "Les races sont des données de référence administrées par les super admins. Vous pouvez créer, modifier ou supprimer des races. Les races supprimées ne sont plus visibles dans l'interface."
+    }
+  },
+  "vaccines": {
+    "title": "Vaccins",
+    "subtitle": "Données de référence - Vaccins disponibles",
+    "newVaccine": "Nouveau vaccin",
+    "editVaccine": "Modifier le vaccin",
+    "deleteVaccine": "Supprimer le vaccin",
+    "noVaccines": "Aucun vaccin trouvé",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "manufacturer": "Fabricant",
+      "diseaseId": "Maladie",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Vaccin contre la rage",
+      "description": "Description du vaccin",
+      "manufacturer": "ex: MSD Santé Animale"
+    },
+    "messages": {
+      "created": "Vaccin créé avec succès",
+      "updated": "Vaccin mis à jour avec succès",
+      "deleted": "Vaccin supprimé avec succès",
+      "createError": "Erreur lors de la création du vaccin",
+      "updateError": "Erreur lors de la mise à jour du vaccin",
+      "deleteError": "Erreur lors de la suppression du vaccin",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer le vaccin {name} ?"
+    }
+  },
+  "diseases": {
+    "title": "Maladies",
+    "subtitle": "Données de référence - Maladies connues",
+    "newDisease": "Nouvelle maladie",
+    "editDisease": "Modifier la maladie",
+    "deleteDisease": "Supprimer la maladie",
+    "noDiseases": "Aucune maladie trouvée",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "symptoms": "Symptômes",
+      "treatment": "Traitement",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Rage",
+      "description": "Description de la maladie",
+      "symptoms": "Symptômes courants",
+      "treatment": "Traitement recommandé"
+    },
+    "messages": {
+      "created": "Maladie créée avec succès",
+      "updated": "Maladie mise à jour avec succès",
+      "deleted": "Maladie supprimée avec succès",
+      "createError": "Erreur lors de la création de la maladie",
+      "updateError": "Erreur lors de la mise à jour de la maladie",
+      "deleteError": "Erreur lors de la suppression de la maladie",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer la maladie {name} ?"
+    }
+  },
+  "medications": {
+    "title": "Médicaments",
+    "subtitle": "Données de référence - Médicaments disponibles",
+    "newMedication": "Nouveau médicament",
+    "editMedication": "Modifier le médicament",
+    "deleteMedication": "Supprimer le médicament",
+    "noMedications": "Aucun médicament trouvé",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "manufacturer": "Fabricant",
+      "activeIngredient": "Principe actif",
+      "dosage": "Posologie",
+      "isActive": "Actif"
+    },
+    "placeholders": {
+      "name": "ex: Ivermectine",
+      "description": "Description du médicament",
+      "manufacturer": "ex: Bayer",
+      "activeIngredient": "ex: Ivermectine 1%",
+      "dosage": "ex: 1ml par 50kg"
+    },
+    "messages": {
+      "created": "Médicament créé avec succès",
+      "updated": "Médicament mis à jour avec succès",
+      "deleted": "Médicament supprimé avec succès",
+      "createError": "Erreur lors de la création du médicament",
+      "updateError": "Erreur lors de la mise à jour du médicament",
+      "deleteError": "Erreur lors de la suppression du médicament",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer le médicament {name} ?"
     }
   },
   "campaigns": {
@@ -354,7 +463,7 @@
       "saveError": "Erreur lors de l'enregistrement de la ferme",
       "deleteError": "Erreur lors de la suppression de la ferme",
       "deleteConfirmTitle": "Confirmer la suppression",
-      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer la ferme « {{name}} » ?",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer la ferme « {name} » ?",
       "addDescription": "Ajoutez les informations de la nouvelle ferme",
       "editDescription": "Modifiez les informations de la ferme"
     }
@@ -420,6 +529,11 @@
       "name": "Nom de l'animal (optionnel)",
       "currentLocation": "Ex: Pâturage Nord",
       "notes": "Notes additionnelles..."
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
     },
     "messages": {
       "loadError": "Impossible de charger les animaux",
@@ -596,6 +710,165 @@
       "previous": "Précédent",
       "skip": "Passer",
       "finish": "Terminer"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "welcome": "Bienvenue sur votre espace de gestion !",
+    "welcomeDescription": "Commencez par enregistrer votre premier animal pour accéder à toutes les fonctionnalités de suivi et de gestion.",
+    "registerFirstAnimal": "Enregistrer mon premier animal",
+    "importFromExcel": "Importer depuis Excel",
+    "configAdvice": "Conseil : Complétez votre configuration",
+    "configAdviceDescription": "Pour saisir vos soins plus rapidement, configurez vos vaccins et vétérinaires habituels.",
+    "configure": "Configurer",
+    "totalAnimals": "Total Animaux",
+    "births": "Naissances",
+    "deaths": "Décès",
+    "vaccinations": "Vaccinations"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez vos préférences et la configuration de votre exploitation",
+    "groups": {
+      "general": "Général",
+      "myData": "Mes Données",
+      "preferences": "Préférences",
+      "system": "Système"
+    },
+    "sections": {
+      "profile": "Profil",
+      "farm": "Ferme",
+      "myVeterinarians": "Mes Vétérinaires",
+      "myBreeds": "Mes Races",
+      "myVaccines": "Mes Vaccins",
+      "myMedications": "Ma Pharmacie",
+      "myAlerts": "Mes Alertes",
+      "language": "Langue & Région",
+      "security": "Sécurité",
+      "data": "Données"
+    },
+    "profile": {
+      "title": "Profil utilisateur",
+      "subtitle": "Gérez vos informations personnelles",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "role": "Rôle",
+      "roles": {
+        "owner": "Propriétaire",
+        "manager": "Gestionnaire",
+        "veterinarian": "Vétérinaire",
+        "worker": "Employé"
+      },
+      "selectRole": "Sélectionner un rôle"
+    },
+    "farm": {
+      "title": "Informations de la ferme",
+      "subtitle": "Configurez les détails de votre exploitation",
+      "farmName": "Nom de la ferme",
+      "farmId": "N° d'identification",
+      "surface": "Surface (hectares)",
+      "address": "Adresse",
+      "country": "Pays",
+      "region": "Région",
+      "selectCountry": "Sélectionner un pays",
+      "selectRegion": "Sélectionner une région",
+      "commune": "Commune",
+      "species": "Espèces élevées",
+      "addSpecies": "+ Ajouter"
+    },
+    "veterinarians": {
+      "title": "Mes Vétérinaires",
+      "subtitle": "Sélectionnez les vétérinaires que vous consultez régulièrement. Ils apparaîtront en priorité dans vos formulaires de saisie.",
+      "available": "Vétérinaires disponibles",
+      "selected": "Mes vétérinaires",
+      "searchPlaceholder": "Rechercher par nom, ville ou région...",
+      "addLocal": "Ajouter un vétérinaire local",
+      "emptySelected": "Sélectionnez vos vétérinaires habituels",
+      "name": "Nom",
+      "region": "Région",
+      "phone": "Téléphone",
+      "optional": "optionnel",
+      "localNote": "Ce vétérinaire sera privé et visible uniquement par vous.",
+      "removed": "retiré",
+      "restored": "a été restauré",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Vétérinaire ajouté",
+      "addedTo": "a été ajouté à votre liste",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos vétérinaires ont été enregistrés",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer"
+    },
+    "language": {
+      "title": "Langue & Région",
+      "subtitle": "Personnalisez l'affichage selon vos préférences",
+      "interfaceLanguage": "Langue de l'interface",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date",
+      "currency": "Devise",
+      "darkTheme": "Thème sombre",
+      "enableDarkMode": "Activer le mode sombre",
+      "languages": {
+        "fr": "Français",
+        "ar": "العربية (Arabe)",
+        "en": "English"
+      },
+      "timezones": {
+        "africaAlgiers": "Afrique/Alger (GMT+1)",
+        "europeParis": "Europe/Paris (GMT+1)",
+        "utc": "UTC (GMT+0)"
+      },
+      "dateFormats": {
+        "ddmmyyyy": "JJ/MM/AAAA",
+        "mmddyyyy": "MM/JJ/AAAA",
+        "yyyymmdd": "AAAA-MM-JJ"
+      },
+      "currencies": {
+        "dzd": "Dinar Algérien (DA)",
+        "eur": "Euro (€)",
+        "usd": "Dollar US ($)",
+        "mad": "Dirham Marocain (DH)",
+        "tnd": "Dinar Tunisien (DT)"
+      }
+    },
+    "security": {
+      "title": "Sécurité",
+      "subtitle": "Protégez votre compte et vos données",
+      "changePassword": "Changer le mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "twoFactor": "Authentification à deux facteurs",
+      "twoFactorDescription": "Ajouter une couche de sécurité supplémentaire",
+      "enable2FA": "Activer 2FA",
+      "activeSessions": "Sessions actives",
+      "currentBrowser": "Navigateur actuel",
+      "disabled": "Désactivé",
+      "active": "Active"
+    },
+    "data": {
+      "title": "Gestion des données",
+      "subtitle": "Sauvegarde, export et suppression de données",
+      "autoBackup": "Sauvegarde automatique",
+      "lastBackup": "Dernière sauvegarde",
+      "backupNow": "Sauvegarder maintenant",
+      "exportData": "Exporter les données",
+      "exportDescription": "Téléchargez une copie complète de toutes vos données",
+      "exportExcel": "Exporter en Excel",
+      "exportJson": "Exporter en JSON",
+      "dangerZone": "Zone de danger",
+      "dangerDescription": "Les actions suivantes sont irréversibles",
+      "deleteAllData": "Supprimer toutes les données",
+      "enabled": "Activé"
+    },
+    "actions": {
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement...",
+      "savePreferences": "Enregistrer les préférences"
     }
   }
 }

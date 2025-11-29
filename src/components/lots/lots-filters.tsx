@@ -2,9 +2,16 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { LotFilters, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
 import { Search } from 'lucide-react';
+import { useTranslations } from '@/lib/i18n';
 
 interface LotsFiltersProps {
   filters: LotFilters;
@@ -12,17 +19,19 @@ interface LotsFiltersProps {
 }
 
 export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
+  const t = useTranslations('lots');
+
   return (
     <div className="rounded-lg border bg-card p-6">
       <div className="grid gap-4 md:grid-cols-4">
         {/* Recherche */}
         <div className="md:col-span-2">
-          <Label htmlFor="search">Recherche</Label>
+          <Label htmlFor="search">{t('filters.search')}</Label>
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               id="search"
-              placeholder="Nom, description, produit..."
+              placeholder={t('filters.searchPlaceholder')}
               className="pl-9"
               value={filters.search}
               onChange={(e) =>
@@ -34,39 +43,47 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
 
         {/* Filtre Type */}
         <div>
-          <Label htmlFor="type">Type de lot</Label>
+          <Label htmlFor="type">{t('filters.type')}</Label>
           <Select
-            id="type"
             value={filters.type}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, type: e.target.value as any })
+            onValueChange={(value) =>
+              onFiltersChange({ ...filters, type: value as any })
             }
           >
-            <option value="all">Tous les types</option>
-            {Object.entries(LOT_TYPE_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder={t('filters.typePlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
+              {Object.keys(LOT_TYPE_LABELS).map((value) => (
+                <SelectItem key={value} value={value}>
+                  {t(`type.${value}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
         {/* Filtre Statut */}
         <div>
-          <Label htmlFor="status">Statut</Label>
+          <Label htmlFor="status">{t('filters.status')}</Label>
           <Select
-            id="status"
             value={filters.status}
-            onChange={(e) =>
-              onFiltersChange({ ...filters, status: e.target.value as any })
+            onValueChange={(value) =>
+              onFiltersChange({ ...filters, status: value as any })
             }
           >
-            <option value="all">Tous les statuts</option>
-            {Object.entries(LOT_STATUS_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder={t('filters.statusPlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
+              {Object.keys(LOT_STATUS_LABELS).map((value) => (
+                <SelectItem key={value} value={value}>
+                  {t(`status.${value}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </div>

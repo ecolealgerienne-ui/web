@@ -2,7 +2,7 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { VaccinationFilters, VACCINATION_STATUS_LABELS, VACCINATION_TARGET_LABELS } from '@/lib/types/vaccination';
 import { Search } from 'lucide-react';
 
@@ -32,28 +32,36 @@ export function VaccinationsFilters({ filters, onFiltersChange }: VaccinationsFi
         <div>
           <Label htmlFor="status">Statut</Label>
           <Select
-            id="status"
             value={filters.status}
-            onChange={(e) => onFiltersChange({ ...filters, status: e.target.value as any })}
+            onValueChange={(value) => onFiltersChange({ ...filters, status: value as any })}
           >
-            <option value="all">Tous les statuts</option>
-            {Object.entries(VACCINATION_STATUS_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Tous les statuts" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              {Object.entries(VACCINATION_STATUS_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label htmlFor="targetType">Cible</Label>
           <Select
-            id="targetType"
             value={filters.targetType}
-            onChange={(e) => onFiltersChange({ ...filters, targetType: e.target.value as any })}
+            onValueChange={(value) => onFiltersChange({ ...filters, targetType: value as any })}
           >
-            <option value="all">Toutes les cibles</option>
-            {Object.entries(VACCINATION_TARGET_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Toutes les cibles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les cibles</SelectItem>
+              {Object.entries(VACCINATION_TARGET_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </div>

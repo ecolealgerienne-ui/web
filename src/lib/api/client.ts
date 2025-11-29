@@ -110,13 +110,17 @@ class ApiClient {
         errorData = await response.text()
       }
 
-      logger.httpError(
-        method.toUpperCase(),
-        url,
-        response.status,
-        errorData,
-        { statusText: response.statusText }
-      )
+      // Ne pas logger les 404 comme des erreurs (souvent des cas normaux: pas de données)
+      // Les services gèrent les 404 individuellement
+      if (response.status !== 404) {
+        logger.httpError(
+          method.toUpperCase(),
+          url,
+          response.status,
+          errorData,
+          { statusText: response.statusText }
+        )
+      }
 
       throw new ApiError(
         response.status,

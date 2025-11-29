@@ -37,7 +37,7 @@ export function AnimalEventFormDialog({
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateAnimalEventDto>({
     defaultValues: {
       animalId: '',
-      eventType: 'other',
+      eventType: 'entry',
       eventDate: '',
       title: '',
       description: '',
@@ -68,7 +68,7 @@ export function AnimalEventFormDialog({
     } else {
       reset({
         animalId: '',
-        eventType: 'other',
+        eventType: 'entry',
         eventDate: new Date().toISOString().split('T')[0],
         title: '',
         description: '',
@@ -123,16 +123,16 @@ export function AnimalEventFormDialog({
                   {...register('eventType')}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
+                  <option value="entry">{t('types.entry')}</option>
+                  <option value="exit">{t('types.exit')}</option>
                   <option value="birth">{t('types.birth')}</option>
                   <option value="death">{t('types.death')}</option>
                   <option value="sale">{t('types.sale')}</option>
                   <option value="purchase">{t('types.purchase')}</option>
-                  <option value="transfer">{t('types.transfer')}</option>
-                  <option value="health_check">{t('types.health_check')}</option>
-                  <option value="vaccination">{t('types.vaccination')}</option>
-                  <option value="treatment">{t('types.treatment')}</option>
-                  <option value="weighing">{t('types.weighing')}</option>
-                  <option value="other">{t('types.other')}</option>
+                  <option value="transfer_in">{t('types.transfer_in')}</option>
+                  <option value="transfer_out">{t('types.transfer_out')}</option>
+                  <option value="temporary_out">{t('types.temporary_out')}</option>
+                  <option value="temporary_return">{t('types.temporary_return')}</option>
                 </select>
               </div>
             </div>

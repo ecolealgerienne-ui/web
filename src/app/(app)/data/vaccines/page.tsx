@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useVaccines } from '@/lib/hooks/useVaccines';
 import { VaccineScope, VaccineTargetDisease } from '@/lib/types/vaccine';
 import { VACCINE_TARGET_DISEASE_LABELS, VACCINE_SCOPE_LABELS } from '@/lib/types/vaccine';
@@ -63,31 +64,39 @@ export default function VaccinesPage() {
 
             <div>
               <label className="text-sm font-medium mb-2 block">Scope</label>
-              <select
+              <Select
                 value={scopeFilter}
-                onChange={(e) => setScopeFilter(e.target.value as VaccineScope | 'all')}
-                className="w-full px-3 py-2 border rounded-md"
+                onValueChange={(value) => setScopeFilter(value as VaccineScope | 'all')}
               >
-                <option value="all">Tous</option>
-                <option value="global">Global</option>
-                <option value="local">Local</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un scope" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="global">Global</SelectItem>
+                  <SelectItem value="local">Local</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className="text-sm font-medium mb-2 block">Maladie ciblée</label>
-              <select
+              <Select
                 value={diseaseFilter}
-                onChange={(e) => setDiseaseFilter(e.target.value as VaccineTargetDisease | 'all')}
-                className="w-full px-3 py-2 border rounded-md"
+                onValueChange={(value) => setDiseaseFilter(value as VaccineTargetDisease | 'all')}
               >
-                <option value="all">Toutes</option>
-                {Object.entries(VACCINE_TARGET_DISEASE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une maladie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes</SelectItem>
+                  {Object.entries(VACCINE_TARGET_DISEASE_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -102,7 +111,8 @@ export default function VaccinesPage() {
         </CardHeader>
         <CardContent>
           {loading && (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Chargement des vaccins...
             </div>
           )}
