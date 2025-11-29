@@ -8,6 +8,61 @@ import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/t
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 
+// Type pour la réponse du backend (movements)
+interface BackendMovement {
+  id: string;
+  farmId: string;
+  animalId?: string;
+  lotId?: string;
+  movementType: string;
+  movementDate: string;
+  reason?: string;
+  notes?: string;
+  quantity?: number;
+  sourceLocation?: string;
+  destinationLocation?: string;
+  performedBy?: string;
+  veterinarianId?: string;
+  cost?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Mapping backend movement -> frontend AnimalEvent
+function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
+  return {
+    id: movement.id,
+    farmId: movement.farmId,
+    animalId: movement.animalId || '',
+    eventType: movement.movementType as AnimalEvent['eventType'],
+    eventDate: movement.movementDate,
+    title: movement.reason || formatEventTitle(movement.movementType),
+    description: movement.notes,
+    performedBy: movement.performedBy,
+    veterinarianId: movement.veterinarianId,
+    cost: movement.cost,
+    location: movement.destinationLocation || movement.sourceLocation,
+    createdAt: movement.createdAt,
+    updatedAt: movement.updatedAt,
+  };
+}
+
+// Générer un titre lisible pour l'événement
+function formatEventTitle(movementType: string): string {
+  const titles: Record<string, string> = {
+    entry: 'Entrée',
+    exit: 'Sortie',
+    birth: 'Naissance',
+    death: 'Décès',
+    sale: 'Vente',
+    purchase: 'Achat',
+    transfer_in: 'Transfert entrant',
+    transfer_out: 'Transfert sortant',
+    temporary_out: 'Sortie temporaire',
+    temporary_return: 'Retour temporaire',
+  };
+  return titles[movementType] || movementType;
+}
 
 class AnimalEventsService {
   private getBasePath(): string {
@@ -24,9 +79,12 @@ class AnimalEventsService {
       if (filters?.toDate) params.append('toDate', filters.toDate);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<{ data: AnimalEvent[] }>(url);
-      logger.info('Animal events (movements) fetched', { count: response.data?.length || 0 });
-      return response.data || [];
+      const response = await apiClient.get<{ data: BackendMovement[] }>(url);
+
+      // Map backend movements to frontend AnimalEvent format
+      const events = (response.data || []).map(mapMovementToEvent);
+      logger.info('Animal events (movements) fetched', { count: events.length });
+      return events;
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No movements found (404)');
@@ -39,9 +97,9 @@ class AnimalEventsService {
 
   async getById(id: string): Promise<AnimalEvent | null> {
     try {
-      const response = await apiClient.get<AnimalEvent>(`${this.getBasePath()}/${id}`);
+      const response = await apiClient.get<BackendMovement>(`${this.getBasePath()}/${id}`);
       logger.info('Movement fetched', { id });
-      return response;
+      return mapMovementToEvent(response);
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('Movement not found (404)', { id });
@@ -54,9 +112,10 @@ class AnimalEventsService {
 
   async getByAnimalId(animalId: string): Promise<AnimalEvent[]> {
     try {
-      const response = await apiClient.get<{ data: AnimalEvent[] }>(`${this.getBasePath()}?animalId=${animalId}`);
-      logger.info('Movements fetched for animal', { animalId, count: response.data?.length || 0 });
-      return response.data || [];
+      const response = await apiClient.get<{ data: BackendMovement[] }>(`${this.getBasePath()}?animalId=${animalId}`);
+      const events = (response.data || []).map(mapMovementToEvent);
+      logger.info('Movements fetched for animal', { animalId, count: events.length });
+      return events;
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No movements found for animal (404)', { animalId });
