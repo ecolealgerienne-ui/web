@@ -1,72 +1,87 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save } from 'lucide-react'
+import { Save, AlertCircle } from 'lucide-react'
+import { useToast } from '@/lib/hooks/useToast'
+import { useTranslations } from 'next-intl'
+import { useMedicalProducts } from '@/lib/hooks/useMedicalProducts'
+import { MedicalProduct, CreateMedicalProductDto, MedicalProductCategory } from '@/lib/types/medical-product'
 
-// Catégories de produits
-type MedicationCategory = 'antibiotic' | 'antiparasitic' | 'anti_inflammatory' | 'vitamin' | 'other'
-
-const CATEGORY_LABELS: Record<MedicationCategory, string> = {
-  antibiotic: 'Antibiotiques',
-  antiparasitic: 'Antiparasitaires',
-  anti_inflammatory: 'Anti-inflammatoires',
-  vitamin: 'Vitamines & Compléments',
-  other: 'Autres',
-}
-
-// Mock des produits médicaux du catalogue global
-const MOCK_CATALOG_MEDICATIONS: TransferListItem[] = [
-  // Antibiotiques
-  { id: 'med-1', name: 'Oxytétracycline 20%', description: 'Antibiotique', metadata: { category: 'antibiotic' } },
-  { id: 'med-2', name: 'Pénicilline-Streptomycine', description: 'Antibiotique', metadata: { category: 'antibiotic' } },
-  { id: 'med-3', name: 'Amoxicilline', description: 'Antibiotique', metadata: { category: 'antibiotic' } },
-  { id: 'med-4', name: 'Enrofloxacine', description: 'Antibiotique', metadata: { category: 'antibiotic' } },
-
-  // Antiparasitaires
-  { id: 'med-5', name: 'Ivermectine 1%', description: 'Antiparasitaire', metadata: { category: 'antiparasitic' } },
-  { id: 'med-6', name: 'Albendazole', description: 'Antiparasitaire', metadata: { category: 'antiparasitic' } },
-  { id: 'med-7', name: 'Fenbendazole', description: 'Antiparasitaire', metadata: { category: 'antiparasitic' } },
-  { id: 'med-8', name: 'Lévamisole', description: 'Antiparasitaire', metadata: { category: 'antiparasitic' } },
-
-  // Anti-inflammatoires
-  { id: 'med-9', name: 'Méloxicam', description: 'Anti-inflammatoire', metadata: { category: 'anti_inflammatory' } },
-  { id: 'med-10', name: 'Flunixine', description: 'Anti-inflammatoire', metadata: { category: 'anti_inflammatory' } },
-  { id: 'med-11', name: 'Dexaméthasone', description: 'Corticoïde', metadata: { category: 'anti_inflammatory' } },
-
-  // Vitamines
-  { id: 'med-12', name: 'Vitamine AD3E', description: 'Vitamine', metadata: { category: 'vitamin' } },
-  { id: 'med-13', name: 'Complexe B', description: 'Vitamine', metadata: { category: 'vitamin' } },
-  { id: 'med-14', name: 'Calcium Borogluconate', description: 'Minéral', metadata: { category: 'vitamin' } },
-
-  // Autres
-  { id: 'med-15', name: 'Ocytocine', description: 'Hormone', metadata: { category: 'other' } },
-  { id: 'med-16', name: 'Atropine', description: 'Antispasmodique', metadata: { category: 'other' } },
+// Catégories de produits médicaux
+const CATEGORIES: { code: MedicalProductCategory | 'all'; key: string }[] = [
+  { code: 'all', key: 'all' },
+  { code: 'antiparasitic', key: 'antiparasitic' },
+  { code: 'antibiotic', key: 'antibiotic' },
+  { code: 'anti_inflammatory', key: 'anti_inflammatory' },
+  { code: 'vitamin_mineral', key: 'vitamin_mineral' },
+  { code: 'hormone', key: 'hormone' },
+  { code: 'antiseptic', key: 'antiseptic' },
+  { code: 'other', key: 'other' },
 ]
 
 interface MyMedicationsProps {
+  initialSelectedIds?: string[]
   onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
 }
 
-export function MyMedications({ onSave }: MyMedicationsProps) {
-  const [activeCategory, setActiveCategory] = useState<MedicationCategory | 'all'>('all')
-  const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([
-    { id: 'med-1', name: 'Oxytétracycline 20%', description: 'Antibiotique' },
-    { id: 'med-5', name: 'Ivermectine 1%', description: 'Antiparasitaire' },
-    { id: 'med-12', name: 'Vitamine AD3E', description: 'Vitamine' },
-  ])
+// Convertir un MedicalProduct API en TransferListItem
+function productToTransferItem(product: MedicalProduct): TransferListItem {
+  return {
+    id: product.id,
+    name: product.nameFr,
+    description: product.description || product.commercialName || '',
+    metadata: {
+      category: product.category,
+      activeIngredient: product.activeIngredient,
+      manufacturer: product.manufacturer,
+      scope: product.scope,
+    },
+  }
+}
+
+export function MyMedications({ initialSelectedIds = [], onSave }: MyMedicationsProps) {
+  const t = useTranslations('settings.medications')
+  const ta = useTranslations('settings.actions')
+  const toast = useToast()
+
+  // Filtre par catégorie
+  const [activeCategory, setActiveCategory] = useState<MedicalProductCategory | 'all'>('all')
+
+  // Charger les produits médicaux depuis l'API
+  const { medicalProducts, loading, error, createMedicalProduct } = useMedicalProducts({
+    isActive: true,
+  })
+
+  // Convertir les produits API en items de transfert
+  const availableItems = useMemo(() => {
+    return medicalProducts.map(productToTransferItem)
+  }, [medicalProducts])
+
+  // Items sélectionnés
+  const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  const filteredCatalog = useMemo(() => {
-    if (activeCategory === 'all') {
-      return MOCK_CATALOG_MEDICATIONS
+  // Initialiser les sélections depuis initialSelectedIds
+  useEffect(() => {
+    if (initialSelectedIds.length > 0 && medicalProducts.length > 0) {
+      const initialSelected = medicalProducts
+        .filter(p => initialSelectedIds.includes(p.id))
+        .map(productToTransferItem)
+      setSelectedItems(initialSelected)
     }
-    return MOCK_CATALOG_MEDICATIONS.filter(
-      (item) => item.metadata?.category === activeCategory
-    )
-  }, [activeCategory])
+  }, [initialSelectedIds, medicalProducts])
+
+  // Filtrer les items disponibles par catégorie
+  const filteredAvailableItems = useMemo(() => {
+    if (activeCategory === 'all') return availableItems
+    return availableItems.filter(item => {
+      const category = item.metadata?.category as string | undefined
+      return category === activeCategory
+    })
+  }, [availableItems, activeCategory])
 
   const handleSelect = useCallback((item: TransferListItem) => {
     setSelectedItems((prev) => [...prev, item])
@@ -78,16 +93,37 @@ export function MyMedications({ onSave }: MyMedicationsProps) {
     setHasChanges(true)
   }, [])
 
-  const handleCreateLocal = useCallback((name: string) => {
-    const newItem: TransferListItem = {
-      id: `local-med-${Date.now()}`,
-      name: name,
-      description: 'Produit local',
-      isLocal: true,
+  const handleCreateLocal = useCallback(async (name: string) => {
+    try {
+      // Créer le produit via l'API
+      const createDto: CreateMedicalProductDto = {
+        nameFr: name,
+        nameEn: name,
+        nameAr: name,
+        description: t('localNote'),
+        isActive: true,
+      }
+
+      const newProduct = await createMedicalProduct(createDto)
+      const newItem = productToTransferItem(newProduct)
+      newItem.isLocal = true
+
+      setSelectedItems((prev) => [...prev, newItem])
+      setHasChanges(true)
+      toast.success(t('added'), `${name} ${t('addedTo')}`)
+    } catch {
+      // Fallback: créer localement si l'API échoue
+      const newItem: TransferListItem = {
+        id: `local-med-${Date.now()}`,
+        name: name,
+        description: t('localNote'),
+        isLocal: true,
+      }
+      setSelectedItems((prev) => [...prev, newItem])
+      setHasChanges(true)
+      toast.success(t('added'), `${name} ${t('addedTo')}`)
     }
-    setSelectedItems((prev) => [...prev, newItem])
-    setHasChanges(true)
-  }, [])
+  }, [createMedicalProduct, toast, t])
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -103,30 +139,49 @@ export function MyMedications({ onSave }: MyMedicationsProps) {
       }
 
       setHasChanges(false)
+      toast.success(t('saved'), t('savedMessage'))
+    } catch {
+      toast.error(
+        t('saveFailed'),
+        t('saveFailedMessage'),
+        {
+          label: t('retry'),
+          onClick: handleSave,
+        }
+      )
     } finally {
       setIsSaving(false)
     }
   }
 
+  // Afficher l'erreur si le chargement a échoué
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-lg">
+          <AlertCircle className="w-5 h-5" />
+          <span>{t('loadError')}</span>
+        </div>
+      </div>
+    )
+  }
+
+  // Composant de filtres par catégorie
   const categoryFilters = (
     <div className="flex flex-wrap gap-1">
-      <Button
-        variant={activeCategory === 'all' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => setActiveCategory('all')}
-        className="h-7 text-xs"
-      >
-        Tous
-      </Button>
-      {(Object.keys(CATEGORY_LABELS) as MedicationCategory[]).map((cat) => (
+      {CATEGORIES.map((cat) => (
         <Button
-          key={cat}
-          variant={activeCategory === cat ? 'default' : 'outline'}
+          key={cat.code}
+          variant={activeCategory === cat.code ? 'default' : 'outline'}
           size="sm"
-          onClick={() => setActiveCategory(cat)}
+          onClick={() => setActiveCategory(cat.code)}
           className="h-7 text-xs"
         >
-          {CATEGORY_LABELS[cat]}
+          {t(`categories.${cat.key}`)}
         </Button>
       ))}
     </div>
@@ -135,24 +190,23 @@ export function MyMedications({ onSave }: MyMedicationsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Mes Produits Médicaux</h2>
-        <p className="text-sm text-muted-foreground">
-          Sélectionnez les médicaments et produits vétérinaires que vous utilisez.
-          Ils apparaîtront en priorité lors de l'enregistrement des traitements.
-        </p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <TransferList
-        availableItems={filteredCatalog}
+        availableItems={filteredAvailableItems}
         selectedItems={selectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
         onCreateLocal={handleCreateLocal}
-        availableTitle="Produits disponibles"
-        selectedTitle="Ma pharmacie"
-        searchPlaceholder="Rechercher un produit..."
-        createLocalLabel="Ajouter un produit local"
-        emptySelectedMessage="Sélectionnez vos produits habituels"
+        availableTitle={t('available')}
+        selectedTitle={t('selected')}
+        searchPlaceholder={t('searchPlaceholder')}
+        createLocalLabel={t('addLocal')}
+        emptySelectedMessage={t('emptySelected')}
+        emptyAvailableMessage={t('emptyAvailable')}
+        isLoading={loading}
         filters={categoryFilters}
       />
 
@@ -160,13 +214,13 @@ export function MyMedications({ onSave }: MyMedicationsProps) {
         <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
           {isSaving ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Enregistrement...
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+              {ta('saving')}
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-2" />
-              Enregistrer les modifications
+              <Save className="w-4 h-4 me-2" />
+              {ta('save')}
             </>
           )}
         </Button>

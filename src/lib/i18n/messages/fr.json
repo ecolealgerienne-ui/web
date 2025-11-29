@@ -901,6 +901,81 @@
         "other": "Autre"
       }
     },
+    "medications": {
+      "title": "Ma Pharmacie",
+      "subtitle": "Sélectionnez les médicaments que vous utilisez. Ils apparaîtront en priorité lors de l'enregistrement des traitements.",
+      "available": "Produits disponibles",
+      "selected": "Ma pharmacie",
+      "searchPlaceholder": "Rechercher un produit...",
+      "addLocal": "Ajouter un produit local",
+      "emptySelected": "Sélectionnez vos produits habituels",
+      "emptyAvailable": "Aucun produit disponible",
+      "localNote": "Ce produit sera privé et visible uniquement par vous.",
+      "removed": "retiré",
+      "restored": "a été restauré",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Produit ajouté",
+      "addedTo": "a été ajouté à votre pharmacie",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos produits ont été enregistrés",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "loadError": "Erreur lors du chargement des produits",
+      "filters": {
+        "allCategories": "Toutes les catégories"
+      },
+      "categories": {
+        "all": "Tous",
+        "antiparasitic": "Antiparasitaires",
+        "antibiotic": "Antibiotiques",
+        "anti_inflammatory": "Anti-inflammatoires",
+        "vitamin_mineral": "Vitamines & Minéraux",
+        "hormone": "Hormones",
+        "antiseptic": "Antiseptiques",
+        "other": "Autres"
+      }
+    },
+    "alerts": {
+      "title": "Mes Alertes",
+      "subtitle": "Configurez les alertes que vous souhaitez recevoir. Elles apparaîtront sur votre tableau de bord.",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos préférences d'alertes ont été enregistrées",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "groups": {
+        "health": "Santé",
+        "production": "Production",
+        "admin": "Administratif"
+      },
+      "alertTypes": {
+        "vaccinationReminders": {
+          "label": "Rappels vaccinations",
+          "description": "Recevoir une alerte 7 jours avant les vaccinations prévues"
+        },
+        "treatmentOverdue": {
+          "label": "Traitements en retard",
+          "description": "Alerte pour les traitements non terminés"
+        },
+        "withdrawalPeriod": {
+          "label": "Fin de délai d'attente",
+          "description": "Notification quand le délai d'attente est terminé"
+        },
+        "missingWeights": {
+          "label": "Pesées manquantes",
+          "description": "Animaux non pesés depuis plus de 30 jours"
+        },
+        "pendingMovements": {
+          "label": "Mouvements à déclarer",
+          "description": "Entrées et sorties d'animaux à déclarer"
+        },
+        "expiredDocuments": {
+          "label": "Documents expirés",
+          "description": "Certificats et documents à renouveler"
+        }
+      }
+    },
     "language": {
       "title": "Langue & Région",
       "subtitle": "Personnalisez l'affichage selon vos préférences",

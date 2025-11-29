@@ -901,6 +901,81 @@
         "other": "Other"
       }
     },
+    "medications": {
+      "title": "My Pharmacy",
+      "subtitle": "Select the medications you use. They will appear first when recording treatments.",
+      "available": "Available products",
+      "selected": "My pharmacy",
+      "searchPlaceholder": "Search for a product...",
+      "addLocal": "Add a local product",
+      "emptySelected": "Select your usual products",
+      "emptyAvailable": "No products available",
+      "localNote": "This product will be private and visible only to you.",
+      "removed": "removed",
+      "restored": "has been restored",
+      "clickToUndo": "Click to undo",
+      "added": "Product added",
+      "addedTo": "has been added to your pharmacy",
+      "saved": "Configuration saved",
+      "savedMessage": "Your products have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "loadError": "Error loading products",
+      "filters": {
+        "allCategories": "All categories"
+      },
+      "categories": {
+        "all": "All",
+        "antiparasitic": "Antiparasitic",
+        "antibiotic": "Antibiotics",
+        "anti_inflammatory": "Anti-inflammatory",
+        "vitamin_mineral": "Vitamins & Minerals",
+        "hormone": "Hormones",
+        "antiseptic": "Antiseptics",
+        "other": "Other"
+      }
+    },
+    "alerts": {
+      "title": "My Alerts",
+      "subtitle": "Configure the alerts you want to receive. They will appear on your dashboard.",
+      "saved": "Configuration saved",
+      "savedMessage": "Your alert preferences have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "groups": {
+        "health": "Health",
+        "production": "Production",
+        "admin": "Administrative"
+      },
+      "alertTypes": {
+        "vaccinationReminders": {
+          "label": "Vaccination reminders",
+          "description": "Receive an alert 7 days before scheduled vaccinations"
+        },
+        "treatmentOverdue": {
+          "label": "Overdue treatments",
+          "description": "Alert for unfinished treatments"
+        },
+        "withdrawalPeriod": {
+          "label": "End of withdrawal period",
+          "description": "Notification when the withdrawal period is over"
+        },
+        "missingWeights": {
+          "label": "Missing weights",
+          "description": "Animals not weighed for more than 30 days"
+        },
+        "pendingMovements": {
+          "label": "Movements to declare",
+          "description": "Animal entries and exits to declare"
+        },
+        "expiredDocuments": {
+          "label": "Expired documents",
+          "description": "Certificates and documents to renew"
+        }
+      }
+    },
     "language": {
       "title": "Language & Region",
       "subtitle": "Customize display according to your preferences",
