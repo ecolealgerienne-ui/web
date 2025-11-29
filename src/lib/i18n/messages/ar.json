@@ -863,6 +863,44 @@
         "local": "سلالة محلية"
       }
     },
+    "vaccines": {
+      "title": "لقاحاتي",
+      "subtitle": "اختر اللقاحات التي تستخدمها. ستظهر أولاً عند تسجيل التطعيمات.",
+      "available": "اللقاحات المتاحة",
+      "selected": "لقاحاتي",
+      "searchPlaceholder": "البحث عن لقاح...",
+      "addLocal": "إضافة لقاح محلي",
+      "emptySelected": "اختر لقاحاتك المعتادة",
+      "emptyAvailable": "لا توجد لقاحات متاحة",
+      "localNote": "سيكون هذا اللقاح خاصاً ومرئياً لك فقط.",
+      "removed": "تمت إزالته",
+      "restored": "تمت استعادته",
+      "clickToUndo": "انقر للتراجع",
+      "added": "تمت إضافة اللقاح",
+      "addedTo": "تمت إضافته إلى قائمتك",
+      "saved": "تم حفظ الإعدادات",
+      "savedMessage": "تم حفظ لقاحاتك",
+      "saveFailed": "فشل الحفظ",
+      "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
+      "retry": "إعادة المحاولة",
+      "loadError": "خطأ في تحميل اللقاحات",
+      "filters": {
+        "allDiseases": "جميع الأمراض"
+      },
+      "targetDiseases": {
+        "enterotoxemia": "التسمم المعوي",
+        "brucellosis": "الحمى المالطية",
+        "bluetongue": "اللسان الأزرق",
+        "foot_and_mouth": "الحمى القلاعية",
+        "rabies": "داء الكلب",
+        "anthrax": "الجمرة الخبيثة",
+        "lumpy_skin": "الجلد العقدي",
+        "ppr": "طاعون المجترات الصغيرة",
+        "sheep_pox": "جدري الغنم",
+        "pasteurellosis": "الباستوريلا",
+        "other": "أخرى"
+      }
+    },
     "language": {
       "title": "اللغة والمنطقة",
       "subtitle": "تخصيص العرض حسب تفضيلاتك",

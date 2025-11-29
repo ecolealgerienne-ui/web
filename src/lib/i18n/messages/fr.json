@@ -863,6 +863,44 @@
         "local": "Race locale"
       }
     },
+    "vaccines": {
+      "title": "Mes Vaccins",
+      "subtitle": "Sélectionnez les vaccins que vous utilisez. Ils apparaîtront en priorité lors de l'enregistrement des vaccinations.",
+      "available": "Vaccins disponibles",
+      "selected": "Mes vaccins",
+      "searchPlaceholder": "Rechercher un vaccin...",
+      "addLocal": "Ajouter un vaccin local",
+      "emptySelected": "Sélectionnez vos vaccins habituels",
+      "emptyAvailable": "Aucun vaccin disponible",
+      "localNote": "Ce vaccin sera privé et visible uniquement par vous.",
+      "removed": "retiré",
+      "restored": "a été restauré",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Vaccin ajouté",
+      "addedTo": "a été ajouté à votre liste",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos vaccins ont été enregistrés",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "loadError": "Erreur lors du chargement des vaccins",
+      "filters": {
+        "allDiseases": "Toutes les maladies"
+      },
+      "targetDiseases": {
+        "enterotoxemia": "Entérotoxémie",
+        "brucellosis": "Brucellose",
+        "bluetongue": "Fièvre Catarrhale",
+        "foot_and_mouth": "Fièvre Aphteuse",
+        "rabies": "Rage",
+        "anthrax": "Charbon",
+        "lumpy_skin": "Dermatose Nodulaire",
+        "ppr": "Peste des Petits Ruminants",
+        "sheep_pox": "Variole Ovine (Clavelée)",
+        "pasteurellosis": "Pasteurellose",
+        "other": "Autre"
+      }
+    },
     "language": {
       "title": "Langue & Région",
       "subtitle": "Personnalisez l'affichage selon vos préférences",

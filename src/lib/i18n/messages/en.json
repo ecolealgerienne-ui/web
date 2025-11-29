@@ -863,6 +863,44 @@
         "local": "Local breed"
       }
     },
+    "vaccines": {
+      "title": "My Vaccines",
+      "subtitle": "Select the vaccines you use. They will appear first when recording vaccinations.",
+      "available": "Available vaccines",
+      "selected": "My vaccines",
+      "searchPlaceholder": "Search for a vaccine...",
+      "addLocal": "Add a local vaccine",
+      "emptySelected": "Select your usual vaccines",
+      "emptyAvailable": "No vaccines available",
+      "localNote": "This vaccine will be private and visible only to you.",
+      "removed": "removed",
+      "restored": "has been restored",
+      "clickToUndo": "Click to undo",
+      "added": "Vaccine added",
+      "addedTo": "has been added to your list",
+      "saved": "Configuration saved",
+      "savedMessage": "Your vaccines have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "loadError": "Error loading vaccines",
+      "filters": {
+        "allDiseases": "All diseases"
+      },
+      "targetDiseases": {
+        "enterotoxemia": "Enterotoxemia",
+        "brucellosis": "Brucellosis",
+        "bluetongue": "Bluetongue",
+        "foot_and_mouth": "Foot and Mouth Disease",
+        "rabies": "Rabies",
+        "anthrax": "Anthrax",
+        "lumpy_skin": "Lumpy Skin Disease",
+        "ppr": "Peste des Petits Ruminants",
+        "sheep_pox": "Sheep Pox",
+        "pasteurellosis": "Pasteurellosis",
+        "other": "Other"
+      }
+    },
     "language": {
       "title": "Language & Region",
       "subtitle": "Customize display according to your preferences",
