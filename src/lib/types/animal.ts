@@ -8,13 +8,27 @@ export type AnimalStatus = 'alive' | 'sold' | 'dead'; // 'missing' not supported
 export interface Animal {
   id: string;
   farmId: string;
-  identificationNumber: string;
-  name?: string;
-  speciesId: string;
-  breedId?: string;
+  currentEid: string | null;
+  officialNumber: string | null;
+  visualId: string | null;
+  speciesId: string | null;
+  breedId?: string | null;
   sex: AnimalSex;
-  birthDate?: string;
+  birthDate: string;
   status: AnimalStatus;
+  motherId?: string | null;
+  photoUrl?: string | null;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
+  // Relations (when included)
+  species?: { id: string; name: string };
+  breed?: { id: string; name: string };
+  mother?: Animal;
+  // Deprecated fields (for backward compatibility, will be removed)
+  identificationNumber?: string;
+  name?: string;
   motherIdentificationNumber?: string;
   fatherIdentificationNumber?: string;
   acquisitionDate?: string;
@@ -22,48 +36,35 @@ export interface Animal {
   currentWeight?: number;
   currentLocation?: string;
   healthStatus?: string;
-  notes?: string;
-  isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive?: boolean;
 }
 
 export interface CreateAnimalDto {
-  identificationNumber: string;
-  name?: string;
-  speciesId: string;
-  breedId?: string;
+  birthDate: string;
   sex: AnimalSex;
-  birthDate?: string;
-  status: AnimalStatus;
-  motherIdentificationNumber?: string;
-  fatherIdentificationNumber?: string;
-  acquisitionDate?: string;
-  acquisitionPrice?: number;
-  currentWeight?: number;
-  currentLocation?: string;
-  healthStatus?: string;
+  currentEid?: string;
+  officialNumber?: string;
+  visualId?: string;
+  speciesId?: string;
+  breedId?: string;
+  motherId?: string;
+  status?: AnimalStatus;
+  photoUrl?: string;
   notes?: string;
-  isActive?: boolean;
 }
 
 export interface UpdateAnimalDto {
-  identificationNumber?: string;
-  name?: string;
+  birthDate?: string;
+  sex?: AnimalSex;
+  currentEid?: string;
+  officialNumber?: string;
+  visualId?: string;
   speciesId?: string;
   breedId?: string;
-  sex?: AnimalSex;
-  birthDate?: string;
+  motherId?: string;
   status?: AnimalStatus;
-  motherIdentificationNumber?: string;
-  fatherIdentificationNumber?: string;
-  acquisitionDate?: string;
-  acquisitionPrice?: number;
-  currentWeight?: number;
-  currentLocation?: string;
-  healthStatus?: string;
+  photoUrl?: string;
   notes?: string;
-  isActive?: boolean;
 }
 
 // Helper types for animal details and related data

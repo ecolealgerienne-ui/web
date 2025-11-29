@@ -515,6 +515,9 @@
       "currentWeight": "Current weight",
       "currentLocation": "Current location",
       "healthStatus": "Health status",
+      "currentEid": "Current EID",
+      "officialNumber": "Official number",
+      "visualId": "Visual ID",
       "notes": "Notes",
       "isActive": "Active"
     },
