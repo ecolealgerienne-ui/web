@@ -728,6 +728,12 @@
     "vaccinations": "التطعيمات",
     "chart": {
       "evolution": "تطور القطيع"
+    },
+    "alerts": {
+      "title": "التنبيهات"
+    },
+    "activities": {
+      "title": "الأنشطة الأخيرة"
     }
   },
   "settings": {

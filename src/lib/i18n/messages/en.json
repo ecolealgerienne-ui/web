@@ -728,6 +728,12 @@
     "vaccinations": "Vaccinations",
     "chart": {
       "evolution": "Herd Evolution"
+    },
+    "alerts": {
+      "title": "Alerts"
+    },
+    "activities": {
+      "title": "Recent Activities"
     }
   },
   "settings": {

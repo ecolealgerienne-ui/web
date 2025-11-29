@@ -728,6 +728,12 @@
     "vaccinations": "Vaccinations",
     "chart": {
       "evolution": "Évolution du cheptel"
+    },
+    "alerts": {
+      "title": "Alertes"
+    },
+    "activities": {
+      "title": "Activités récentes"
     }
   },
   "settings": {
