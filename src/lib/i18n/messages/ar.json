@@ -725,7 +725,16 @@
     "totalAnimals": "إجمالي الحيوانات",
     "births": "الولادات",
     "deaths": "الوفيات",
-    "vaccinations": "التطعيمات"
+    "vaccinations": "التطعيمات",
+    "chart": {
+      "evolution": "تطور القطيع"
+    },
+    "alerts": {
+      "title": "التنبيهات"
+    },
+    "activities": {
+      "title": "الأنشطة الأخيرة"
+    }
   },
   "settings": {
     "title": "الإعدادات",
@@ -820,6 +829,162 @@
       "noVeterinarians": "لا يوجد أطباء بيطريين متاحين",
       "loadError": "خطأ في تحميل الأطباء البيطريين"
     },
+    "breeds": {
+      "title": "سلالاتي",
+      "subtitle": "حدد السلالات التي تربيها. ستظهر كخيارات أولوية في نماذجك.",
+      "available": "السلالات المتاحة",
+      "selected": "سلالاتي",
+      "searchPlaceholder": "البحث عن سلالة...",
+      "addLocal": "إضافة سلالة محلية",
+      "emptySelected": "حدد سلالاتك",
+      "emptyAvailable": "لا توجد سلالات متاحة لهذا النوع",
+      "localNote": "ستكون هذه السلالة خاصة ومرئية فقط لك.",
+      "removed": "تمت إزالتها",
+      "restored": "تمت استعادتها",
+      "clickToUndo": "انقر للتراجع",
+      "added": "تمت إضافة السلالة",
+      "addedTo": "تمت إضافتها إلى قائمتك",
+      "saved": "تم حفظ التكوين",
+      "savedMessage": "تم حفظ سلالاتك",
+      "saveFailed": "فشل الحفظ",
+      "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
+      "retry": "إعادة المحاولة",
+      "noBreeds": "لا توجد سلالات متاحة",
+      "loadError": "خطأ في تحميل السلالات",
+      "totalSelected": "{count} سلالة محددة",
+      "totalSelected_plural": "{count} سلالات محددة",
+      "species": {
+        "bovine": "أبقار",
+        "ovine": "أغنام",
+        "caprine": "ماعز",
+        "poultry": "دواجن",
+        "equine": "خيول",
+        "camelid": "إبل"
+      },
+      "breedTypes": {
+        "meat": "لحم",
+        "milk": "حليب",
+        "mixed": "مختلط",
+        "eggs": "بيض",
+        "wool": "صوف",
+        "work": "عمل",
+        "sport": "رياضة",
+        "local": "سلالة محلية"
+      }
+    },
+    "vaccines": {
+      "title": "لقاحاتي",
+      "subtitle": "اختر اللقاحات التي تستخدمها. ستظهر أولاً عند تسجيل التطعيمات.",
+      "available": "اللقاحات المتاحة",
+      "selected": "لقاحاتي",
+      "searchPlaceholder": "البحث عن لقاح...",
+      "addLocal": "إضافة لقاح محلي",
+      "emptySelected": "اختر لقاحاتك المعتادة",
+      "emptyAvailable": "لا توجد لقاحات متاحة",
+      "localNote": "سيكون هذا اللقاح خاصاً ومرئياً لك فقط.",
+      "removed": "تمت إزالته",
+      "restored": "تمت استعادته",
+      "clickToUndo": "انقر للتراجع",
+      "added": "تمت إضافة اللقاح",
+      "addedTo": "تمت إضافته إلى قائمتك",
+      "saved": "تم حفظ الإعدادات",
+      "savedMessage": "تم حفظ لقاحاتك",
+      "saveFailed": "فشل الحفظ",
+      "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
+      "retry": "إعادة المحاولة",
+      "loadError": "خطأ في تحميل اللقاحات",
+      "filters": {
+        "allDiseases": "جميع الأمراض"
+      },
+      "targetDiseases": {
+        "enterotoxemia": "التسمم المعوي",
+        "brucellosis": "الحمى المالطية",
+        "bluetongue": "اللسان الأزرق",
+        "foot_and_mouth": "الحمى القلاعية",
+        "rabies": "داء الكلب",
+        "anthrax": "الجمرة الخبيثة",
+        "lumpy_skin": "الجلد العقدي",
+        "ppr": "طاعون المجترات الصغيرة",
+        "sheep_pox": "جدري الغنم",
+        "pasteurellosis": "الباستوريلا",
+        "other": "أخرى"
+      }
+    },
+    "medications": {
+      "title": "صيدليتي",
+      "subtitle": "اختر الأدوية التي تستخدمها. ستظهر أولاً عند تسجيل العلاجات.",
+      "available": "المنتجات المتاحة",
+      "selected": "صيدليتي",
+      "searchPlaceholder": "البحث عن منتج...",
+      "addLocal": "إضافة منتج محلي",
+      "emptySelected": "اختر منتجاتك المعتادة",
+      "emptyAvailable": "لا توجد منتجات متاحة",
+      "localNote": "سيكون هذا المنتج خاصاً ومرئياً لك فقط.",
+      "removed": "تمت إزالته",
+      "restored": "تمت استعادته",
+      "clickToUndo": "انقر للتراجع",
+      "added": "تمت إضافة المنتج",
+      "addedTo": "تمت إضافته إلى صيدليتك",
+      "saved": "تم حفظ الإعدادات",
+      "savedMessage": "تم حفظ منتجاتك",
+      "saveFailed": "فشل الحفظ",
+      "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
+      "retry": "إعادة المحاولة",
+      "loadError": "خطأ في تحميل المنتجات",
+      "filters": {
+        "allCategories": "جميع الفئات"
+      },
+      "categories": {
+        "all": "الكل",
+        "antiparasitic": "مضادات الطفيليات",
+        "antibiotic": "المضادات الحيوية",
+        "anti_inflammatory": "مضادات الالتهاب",
+        "vitamin_mineral": "الفيتامينات والمعادن",
+        "hormone": "الهرمونات",
+        "antiseptic": "المطهرات",
+        "other": "أخرى"
+      }
+    },
+    "alerts": {
+      "title": "تنبيهاتي",
+      "subtitle": "قم بتكوين التنبيهات التي ترغب في تلقيها. ستظهر على لوحة التحكم الخاصة بك.",
+      "saved": "تم حفظ الإعدادات",
+      "savedMessage": "تم حفظ تفضيلات التنبيهات الخاصة بك",
+      "saveFailed": "فشل الحفظ",
+      "saveFailedMessage": "تحقق من اتصالك بالإنترنت",
+      "retry": "إعادة المحاولة",
+      "groups": {
+        "health": "الصحة",
+        "production": "الإنتاج",
+        "admin": "الإداري"
+      },
+      "alertTypes": {
+        "vaccinationReminders": {
+          "label": "تذكيرات التطعيم",
+          "description": "تلقي تنبيه قبل 7 أيام من التطعيمات المقررة"
+        },
+        "treatmentOverdue": {
+          "label": "العلاجات المتأخرة",
+          "description": "تنبيه للعلاجات غير المكتملة"
+        },
+        "withdrawalPeriod": {
+          "label": "نهاية فترة الانتظار",
+          "description": "إشعار عند انتهاء فترة الانتظار"
+        },
+        "missingWeights": {
+          "label": "الأوزان المفقودة",
+          "description": "الحيوانات التي لم يتم وزنها لأكثر من 30 يوماً"
+        },
+        "pendingMovements": {
+          "label": "الحركات المعلقة",
+          "description": "دخول وخروج الحيوانات للإعلان عنها"
+        },
+        "expiredDocuments": {
+          "label": "المستندات منتهية الصلاحية",
+          "description": "الشهادات والمستندات للتجديد"
+        }
+      }
+    },
     "language": {
       "title": "اللغة والمنطقة",
       "subtitle": "تخصيص العرض حسب تفضيلاتك",
@@ -886,6 +1051,50 @@
       "save": "حفظ التغييرات",
       "saving": "جاري الحفظ...",
       "savePreferences": "حفظ التفضيلات"
+    }
+  },
+  "homepage": {
+    "title": "إدارة القطيع حديثة وسهلة الاستخدام",
+    "subtitle": "منصة شاملة لإدارة مزرعتك بكفاءة وبساطة",
+    "login": "تسجيل الدخول",
+    "getStarted": "ابدأ",
+    "accessDashboard": "الوصول إلى لوحة التحكم",
+    "features": {
+      "animalTracking": {
+        "title": "تتبع الحيوانات",
+        "description": "إدارة حيواناتك مع تتبع كامل من الولادة إلى الخروج"
+      },
+      "vaccinations": {
+        "title": "التطعيمات والرعاية",
+        "description": "خطط وسجل جميع الرعاية البيطرية لقطيعك"
+      },
+      "reports": {
+        "title": "التقارير والإحصائيات",
+        "description": "حلل بياناتك لتحسين إدارة مزرعتك"
+      },
+      "lotManagement": {
+        "title": "إدارة القطعان",
+        "description": "نظم حيواناتك في قطعان لإدارة مبسطة"
+      },
+      "traceability": {
+        "title": "التتبع الكامل",
+        "description": "احترم المعايير واللوائح مع سجل مفصل"
+      },
+      "multiUser": {
+        "title": "متعدد المستخدمين",
+        "description": "تعاون مع فريقك مع أدوار وصلاحيات مناسبة"
+      }
+    },
+    "benefits": {
+      "title": "لماذا تختار حلنا؟",
+      "modernInterface": "واجهة حديثة وبديهية لسهولة الاستخدام",
+      "accessAnywhere": "الوصول من أي مكان عبر متصفح الويب",
+      "secureData": "بياناتك آمنة ومحفوظة تلقائياً",
+      "reactiveSupport": "دعم سريع الاستجابة لمرافقتك يومياً",
+      "regularUpdates": "تحديثات منتظمة مع ميزات جديدة"
+    },
+    "footer": {
+      "copyright": "© 2024 المدرسة الجزائرية. جميع الحقوق محفوظة."
     }
   }
 }

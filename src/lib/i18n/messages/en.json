@@ -725,7 +725,16 @@
     "totalAnimals": "Total Animals",
     "births": "Births",
     "deaths": "Deaths",
-    "vaccinations": "Vaccinations"
+    "vaccinations": "Vaccinations",
+    "chart": {
+      "evolution": "Herd Evolution"
+    },
+    "alerts": {
+      "title": "Alerts"
+    },
+    "activities": {
+      "title": "Recent Activities"
+    }
   },
   "settings": {
     "title": "Settings",
@@ -820,6 +829,162 @@
       "noVeterinarians": "No veterinarians available",
       "loadError": "Error loading veterinarians"
     },
+    "breeds": {
+      "title": "My Breeds",
+      "subtitle": "Select the breeds you raise. They will appear as priority options in your forms.",
+      "available": "Available breeds",
+      "selected": "My breeds",
+      "searchPlaceholder": "Search for a breed...",
+      "addLocal": "Add a local breed",
+      "emptySelected": "Select your breeds",
+      "emptyAvailable": "No breeds available for this species",
+      "localNote": "This breed will be private and visible only by you.",
+      "removed": "removed",
+      "restored": "has been restored",
+      "clickToUndo": "Click to undo",
+      "added": "Breed added",
+      "addedTo": "has been added to your list",
+      "saved": "Configuration saved",
+      "savedMessage": "Your breeds have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "noBreeds": "No breeds available",
+      "loadError": "Error loading breeds",
+      "totalSelected": "{count} breed selected",
+      "totalSelected_plural": "{count} breeds selected",
+      "species": {
+        "bovine": "Cattle",
+        "ovine": "Sheep",
+        "caprine": "Goats",
+        "poultry": "Poultry",
+        "equine": "Equine",
+        "camelid": "Camelids"
+      },
+      "breedTypes": {
+        "meat": "Meat",
+        "milk": "Milk",
+        "mixed": "Mixed",
+        "eggs": "Eggs",
+        "wool": "Wool",
+        "work": "Work",
+        "sport": "Sport",
+        "local": "Local breed"
+      }
+    },
+    "vaccines": {
+      "title": "My Vaccines",
+      "subtitle": "Select the vaccines you use. They will appear first when recording vaccinations.",
+      "available": "Available vaccines",
+      "selected": "My vaccines",
+      "searchPlaceholder": "Search for a vaccine...",
+      "addLocal": "Add a local vaccine",
+      "emptySelected": "Select your usual vaccines",
+      "emptyAvailable": "No vaccines available",
+      "localNote": "This vaccine will be private and visible only to you.",
+      "removed": "removed",
+      "restored": "has been restored",
+      "clickToUndo": "Click to undo",
+      "added": "Vaccine added",
+      "addedTo": "has been added to your list",
+      "saved": "Configuration saved",
+      "savedMessage": "Your vaccines have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "loadError": "Error loading vaccines",
+      "filters": {
+        "allDiseases": "All diseases"
+      },
+      "targetDiseases": {
+        "enterotoxemia": "Enterotoxemia",
+        "brucellosis": "Brucellosis",
+        "bluetongue": "Bluetongue",
+        "foot_and_mouth": "Foot and Mouth Disease",
+        "rabies": "Rabies",
+        "anthrax": "Anthrax",
+        "lumpy_skin": "Lumpy Skin Disease",
+        "ppr": "Peste des Petits Ruminants",
+        "sheep_pox": "Sheep Pox",
+        "pasteurellosis": "Pasteurellosis",
+        "other": "Other"
+      }
+    },
+    "medications": {
+      "title": "My Pharmacy",
+      "subtitle": "Select the medications you use. They will appear first when recording treatments.",
+      "available": "Available products",
+      "selected": "My pharmacy",
+      "searchPlaceholder": "Search for a product...",
+      "addLocal": "Add a local product",
+      "emptySelected": "Select your usual products",
+      "emptyAvailable": "No products available",
+      "localNote": "This product will be private and visible only to you.",
+      "removed": "removed",
+      "restored": "has been restored",
+      "clickToUndo": "Click to undo",
+      "added": "Product added",
+      "addedTo": "has been added to your pharmacy",
+      "saved": "Configuration saved",
+      "savedMessage": "Your products have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "loadError": "Error loading products",
+      "filters": {
+        "allCategories": "All categories"
+      },
+      "categories": {
+        "all": "All",
+        "antiparasitic": "Antiparasitic",
+        "antibiotic": "Antibiotics",
+        "anti_inflammatory": "Anti-inflammatory",
+        "vitamin_mineral": "Vitamins & Minerals",
+        "hormone": "Hormones",
+        "antiseptic": "Antiseptics",
+        "other": "Other"
+      }
+    },
+    "alerts": {
+      "title": "My Alerts",
+      "subtitle": "Configure the alerts you want to receive. They will appear on your dashboard.",
+      "saved": "Configuration saved",
+      "savedMessage": "Your alert preferences have been saved",
+      "saveFailed": "Save failed",
+      "saveFailedMessage": "Check your internet connection",
+      "retry": "Retry",
+      "groups": {
+        "health": "Health",
+        "production": "Production",
+        "admin": "Administrative"
+      },
+      "alertTypes": {
+        "vaccinationReminders": {
+          "label": "Vaccination reminders",
+          "description": "Receive an alert 7 days before scheduled vaccinations"
+        },
+        "treatmentOverdue": {
+          "label": "Overdue treatments",
+          "description": "Alert for unfinished treatments"
+        },
+        "withdrawalPeriod": {
+          "label": "End of withdrawal period",
+          "description": "Notification when the withdrawal period is over"
+        },
+        "missingWeights": {
+          "label": "Missing weights",
+          "description": "Animals not weighed for more than 30 days"
+        },
+        "pendingMovements": {
+          "label": "Movements to declare",
+          "description": "Animal entries and exits to declare"
+        },
+        "expiredDocuments": {
+          "label": "Expired documents",
+          "description": "Certificates and documents to renew"
+        }
+      }
+    },
     "language": {
       "title": "Language & Region",
       "subtitle": "Customize display according to your preferences",
@@ -886,6 +1051,50 @@
       "save": "Save Changes",
       "saving": "Saving...",
       "savePreferences": "Save Preferences"
+    }
+  },
+  "homepage": {
+    "title": "Modern and Intuitive Herd Management",
+    "subtitle": "A complete platform to manage your farm with efficiency and simplicity",
+    "login": "Log In",
+    "getStarted": "Get Started",
+    "accessDashboard": "Access Dashboard",
+    "features": {
+      "animalTracking": {
+        "title": "Animal Tracking",
+        "description": "Manage your animals with complete traceability from birth to exit"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Care",
+        "description": "Plan and record all veterinary care for your herd"
+      },
+      "reports": {
+        "title": "Reports & Statistics",
+        "description": "Analyze your data to optimize farm management"
+      },
+      "lotManagement": {
+        "title": "Lot Management",
+        "description": "Organize your animals in lots for simplified management"
+      },
+      "traceability": {
+        "title": "Complete Traceability",
+        "description": "Comply with standards and regulations with detailed history"
+      },
+      "multiUser": {
+        "title": "Multi-User",
+        "description": "Collaborate with your team with appropriate roles and permissions"
+      }
+    },
+    "benefits": {
+      "title": "Why choose our solution?",
+      "modernInterface": "Modern and intuitive interface for easy handling",
+      "accessAnywhere": "Access from anywhere via your web browser",
+      "secureData": "Your data is secure and automatically backed up",
+      "reactiveSupport": "Responsive support to accompany you daily",
+      "regularUpdates": "Regular updates with new features"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. All rights reserved."
     }
   }
 }

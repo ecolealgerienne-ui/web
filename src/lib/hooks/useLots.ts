@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { lotsService, CreateLotDto, UpdateLotDto } from '@/lib/services/lots.service';
 import { Lot, LotFilters, LotAnimal } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
@@ -8,11 +8,24 @@ export function useLots(filters?: Partial<LotFilters>) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterSearch = filters?.search;
+  const filterType = filters?.type;
+  const filterStatus = filters?.status;
+  const filterCompleted = filters?.completed;
+
+  const memoizedFilters = useMemo(() => ({
+    search: filterSearch,
+    type: filterType,
+    status: filterStatus,
+    completed: filterCompleted,
+  }), [filterSearch, filterType, filterStatus, filterCompleted]);
+
   const fetchLots = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await lotsService.getAll(filters);
+      const data = await lotsService.getAll(memoizedFilters);
       setLots(data);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch lots');
@@ -21,7 +34,7 @@ export function useLots(filters?: Partial<LotFilters>) {
     } finally {
       setLoading(false);
     }
-  }, [filters?.search, filters?.type, filters?.status, filters?.completed]);
+  }, [memoizedFilters]);
 
   useEffect(() => {
     fetchLots();

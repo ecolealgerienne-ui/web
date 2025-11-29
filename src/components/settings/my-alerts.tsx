@@ -3,70 +3,33 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Save, Heart, BarChart3, FileText } from 'lucide-react'
+import { useToast } from '@/lib/hooks/useToast'
+import { useTranslations } from 'next-intl'
 import { AlertSettings, defaultAlertSettings } from '@/lib/types/farm-preferences'
 
+type AlertGroupId = 'health' | 'production' | 'admin'
+
 interface AlertGroup {
-  id: string
-  title: string
+  id: AlertGroupId
   icon: React.ReactNode
-  alerts: {
-    key: keyof AlertSettings
-    label: string
-    description: string
-  }[]
+  alerts: (keyof AlertSettings)[]
 }
 
 const ALERT_GROUPS: AlertGroup[] = [
   {
     id: 'health',
-    title: 'Santé',
     icon: <Heart className="w-5 h-5 text-red-500" />,
-    alerts: [
-      {
-        key: 'vaccinationReminders',
-        label: 'Rappels vaccinations',
-        description: 'Recevoir une alerte 7 jours avant les vaccinations prévues',
-      },
-      {
-        key: 'treatmentOverdue',
-        label: 'Traitements en retard',
-        description: 'Alerte pour les traitements non terminés',
-      },
-      {
-        key: 'withdrawalPeriod',
-        label: 'Fin de délai d\'attente',
-        description: 'Notification quand le délai d\'attente est terminé',
-      },
-    ],
+    alerts: ['vaccinationReminders', 'treatmentOverdue', 'withdrawalPeriod'],
   },
   {
     id: 'production',
-    title: 'Production',
     icon: <BarChart3 className="w-5 h-5 text-blue-500" />,
-    alerts: [
-      {
-        key: 'missingWeights',
-        label: 'Pesées manquantes',
-        description: 'Animaux non pesés depuis plus de 30 jours',
-      },
-    ],
+    alerts: ['missingWeights'],
   },
   {
     id: 'admin',
-    title: 'Administratif',
     icon: <FileText className="w-5 h-5 text-amber-500" />,
-    alerts: [
-      {
-        key: 'pendingMovements',
-        label: 'Mouvements à déclarer',
-        description: 'Entrées et sorties d\'animaux à déclarer',
-      },
-      {
-        key: 'expiredDocuments',
-        label: 'Documents expirés',
-        description: 'Certificats et documents à renouveler',
-      },
-    ],
+    alerts: ['pendingMovements', 'expiredDocuments'],
   },
 ]
 
@@ -76,6 +39,10 @@ interface MyAlertsProps {
 }
 
 export function MyAlerts({ initialSettings = defaultAlertSettings, onSave }: MyAlertsProps) {
+  const t = useTranslations('settings.alerts')
+  const ta = useTranslations('settings.actions')
+  const toast = useToast()
+
   const [settings, setSettings] = useState<AlertSettings>(initialSettings)
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
@@ -98,6 +65,16 @@ export function MyAlerts({ initialSettings = defaultAlertSettings, onSave }: MyA
         console.log('Saved alert settings:', settings)
       }
       setHasChanges(false)
+      toast.success(t('saved'), t('savedMessage'))
+    } catch {
+      toast.error(
+        t('saveFailed'),
+        t('saveFailedMessage'),
+        {
+          label: t('retry'),
+          onClick: handleSave,
+        }
+      )
     } finally {
       setIsSaving(false)
     }
@@ -106,11 +83,8 @@ export function MyAlerts({ initialSettings = defaultAlertSettings, onSave }: MyA
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Mes Alertes</h2>
-        <p className="text-sm text-muted-foreground">
-          Configurez les alertes que vous souhaitez recevoir.
-          Elles apparaîtront sur votre tableau de bord.
-        </p>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <div className="space-y-6">
@@ -119,37 +93,37 @@ export function MyAlerts({ initialSettings = defaultAlertSettings, onSave }: MyA
             {/* En-tête du groupe */}
             <div className="flex items-center gap-3 p-4 bg-muted/30 border-b">
               {group.icon}
-              <h3 className="font-semibold">{group.title}</h3>
+              <h3 className="font-semibold">{t(`groups.${group.id}`)}</h3>
             </div>
 
             {/* Alertes du groupe */}
             <div className="divide-y">
-              {group.alerts.map((alert) => (
+              {group.alerts.map((alertKey) => (
                 <div
-                  key={alert.key}
+                  key={alertKey}
                   className="flex items-center justify-between p-4 hover:bg-muted/20 transition-colors"
                 >
-                  <div className="flex-1 pr-4">
-                    <p className="font-medium text-sm">{alert.label}</p>
-                    <p className="text-sm text-muted-foreground">{alert.description}</p>
+                  <div className="flex-1 pe-4">
+                    <p className="font-medium text-sm">{t(`alertTypes.${alertKey}.label`)}</p>
+                    <p className="text-sm text-muted-foreground">{t(`alertTypes.${alertKey}.description`)}</p>
                   </div>
 
                   {/* Toggle Switch */}
                   <button
                     type="button"
                     role="switch"
-                    aria-checked={settings[alert.key]}
-                    onClick={() => handleToggle(alert.key)}
+                    aria-checked={settings[alertKey]}
+                    onClick={() => handleToggle(alertKey)}
                     className={`
                       relative inline-flex h-6 w-11 items-center rounded-full transition-colors
                       focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                      ${settings[alert.key] ? 'bg-primary' : 'bg-muted'}
+                      ${settings[alertKey] ? 'bg-primary' : 'bg-muted'}
                     `}
                   >
                     <span
                       className={`
                         inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm
-                        ${settings[alert.key] ? 'translate-x-6' : 'translate-x-1'}
+                        ${settings[alertKey] ? 'translate-x-6' : 'translate-x-1'}
                       `}
                     />
                   </button>
@@ -164,13 +138,13 @@ export function MyAlerts({ initialSettings = defaultAlertSettings, onSave }: MyA
         <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
           {isSaving ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Enregistrement...
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+              {ta('saving')}
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-2" />
-              Enregistrer les préférences
+              <Save className="w-4 h-4 me-2" />
+              {ta('savePreferences')}
             </>
           )}
         </Button>

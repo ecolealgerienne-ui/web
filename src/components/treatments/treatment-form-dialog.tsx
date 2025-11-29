@@ -4,7 +4,13 @@ import { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { SmartSelect, SmartSelectItem } from '@/components/ui/smart-select';
 import { useFarmerPreferences } from '@/lib/hooks/useFarmerPreferences';
 import {
@@ -178,10 +184,9 @@ export function TreatmentFormDialog({
             <div>
               <Label htmlFor="treatmentType">Type de traitement *</Label>
               <Select
-                required
                 value={formData.treatmentType}
-                onChange={(e) =>
-                  setFormData({ ...formData, treatmentType: e.target.value as Treatment['treatmentType'] })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, treatmentType: value as Treatment['treatmentType'] })
                 }
               >
                 <SelectTrigger>
@@ -201,10 +206,9 @@ export function TreatmentFormDialog({
             <div>
               <Label htmlFor="targetType">Cible *</Label>
               <Select
-                required
                 value={formData.targetType}
-                onChange={(e) =>
-                  setFormData({ ...formData, targetType: e.target.value as Treatment['targetType'] })
+                onValueChange={(value) =>
+                  setFormData({ ...formData, targetType: value as Treatment['targetType'] })
                 }
               >
                 <SelectTrigger>
@@ -377,9 +381,8 @@ export function TreatmentFormDialog({
           <div>
             <Label htmlFor="status">Statut *</Label>
             <Select
-              required
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as Treatment['status'] })}
+              onValueChange={(value) => setFormData({ ...formData, status: value as Treatment['status'] })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un statut" />

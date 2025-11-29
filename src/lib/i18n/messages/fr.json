@@ -725,7 +725,16 @@
     "totalAnimals": "Total Animaux",
     "births": "Naissances",
     "deaths": "Décès",
-    "vaccinations": "Vaccinations"
+    "vaccinations": "Vaccinations",
+    "chart": {
+      "evolution": "Évolution du cheptel"
+    },
+    "alerts": {
+      "title": "Alertes"
+    },
+    "activities": {
+      "title": "Activités récentes"
+    }
   },
   "settings": {
     "title": "Paramètres",
@@ -820,6 +829,162 @@
       "noVeterinarians": "Aucun vétérinaire disponible",
       "loadError": "Erreur lors du chargement des vétérinaires"
     },
+    "breeds": {
+      "title": "Mes Races",
+      "subtitle": "Sélectionnez les races que vous élevez. Elles apparaîtront en priorité dans vos formulaires de saisie.",
+      "available": "Races disponibles",
+      "selected": "Mes races",
+      "searchPlaceholder": "Rechercher une race...",
+      "addLocal": "Ajouter une race locale",
+      "emptySelected": "Sélectionnez vos races",
+      "emptyAvailable": "Aucune race disponible pour cette espèce",
+      "localNote": "Cette race sera privée et visible uniquement par vous.",
+      "removed": "retirée",
+      "restored": "a été restaurée",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Race ajoutée",
+      "addedTo": "a été ajoutée à votre liste",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos races ont été enregistrées",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "noBreeds": "Aucune race disponible",
+      "loadError": "Erreur lors du chargement des races",
+      "totalSelected": "{count} race sélectionnée",
+      "totalSelected_plural": "{count} races sélectionnées",
+      "species": {
+        "bovine": "Bovins",
+        "ovine": "Ovins",
+        "caprine": "Caprins",
+        "poultry": "Volaille",
+        "equine": "Équins",
+        "camelid": "Camélidés"
+      },
+      "breedTypes": {
+        "meat": "Viande",
+        "milk": "Lait",
+        "mixed": "Mixte",
+        "eggs": "Oeufs",
+        "wool": "Laine",
+        "work": "Travail",
+        "sport": "Sport",
+        "local": "Race locale"
+      }
+    },
+    "vaccines": {
+      "title": "Mes Vaccins",
+      "subtitle": "Sélectionnez les vaccins que vous utilisez. Ils apparaîtront en priorité lors de l'enregistrement des vaccinations.",
+      "available": "Vaccins disponibles",
+      "selected": "Mes vaccins",
+      "searchPlaceholder": "Rechercher un vaccin...",
+      "addLocal": "Ajouter un vaccin local",
+      "emptySelected": "Sélectionnez vos vaccins habituels",
+      "emptyAvailable": "Aucun vaccin disponible",
+      "localNote": "Ce vaccin sera privé et visible uniquement par vous.",
+      "removed": "retiré",
+      "restored": "a été restauré",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Vaccin ajouté",
+      "addedTo": "a été ajouté à votre liste",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos vaccins ont été enregistrés",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "loadError": "Erreur lors du chargement des vaccins",
+      "filters": {
+        "allDiseases": "Toutes les maladies"
+      },
+      "targetDiseases": {
+        "enterotoxemia": "Entérotoxémie",
+        "brucellosis": "Brucellose",
+        "bluetongue": "Fièvre Catarrhale",
+        "foot_and_mouth": "Fièvre Aphteuse",
+        "rabies": "Rage",
+        "anthrax": "Charbon",
+        "lumpy_skin": "Dermatose Nodulaire",
+        "ppr": "Peste des Petits Ruminants",
+        "sheep_pox": "Variole Ovine (Clavelée)",
+        "pasteurellosis": "Pasteurellose",
+        "other": "Autre"
+      }
+    },
+    "medications": {
+      "title": "Ma Pharmacie",
+      "subtitle": "Sélectionnez les médicaments que vous utilisez. Ils apparaîtront en priorité lors de l'enregistrement des traitements.",
+      "available": "Produits disponibles",
+      "selected": "Ma pharmacie",
+      "searchPlaceholder": "Rechercher un produit...",
+      "addLocal": "Ajouter un produit local",
+      "emptySelected": "Sélectionnez vos produits habituels",
+      "emptyAvailable": "Aucun produit disponible",
+      "localNote": "Ce produit sera privé et visible uniquement par vous.",
+      "removed": "retiré",
+      "restored": "a été restauré",
+      "clickToUndo": "Cliquez pour annuler",
+      "added": "Produit ajouté",
+      "addedTo": "a été ajouté à votre pharmacie",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos produits ont été enregistrés",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "loadError": "Erreur lors du chargement des produits",
+      "filters": {
+        "allCategories": "Toutes les catégories"
+      },
+      "categories": {
+        "all": "Tous",
+        "antiparasitic": "Antiparasitaires",
+        "antibiotic": "Antibiotiques",
+        "anti_inflammatory": "Anti-inflammatoires",
+        "vitamin_mineral": "Vitamines & Minéraux",
+        "hormone": "Hormones",
+        "antiseptic": "Antiseptiques",
+        "other": "Autres"
+      }
+    },
+    "alerts": {
+      "title": "Mes Alertes",
+      "subtitle": "Configurez les alertes que vous souhaitez recevoir. Elles apparaîtront sur votre tableau de bord.",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos préférences d'alertes ont été enregistrées",
+      "saveFailed": "Échec de sauvegarde",
+      "saveFailedMessage": "Vérifiez votre connexion internet",
+      "retry": "Réessayer",
+      "groups": {
+        "health": "Santé",
+        "production": "Production",
+        "admin": "Administratif"
+      },
+      "alertTypes": {
+        "vaccinationReminders": {
+          "label": "Rappels vaccinations",
+          "description": "Recevoir une alerte 7 jours avant les vaccinations prévues"
+        },
+        "treatmentOverdue": {
+          "label": "Traitements en retard",
+          "description": "Alerte pour les traitements non terminés"
+        },
+        "withdrawalPeriod": {
+          "label": "Fin de délai d'attente",
+          "description": "Notification quand le délai d'attente est terminé"
+        },
+        "missingWeights": {
+          "label": "Pesées manquantes",
+          "description": "Animaux non pesés depuis plus de 30 jours"
+        },
+        "pendingMovements": {
+          "label": "Mouvements à déclarer",
+          "description": "Entrées et sorties d'animaux à déclarer"
+        },
+        "expiredDocuments": {
+          "label": "Documents expirés",
+          "description": "Certificats et documents à renouveler"
+        }
+      }
+    },
     "language": {
       "title": "Langue & Région",
       "subtitle": "Personnalisez l'affichage selon vos préférences",
@@ -886,6 +1051,50 @@
       "save": "Enregistrer les modifications",
       "saving": "Enregistrement...",
       "savePreferences": "Enregistrer les préférences"
+    }
+  },
+  "homepage": {
+    "title": "Gestion de cheptel moderne et intuitive",
+    "subtitle": "Une plateforme complète pour gérer votre élevage avec efficacité et simplicité",
+    "login": "Se connecter",
+    "getStarted": "Commencer",
+    "accessDashboard": "Accéder au tableau de bord",
+    "features": {
+      "animalTracking": {
+        "title": "Suivi des animaux",
+        "description": "Gérez vos animaux avec traçabilité complète de la naissance à la sortie"
+      },
+      "vaccinations": {
+        "title": "Vaccinations & Soins",
+        "description": "Planifiez et enregistrez tous les soins vétérinaires de votre troupeau"
+      },
+      "reports": {
+        "title": "Rapports & Statistiques",
+        "description": "Analysez vos données pour optimiser la gestion de votre exploitation"
+      },
+      "lotManagement": {
+        "title": "Gestion des lots",
+        "description": "Organisez vos animaux en lots pour une gestion simplifiée"
+      },
+      "traceability": {
+        "title": "Traçabilité complète",
+        "description": "Respectez les normes et réglementations avec un historique détaillé"
+      },
+      "multiUser": {
+        "title": "Multi-utilisateurs",
+        "description": "Collaborez avec votre équipe avec des rôles et permissions adaptés"
+      }
+    },
+    "benefits": {
+      "title": "Pourquoi choisir notre solution ?",
+      "modernInterface": "Interface moderne et intuitive pour une prise en main facile",
+      "accessAnywhere": "Accès depuis n'importe où via votre navigateur web",
+      "secureData": "Vos données sont sécurisées et sauvegardées automatiquement",
+      "reactiveSupport": "Support réactif pour vous accompagner au quotidien",
+      "regularUpdates": "Mises à jour régulières avec de nouvelles fonctionnalités"
+    },
+    "footer": {
+      "copyright": "© 2024 École Algérienne. Tous droits réservés."
     }
   }
 }

@@ -2,7 +2,7 @@
  * Hook React pour la gestion des campagnes
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Campaign, CampaignType, CampaignStatus } from '@/lib/types/campaign'
 import { campaignsService } from '@/lib/services/campaigns.service'
 import { logger } from '@/lib/utils/logger'
@@ -19,12 +19,21 @@ export function useCampaigns(filters?: { type?: CampaignType | 'all'; status?: C
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterType = filters?.type
+  const filterStatus = filters?.status
+
+  const memoizedFilters = useMemo(() => ({
+    type: filterType,
+    status: filterStatus,
+  }), [filterType, filterStatus])
+
   const fetchCampaigns = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await campaignsService.getAll(filters)
+      const data = await campaignsService.getAll(memoizedFilters)
       setCampaigns(data)
     } catch (err) {
       const error = err as Error
@@ -33,7 +42,7 @@ export function useCampaigns(filters?: { type?: CampaignType | 'all'; status?: C
     } finally {
       setLoading(false)
     }
-  }, [filters?.type, filters?.status])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchCampaigns()

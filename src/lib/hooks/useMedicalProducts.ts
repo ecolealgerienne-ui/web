@@ -2,8 +2,8 @@
  * Hook React pour la gestion des produits médicaux
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { MedicalProduct, MedicalProductFilters } from '@/lib/types/medical-product';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { MedicalProduct, MedicalProductFilters, CreateMedicalProductDto } from '@/lib/types/medical-product';
 import { medicalProductsService } from '@/lib/services/medical-products.service';
 import { logger } from '@/lib/utils/logger';
 
@@ -12,6 +12,7 @@ interface UseMedicalProductsResult {
   loading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
+  createMedicalProduct: (data: CreateMedicalProductDto) => Promise<MedicalProduct>;
 }
 
 export function useMedicalProducts(filters?: MedicalProductFilters): UseMedicalProductsResult {
@@ -19,12 +20,25 @@ export function useMedicalProducts(filters?: MedicalProductFilters): UseMedicalP
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterSearch = filters?.search;
+  const filterScope = filters?.scope;
+  const filterCategory = filters?.category;
+  const filterIsActive = filters?.isActive;
+
+  const memoizedFilters = useMemo(() => ({
+    search: filterSearch,
+    scope: filterScope,
+    category: filterCategory,
+    isActive: filterIsActive,
+  }), [filterSearch, filterScope, filterCategory, filterIsActive]);
+
   const fetchMedicalProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await medicalProductsService.getAll(filters);
+      const data = await medicalProductsService.getAll(memoizedFilters);
       setMedicalProducts(data);
     } catch (err) {
       const error = err as Error;
@@ -33,16 +47,23 @@ export function useMedicalProducts(filters?: MedicalProductFilters): UseMedicalP
     } finally {
       setLoading(false);
     }
-  }, [filters?.search, filters?.scope, filters?.category, filters?.isActive]);
+  }, [memoizedFilters]);
 
   useEffect(() => {
     fetchMedicalProducts();
   }, [fetchMedicalProducts]);
+
+  const createMedicalProduct = useCallback(async (data: CreateMedicalProductDto): Promise<MedicalProduct> => {
+    const newProduct = await medicalProductsService.create(data);
+    setMedicalProducts(prev => [...prev, newProduct]);
+    return newProduct;
+  }, []);
 
   return {
     medicalProducts,
     loading,
     error,
     refetch: fetchMedicalProducts,
+    createMedicalProduct,
   };
 }

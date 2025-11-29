@@ -2,7 +2,7 @@
  * Hook React pour la gestion des animaux
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Animal } from '@/lib/types/animal'
 import { animalsService } from '@/lib/services/animals.service'
 import { logger } from '@/lib/utils/logger'
@@ -19,12 +19,23 @@ export function useAnimals(filters?: { status?: string; speciesId?: string; sear
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterStatus = filters?.status
+  const filterSpeciesId = filters?.speciesId
+  const filterSearch = filters?.search
+
+  const memoizedFilters = useMemo(() => ({
+    status: filterStatus,
+    speciesId: filterSpeciesId,
+    search: filterSearch,
+  }), [filterStatus, filterSpeciesId, filterSearch])
+
   const fetchAnimals = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await animalsService.getAll(filters)
+      const data = await animalsService.getAll(memoizedFilters)
       setAnimals(data)
     } catch (err) {
       const error = err as Error
@@ -33,7 +44,7 @@ export function useAnimals(filters?: { status?: string; speciesId?: string; sear
     } finally {
       setLoading(false)
     }
-  }, [filters?.status, filters?.speciesId, filters?.search])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchAnimals()

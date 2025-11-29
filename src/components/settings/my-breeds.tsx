@@ -1,93 +1,89 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save } from 'lucide-react'
+import { Save, AlertCircle } from 'lucide-react'
+import { useToast } from '@/lib/hooks/useToast'
+import { useTranslations } from 'next-intl'
+import { useBreeds } from '@/lib/hooks/useBreeds'
+import { Breed, CreateBreedDto } from '@/lib/types/breed'
 import { Species } from '@/lib/types/farm'
 
-// Mock des races du catalogue global par espèce
-const MOCK_CATALOG_BREEDS: Record<Species, TransferListItem[]> = {
-  bovine: [
-    { id: 'breed-bov-1', name: 'Charolaise', description: 'Viande' },
-    { id: 'breed-bov-2', name: 'Holstein', description: 'Lait' },
-    { id: 'breed-bov-3', name: 'Montbéliarde', description: 'Mixte' },
-    { id: 'breed-bov-4', name: 'Limousine', description: 'Viande' },
-    { id: 'breed-bov-5', name: 'Blonde d\'Aquitaine', description: 'Viande' },
-    { id: 'breed-bov-6', name: 'Brune des Alpes', description: 'Lait' },
-  ],
-  ovine: [
-    { id: 'breed-ovi-1', name: 'Ouled Djellal', description: 'Viande' },
-    { id: 'breed-ovi-2', name: 'Rembi', description: 'Viande' },
-    { id: 'breed-ovi-3', name: 'Hamra', description: 'Viande' },
-    { id: 'breed-ovi-4', name: 'Berbère', description: 'Mixte' },
-    { id: 'breed-ovi-5', name: 'D\'man', description: 'Prolifique' },
-    { id: 'breed-ovi-6', name: 'Sidaou', description: 'Désert' },
-  ],
-  caprine: [
-    { id: 'breed-cap-1', name: 'Alpine', description: 'Lait' },
-    { id: 'breed-cap-2', name: 'Saanen', description: 'Lait' },
-    { id: 'breed-cap-3', name: 'Arbia', description: 'Mixte' },
-    { id: 'breed-cap-4', name: 'M\'zabite', description: 'Désert' },
-  ],
-  poultry: [
-    { id: 'breed-pou-1', name: 'Poulet de chair', description: 'Viande' },
-    { id: 'breed-pou-2', name: 'Poule pondeuse', description: 'Oeufs' },
-    { id: 'breed-pou-3', name: 'Dinde', description: 'Viande' },
-    { id: 'breed-pou-4', name: 'Canard', description: 'Viande' },
-  ],
-  equine: [
-    { id: 'breed-equ-1', name: 'Arabe-Barbe', description: 'Algérie' },
-    { id: 'breed-equ-2', name: 'Pur-sang arabe', description: 'Sport' },
-    { id: 'breed-equ-3', name: 'Barbe', description: 'Travail' },
-  ],
-  camelid: [
-    { id: 'breed-cam-1', name: 'Méhari', description: 'Course' },
-    { id: 'breed-cam-2', name: 'Sahraoui', description: 'Lait/Viande' },
-    { id: 'breed-cam-3', name: 'Targui', description: 'Transport' },
-  ],
-}
-
-const SPECIES_LABELS: Record<Species, string> = {
-  bovine: 'Bovins',
-  ovine: 'Ovins',
-  caprine: 'Caprins',
-  poultry: 'Volaille',
-  equine: 'Équins',
-  camelid: 'Camélidés',
-}
+// Constantes pour les espèces
+const ALL_SPECIES: Species[] = ['bovine', 'ovine', 'caprine', 'poultry', 'equine', 'camelid']
 
 interface MyBreedsProps {
-  // Les espèces configurées par le fermier
   farmSpecies?: Species[]
+  initialSelectedIds?: string[]
   onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
 }
 
-export function MyBreeds({ farmSpecies = ['ovine', 'caprine'], onSave }: MyBreedsProps) {
+// Convertir une Breed API en TransferListItem
+function breedToTransferItem(breed: Breed): TransferListItem {
+  return {
+    id: breed.id,
+    name: breed.nameFr || breed.name,
+    description: breed.description || '',
+    metadata: {
+      speciesId: breed.speciesId,
+      nameFr: breed.nameFr,
+      nameEn: breed.nameEn,
+      nameAr: breed.nameAr,
+    },
+  }
+}
+
+export function MyBreeds({
+  farmSpecies = ['ovine', 'caprine'],
+  initialSelectedIds = [],
+  onSave
+}: MyBreedsProps) {
+  const t = useTranslations('settings.breeds')
+  const ta = useTranslations('settings.actions')
+  const toast = useToast()
+
+  // Espèce active (onglet sélectionné)
   const [activeSpecies, setActiveSpecies] = useState<Species>(farmSpecies[0] || 'bovine')
-  const [selectedItemsBySpecies, setSelectedItemsBySpecies] = useState<Record<Species, TransferListItem[]>>({
-    bovine: [],
-    ovine: [
-      { id: 'breed-ovi-1', name: 'Ouled Djellal', description: 'Viande' },
-      { id: 'breed-ovi-3', name: 'Hamra', description: 'Viande' },
-    ],
-    caprine: [
-      { id: 'breed-cap-1', name: 'Alpine', description: 'Lait' },
-    ],
-    poultry: [],
-    equine: [],
-    camelid: [],
+
+  // Charger les races depuis l'API pour l'espèce active
+  const { breeds, loading, error, createBreed } = useBreeds(activeSpecies)
+
+  // Items sélectionnés par espèce
+  const [selectedItemsBySpecies, setSelectedItemsBySpecies] = useState<Record<Species, TransferListItem[]>>(() => {
+    const initial: Record<Species, TransferListItem[]> = {} as Record<Species, TransferListItem[]>
+    ALL_SPECIES.forEach(sp => { initial[sp] = [] })
+    return initial
   })
+
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
+  // Convertir les races API en items de transfert
   const availableBreeds = useMemo(() => {
-    return MOCK_CATALOG_BREEDS[activeSpecies] || []
-  }, [activeSpecies])
+    return breeds.map(breed => breedToTransferItem(breed))
+  }, [breeds])
 
+  // Items sélectionnés pour l'espèce active
   const selectedBreeds = useMemo(() => {
     return selectedItemsBySpecies[activeSpecies] || []
   }, [activeSpecies, selectedItemsBySpecies])
+
+  // Initialiser les sélections depuis initialSelectedIds
+  useEffect(() => {
+    if (initialSelectedIds.length > 0 && breeds.length > 0) {
+      const initialSelected = breeds
+        .filter(b => initialSelectedIds.includes(b.id))
+        .map(b => breedToTransferItem(b))
+
+      if (initialSelected.length > 0) {
+        setSelectedItemsBySpecies(prev => ({
+          ...prev,
+          [activeSpecies]: initialSelected,
+        }))
+      }
+    }
+  }, [initialSelectedIds, breeds, activeSpecies])
 
   const handleSelect = useCallback((item: TransferListItem) => {
     setSelectedItemsBySpecies((prev) => ({
@@ -105,24 +101,49 @@ export function MyBreeds({ farmSpecies = ['ovine', 'caprine'], onSave }: MyBreed
     setHasChanges(true)
   }, [activeSpecies])
 
-  const handleCreateLocal = useCallback((name: string) => {
-    const newItem: TransferListItem = {
-      id: `local-breed-${activeSpecies}-${Date.now()}`,
-      name: name,
-      description: 'Race locale',
-      isLocal: true,
+  const handleCreateLocal = useCallback(async (name: string) => {
+    try {
+      // Créer la race via l'API
+      const createDto: CreateBreedDto = {
+        id: `local-${activeSpecies}-${Date.now()}`,
+        speciesId: activeSpecies,
+        nameFr: name,
+        nameEn: name,
+        nameAr: name,
+        description: t('breedTypes.local'),
+        isActive: true,
+      }
+
+      const newBreed = await createBreed(createDto)
+      const newItem = breedToTransferItem(newBreed)
+      newItem.isLocal = true
+
+      setSelectedItemsBySpecies((prev) => ({
+        ...prev,
+        [activeSpecies]: [...(prev[activeSpecies] || []), newItem],
+      }))
+      setHasChanges(true)
+      toast.success(t('added'), `${name} ${t('addedTo')}`)
+    } catch {
+      // Fallback: créer localement si l'API échoue
+      const newItem: TransferListItem = {
+        id: `local-breed-${activeSpecies}-${Date.now()}`,
+        name: name,
+        description: t('breedTypes.local'),
+        isLocal: true,
+      }
+      setSelectedItemsBySpecies((prev) => ({
+        ...prev,
+        [activeSpecies]: [...(prev[activeSpecies] || []), newItem],
+      }))
+      setHasChanges(true)
+      toast.success(t('added'), `${name} ${t('addedTo')}`)
     }
-    setSelectedItemsBySpecies((prev) => ({
-      ...prev,
-      [activeSpecies]: [...(prev[activeSpecies] || []), newItem],
-    }))
-    setHasChanges(true)
-  }, [activeSpecies])
+  }, [activeSpecies, createBreed, toast, t])
 
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      // Flatten all selected items
       const allSelected = Object.values(selectedItemsBySpecies).flat()
       const localItems = allSelected.filter((item) => item.isLocal)
       const selectedIds = allSelected.map((item) => item.id)
@@ -135,6 +156,16 @@ export function MyBreeds({ farmSpecies = ['ovine', 'caprine'], onSave }: MyBreed
       }
 
       setHasChanges(false)
+      toast.success(t('saved'), t('savedMessage'))
+    } catch {
+      toast.error(
+        t('saveFailed'),
+        t('saveFailedMessage'),
+        {
+          label: t('retry'),
+          onClick: handleSave,
+        }
+      )
     } finally {
       setIsSaving(false)
     }
@@ -145,13 +176,29 @@ export function MyBreeds({ farmSpecies = ['ovine', 'caprine'], onSave }: MyBreed
     return Object.values(selectedItemsBySpecies).reduce((acc, items) => acc + items.length, 0)
   }, [selectedItemsBySpecies])
 
+  // Afficher l'erreur si le chargement a échoué
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-lg">
+          <AlertCircle className="w-5 h-5" />
+          <span>{t('loadError')}</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-1">Mes Races</h2>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
         <p className="text-sm text-muted-foreground">
-          Sélectionnez les races que vous élevez.
-          {totalSelected > 0 && ` (${totalSelected} race${totalSelected > 1 ? 's' : ''} sélectionnée${totalSelected > 1 ? 's' : ''})`}
+          {t('subtitle')}
+          {totalSelected > 0 && ` (${totalSelected > 1 ? t('totalSelected_plural', { count: totalSelected }) : t('totalSelected', { count: totalSelected })})`}
         </p>
       </div>
 
@@ -167,7 +214,7 @@ export function MyBreeds({ farmSpecies = ['ovine', 'caprine'], onSave }: MyBreed
               onClick={() => setActiveSpecies(species)}
               className="gap-2"
             >
-              {SPECIES_LABELS[species]}
+              {t(`species.${species}`)}
               {count > 0 && (
                 <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                   activeSpecies === species
@@ -188,24 +235,26 @@ export function MyBreeds({ farmSpecies = ['ovine', 'caprine'], onSave }: MyBreed
         onSelect={handleSelect}
         onDeselect={handleDeselect}
         onCreateLocal={handleCreateLocal}
-        availableTitle={`Races ${SPECIES_LABELS[activeSpecies].toLowerCase()} disponibles`}
-        selectedTitle="Mes races"
-        searchPlaceholder="Rechercher une race..."
-        createLocalLabel="Ajouter une race locale"
-        emptySelectedMessage="Sélectionnez vos races"
+        availableTitle={`${t('available')} - ${t(`species.${activeSpecies}`)}`}
+        selectedTitle={t('selected')}
+        searchPlaceholder={t('searchPlaceholder')}
+        createLocalLabel={t('addLocal')}
+        emptySelectedMessage={t('emptySelected')}
+        emptyAvailableMessage={t('emptyAvailable')}
+        isLoading={loading}
       />
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
           {isSaving ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Enregistrement...
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+              {ta('saving')}
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-2" />
-              Enregistrer les modifications
+              <Save className="w-4 h-4 me-2" />
+              {ta('save')}
             </>
           )}
         </Button>
