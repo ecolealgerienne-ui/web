@@ -8,6 +8,7 @@ import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/t
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 
+<<<<<<< HEAD
 // Backend Movement type (from API response)
 interface BackendMovement {
   id: string;
@@ -35,6 +36,62 @@ interface BackendMovement {
   createdAt: string;
   updatedAt: string;
   // ... autres champs optionnels
+=======
+// Type pour la réponse du backend (movements)
+interface BackendMovement {
+  id: string;
+  farmId: string;
+  animalId?: string;
+  lotId?: string;
+  movementType: string;
+  movementDate: string;
+  reason?: string;
+  notes?: string;
+  quantity?: number;
+  sourceLocation?: string;
+  destinationLocation?: string;
+  performedBy?: string;
+  veterinarianId?: string;
+  cost?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Mapping backend movement -> frontend AnimalEvent
+function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
+  return {
+    id: movement.id,
+    farmId: movement.farmId,
+    animalId: movement.animalId || '',
+    eventType: movement.movementType as AnimalEvent['eventType'],
+    eventDate: movement.movementDate,
+    title: movement.reason || formatEventTitle(movement.movementType),
+    description: movement.notes,
+    performedBy: movement.performedBy,
+    veterinarianId: movement.veterinarianId,
+    cost: movement.cost,
+    location: movement.destinationLocation || movement.sourceLocation,
+    createdAt: movement.createdAt,
+    updatedAt: movement.updatedAt,
+  };
+}
+
+// Générer un titre lisible pour l'événement
+function formatEventTitle(movementType: string): string {
+  const titles: Record<string, string> = {
+    entry: 'Entrée',
+    exit: 'Sortie',
+    birth: 'Naissance',
+    death: 'Décès',
+    sale: 'Vente',
+    purchase: 'Achat',
+    transfer_in: 'Transfert entrant',
+    transfer_out: 'Transfert sortant',
+    temporary_out: 'Sortie temporaire',
+    temporary_return: 'Retour temporaire',
+  };
+  return titles[movementType] || movementType;
+>>>>>>> e20e61bd86ff804a2d2a6572dbafab410c4ef843
 }
 
 class AnimalEventsService {
@@ -96,6 +153,7 @@ class AnimalEventsService {
       if (filters?.toDate) params.append('toDate', filters.toDate);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+<<<<<<< HEAD
       console.log('[Animal Events] Fetching movements from:', url);
       const response = await apiClient.get<{ data: BackendMovement[] }>(url);
       console.log('[Animal Events] Backend response:', response);
@@ -106,6 +164,14 @@ class AnimalEventsService {
 
       logger.info('Animal events (movements) fetched', { count: mappedEvents.length });
       return mappedEvents;
+=======
+      const response = await apiClient.get<{ data: BackendMovement[] }>(url);
+
+      // Map backend movements to frontend AnimalEvent format
+      const events = (response.data || []).map(mapMovementToEvent);
+      logger.info('Animal events (movements) fetched', { count: events.length });
+      return events;
+>>>>>>> e20e61bd86ff804a2d2a6572dbafab410c4ef843
     } catch (error: any) {
       console.error('[Animal Events] Failed to fetch movements:', error);
       if (error.status === 404) {
@@ -121,7 +187,11 @@ class AnimalEventsService {
     try {
       const response = await apiClient.get<BackendMovement>(`${this.getBasePath()}/${id}`);
       logger.info('Movement fetched', { id });
+<<<<<<< HEAD
       return this.mapBackendMovementToAnimalEvent(response);
+=======
+      return mapMovementToEvent(response);
+>>>>>>> e20e61bd86ff804a2d2a6572dbafab410c4ef843
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('Movement not found (404)', { id });
@@ -135,9 +205,15 @@ class AnimalEventsService {
   async getByAnimalId(animalId: string): Promise<AnimalEvent[]> {
     try {
       const response = await apiClient.get<{ data: BackendMovement[] }>(`${this.getBasePath()}?animalId=${animalId}`);
+<<<<<<< HEAD
       const mappedEvents = response.data?.map(movement => this.mapBackendMovementToAnimalEvent(movement)) || [];
       logger.info('Movements fetched for animal', { animalId, count: mappedEvents.length });
       return mappedEvents;
+=======
+      const events = (response.data || []).map(mapMovementToEvent);
+      logger.info('Movements fetched for animal', { animalId, count: events.length });
+      return events;
+>>>>>>> e20e61bd86ff804a2d2a6572dbafab410c4ef843
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No movements found for animal (404)', { animalId });
