@@ -41,6 +41,22 @@
   - Toujours utiliser `apiClient` de `/src/lib/api/client.ts`
   - Toujours logger les erreurs via `/src/lib/utils/logger.ts`
 
+- ❌ **Ne jamais recréer les composants génériques admin**
+  - **TOUJOURS** utiliser `DataTable<T>` pour les tableaux paginés admin
+  - **TOUJOURS** utiliser `Pagination` pour la pagination
+  - **TOUJOURS** utiliser `DeleteConfirmModal` pour les suppressions
+  - Ces composants sont dans `/src/components/admin/common/`
+  - Voir section 7.2 pour documentation complète
+
+- ❌ **Ne jamais ignorer les types et patterns communs (Phase 1)**
+  - **TOUJOURS** étendre `BaseEntity` pour toutes les entités admin
+  - **TOUJOURS** utiliser `PaginatedResponse<T>` pour les listes paginées
+  - **TOUJOURS** utiliser `HTTP_STATUS` constants (jamais de magic numbers : 200, 404, etc.)
+  - **TOUJOURS** utiliser `handleApiError()` pour la gestion d'erreurs API
+  - **TOUJOURS** implémenter `CrudService<T, CreateDto, UpdateDto>` pour les services
+  - Ces types sont dans `/src/lib/types/common/api.ts` et `/src/lib/constants/http-status.ts`
+  - Voir section 6 pour documentation complète
+
 - ❌ **Aucun commit sans build réussi**
   - Toujours exécuter `npm run build` avant commit
   - Corriger toutes les erreurs TypeScript
@@ -436,13 +452,30 @@ export interface UpdateActiveSubstanceDto {
 }
 ```
 
-### 6.2 Types Génériques
+### 6.2 Types Génériques (OBLIGATOIRES - Phase 1)
 
-**Utiliser ces types pour TOUTES les entités :**
+❌ **INTERDICTION ABSOLUE : Ne jamais recréer ces types**
+
+**Ces types DOIVENT être utilisés pour TOUTES les entités admin :**
 
 ```typescript
 // /src/lib/types/common/api.ts
 
+/**
+ * ⚠️ OBLIGATOIRE : Toutes les entités admin DOIVENT étendre BaseEntity
+ */
+export interface BaseEntity {
+  id: string
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: string | null  // Pour soft delete
+  version?: number            // Pour optimistic locking
+  isActive?: boolean
+}
+
+/**
+ * ⚠️ OBLIGATOIRE : Utiliser pour TOUTES les listes paginées
+ */
 export interface PaginatedResponse<T> {
   data: T[]
   meta: {
@@ -453,6 +486,9 @@ export interface PaginatedResponse<T> {
   }
 }
 
+/**
+ * ⚠️ OBLIGATOIRE : Utiliser pour TOUS les paramètres de pagination
+ */
 export interface PaginationParams {
   page?: number
   limit?: number
@@ -462,16 +498,92 @@ export interface PaginationParams {
   sortOrder?: 'asc' | 'desc'
 }
 
-export interface BaseEntity {
-  id: string
-  createdAt?: string
-  updatedAt?: string
-  deletedAt?: string | null
-  version?: number
+/**
+ * ⚠️ OBLIGATOIRE : Implémenter pour TOUS les services CRUD
+ */
+export interface CrudService<T extends BaseEntity, CreateDto, UpdateDto> {
+  getAll(params?: PaginationParams): Promise<PaginatedResponse<T>>
+  getById(id: string): Promise<T>
+  create(data: CreateDto): Promise<T>
+  update(id: string, data: UpdateDto): Promise<T>
+  delete(id: string): Promise<void>
+  restore?(id: string): Promise<T>
 }
 ```
 
-### 6.3 Configuration TypeScript Stricte
+**Exemple d'utilisation obligatoire :**
+
+```typescript
+// ✅ CORRECT - L'entité étend BaseEntity
+export interface ActiveSubstance extends BaseEntity {
+  code: string
+  name: string
+  description?: string
+}
+
+// ❌ INTERDIT - Ne pas recréer les champs de BaseEntity
+export interface ActiveSubstance {
+  id: string           // ❌ Déjà dans BaseEntity
+  code: string
+  name: string
+  createdAt: string    // ❌ Déjà dans BaseEntity
+  updatedAt: string    // ❌ Déjà dans BaseEntity
+}
+```
+
+### 6.3 Constantes HTTP (OBLIGATOIRES - Phase 1)
+
+❌ **INTERDICTION ABSOLUE : Jamais de magic numbers HTTP**
+
+**TOUJOURS utiliser les constantes HTTP_STATUS :**
+
+```typescript
+// /src/lib/constants/http-status.ts
+
+export const HTTP_STATUS = {
+  // 2xx Success
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+
+  // 4xx Client Errors
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+
+  // 5xx Server Errors
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+} as const
+
+// Helper functions
+export function isSuccessStatus(status: number): boolean
+export function isClientError(status: number): boolean
+export function isServerError(status: number): boolean
+```
+
+**Utilisation :**
+
+```typescript
+// ❌ INTERDIT - Magic numbers
+if (response.status === 200) { /* ... */ }
+if (error.status === 404) { /* ... */ }
+
+// ✅ OBLIGATOIRE - Constantes nommées
+import { HTTP_STATUS } from '@/lib/constants/http-status'
+
+if (response.status === HTTP_STATUS.OK) { /* ... */ }
+if (error.status === HTTP_STATUS.NOT_FOUND) { /* ... */ }
+```
+
+---
+
+### 6.4 Configuration TypeScript Stricte
 
 ```json
 // tsconfig.json (déjà configuré, ne pas modifier)
@@ -548,7 +660,102 @@ export function MyComponent({ data, onSuccess, canEdit = true }: MyComponentProp
 }
 ```
 
-### 7.2 Props Pattern
+### 7.2 Composants Génériques Admin (OBLIGATOIRES)
+
+❌ **INTERDICTION ABSOLUE : Ne jamais recréer ces composants**
+
+**Pour TOUTES les pages admin**, utiliser les composants génériques de `/src/components/admin/common/` :
+
+#### 7.2.1 DataTable<T> - Tableau Paginé
+
+```typescript
+import { DataTable } from '@/components/admin/common/DataTable'
+
+<DataTable<ActiveSubstance>
+  data={substances}
+  columns={[
+    { key: 'code', header: t('fields.code'), sortable: true },
+    { key: 'name', header: t('fields.name'), sortable: true },
+    {
+      key: 'isActive',
+      header: t('fields.isActive'),
+      render: (item) => item.isActive ? t('status.active') : t('status.inactive')
+    },
+  ]}
+  totalItems={total}
+  page={page}
+  limit={limit}
+  onPageChange={setPage}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+  searchValue={search}
+  onSearchChange={setSearch}
+  sortBy={sortBy}
+  sortOrder={sortOrder}
+  onSortChange={handleSort}
+/>
+```
+
+**Features incluses :**
+- ✅ Pagination serveur
+- ✅ Tri par colonne
+- ✅ Recherche avec debounce
+- ✅ Actions (Edit/Delete/View/Custom)
+- ✅ Loading/error/empty states
+- ✅ Badge soft-delete
+- ✅ Type-safe avec génériques
+
+#### 7.2.2 Pagination - Contrôles de Pagination
+
+```typescript
+import { Pagination } from '@/components/admin/common/Pagination'
+
+<Pagination
+  currentPage={page}
+  totalPages={totalPages}
+  totalItems={total}
+  itemsPerPage={limit}
+  onPageChange={setPage}
+  onItemsPerPageChange={setLimit}
+/>
+```
+
+**Features incluses :**
+- ✅ Navigation : first, previous, next, last
+- ✅ Sélecteur items/page : 10, 25, 50, 100
+- ✅ Affichage "1-25 sur 250 éléments"
+- ✅ i18n complet
+
+#### 7.2.3 DeleteConfirmModal - Suppression avec Dépendances
+
+```typescript
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+
+const [showDeleteModal, setShowDeleteModal] = useState(false)
+const [itemToDelete, setItemToDelete] = useState<ActiveSubstance | null>(null)
+const [dependencies, setDependencies] = useState<Record<string, number>>()
+
+<DeleteConfirmModal
+  open={showDeleteModal}
+  onOpenChange={setShowDeleteModal}
+  itemName={itemToDelete?.name || ''}
+  onConfirm={handleDeleteConfirm}
+  dependencies={dependencies}
+/>
+```
+
+**Features incluses :**
+- ✅ Vérification automatique des dépendances
+- ✅ Blocage si dépendances existent
+- ✅ Formatage lisible des dépendances
+- ✅ Loading state
+- ✅ i18n complet
+
+**⚠️ RÈGLE ABSOLUE :** Ces composants DOIVENT être utilisés pour toutes les pages admin. Ne jamais créer de variantes ou de doublons.
+
+---
+
+### 7.3 Props Pattern
 
 **✅ Bonnes pratiques :**
 
@@ -765,6 +972,114 @@ export const activeSubstancesService = new ActiveSubstancesService()
 - Capturer les erreurs sans les re-throw
 - Faire des transformations complexes (laisser au composant)
 - Mélanger logique métier et logique API
+
+### 8.3 Bonnes Pratiques Techniques (Phase 3)
+
+**🔧 Découvertes lors de l'implémentation Active-Substances :**
+
+#### 8.3.1 Query Parameters avec apiClient
+
+⚠️ **IMPORTANT :** `apiClient.get()` ne supporte PAS l'option `{ params }`
+
+❌ **NE FONCTIONNE PAS :**
+```typescript
+// ❌ ERREUR : RequestOptions ne contient pas 'params'
+const response = await apiClient.get('/endpoint', { params: { page: 1 } })
+```
+
+✅ **SOLUTION :** Construire l'URL manuellement avec `URLSearchParams`
+```typescript
+// ✅ CORRECT
+const queryParams = new URLSearchParams()
+if (params?.page) queryParams.append('page', String(params.page))
+if (params?.limit) queryParams.append('limit', String(params.limit))
+if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+
+const url = queryParams.toString()
+  ? `${this.baseUrl}?${queryParams.toString()}`
+  : this.baseUrl
+
+const response = await apiClient.get<PaginatedResponse<T>>(url)
+```
+
+#### 8.3.2 ColumnDef pour DataTable
+
+⚠️ **Le type `ColumnDef<T>` n'est pas exporté** de `DataTable.tsx`
+
+✅ **SOLUTION :** Définir localement dans chaque page
+```typescript
+// Dans votre page.tsx
+interface ColumnDef<T> {
+  key: keyof T | string
+  header: string
+  sortable?: boolean
+  render?: (item: T) => React.ReactNode
+  width?: string
+  align?: 'left' | 'center' | 'right'
+}
+
+const columns: ColumnDef<ActiveSubstance>[] = [
+  {
+    key: 'code',
+    header: t('fields.code'),
+    sortable: true,
+    render: (substance: ActiveSubstance) => (
+      <span className="font-mono">{substance.code}</span>
+    ),
+  },
+]
+```
+
+#### 8.3.3 DeleteConfirmModal Props
+
+⚠️ **Le composant `DeleteConfirmModal` n'a QUE `itemName` comme prop**
+
+❌ **NE FONCTIONNE PAS :**
+```typescript
+<DeleteConfirmModal
+  title={t('actions.delete')}        // ❌ Prop n'existe pas
+  description={t('messages.confirm')} // ❌ Prop n'existe pas
+  itemName="Amoxicilline"
+/>
+```
+
+✅ **CORRECT :**
+```typescript
+<DeleteConfirmModal
+  open={deleteDialogOpen}
+  onOpenChange={setDeleteDialogOpen}
+  onConfirm={handleDeleteConfirm}
+  itemName={deletingItem?.name || ''} // ✅ Seule prop pour le nom
+/>
+```
+
+Le composant génère automatiquement le titre et la description via i18n.
+
+#### 8.3.4 Version Field pour Optimistic Locking
+
+✅ **OBLIGATOIRE :** Le champ `version` est requis dans `UpdateDto`
+
+```typescript
+// Type definition
+export interface UpdateActiveSubstanceDto {
+  code?: string
+  name?: string
+  description?: string
+  isActive?: boolean
+  version: number  // ✅ OBLIGATOIRE pour optimistic locking
+}
+
+// Utilisation dans le hook
+const update = async (id: string, dto: UpdateActiveSubstanceDto) => {
+  // Le backend vérifie version et retourne 409 Conflict si mismatch
+  const updated = await service.update(id, {
+    ...dto,
+    version: currentItem.version || 1,
+  })
+}
+```
+
+Le backend incrémente automatiquement la version à chaque mise à jour et retourne `409 Conflict` si la version envoyée ne correspond pas (détection de modifications concurrentes).
 
 ---
 

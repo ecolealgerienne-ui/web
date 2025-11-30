@@ -4,7 +4,7 @@
 
 ---
 
-## 🚫 LES 5 INTERDICTIONS ABSOLUES
+## 🚫 LES 7 INTERDICTIONS ABSOLUES
 
 ### 1. ❌ AUCUNE VALEUR EN DUR
 ```typescript
@@ -27,14 +27,63 @@ import { apiClient } from '@/lib/api/client'
 const response = await apiClient.get('/api/v1/endpoint')
 ```
 
-### 3. ❌ JAMAIS COMMIT SANS BUILD RÉUSSI
+### 3. ❌ JAMAIS RECRÉER LES COMPOSANTS GÉNÉRIQUES ADMIN
+```typescript
+// ❌ INTERDIT - Créer son propre tableau paginé
+const MyCustomTable = () => { /* ... */ }
+
+// ✅ OBLIGATOIRE - Utiliser les composants génériques
+import { DataTable } from '@/components/admin/common/DataTable'
+import { Pagination } from '@/components/admin/common/Pagination'
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+
+// Ces 3 composants DOIVENT être utilisés pour TOUTES les pages admin
+// Voir section 7.2 du DEVELOPMENT_STANDARDS.md
+```
+
+### 4. ❌ JAMAIS IGNORER LES TYPES ET PATTERNS COMMUNS (PHASE 1)
+```typescript
+// ❌ INTERDIT - Recréer BaseEntity
+export interface MyEntity {
+  id: string
+  createdAt: string  // ❌ Déjà dans BaseEntity
+}
+
+// ✅ OBLIGATOIRE - Étendre BaseEntity
+import { BaseEntity } from '@/lib/types/common/api'
+export interface MyEntity extends BaseEntity {
+  code: string
+  name: string
+}
+
+// ❌ INTERDIT - Magic numbers HTTP
+if (response.status === 200) { /* ... */ }
+if (error.status === 404) { /* ... */ }
+
+// ✅ OBLIGATOIRE - Constantes HTTP_STATUS
+import { HTTP_STATUS } from '@/lib/constants/http-status'
+if (response.status === HTTP_STATUS.OK) { /* ... */ }
+if (error.status === HTTP_STATUS.NOT_FOUND) { /* ... */ }
+
+// ✅ OBLIGATOIRE - PaginatedResponse pour listes
+const result: PaginatedResponse<MyEntity> = await service.getAll()
+
+// ✅ OBLIGATOIRE - CrudService pour services
+class MyService implements CrudService<MyEntity, CreateDto, UpdateDto> {
+  async getAll(params?: PaginationParams): Promise<PaginatedResponse<MyEntity>>
+  async getById(id: string): Promise<MyEntity>
+  // ...
+}
+```
+
+### 5. ❌ JAMAIS COMMIT SANS BUILD RÉUSSI
 ```bash
 # TOUJOURS avant commit :
 npm run build
 # Si erreur → corriger AVANT de commit
 ```
 
-### 4. ❌ JAMAIS DE TEXTE SANS i18n
+### 6. ❌ JAMAIS DE TEXTE SANS i18n
 ```typescript
 // ❌ INTERDIT
 <Button>Créer</Button>
@@ -45,7 +94,7 @@ toast.success("Créé avec succès")
 toast.success(t('entity.success.created'))
 ```
 
-### 5. ❌ JAMAIS D'ERREUR NON LOGGÉE
+### 7. ❌ JAMAIS D'ERREUR NON LOGGÉE
 ```typescript
 // ❌ INTERDIT
 try {
@@ -362,6 +411,9 @@ git push -u origin feature/admin-active-substances
 ☐ Build réussi (npm run build) ?
 ☐ Aucune valeur en dur ?
 ☐ Toutes les traductions FR/EN/AR ?
+☐ Composants génériques admin utilisés (DataTable/Pagination/DeleteConfirmModal) ?
+☐ Types communs utilisés (BaseEntity/PaginatedResponse/CrudService) ?
+☐ Constantes HTTP_STATUS utilisées (pas de magic numbers) ?
 ☐ Validation Zod en place ?
 ☐ Tous les types TypeScript définis ?
 ☐ Service utilise apiClient + logger ?
@@ -384,8 +436,15 @@ git push -u origin feature/admin-active-substances
 | **Toast** | `/src/contexts/toast-context.tsx` | `toast.success/error/warning` |
 | **i18n** | `/src/lib/i18n/` | `t('key')` |
 | **Error Handler** | `/src/lib/utils/api-error-handler.ts` | `handleApiError()` |
+| **DataTable** | `/src/components/admin/common/DataTable.tsx` | `<DataTable<T> />` |
+| **Pagination** | `/src/components/admin/common/Pagination.tsx` | `<Pagination />` |
+| **DeleteConfirmModal** | `/src/components/admin/common/DeleteConfirmModal.tsx` | `<DeleteConfirmModal />` |
+| **BaseEntity** | `/src/lib/types/common/api.ts` | `extends BaseEntity` |
+| **PaginatedResponse** | `/src/lib/types/common/api.ts` | `PaginatedResponse<T>` |
+| **CrudService** | `/src/lib/types/common/api.ts` | `implements CrudService<T, C, U>` |
+| **HTTP_STATUS** | `/src/lib/constants/http-status.ts` | `HTTP_STATUS.OK` |
 
-**Ces outils sont OBLIGATOIRES et CENTRALISÉS.**
+**Ces outils, types et composants sont OBLIGATOIRES et CENTRALISÉS.**
 **Ne jamais créer d'alternative ou de bypass.**
 
 ---
@@ -424,6 +483,9 @@ npm run lint             # Lint code
 - ✅ Vérifier responsive (mobile/desktop)
 
 ### DON'Ts ❌
+- ❌ Recréer DataTable, Pagination ou DeleteConfirmModal
+- ❌ Recréer BaseEntity ou ne pas l'étendre
+- ❌ Utiliser magic numbers HTTP (200, 404, etc.)
 - ❌ Réinventer la roue (réutiliser composants existants)
 - ❌ Modifier les fichiers core (apiClient, logger, etc.)
 - ❌ Ignorer les erreurs TypeScript

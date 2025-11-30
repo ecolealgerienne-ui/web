@@ -41,6 +41,40 @@
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "required": "Required"
+    },
+    "error": {
+      "title": "Error",
+      "validation": "Validation error",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Access denied",
+      "notFound": "Resource not found",
+      "timeout": "Timeout",
+      "conflict": "Conflict detected",
+      "versionConflict": "Version conflict",
+      "hasDependencies": "Cannot delete",
+      "tooManyRequests": "Too many requests",
+      "serverError": "Server error",
+      "network": "Network error",
+      "unknown": "Unknown error"
+    },
+    "pagination": {
+      "of": "of",
+      "items": "items",
+      "itemsPerPage": "Per page",
+      "page": "Page",
+      "firstPage": "First page",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "lastPage": "Last page"
+    },
+    "table": {
+      "actions": "Actions",
+      "noResults": "No results found",
+      "loading": "Loading...",
+      "cannotDelete": "Cannot delete",
+      "isUsedBy": "because it is used by",
+      "mustDeleteDependencies": "You must first delete these dependencies.",
+      "confirmDeleteItem": "Are you sure you want to delete"
     }
   },
   "header": {
@@ -211,6 +245,53 @@
       "updateError": "Error updating medication",
       "deleteError": "Error deleting medication",
       "confirmDelete": "Are you sure you want to delete the medication {name}?"
+    }
+  },
+  "activeSubstance": {
+    "title": {
+      "singular": "Active Substance",
+      "plural": "Active Substances"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "International Name (INN)",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, dashes and underscores"
+      },
+      "name": {
+        "required": "Name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "actions": {
+      "create": "Create active substance",
+      "edit": "Edit active substance",
+      "delete": "Delete active substance",
+      "restore": "Restore active substance"
+    },
+    "messages": {
+      "created": "Active substance created successfully",
+      "updated": "Active substance updated successfully",
+      "deleted": "Active substance deleted successfully",
+      "restored": "Active substance restored successfully",
+      "createError": "Error creating active substance",
+      "updateError": "Error updating active substance",
+      "deleteError": "Error deleting active substance",
+      "confirmDelete": "Are you sure you want to delete the active substance \"{name}\"?",
+      "noResults": "No active substances found"
     }
   },
   "errors": {
