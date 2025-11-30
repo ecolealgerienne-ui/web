@@ -11,6 +11,7 @@ import { useAnimalEvents } from '@/lib/hooks/useAnimalEvents';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { animalEventsService } from '@/lib/services/animal-events.service';
 import { AnimalEventFormDialog } from '@/components/data/animal-event-form-dialog';
+import { AnimalEventDetailDialog } from '@/components/data/animal-event-detail-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -22,14 +23,21 @@ export default function AnimalEventsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const { events, loading, error, refetch } = useAnimalEvents({ eventType: typeFilter });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<AnimalEvent | undefined>();
+  const [detailEvent, setDetailEvent] = useState<AnimalEvent | null>(null);
   const [eventToDelete, setEventToDelete] = useState<AnimalEvent | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAdd = () => {
     setSelectedEvent(undefined);
     setIsDialogOpen(true);
+  };
+
+  const handleViewDetail = (event: AnimalEvent) => {
+    setDetailEvent(event);
+    setIsDetailDialogOpen(true);
   };
 
   const handleEdit = (event: AnimalEvent) => {
@@ -112,7 +120,11 @@ export default function AnimalEventsPage() {
           ) : (
             <div className="space-y-3">
               {events.map((event) => (
-                <div key={event.id} className="p-4 border rounded-lg hover:bg-accent transition-colors">
+                <div
+                  key={event.id}
+                  className="p-4 border rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                  onClick={() => handleViewDetail(event)}
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -121,10 +133,10 @@ export default function AnimalEventsPage() {
                         <Badge>{t(`types.${event.eventType}`)}</Badge>
                       </div>
                       <h3 className="font-semibold">{event.title}</h3>
-                      {event.description && <p className="text-sm text-muted-foreground mt-1">{event.description}</p>}
-                      {event.cost && <p className="text-sm mt-1">Coût: {event.cost} €</p>}
+                      {event.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>}
+                      {event.cost !== undefined && event.cost !== null && <p className="text-sm mt-1">Coût: {event.cost} €</p>}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button variant="outline" size="sm" onClick={() => handleEdit(event)}><Edit2 className="h-3 w-3" /></Button>
                       <Button variant="outline" size="sm" onClick={() => handleDelete(event)} className="text-destructive"><Trash2 className="h-3 w-3" /></Button>
                     </div>
@@ -137,7 +149,14 @@ export default function AnimalEventsPage() {
       </Card>
 
       <AnimalEventFormDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSubmit={handleSubmit} event={selectedEvent} isLoading={isSubmitting} />
-      
+
+      <AnimalEventDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        event={detailEvent}
+        onEdit={handleEdit}
+      />
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
