@@ -973,6 +973,114 @@ export const activeSubstancesService = new ActiveSubstancesService()
 - Faire des transformations complexes (laisser au composant)
 - Mélanger logique métier et logique API
 
+### 8.3 Bonnes Pratiques Techniques (Phase 3)
+
+**🔧 Découvertes lors de l'implémentation Active-Substances :**
+
+#### 8.3.1 Query Parameters avec apiClient
+
+⚠️ **IMPORTANT :** `apiClient.get()` ne supporte PAS l'option `{ params }`
+
+❌ **NE FONCTIONNE PAS :**
+```typescript
+// ❌ ERREUR : RequestOptions ne contient pas 'params'
+const response = await apiClient.get('/endpoint', { params: { page: 1 } })
+```
+
+✅ **SOLUTION :** Construire l'URL manuellement avec `URLSearchParams`
+```typescript
+// ✅ CORRECT
+const queryParams = new URLSearchParams()
+if (params?.page) queryParams.append('page', String(params.page))
+if (params?.limit) queryParams.append('limit', String(params.limit))
+if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+
+const url = queryParams.toString()
+  ? `${this.baseUrl}?${queryParams.toString()}`
+  : this.baseUrl
+
+const response = await apiClient.get<PaginatedResponse<T>>(url)
+```
+
+#### 8.3.2 ColumnDef pour DataTable
+
+⚠️ **Le type `ColumnDef<T>` n'est pas exporté** de `DataTable.tsx`
+
+✅ **SOLUTION :** Définir localement dans chaque page
+```typescript
+// Dans votre page.tsx
+interface ColumnDef<T> {
+  key: keyof T | string
+  header: string
+  sortable?: boolean
+  render?: (item: T) => React.ReactNode
+  width?: string
+  align?: 'left' | 'center' | 'right'
+}
+
+const columns: ColumnDef<ActiveSubstance>[] = [
+  {
+    key: 'code',
+    header: t('fields.code'),
+    sortable: true,
+    render: (substance: ActiveSubstance) => (
+      <span className="font-mono">{substance.code}</span>
+    ),
+  },
+]
+```
+
+#### 8.3.3 DeleteConfirmModal Props
+
+⚠️ **Le composant `DeleteConfirmModal` n'a QUE `itemName` comme prop**
+
+❌ **NE FONCTIONNE PAS :**
+```typescript
+<DeleteConfirmModal
+  title={t('actions.delete')}        // ❌ Prop n'existe pas
+  description={t('messages.confirm')} // ❌ Prop n'existe pas
+  itemName="Amoxicilline"
+/>
+```
+
+✅ **CORRECT :**
+```typescript
+<DeleteConfirmModal
+  open={deleteDialogOpen}
+  onOpenChange={setDeleteDialogOpen}
+  onConfirm={handleDeleteConfirm}
+  itemName={deletingItem?.name || ''} // ✅ Seule prop pour le nom
+/>
+```
+
+Le composant génère automatiquement le titre et la description via i18n.
+
+#### 8.3.4 Version Field pour Optimistic Locking
+
+✅ **OBLIGATOIRE :** Le champ `version` est requis dans `UpdateDto`
+
+```typescript
+// Type definition
+export interface UpdateActiveSubstanceDto {
+  code?: string
+  name?: string
+  description?: string
+  isActive?: boolean
+  version: number  // ✅ OBLIGATOIRE pour optimistic locking
+}
+
+// Utilisation dans le hook
+const update = async (id: string, dto: UpdateActiveSubstanceDto) => {
+  // Le backend vérifie version et retourne 409 Conflict si mismatch
+  const updated = await service.update(id, {
+    ...dto,
+    version: currentItem.version || 1,
+  })
+}
+```
+
+Le backend incrémente automatiquement la version à chaque mise à jour et retourne `409 Conflict` si la version envoyée ne correspond pas (détection de modifications concurrentes).
+
 ---
 
 ## 9. State Management
