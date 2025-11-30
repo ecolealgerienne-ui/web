@@ -14,7 +14,7 @@ export const viewport = defaultViewport;
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.Node;
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>

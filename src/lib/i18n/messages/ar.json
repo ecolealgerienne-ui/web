@@ -41,6 +41,21 @@
       "createdAt": "تاريخ الإنشاء",
       "updatedAt": "تاريخ التحديث",
       "required": "مطلوب"
+    },
+    "error": {
+      "title": "خطأ",
+      "validation": "خطأ في التحقق",
+      "unauthorized": "غير مصرح",
+      "forbidden": "الوصول مرفوض",
+      "notFound": "المورد غير موجود",
+      "timeout": "انتهت المهلة",
+      "conflict": "تم اكتشاف تعارض",
+      "versionConflict": "تعارض الإصدار",
+      "hasDependencies": "لا يمكن الحذف",
+      "tooManyRequests": "طلبات كثيرة جدًا",
+      "serverError": "خطأ في الخادم",
+      "network": "خطأ في الشبكة",
+      "unknown": "خطأ غير معروف"
     }
   },
   "header": {

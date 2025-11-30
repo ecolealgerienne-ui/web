@@ -41,6 +41,21 @@
       "createdAt": "Créé le",
       "updatedAt": "Modifié le",
       "required": "Requis"
+    },
+    "error": {
+      "title": "Erreur",
+      "validation": "Erreur de validation",
+      "unauthorized": "Non authentifié",
+      "forbidden": "Accès refusé",
+      "notFound": "Ressource non trouvée",
+      "timeout": "Délai d'attente dépassé",
+      "conflict": "Conflit détecté",
+      "versionConflict": "Conflit de version",
+      "hasDependencies": "Suppression impossible",
+      "tooManyRequests": "Trop de requêtes",
+      "serverError": "Erreur serveur",
+      "network": "Erreur réseau",
+      "unknown": "Erreur inconnue"
     }
   },
   "header": {
