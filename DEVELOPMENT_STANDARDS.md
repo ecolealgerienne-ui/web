@@ -41,6 +41,13 @@
   - Toujours utiliser `apiClient` de `/src/lib/api/client.ts`
   - Toujours logger les erreurs via `/src/lib/utils/logger.ts`
 
+- ❌ **Ne jamais recréer les composants génériques admin**
+  - **TOUJOURS** utiliser `DataTable<T>` pour les tableaux paginés admin
+  - **TOUJOURS** utiliser `Pagination` pour la pagination
+  - **TOUJOURS** utiliser `DeleteConfirmModal` pour les suppressions
+  - Ces composants sont dans `/src/components/admin/common/`
+  - Voir section 7.2 pour documentation complète
+
 - ❌ **Aucun commit sans build réussi**
   - Toujours exécuter `npm run build` avant commit
   - Corriger toutes les erreurs TypeScript
@@ -548,7 +555,102 @@ export function MyComponent({ data, onSuccess, canEdit = true }: MyComponentProp
 }
 ```
 
-### 7.2 Props Pattern
+### 7.2 Composants Génériques Admin (OBLIGATOIRES)
+
+❌ **INTERDICTION ABSOLUE : Ne jamais recréer ces composants**
+
+**Pour TOUTES les pages admin**, utiliser les composants génériques de `/src/components/admin/common/` :
+
+#### 7.2.1 DataTable<T> - Tableau Paginé
+
+```typescript
+import { DataTable } from '@/components/admin/common/DataTable'
+
+<DataTable<ActiveSubstance>
+  data={substances}
+  columns={[
+    { key: 'code', header: t('fields.code'), sortable: true },
+    { key: 'name', header: t('fields.name'), sortable: true },
+    {
+      key: 'isActive',
+      header: t('fields.isActive'),
+      render: (item) => item.isActive ? t('status.active') : t('status.inactive')
+    },
+  ]}
+  totalItems={total}
+  page={page}
+  limit={limit}
+  onPageChange={setPage}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+  searchValue={search}
+  onSearchChange={setSearch}
+  sortBy={sortBy}
+  sortOrder={sortOrder}
+  onSortChange={handleSort}
+/>
+```
+
+**Features incluses :**
+- ✅ Pagination serveur
+- ✅ Tri par colonne
+- ✅ Recherche avec debounce
+- ✅ Actions (Edit/Delete/View/Custom)
+- ✅ Loading/error/empty states
+- ✅ Badge soft-delete
+- ✅ Type-safe avec génériques
+
+#### 7.2.2 Pagination - Contrôles de Pagination
+
+```typescript
+import { Pagination } from '@/components/admin/common/Pagination'
+
+<Pagination
+  currentPage={page}
+  totalPages={totalPages}
+  totalItems={total}
+  itemsPerPage={limit}
+  onPageChange={setPage}
+  onItemsPerPageChange={setLimit}
+/>
+```
+
+**Features incluses :**
+- ✅ Navigation : first, previous, next, last
+- ✅ Sélecteur items/page : 10, 25, 50, 100
+- ✅ Affichage "1-25 sur 250 éléments"
+- ✅ i18n complet
+
+#### 7.2.3 DeleteConfirmModal - Suppression avec Dépendances
+
+```typescript
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+
+const [showDeleteModal, setShowDeleteModal] = useState(false)
+const [itemToDelete, setItemToDelete] = useState<ActiveSubstance | null>(null)
+const [dependencies, setDependencies] = useState<Record<string, number>>()
+
+<DeleteConfirmModal
+  open={showDeleteModal}
+  onOpenChange={setShowDeleteModal}
+  itemName={itemToDelete?.name || ''}
+  onConfirm={handleDeleteConfirm}
+  dependencies={dependencies}
+/>
+```
+
+**Features incluses :**
+- ✅ Vérification automatique des dépendances
+- ✅ Blocage si dépendances existent
+- ✅ Formatage lisible des dépendances
+- ✅ Loading state
+- ✅ i18n complet
+
+**⚠️ RÈGLE ABSOLUE :** Ces composants DOIVENT être utilisés pour toutes les pages admin. Ne jamais créer de variantes ou de doublons.
+
+---
+
+### 7.3 Props Pattern
 
 **✅ Bonnes pratiques :**
 

@@ -4,7 +4,7 @@
 
 ---
 
-## 🚫 LES 5 INTERDICTIONS ABSOLUES
+## 🚫 LES 6 INTERDICTIONS ABSOLUES
 
 ### 1. ❌ AUCUNE VALEUR EN DUR
 ```typescript
@@ -27,14 +27,28 @@ import { apiClient } from '@/lib/api/client'
 const response = await apiClient.get('/api/v1/endpoint')
 ```
 
-### 3. ❌ JAMAIS COMMIT SANS BUILD RÉUSSI
+### 3. ❌ JAMAIS RECRÉER LES COMPOSANTS GÉNÉRIQUES ADMIN
+```typescript
+// ❌ INTERDIT - Créer son propre tableau paginé
+const MyCustomTable = () => { /* ... */ }
+
+// ✅ OBLIGATOIRE - Utiliser les composants génériques
+import { DataTable } from '@/components/admin/common/DataTable'
+import { Pagination } from '@/components/admin/common/Pagination'
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+
+// Ces 3 composants DOIVENT être utilisés pour TOUTES les pages admin
+// Voir section 7.2 du DEVELOPMENT_STANDARDS.md
+```
+
+### 4. ❌ JAMAIS COMMIT SANS BUILD RÉUSSI
 ```bash
 # TOUJOURS avant commit :
 npm run build
 # Si erreur → corriger AVANT de commit
 ```
 
-### 4. ❌ JAMAIS DE TEXTE SANS i18n
+### 5. ❌ JAMAIS DE TEXTE SANS i18n
 ```typescript
 // ❌ INTERDIT
 <Button>Créer</Button>
@@ -45,7 +59,7 @@ toast.success("Créé avec succès")
 toast.success(t('entity.success.created'))
 ```
 
-### 5. ❌ JAMAIS D'ERREUR NON LOGGÉE
+### 6. ❌ JAMAIS D'ERREUR NON LOGGÉE
 ```typescript
 // ❌ INTERDIT
 try {
@@ -362,6 +376,7 @@ git push -u origin feature/admin-active-substances
 ☐ Build réussi (npm run build) ?
 ☐ Aucune valeur en dur ?
 ☐ Toutes les traductions FR/EN/AR ?
+☐ Composants génériques admin utilisés (DataTable/Pagination/DeleteConfirmModal) ?
 ☐ Validation Zod en place ?
 ☐ Tous les types TypeScript définis ?
 ☐ Service utilise apiClient + logger ?
@@ -384,8 +399,11 @@ git push -u origin feature/admin-active-substances
 | **Toast** | `/src/contexts/toast-context.tsx` | `toast.success/error/warning` |
 | **i18n** | `/src/lib/i18n/` | `t('key')` |
 | **Error Handler** | `/src/lib/utils/api-error-handler.ts` | `handleApiError()` |
+| **DataTable** | `/src/components/admin/common/DataTable.tsx` | `<DataTable<T> />` |
+| **Pagination** | `/src/components/admin/common/Pagination.tsx` | `<Pagination />` |
+| **DeleteConfirmModal** | `/src/components/admin/common/DeleteConfirmModal.tsx` | `<DeleteConfirmModal />` |
 
-**Ces outils sont OBLIGATOIRES et CENTRALISÉS.**
+**Ces outils et composants sont OBLIGATOIRES et CENTRALISÉS.**
 **Ne jamais créer d'alternative ou de bypass.**
 
 ---
@@ -424,6 +442,7 @@ npm run lint             # Lint code
 - ✅ Vérifier responsive (mobile/desktop)
 
 ### DON'Ts ❌
+- ❌ Recréer DataTable, Pagination ou DeleteConfirmModal
 - ❌ Réinventer la roue (réutiliser composants existants)
 - ❌ Modifier les fichiers core (apiClient, logger, etc.)
 - ❌ Ignorer les erreurs TypeScript
