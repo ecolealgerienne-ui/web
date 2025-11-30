@@ -52,10 +52,12 @@ export function AnimalEventFormDialog({
 
   useEffect(() => {
     if (event) {
+      // Convertir la date ISO en format YYYY-MM-DD pour l'input type="date"
+      const formattedDate = event.eventDate ? event.eventDate.split('T')[0] : '';
       reset({
         animalId: event.animalId,
         eventType: event.eventType,
-        eventDate: event.eventDate,
+        eventDate: formattedDate,
         title: event.title,
         description: event.description || '',
         performedBy: event.performedBy || '',
