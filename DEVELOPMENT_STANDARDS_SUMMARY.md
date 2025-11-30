@@ -4,7 +4,7 @@
 
 ---
 
-## 🚫 LES 6 INTERDICTIONS ABSOLUES
+## 🚫 LES 7 INTERDICTIONS ABSOLUES
 
 ### 1. ❌ AUCUNE VALEUR EN DUR
 ```typescript
@@ -41,14 +41,49 @@ import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal
 // Voir section 7.2 du DEVELOPMENT_STANDARDS.md
 ```
 
-### 4. ❌ JAMAIS COMMIT SANS BUILD RÉUSSI
+### 4. ❌ JAMAIS IGNORER LES TYPES ET PATTERNS COMMUNS (PHASE 1)
+```typescript
+// ❌ INTERDIT - Recréer BaseEntity
+export interface MyEntity {
+  id: string
+  createdAt: string  // ❌ Déjà dans BaseEntity
+}
+
+// ✅ OBLIGATOIRE - Étendre BaseEntity
+import { BaseEntity } from '@/lib/types/common/api'
+export interface MyEntity extends BaseEntity {
+  code: string
+  name: string
+}
+
+// ❌ INTERDIT - Magic numbers HTTP
+if (response.status === 200) { /* ... */ }
+if (error.status === 404) { /* ... */ }
+
+// ✅ OBLIGATOIRE - Constantes HTTP_STATUS
+import { HTTP_STATUS } from '@/lib/constants/http-status'
+if (response.status === HTTP_STATUS.OK) { /* ... */ }
+if (error.status === HTTP_STATUS.NOT_FOUND) { /* ... */ }
+
+// ✅ OBLIGATOIRE - PaginatedResponse pour listes
+const result: PaginatedResponse<MyEntity> = await service.getAll()
+
+// ✅ OBLIGATOIRE - CrudService pour services
+class MyService implements CrudService<MyEntity, CreateDto, UpdateDto> {
+  async getAll(params?: PaginationParams): Promise<PaginatedResponse<MyEntity>>
+  async getById(id: string): Promise<MyEntity>
+  // ...
+}
+```
+
+### 5. ❌ JAMAIS COMMIT SANS BUILD RÉUSSI
 ```bash
 # TOUJOURS avant commit :
 npm run build
 # Si erreur → corriger AVANT de commit
 ```
 
-### 5. ❌ JAMAIS DE TEXTE SANS i18n
+### 6. ❌ JAMAIS DE TEXTE SANS i18n
 ```typescript
 // ❌ INTERDIT
 <Button>Créer</Button>
@@ -59,7 +94,7 @@ toast.success("Créé avec succès")
 toast.success(t('entity.success.created'))
 ```
 
-### 6. ❌ JAMAIS D'ERREUR NON LOGGÉE
+### 7. ❌ JAMAIS D'ERREUR NON LOGGÉE
 ```typescript
 // ❌ INTERDIT
 try {
@@ -377,6 +412,8 @@ git push -u origin feature/admin-active-substances
 ☐ Aucune valeur en dur ?
 ☐ Toutes les traductions FR/EN/AR ?
 ☐ Composants génériques admin utilisés (DataTable/Pagination/DeleteConfirmModal) ?
+☐ Types communs utilisés (BaseEntity/PaginatedResponse/CrudService) ?
+☐ Constantes HTTP_STATUS utilisées (pas de magic numbers) ?
 ☐ Validation Zod en place ?
 ☐ Tous les types TypeScript définis ?
 ☐ Service utilise apiClient + logger ?
@@ -402,8 +439,12 @@ git push -u origin feature/admin-active-substances
 | **DataTable** | `/src/components/admin/common/DataTable.tsx` | `<DataTable<T> />` |
 | **Pagination** | `/src/components/admin/common/Pagination.tsx` | `<Pagination />` |
 | **DeleteConfirmModal** | `/src/components/admin/common/DeleteConfirmModal.tsx` | `<DeleteConfirmModal />` |
+| **BaseEntity** | `/src/lib/types/common/api.ts` | `extends BaseEntity` |
+| **PaginatedResponse** | `/src/lib/types/common/api.ts` | `PaginatedResponse<T>` |
+| **CrudService** | `/src/lib/types/common/api.ts` | `implements CrudService<T, C, U>` |
+| **HTTP_STATUS** | `/src/lib/constants/http-status.ts` | `HTTP_STATUS.OK` |
 
-**Ces outils et composants sont OBLIGATOIRES et CENTRALISÉS.**
+**Ces outils, types et composants sont OBLIGATOIRES et CENTRALISÉS.**
 **Ne jamais créer d'alternative ou de bypass.**
 
 ---
@@ -443,6 +484,8 @@ npm run lint             # Lint code
 
 ### DON'Ts ❌
 - ❌ Recréer DataTable, Pagination ou DeleteConfirmModal
+- ❌ Recréer BaseEntity ou ne pas l'étendre
+- ❌ Utiliser magic numbers HTTP (200, 404, etc.)
 - ❌ Réinventer la roue (réutiliser composants existants)
 - ❌ Modifier les fichiers core (apiClient, logger, etc.)
 - ❌ Ignorer les erreurs TypeScript

@@ -48,6 +48,15 @@
   - Ces composants sont dans `/src/components/admin/common/`
   - Voir section 7.2 pour documentation complète
 
+- ❌ **Ne jamais ignorer les types et patterns communs (Phase 1)**
+  - **TOUJOURS** étendre `BaseEntity` pour toutes les entités admin
+  - **TOUJOURS** utiliser `PaginatedResponse<T>` pour les listes paginées
+  - **TOUJOURS** utiliser `HTTP_STATUS` constants (jamais de magic numbers : 200, 404, etc.)
+  - **TOUJOURS** utiliser `handleApiError()` pour la gestion d'erreurs API
+  - **TOUJOURS** implémenter `CrudService<T, CreateDto, UpdateDto>` pour les services
+  - Ces types sont dans `/src/lib/types/common/api.ts` et `/src/lib/constants/http-status.ts`
+  - Voir section 6 pour documentation complète
+
 - ❌ **Aucun commit sans build réussi**
   - Toujours exécuter `npm run build` avant commit
   - Corriger toutes les erreurs TypeScript
@@ -443,13 +452,30 @@ export interface UpdateActiveSubstanceDto {
 }
 ```
 
-### 6.2 Types Génériques
+### 6.2 Types Génériques (OBLIGATOIRES - Phase 1)
 
-**Utiliser ces types pour TOUTES les entités :**
+❌ **INTERDICTION ABSOLUE : Ne jamais recréer ces types**
+
+**Ces types DOIVENT être utilisés pour TOUTES les entités admin :**
 
 ```typescript
 // /src/lib/types/common/api.ts
 
+/**
+ * ⚠️ OBLIGATOIRE : Toutes les entités admin DOIVENT étendre BaseEntity
+ */
+export interface BaseEntity {
+  id: string
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: string | null  // Pour soft delete
+  version?: number            // Pour optimistic locking
+  isActive?: boolean
+}
+
+/**
+ * ⚠️ OBLIGATOIRE : Utiliser pour TOUTES les listes paginées
+ */
 export interface PaginatedResponse<T> {
   data: T[]
   meta: {
@@ -460,6 +486,9 @@ export interface PaginatedResponse<T> {
   }
 }
 
+/**
+ * ⚠️ OBLIGATOIRE : Utiliser pour TOUS les paramètres de pagination
+ */
 export interface PaginationParams {
   page?: number
   limit?: number
@@ -469,16 +498,92 @@ export interface PaginationParams {
   sortOrder?: 'asc' | 'desc'
 }
 
-export interface BaseEntity {
-  id: string
-  createdAt?: string
-  updatedAt?: string
-  deletedAt?: string | null
-  version?: number
+/**
+ * ⚠️ OBLIGATOIRE : Implémenter pour TOUS les services CRUD
+ */
+export interface CrudService<T extends BaseEntity, CreateDto, UpdateDto> {
+  getAll(params?: PaginationParams): Promise<PaginatedResponse<T>>
+  getById(id: string): Promise<T>
+  create(data: CreateDto): Promise<T>
+  update(id: string, data: UpdateDto): Promise<T>
+  delete(id: string): Promise<void>
+  restore?(id: string): Promise<T>
 }
 ```
 
-### 6.3 Configuration TypeScript Stricte
+**Exemple d'utilisation obligatoire :**
+
+```typescript
+// ✅ CORRECT - L'entité étend BaseEntity
+export interface ActiveSubstance extends BaseEntity {
+  code: string
+  name: string
+  description?: string
+}
+
+// ❌ INTERDIT - Ne pas recréer les champs de BaseEntity
+export interface ActiveSubstance {
+  id: string           // ❌ Déjà dans BaseEntity
+  code: string
+  name: string
+  createdAt: string    // ❌ Déjà dans BaseEntity
+  updatedAt: string    // ❌ Déjà dans BaseEntity
+}
+```
+
+### 6.3 Constantes HTTP (OBLIGATOIRES - Phase 1)
+
+❌ **INTERDICTION ABSOLUE : Jamais de magic numbers HTTP**
+
+**TOUJOURS utiliser les constantes HTTP_STATUS :**
+
+```typescript
+// /src/lib/constants/http-status.ts
+
+export const HTTP_STATUS = {
+  // 2xx Success
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+
+  // 4xx Client Errors
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+
+  // 5xx Server Errors
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+} as const
+
+// Helper functions
+export function isSuccessStatus(status: number): boolean
+export function isClientError(status: number): boolean
+export function isServerError(status: number): boolean
+```
+
+**Utilisation :**
+
+```typescript
+// ❌ INTERDIT - Magic numbers
+if (response.status === 200) { /* ... */ }
+if (error.status === 404) { /* ... */ }
+
+// ✅ OBLIGATOIRE - Constantes nommées
+import { HTTP_STATUS } from '@/lib/constants/http-status'
+
+if (response.status === HTTP_STATUS.OK) { /* ... */ }
+if (error.status === HTTP_STATUS.NOT_FOUND) { /* ... */ }
+```
+
+---
+
+### 6.4 Configuration TypeScript Stricte
 
 ```json
 // tsconfig.json (déjà configuré, ne pas modifier)
