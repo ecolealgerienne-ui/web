@@ -56,6 +56,25 @@
       "serverError": "خطأ في الخادم",
       "network": "خطأ في الشبكة",
       "unknown": "خطأ غير معروف"
+    },
+    "pagination": {
+      "of": "من",
+      "items": "عناصر",
+      "itemsPerPage": "لكل صفحة",
+      "page": "صفحة",
+      "firstPage": "الصفحة الأولى",
+      "previousPage": "الصفحة السابقة",
+      "nextPage": "الصفحة التالية",
+      "lastPage": "الصفحة الأخيرة"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "noResults": "لم يتم العثور على نتائج",
+      "loading": "جاري التحميل...",
+      "cannotDelete": "لا يمكن الحذف",
+      "isUsedBy": "لأنه مستخدم من قبل",
+      "mustDeleteDependencies": "يجب عليك حذف هذه التبعيات أولاً.",
+      "confirmDeleteItem": "هل أنت متأكد من حذف"
     }
   },
   "header": {
