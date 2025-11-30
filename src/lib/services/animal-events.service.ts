@@ -73,12 +73,16 @@ class AnimalEventsService {
     return `/farms/${TEMP_FARM_ID}/movements`;
   }
 
+<<<<<<< HEAD
   async getAll(filters?: {
     animalId?: string;
     eventType?: string;
     fromDate?: string;
     toDate?: string;
   }): Promise<AnimalEvent[]> {
+=======
+  async getAll(filters?: { animalId?: string; eventType?: string; fromDate?: string; toDate?: string }): Promise<AnimalEvent[]> {
+>>>>>>> 563602cfbf15c29bf4d9564fa671d7e8aad92cd9
     try {
       const params = new URLSearchParams();
       if (filters?.animalId) params.append("animalId", filters.animalId);
@@ -88,6 +92,7 @@ class AnimalEventsService {
       if (filters?.fromDate) params.append("fromDate", filters.fromDate);
       if (filters?.toDate) params.append("toDate", filters.toDate);
 
+<<<<<<< HEAD
       const url = params.toString()
         ? `${this.getBasePath()}?${params}`
         : this.getBasePath();
@@ -95,6 +100,10 @@ class AnimalEventsService {
       const movements = await apiClient.get<BackendMovement[]>(url);
 
       console.log("[Animal Events] Backend response:", movements);
+=======
+      const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      const response = await apiClient.get<{ data: BackendMovement[] }>(url);
+>>>>>>> 563602cfbf15c29bf4d9564fa671d7e8aad92cd9
 
       // Map backend movements to frontend AnimalEvent format
       const events = (movements || []).map(mapMovementToEvent);
@@ -116,10 +125,15 @@ class AnimalEventsService {
 
   async getById(id: string): Promise<AnimalEvent | null> {
     try {
+<<<<<<< HEAD
       const response = await apiClient.get<BackendMovement>(
         `${this.getBasePath()}/${id}`
       );
       logger.info("Movement fetched", { id });
+=======
+      const response = await apiClient.get<BackendMovement>(`${this.getBasePath()}/${id}`);
+      logger.info('Movement fetched', { id });
+>>>>>>> 563602cfbf15c29bf4d9564fa671d7e8aad92cd9
       return mapMovementToEvent(response);
     } catch (error: any) {
       if (error.status === 404) {
@@ -133,6 +147,7 @@ class AnimalEventsService {
 
   async getByAnimalId(animalId: string): Promise<AnimalEvent[]> {
     try {
+<<<<<<< HEAD
       const movements = await apiClient.get<BackendMovement[]>(
         `${this.getBasePath()}?animalId=${animalId}`
       );
@@ -141,6 +156,11 @@ class AnimalEventsService {
         animalId,
         count: events.length,
       });
+=======
+      const response = await apiClient.get<{ data: BackendMovement[] }>(`${this.getBasePath()}?animalId=${animalId}`);
+      const events = (response.data || []).map(mapMovementToEvent);
+      logger.info('Movements fetched for animal', { animalId, count: events.length });
+>>>>>>> 563602cfbf15c29bf4d9564fa671d7e8aad92cd9
       return events;
     } catch (error: any) {
       if (error.status === 404) {
@@ -153,6 +173,7 @@ class AnimalEventsService {
   }
 
   async create(data: CreateAnimalEventDto): Promise<AnimalEvent> {
+<<<<<<< HEAD
     const response = await apiClient.post<AnimalEvent>(
       this.getBasePath(),
       data
@@ -168,6 +189,17 @@ class AnimalEventsService {
     );
     logger.info("Movement updated", { id });
     return response;
+=======
+    const response = await apiClient.post<BackendMovement>(this.getBasePath(), data);
+    logger.info('Movement created', { id: response.id });
+    return mapMovementToEvent(response);
+  }
+
+  async update(id: string, data: UpdateAnimalEventDto): Promise<AnimalEvent> {
+    const response = await apiClient.put<BackendMovement>(`${this.getBasePath()}/${id}`, data);
+    logger.info('Movement updated', { id });
+    return mapMovementToEvent(response);
+>>>>>>> 563602cfbf15c29bf4d9564fa671d7e8aad92cd9
   }
 
   async delete(id: string): Promise<void> {
