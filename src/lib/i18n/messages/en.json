@@ -247,6 +247,53 @@
       "confirmDelete": "Are you sure you want to delete the medication {name}?"
     }
   },
+  "activeSubstance": {
+    "title": {
+      "singular": "Active Substance",
+      "plural": "Active Substances"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "International Name (INN)",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, dashes and underscores"
+      },
+      "name": {
+        "required": "Name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "actions": {
+      "create": "Create active substance",
+      "edit": "Edit active substance",
+      "delete": "Delete active substance",
+      "restore": "Restore active substance"
+    },
+    "messages": {
+      "created": "Active substance created successfully",
+      "updated": "Active substance updated successfully",
+      "deleted": "Active substance deleted successfully",
+      "restored": "Active substance restored successfully",
+      "createError": "Error creating active substance",
+      "updateError": "Error updating active substance",
+      "deleteError": "Error deleting active substance",
+      "confirmDelete": "Are you sure you want to delete the active substance \"{name}\"?",
+      "noResults": "No active substances found"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",

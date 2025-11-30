@@ -57,9 +57,20 @@ class ActiveSubstancesService
     try {
       logger.info('Fetching active substances', { params })
 
+      // Construire l'URL avec les query params
+      const queryParams = new URLSearchParams()
+      if (params?.page) queryParams.append('page', String(params.page))
+      if (params?.limit) queryParams.append('limit', String(params.limit))
+      if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+      if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder)
+      if (params?.search) queryParams.append('search', params.search)
+
+      const url = queryParams.toString()
+        ? `${this.baseUrl}?${queryParams.toString()}`
+        : this.baseUrl
+
       const response = await apiClient.get<PaginatedResponse<ActiveSubstance>>(
-        this.baseUrl,
-        { params }
+        url
       )
 
       logger.info('Active substances fetched successfully', {

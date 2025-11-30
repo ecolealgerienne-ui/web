@@ -247,6 +247,53 @@
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer le médicament {name} ?"
     }
   },
+  "activeSubstance": {
+    "title": {
+      "singular": "Substance Active",
+      "plural": "Substances Actives"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Nom International (DCI)",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "actions": {
+      "create": "Créer une substance active",
+      "edit": "Modifier la substance active",
+      "delete": "Supprimer la substance active",
+      "restore": "Restaurer la substance active"
+    },
+    "messages": {
+      "created": "Substance active créée avec succès",
+      "updated": "Substance active mise à jour avec succès",
+      "deleted": "Substance active supprimée avec succès",
+      "restored": "Substance active restaurée avec succès",
+      "createError": "Erreur lors de la création de la substance active",
+      "updateError": "Erreur lors de la mise à jour de la substance active",
+      "deleteError": "Erreur lors de la suppression de la substance active",
+      "confirmDelete": "Voulez-vous vraiment supprimer la substance active «{name}» ?",
+      "noResults": "Aucune substance active trouvée"
+    }
+  },
   "campaigns": {
     "title": "Campagnes",
     "subtitle": "Gérez vos campagnes de vaccination, traitement et pesée",
