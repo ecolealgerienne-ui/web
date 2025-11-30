@@ -79,10 +79,15 @@ class AnimalEventsService {
       if (filters?.toDate) params.append('toDate', filters.toDate);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<{ data: BackendMovement[] }>(url);
+      // Le client API déballe automatiquement { success, data } -> data
+      const movements = await apiClient.get<BackendMovement[]>(url);
+
+      console.log('[Animal Events] Backend response:', movements);
 
       // Map backend movements to frontend AnimalEvent format
-      const events = (response.data || []).map(mapMovementToEvent);
+      const events = (movements || []).map(mapMovementToEvent);
+
+      console.log('[Animal Events] Mapped events:', events);
       logger.info('Animal events (movements) fetched', { count: events.length });
       return events;
     } catch (error: any) {
@@ -112,8 +117,8 @@ class AnimalEventsService {
 
   async getByAnimalId(animalId: string): Promise<AnimalEvent[]> {
     try {
-      const response = await apiClient.get<{ data: BackendMovement[] }>(`${this.getBasePath()}?animalId=${animalId}`);
-      const events = (response.data || []).map(mapMovementToEvent);
+      const movements = await apiClient.get<BackendMovement[]>(`${this.getBasePath()}?animalId=${animalId}`);
+      const events = (movements || []).map(mapMovementToEvent);
       logger.info('Movements fetched for animal', { animalId, count: events.length });
       return events;
     } catch (error: any) {
