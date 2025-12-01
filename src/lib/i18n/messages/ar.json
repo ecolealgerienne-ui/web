@@ -1023,9 +1023,9 @@
       "nameEn": "Vaccination reminder",
       "nameAr": "تذكير بالتطعيم",
       "description": "وصف نموذج التنبيه...",
-      "messageTemplateFr": "يحتاج حيوانك {animalName} إلى التطعيم...",
-      "messageTemplateEn": "Your animal {animalName} requires vaccination...",
-      "messageTemplateAr": "يحتاج حيوانك {animalName} إلى التطعيم..."
+      "messageTemplateFr": "يحتاج حيوانك إلى التطعيم...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "يحتاج حيوانك إلى التطعيم..."
     },
     "actions": {
       "create": "إنشاء نموذج",

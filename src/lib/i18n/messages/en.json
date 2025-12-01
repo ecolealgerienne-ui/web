@@ -1028,9 +1028,9 @@
       "nameEn": "Vaccination reminder",
       "nameAr": "Vaccination reminder",
       "description": "Alert template description...",
-      "messageTemplateFr": "Your animal {animalName} requires vaccination...",
-      "messageTemplateEn": "Your animal {animalName} requires vaccination...",
-      "messageTemplateAr": "Your animal {animalName} requires vaccination..."
+      "messageTemplateFr": "Your animal requires vaccination...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "Your animal requires vaccination..."
     },
     "actions": {
       "create": "Create template",
