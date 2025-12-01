@@ -132,6 +132,7 @@
       "activeSubstances": "Substances Actives",
       "productCategories": "Catégories de Produits",
       "units": "Unités de Mesure",
+      "species": "Espèces",
       "products": "Produits Vétérinaires"
     }
   },
@@ -526,6 +527,58 @@
       "deleted": "Unité supprimée avec succès",
       "restored": "Unité restaurée avec succès",
       "noResults": "Aucune unité trouvée"
+    }
+  },
+  "species": {
+    "title": {
+      "singular": "Espèce",
+      "plural": "Espèces"
+    },
+    "subtitle": "Gestion des espèces animales (bovins, ovins, caprins, etc.)",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "BOV, OVI, CAP...",
+      "name": "Bovin, Ovin, Caprin...",
+      "description": "Description de l'espèce..."
+    },
+    "actions": {
+      "create": "Créer une espèce",
+      "edit": "Modifier l'espèce",
+      "delete": "Supprimer l'espèce",
+      "restore": "Restaurer l'espèce"
+    },
+    "search": {
+      "placeholder": "Rechercher une espèce..."
+    },
+    "messages": {
+      "created": "Espèce créée avec succès",
+      "updated": "Espèce mise à jour avec succès",
+      "deleted": "Espèce supprimée avec succès",
+      "restored": "Espèce restaurée avec succès",
+      "noResults": "Aucune espèce trouvée"
     }
   },
   "campaigns": {

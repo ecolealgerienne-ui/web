@@ -132,6 +132,7 @@
       "activeSubstances": "Active Substances",
       "productCategories": "Product Categories",
       "units": "Units of Measure",
+      "species": "Species",
       "products": "Veterinary Products"
     }
   },
@@ -526,6 +527,58 @@
       "deleted": "Unit deleted successfully",
       "restored": "Unit restored successfully",
       "noResults": "No unit found"
+    }
+  },
+  "species": {
+    "title": {
+      "singular": "Species",
+      "plural": "Species"
+    },
+    "subtitle": "Management of animal species (bovine, ovine, caprine, etc.)",
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, hyphens and underscores"
+      },
+      "name": {
+        "required": "Name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "placeholders": {
+      "code": "BOV, OVI, CAP...",
+      "name": "Bovine, Ovine, Caprine...",
+      "description": "Species description..."
+    },
+    "actions": {
+      "create": "Create species",
+      "edit": "Edit species",
+      "delete": "Delete species",
+      "restore": "Restore species"
+    },
+    "search": {
+      "placeholder": "Search for a species..."
+    },
+    "messages": {
+      "created": "Species created successfully",
+      "updated": "Species updated successfully",
+      "deleted": "Species deleted successfully",
+      "restored": "Species restored successfully",
+      "noResults": "No species found"
     }
   },
   "errors": {
