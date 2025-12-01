@@ -1,24 +1,10 @@
 import { z } from 'zod'
 
 /**
- * Schéma de validation pour création/édition d'une catégorie d'âge
- *
- * ✅ RÈGLE #1 : Aucune valeur en dur
- * ✅ RÈGLE #6 : Messages i18n (clés, pas de texte)
- *
- * Tous les messages d'erreur sont des clés i18n qui seront traduites
- * dans le composant via `t(error.message)`
- *
- * @example
- * ```typescript
- * const result = ageCategorySchema.safeParse(data)
- * if (!result.success) {
- *   const errors = result.error.flatten().fieldErrors
- *   // errors.code = ['ageCategory.validation.code.required']
- * }
- * ```
+ * Schéma de base (sans refine) pour permettre l'extension
+ * ⚠️ Ne pas exporter - utiliser ageCategorySchema ou updateAgeCategorySchema
  */
-export const ageCategorySchema = z.object({
+const ageCategoryBaseSchema = z.object({
   /**
    * Code unique
    * - Requis
@@ -105,6 +91,26 @@ export const ageCategorySchema = z.object({
    */
   isActive: z.boolean().optional(),
 })
+
+/**
+ * Schéma de validation pour création/édition d'une catégorie d'âge
+ *
+ * ✅ RÈGLE #1 : Aucune valeur en dur
+ * ✅ RÈGLE #6 : Messages i18n (clés, pas de texte)
+ *
+ * Tous les messages d'erreur sont des clés i18n qui seront traduites
+ * dans le composant via `t(error.message)`
+ *
+ * @example
+ * ```typescript
+ * const result = ageCategorySchema.safeParse(data)
+ * if (!result.success) {
+ *   const errors = result.error.flatten().fieldErrors
+ *   // errors.code = ['ageCategory.validation.code.required']
+ * }
+ * ```
+ */
+export const ageCategorySchema = ageCategoryBaseSchema
   // Validation cross-field : ageMaxDays doit être > ageMinDays
   .refine(
     (data) => {
@@ -122,16 +128,33 @@ export const ageCategorySchema = z.object({
 /**
  * Schéma pour mise à jour
  * Ajoute le champ `version` obligatoire pour optimistic locking
+ *
+ * ⚠️ On étend le schéma de base AVANT le refine, puis on ajoute le refine
+ * Car Zod ne permet pas d'utiliser .extend() sur un schéma avec refine
  */
-export const updateAgeCategorySchema = ageCategorySchema.extend({
-  /**
-   * Version pour optimistic locking
-   * Doit être un entier positif
-   */
-  version: z.number()
-    .int('ageCategory.validation.version.integer')
-    .positive('ageCategory.validation.version.positive'),
-})
+export const updateAgeCategorySchema = ageCategoryBaseSchema
+  .extend({
+    /**
+     * Version pour optimistic locking
+     * Doit être un entier positif
+     */
+    version: z.number()
+      .int('ageCategory.validation.version.integer')
+      .positive('ageCategory.validation.version.positive'),
+  })
+  // Même validation cross-field que pour la création
+  .refine(
+    (data) => {
+      if (!data.ageMaxDays || data.ageMaxDays === undefined) {
+        return true // Pas de limite supérieure, valide
+      }
+      return data.ageMaxDays > data.ageMinDays
+    },
+    {
+      message: 'ageCategory.validation.ageMaxDays.greaterThanMin',
+      path: ['ageMaxDays'],
+    }
+  )
 
 /**
  * Type explicite pour les formulaires de création
