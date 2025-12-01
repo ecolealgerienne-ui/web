@@ -3,23 +3,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useToast } from '@/contexts/toast-context'
 import { useTranslations } from 'next-intl'
-import { activeSubstancesService } from '@/lib/services/admin/active-substances.service'
+import { productsService } from '@/lib/services/admin/products.service'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 import type {
-  ActiveSubstance,
-  CreateActiveSubstanceDto,
-  UpdateActiveSubstanceDto,
-} from '@/lib/types/admin/active-substance'
+  Product,
+  CreateProductDto,
+  UpdateProductDto,
+  ProductFilters,
+} from '@/lib/types/admin/product'
 import type { PaginationParams } from '@/lib/types/common/api'
 
 /**
- * Hook personnalisé pour gérer les substances actives
+ * Hook personnalisé pour gérer les produits vétérinaires
  *
  * ✅ RÈGLE #6 : i18n pour tous les messages
  * ✅ RÈGLE #7 : Gestion d'erreurs avec handleApiError
  *
- * @param initialParams - Paramètres de pagination initiaux
- * @returns État et fonctions CRUD pour les substances actives
+ * @param initialParams - Paramètres de pagination et filtres initiaux
+ * @returns État et fonctions CRUD pour les produits
  *
  * @example
  * ```typescript
@@ -33,24 +34,26 @@ import type { PaginationParams } from '@/lib/types/common/api'
  *   update,
  *   delete: deleteItem,
  *   refetch
- * } = useActiveSubstances({ page: 1, limit: 25 })
+ * } = useProducts({ page: 1, limit: 25, search: 'Amox' })
  * ```
  */
-export function useActiveSubstances(initialParams?: PaginationParams) {
+export function useProducts(
+  initialParams?: PaginationParams & ProductFilters
+) {
   const toast = useToast()
-  const t = useTranslations('activeSubstance')
+  const t = useTranslations('product')
   const tc = useTranslations('common')
 
   // État local
-  const [data, setData] = useState<ActiveSubstance[]>([])
+  const [data, setData] = useState<Product[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  const [params, setParams] = useState<PaginationParams>(
+  const [params, setParams] = useState<PaginationParams & ProductFilters>(
     initialParams || {
       page: 1,
       limit: 25,
-      sortBy: 'name',
+      sortBy: 'nameFr', // Backend default: 'nameFr'
       sortOrder: 'asc',
     }
   )
@@ -59,7 +62,7 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
   const isFetchingRef = useRef(false)
 
   /**
-   * Charge les substances actives avec les paramètres actuels
+   * Charge les produits avec les paramètres actuels
    */
   const fetchData = useCallback(async () => {
     // Empêcher les appels concurrents
@@ -72,12 +75,12 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
     setError(null)
 
     try {
-      const response = await activeSubstancesService.getAll(params)
+      const response = await productsService.getAll(params)
       setData(response.data)
       setTotal(response.meta.total)
     } catch (err) {
       setError(err as Error)
-      handleApiError(err, 'fetch active substances', toast)
+      handleApiError(err, 'fetch products', toast)
     } finally {
       setLoading(false)
       isFetchingRef.current = false
@@ -85,20 +88,20 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
   }, [params, toast])
 
   /**
-   * Crée une nouvelle substance active
+   * Crée un nouveau produit
    *
-   * @param dto - Données de la substance à créer
-   * @returns Substance active créée
+   * @param dto - Données du produit à créer
+   * @returns Produit créé
    */
   const create = useCallback(
-    async (dto: CreateActiveSubstanceDto) => {
+    async (dto: CreateProductDto) => {
       try {
-        const substance = await activeSubstancesService.create(dto)
+        const product = await productsService.create(dto)
         toast.success(tc('messages.success'), t('messages.created'))
         await fetchData()
-        return substance
+        return product
       } catch (err) {
-        handleApiError(err, 'create active substance', toast, {
+        handleApiError(err, 'create product', toast, {
           409: t('messages.createError'),
         })
         throw err
@@ -108,21 +111,21 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
   )
 
   /**
-   * Met à jour une substance active existante
+   * Met à jour un produit existant
    *
-   * @param id - ID de la substance
+   * @param id - ID du produit
    * @param dto - Données à mettre à jour (doit inclure version)
-   * @returns Substance active mise à jour
+   * @returns Produit mis à jour
    */
   const update = useCallback(
-    async (id: string, dto: UpdateActiveSubstanceDto) => {
+    async (id: string, dto: UpdateProductDto) => {
       try {
-        const substance = await activeSubstancesService.update(id, dto)
+        const product = await productsService.update(id, dto)
         toast.success(tc('messages.success'), t('messages.updated'))
         await fetchData()
-        return substance
+        return product
       } catch (err) {
-        handleApiError(err, 'update active substance', toast, {
+        handleApiError(err, 'update product', toast, {
           409: t('messages.updateError'),
         })
         throw err
@@ -132,18 +135,18 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
   )
 
   /**
-   * Supprime une substance active (soft delete)
+   * Supprime un produit (soft delete)
    *
-   * @param id - ID de la substance à supprimer
+   * @param id - ID du produit à supprimer
    */
   const deleteItem = useCallback(
     async (id: string) => {
       try {
-        await activeSubstancesService.delete(id)
+        await productsService.delete(id)
         toast.success(tc('messages.success'), t('messages.deleted'))
         await fetchData()
       } catch (err) {
-        handleApiError(err, 'delete active substance', toast, {
+        handleApiError(err, 'delete product', toast, {
           409: t('messages.deleteError'),
         })
         throw err
@@ -153,20 +156,20 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
   )
 
   /**
-   * Restaure une substance active supprimée
+   * Restaure un produit supprimé
    *
-   * @param id - ID de la substance à restaurer
-   * @returns Substance active restaurée
+   * @param id - ID du produit à restaurer
+   * @returns Produit restauré
    */
   const restore = useCallback(
     async (id: string) => {
       try {
-        const substance = await activeSubstancesService.restore(id)
+        const product = await productsService.restore(id)
         toast.success(tc('messages.success'), t('messages.restored'))
         await fetchData()
-        return substance
+        return product
       } catch (err) {
-        handleApiError(err, 'restore active substance', toast)
+        handleApiError(err, 'restore product', toast)
         throw err
       }
     },
