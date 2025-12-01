@@ -40,7 +40,7 @@ class ActiveSubstancesService
       UpdateActiveSubstanceDto
     >
 {
-  private readonly baseUrl = '/api/v1/admin/active-substances'
+  private readonly baseUrl = '/api/v1/active-substances'
 
   /**
    * Récupère toutes les substances actives avec pagination

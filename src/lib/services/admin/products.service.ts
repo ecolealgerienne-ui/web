@@ -39,7 +39,7 @@ import type {
 class ProductsService
   implements CrudService<Product, CreateProductDto, UpdateProductDto>
 {
-  private readonly baseUrl = '/api/v1/admin/products'
+  private readonly baseUrl = '/api/v1/products'
 
   /**
    * Récupère tous les produits (paginés)
