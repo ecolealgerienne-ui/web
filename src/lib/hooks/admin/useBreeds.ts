@@ -55,9 +55,9 @@ export function useBreeds(initialParams: BreedFilterParams = {}) {
   const fetchBreeds = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await breedsService.list(params)
+      const response = await breedsService.getAll(params)
       setData(response.data)
-      setTotal(response.total)
+      setTotal(response.meta.total)
     } catch (error) {
       handleApiError(error, 'breeds.fetch', toast)
       setData([])
