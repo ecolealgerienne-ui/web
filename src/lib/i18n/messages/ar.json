@@ -127,6 +127,7 @@
     "admin": {
       "title": "الإدارة",
       "activeSubstances": "المواد الفعالة",
+      "productCategories": "فئات المنتجات",
       "products": "المنتجات البيطرية"
     }
   },
@@ -412,6 +413,48 @@
       "powder": "مسحوق",
       "suspension": "معلق",
       "tablet": "قرص"
+    }
+  },
+  "productCategory": {
+    "title": {
+      "singular": "فئة المنتج",
+      "plural": "فئات المنتجات"
+    },
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "actions": {
+      "create": "إنشاء فئة",
+      "edit": "تعديل الفئة",
+      "delete": "حذف الفئة",
+      "restore": "استعادة الفئة"
+    },
+    "messages": {
+      "created": "تم إنشاء الفئة بنجاح",
+      "updated": "تم تحديث الفئة بنجاح",
+      "deleted": "تم حذف الفئة بنجاح",
+      "noResults": "لم يتم العثور على فئات"
     }
   },
   "errors": {

@@ -127,6 +127,7 @@
     "admin": {
       "title": "Administration",
       "activeSubstances": "Active Substances",
+      "productCategories": "Product Categories",
       "products": "Veterinary Products"
     }
   },
@@ -412,6 +413,53 @@
       "powder": "Powder",
       "suspension": "Suspension",
       "tablet": "Tablet"
+    }
+  },
+  "productCategory": {
+    "title": {
+      "singular": "Product Category",
+      "plural": "Product Categories"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, hyphens and underscores"
+      },
+      "name": {
+        "required": "Name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "actions": {
+      "create": "Create category",
+      "edit": "Edit category",
+      "delete": "Delete category",
+      "restore": "Restore category"
+    },
+    "messages": {
+      "created": "Category created successfully",
+      "updated": "Category updated successfully",
+      "deleted": "Category deleted successfully",
+      "restored": "Category restored successfully",
+      "createError": "Error creating category",
+      "updateError": "Error updating category",
+      "deleteError": "Error deleting category",
+      "confirmDelete": "Do you really want to delete the category «{name}»?",
+      "noResults": "No category found"
     }
   },
   "errors": {
