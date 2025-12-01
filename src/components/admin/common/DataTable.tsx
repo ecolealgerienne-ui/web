@@ -309,7 +309,7 @@ export function DataTable<T extends BaseEntity>({
               ))
             ) : data.length === 0 ? (
               // Empty state
-              <TableRow>
+              <TableRow key="empty-state">
                 <TableCell colSpan={columns.length + (hasActions ? 1 : 0)} className="h-64">
                   <EmptyState
                     title={emptyMessage || t('messages.noData')}
