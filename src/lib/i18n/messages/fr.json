@@ -141,6 +141,7 @@
       "countries": "Pays",
       "veterinarians": "Vétérinaires",
       "nationalCampaigns": "Campagnes Nationales",
+      "alertTemplates": "Modèles d'Alertes",
       "products": "Produits Vétérinaires"
     }
   },
@@ -946,6 +947,109 @@
       "updateError": "Erreur lors de la mise à jour de la campagne",
       "deleteError": "Erreur lors de la suppression de la campagne",
       "noResults": "Aucune campagne trouvée"
+    }
+  },
+  "alertTemplate": {
+    "title": {
+      "singular": "Modèle d'Alerte",
+      "plural": "Modèles d'Alertes"
+    },
+    "subtitle": "Gestion des modèles de notifications et rappels du système",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "nameAr": "Nom (AR)",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "description": "Description",
+      "messageTemplateFr": "Modèle de message (FR)",
+      "messageTemplateEn": "Modèle de message (EN)",
+      "messageTemplateAr": "Modèle de message (AR)",
+      "isActive": "Actif"
+    },
+    "categories": {
+      "health": "Santé",
+      "vaccination": "Vaccination",
+      "treatment": "Traitement",
+      "reproduction": "Reproduction",
+      "nutrition": "Nutrition",
+      "administrative": "Administratif",
+      "other": "Autre"
+    },
+    "priorities": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée",
+      "urgent": "Urgente"
+    },
+    "sections": {
+      "names": "Noms multilingues",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom français est requis",
+        "maxLength": "Le nom français ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom anglais est requis",
+        "maxLength": "Le nom anglais ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom arabe est requis",
+        "maxLength": "Le nom arabe ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "messageTemplateFr": {
+        "maxLength": "Le modèle de message français ne doit pas dépasser 500 caractères"
+      },
+      "messageTemplateEn": {
+        "maxLength": "Le modèle de message anglais ne doit pas dépasser 500 caractères"
+      },
+      "messageTemplateAr": {
+        "maxLength": "Le modèle de message arabe ne doit pas dépasser 500 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "ALERT_VACC_REMINDER, ALERT_TREATMENT...",
+      "nameFr": "Rappel de vaccination",
+      "nameEn": "Vaccination reminder",
+      "nameAr": "تذكير التطعيم",
+      "description": "Description du modèle d'alerte...",
+      "messageTemplateFr": "Votre animal {animalName} nécessite une vaccination...",
+      "messageTemplateEn": "Your animal {animalName} requires vaccination...",
+      "messageTemplateAr": "يحتاج حيوانك {animalName} إلى التطعيم..."
+    },
+    "actions": {
+      "create": "Créer un modèle",
+      "edit": "Modifier le modèle",
+      "delete": "Supprimer le modèle",
+      "restore": "Restaurer le modèle"
+    },
+    "search": {
+      "placeholder": "Rechercher un modèle..."
+    },
+    "messages": {
+      "created": "Modèle d'alerte créé avec succès",
+      "updated": "Modèle d'alerte mis à jour avec succès",
+      "deleted": "Modèle d'alerte supprimé avec succès",
+      "restored": "Modèle d'alerte restauré avec succès",
+      "createError": "Erreur lors de la création du modèle",
+      "updateError": "Erreur lors de la mise à jour du modèle",
+      "deleteError": "Erreur lors de la suppression du modèle",
+      "noResults": "Aucun modèle d'alerte trouvé"
     }
   },
   "campaigns": {
