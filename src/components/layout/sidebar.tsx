@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -16,6 +16,12 @@ const menuItems = [
   { icon: Syringe, key: "vaccinations", href: "/vaccinations" },
   { icon: Pill, key: "treatments", href: "/treatments" },
   { icon: Scale, key: "weighings", href: "/weighings" },
+];
+
+// Menu Administration (référentiels globaux - super admin uniquement)
+const adminMenuItems = [
+  { icon: TestTube2, key: "activeSubstances", href: "/admin/active-substances" },
+  { icon: PackageOpen, key: "products", href: "/admin/products" },
 ];
 
 // Menu Données de référence (super admin uniquement)
@@ -80,13 +86,42 @@ export function Sidebar() {
           );
         })}
 
-        {/* Séparateur pour Données */}
+        {/* Séparateur pour Admin */}
         {canAccessAdmin(user) && (
           <>
             <div className="my-4 border-t border-border" />
 
-            {/* Menu Données de référence (super admin uniquement) */}
+            {/* Menu Administration (référentiels globaux) */}
             <div className="mb-1">
+              <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
+                <Shield className="h-4 w-4" />
+                {t('admin.title')}
+              </div>
+              <div className="ml-3 space-y-1">
+                {adminMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm transition-colors",
+                        active
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {t(`admin.${item.key}`)}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Menu Données de référence (super admin uniquement) */}
+            <div className="mb-1 mt-4">
               <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
                 <Database className="h-4 w-4" />
                 {t('data.title')}

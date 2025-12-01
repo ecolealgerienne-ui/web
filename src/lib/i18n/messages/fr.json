@@ -123,6 +123,11 @@
       "preferences": "Préférences",
       "alerts": "Alertes",
       "farms": "Fermes"
+    },
+    "admin": {
+      "title": "Administration",
+      "activeSubstances": "Substances Actives",
+      "products": "Produits Vétérinaires"
     }
   },
   "breeds": {

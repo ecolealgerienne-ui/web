@@ -123,6 +123,11 @@
       "preferences": "التفضيلات",
       "alerts": "التنبيهات",
       "farms": "المزارع"
+    },
+    "admin": {
+      "title": "الإدارة",
+      "activeSubstances": "المواد الفعالة",
+      "products": "المنتجات البيطرية"
     }
   },
   "breeds": {
