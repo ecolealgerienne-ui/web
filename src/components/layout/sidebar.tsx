@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -40,12 +40,11 @@ const dataMenuItems = [
   { key: "medications", href: "/data/medications" },
   { key: "veterinarians", href: "/data/veterinarians" },
   { key: "campaigns", href: "/data/campaigns" },
-  { key: "preferences", href: "/data/farm-preferences" },
   { key: "alerts", href: "/data/alert-configurations" },
-  { key: "farms", href: "/data/farms" },
 ];
 
 const bottomMenuItems = [
+  { icon: Building2, key: "farms", href: "/data/farms" },
   { icon: BarChart3, key: "reports", href: "/reports" },
   { icon: Settings, key: "settings", href: "/settings" },
 ];
