@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.4
+**Version:** 1.5
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout 5 nouvelles règles suite audit Units/ProductCategories (Règles 1.1, 2.3, 8.3.14-15, 11.3, 14.8)
+**Dernière mise à jour:** Ajout 2 nouvelles règles suite implémentation Veterinarians (Règles 8.3.19-20: useState vs useFieldArray, Import CrudService)
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -2484,6 +2484,240 @@ render: (value) => value ? `${value} jours` : '-'
 // ❌ Mauvais - Pas de gestion du null
 render: (value) => `${value} ${t('fields.days')}` // Affiche "undefined jours"
 ```
+
+---
+
+#### 8.3.19 Gestion des Champs Array Dynamiques - useState vs useFieldArray
+
+⚠️ **PROBLÈME** : `useFieldArray` de react-hook-form a des problèmes de typage TypeScript avec `zodResolver` + `as any`
+
+❌ **SYMPTÔMES :**
+```
+Type 'string' is not assignable to type 'never'
+Type error on useFieldArray name parameter
+```
+
+✅ **SOLUTION** : Utiliser `useState` avec synchronisation manuelle pour les arrays dynamiques
+
+**Pattern recommandé (useState) :**
+
+```typescript
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+function MyFormDialog({ item, onSubmit }: Props) {
+  // 1. État local pour l'array dynamique
+  const [specialties, setSpecialties] = useState<string[]>([''])
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm<MyFormData>({
+    resolver: zodResolver(mySchema) as any,
+    defaultValues: {
+      specialties: [''],
+      // ... autres champs
+    },
+  })
+
+  // 2. Synchroniser avec react-hook-form
+  useEffect(() => {
+    setValue('specialties', specialties)
+  }, [specialties, setValue])
+
+  // 3. Fonctions de gestion
+  const addItem = () => {
+    if (specialties.length < MAX_ITEMS) {
+      setSpecialties([...specialties, ''])
+    }
+  }
+
+  const removeItem = (index: number) => {
+    if (specialties.length > 1) {
+      setSpecialties(specialties.filter((_, i) => i !== index))
+    }
+  }
+
+  const updateItem = (index: number, value: string) => {
+    const updated = [...specialties]
+    updated[index] = value
+    setSpecialties(updated)
+  }
+
+  // 4. Charger les données en mode édition
+  useEffect(() => {
+    if (item && open) {
+      const items = item.specialties.length ? item.specialties : ['']
+      setSpecialties(items)
+      reset({
+        specialties: items,
+        // ... autres champs
+      })
+    }
+  }, [item, open, reset])
+
+  // 5. JSX avec inputs contrôlés
+  return (
+    <form onSubmit={handleSubmit(onFormSubmit)}>
+      {specialties.map((specialty, index) => (
+        <div key={index} className="flex gap-2">
+          <Input
+            value={specialty}
+            onChange={(e) => updateItem(index, e.target.value)}
+            disabled={loading}
+          />
+          {specialties.length > 1 && (
+            <Button
+              type="button"
+              onClick={() => removeItem(index)}
+            >
+              Remove
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button type="button" onClick={addItem}>
+        Add Item
+      </Button>
+    </form>
+  )
+}
+```
+
+**❌ Pattern à éviter (useFieldArray avec as any) :**
+
+```typescript
+// ❌ Problème : Erreur TypeScript avec as any sur resolver
+const { control } = useForm({
+  resolver: zodResolver(schema) as any, // ← Casse l'inférence de type
+})
+
+const { fields, append, remove } = useFieldArray({
+  control, // ← Type 'never' - ne peut pas inférer
+  name: 'specialties', // ← Erreur: 'string' not assignable to 'never'
+})
+```
+
+**Cas d'usage :**
+- ✅ Arrays dynamiques de strings (specialties, tags, keywords)
+- ✅ Arrays de nested objects simples
+- ✅ Formulaires avec 'as any' sur zodResolver
+- ✅ Quand useFieldArray donne des erreurs TypeScript persistantes
+
+**Raison :**
+- Évite les problèmes de typage TypeScript avec useFieldArray
+- Plus de contrôle explicite sur l'état de l'array
+- Déboggage plus simple (état local visible)
+- Compatible avec tous les schémas Zod
+
+**Conséquence violation :**
+- 10+ commits pour résoudre des erreurs TypeScript
+- Build bloqué par erreurs de type 'never'
+- Perte de temps à chercher des workarounds de typage
+
+**Performance :**
+- ℹ️ useState est légèrement plus performant que useFieldArray (moins de re-renders)
+- ℹ️ useFieldArray est utile pour validation granulaire par item, mais useState suffit pour la plupart des cas
+
+---
+
+#### 8.3.20 Import de CrudService et Types Communs
+
+✅ **RÈGLE OBLIGATOIRE** : Toujours importer `CrudService` et autres types communs depuis `/src/lib/types/common/api.ts`
+
+**Pattern correct :**
+
+```typescript
+// /src/lib/services/admin/my-entity.service.ts
+import { apiClient } from '@/lib/api/client'
+import { logger } from '@/lib/utils/logger'
+import type {
+  MyEntity,
+  CreateMyEntityDto,
+  UpdateMyEntityDto,
+} from '@/lib/types/admin/my-entity'
+
+// ✅ CORRECT : Import depuis le chemin canonique
+import type {
+  PaginatedResponse,
+  PaginationParams,
+  CrudService,
+} from '@/lib/types/common/api'
+
+// ✅ CORRECT : Spécifier les 3 génériques de CrudService
+class MyEntityService implements CrudService<
+  MyEntity,           // Type de l'entité
+  CreateMyEntityDto,  // DTO création
+  UpdateMyEntityDto   // DTO mise à jour
+> {
+  private readonly baseUrl = '/api/v1/my-entities'
+
+  async getAll(params?: PaginationParams): Promise<PaginatedResponse<MyEntity>> {
+    // ... implémentation
+  }
+
+  async create(data: CreateMyEntityDto): Promise<MyEntity> {
+    // ... implémentation
+  }
+
+  async update(id: string, data: UpdateMyEntityDto): Promise<MyEntity> {
+    // ... implémentation
+  }
+
+  // ... autres méthodes CRUD
+}
+
+export const myEntityService = new MyEntityService()
+```
+
+**❌ Erreurs courantes :**
+
+```typescript
+// ❌ ERREUR 1 : Import depuis chemin relatif inexistant
+import type { CrudService } from './types' // Fichier n'existe pas
+
+// ❌ ERREUR 2 : Génériques manquants
+class MyService implements CrudService<MyEntity> {
+  // Erreur: Generic type 'CrudService<T, CreateDto, UpdateDto>' requires 3 type argument(s)
+}
+
+// ❌ ERREUR 3 : Ne pas implémenter CrudService
+class MyService { // Pas de garantie de l'interface CRUD
+  async getAll() { /* ... */ }
+}
+```
+
+**Types à importer depuis `/src/lib/types/common/api.ts` :**
+- ✅ `CrudService<T, CreateDto, UpdateDto>` - Interface pour services CRUD
+- ✅ `BaseEntity` - Type de base pour toutes les entités
+- ✅ `PaginatedResponse<T>` - Réponse paginée
+- ✅ `PaginationParams` - Paramètres de pagination
+- ✅ `ApiError` - Type d'erreur API
+
+**Raison :**
+- Cohérence : Tous les services utilisent la même interface
+- Type safety : Les 3 génériques garantissent l'implémentation complète
+- Maintenance : Changement de l'interface se propage automatiquement
+- Documentation : L'interface est auto-documentée
+
+**Conséquence violation :**
+- Build error: "Cannot find module './types'"
+- Build error: "Generic type requires 3 type argument(s)"
+- Services non standardisés (méthodes manquantes ou signatures différentes)
+- Perte de type safety
+
+**Checklist service CRUD :**
+- [ ] Import `CrudService` depuis `@/lib/types/common/api`
+- [ ] Spécifier les 3 génériques : `<Entity, CreateDto, UpdateDto>`
+- [ ] Implémenter toutes les méthodes : getAll, getById, create, update, delete
+- [ ] Ajouter restore() si soft delete
+- [ ] Logger toutes les opérations
+- [ ] Utiliser apiClient (jamais fetch direct)
+- [ ] Documenter avec JSDoc
 
 ---
 
