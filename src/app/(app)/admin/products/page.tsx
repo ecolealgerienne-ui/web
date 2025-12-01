@@ -58,6 +58,12 @@ export default function ProductsPage() {
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  // Liste des formes thérapeutiques traduites
+  const validTherapeuticForms = [
+    'injectable', 'oral', 'topical', 'intramammary',
+    'pour-on', 'bolus', 'powder', 'suspension', 'tablet'
+  ]
+
   /**
    * Définition des colonnes du DataTable
    * ✅ RÈGLE #1 : Aucune valeur en dur (i18n pour headers)
@@ -88,11 +94,28 @@ export default function ProductsPage() {
       key: 'therapeuticForm',
       header: t('fields.therapeuticForm'),
       sortable: true,
-      render: (product: Product) => (
-        <Badge variant="default">
-          {t(`therapeuticForms.${product.therapeuticForm}`)}
-        </Badge>
-      ),
+      render: (product: Product) => {
+        // Gérer le cas où therapeuticForm est undefined ou vide
+        if (!product.therapeuticForm) {
+          return <span className="text-muted-foreground text-xs">-</span>
+        }
+
+        // Vérifier si la forme thérapeutique a une traduction
+        if (validTherapeuticForms.includes(product.therapeuticForm)) {
+          return (
+            <Badge variant="default">
+              {t(`therapeuticForms.${product.therapeuticForm}`)}
+            </Badge>
+          )
+        }
+
+        // Sinon afficher la valeur brute (valeur du backend non traduite)
+        return (
+          <Badge variant="default" className="opacity-60">
+            {product.therapeuticForm}
+          </Badge>
+        )
+      },
     },
     {
       key: 'dosage',
