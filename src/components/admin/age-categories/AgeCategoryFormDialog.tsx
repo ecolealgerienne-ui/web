@@ -23,9 +23,7 @@ import {
 } from '@/components/ui/select'
 import {
   ageCategorySchema,
-  updateAgeCategorySchema,
   type AgeCategoryFormData,
-  type UpdateAgeCategoryFormData,
 } from '@/lib/validation/schemas/admin/age-category.schema'
 import type { AgeCategory } from '@/lib/types/admin/age-category'
 import { useTranslations } from 'next-intl'
@@ -37,7 +35,7 @@ interface AgeCategoryFormDialogProps {
   onOpenChange: (open: boolean) => void
   ageCategory?: AgeCategory | null
   onSubmit: (
-    data: AgeCategoryFormData | UpdateAgeCategoryFormData
+    data: AgeCategoryFormData
   ) => Promise<void>
   loading?: boolean
   /** ID de l'espèce pré-sélectionnée (pour mode création depuis liste filtrée) */
@@ -83,7 +81,7 @@ export function AgeCategoryFormDialog({
   const [species, setSpecies] = useState<Species[]>([])
   const [loadingSpecies, setLoadingSpecies] = useState(false)
 
-  // Utilise le schéma approprié selon le mode (création/édition)
+  // Utilise le schéma de base pour le formulaire (version gérée séparément)
   const {
     register,
     handleSubmit: handleFormSubmit,
@@ -91,10 +89,8 @@ export function AgeCategoryFormDialog({
     reset,
     setValue,
     watch,
-  } = useForm<AgeCategoryFormData | UpdateAgeCategoryFormData>({
-    resolver: zodResolver(
-      isEditMode ? updateAgeCategorySchema : ageCategorySchema
-    ),
+  } = useForm<AgeCategoryFormData>({
+    resolver: zodResolver(ageCategorySchema),
     defaultValues: {
       code: '',
       nameFr: '',
@@ -147,8 +143,7 @@ export function AgeCategoryFormDialog({
         ageMaxDays: ageCategory.ageMaxDays ?? undefined,
         displayOrder: ageCategory.displayOrder || 0,
         isActive: ageCategory.isActive ?? true,
-        ...(isEditMode && { version: ageCategory.version || 1 }),
-      } as UpdateAgeCategoryFormData)
+      })
     } else if (!ageCategory && open) {
       // Réinitialise en mode création
       reset({
@@ -166,7 +161,7 @@ export function AgeCategoryFormDialog({
   }, [ageCategory, open, reset, isEditMode, preSelectedSpeciesId])
 
   const handleFormSubmission = async (
-    data: AgeCategoryFormData | UpdateAgeCategoryFormData
+    data: AgeCategoryFormData
   ) => {
     await onSubmit(data)
   }
@@ -362,10 +357,6 @@ export function AgeCategoryFormDialog({
               </Label>
             </div>
 
-            {/* Version (hidden field for edit mode) */}
-            {isEditMode && (
-              <input type="hidden" {...register('version' as any)} />
-            )}
           </div>
 
           <DialogFooter>
