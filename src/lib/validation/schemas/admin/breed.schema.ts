@@ -7,15 +7,16 @@ import { z } from 'zod'
  * ✅ RÈGLE #6 : Messages i18n (clés, pas de texte)
  * ✅ RÈGLE Section 5.3 : z.number() pour displayOrder (pas de z.coerce)
  *
- * Tous les messages d'erreur sont des clés i18n qui seront traduites
- * dans le composant via `t(error.message)`
+ * Tous les messages d'erreur sont des clés i18n relatives qui seront traduites
+ * dans le composant via `t(error.message)` avec useTranslations('breed')
  *
  * @example
  * ```typescript
  * const result = breedSchema.safeParse(data)
  * if (!result.success) {
  *   const errors = result.error.flatten().fieldErrors
- *   // errors.code = ['breed.validation.code.required']
+ *   // errors.code = ['validation.code.required']
+ *   // Avec useTranslations('breed'), t('validation.code.required') → breed.validation.code.required
  * }
  * ```
  */
@@ -27,11 +28,11 @@ export const breedSchema = z.object({
    * - Format : majuscules, chiffres, tirets, underscores
    */
   code: z.string()
-    .min(1, 'breed.validation.code.required')
-    .max(50, 'breed.validation.code.maxLength')
+    .min(1, 'validation.code.required')
+    .max(50, 'validation.code.maxLength')
     .regex(
       /^[A-Z0-9_-]+$/,
-      'breed.validation.code.pattern'
+      'validation.code.pattern'
     ),
 
   /**
@@ -40,8 +41,8 @@ export const breedSchema = z.object({
    * - Max 200 caractères
    */
   nameFr: z.string()
-    .min(1, 'breed.validation.nameFr.required')
-    .max(200, 'breed.validation.nameFr.maxLength'),
+    .min(1, 'validation.nameFr.required')
+    .max(200, 'validation.nameFr.maxLength'),
 
   /**
    * Nom en anglais
@@ -49,15 +50,15 @@ export const breedSchema = z.object({
    * - Max 200 caractères
    */
   nameEn: z.string()
-    .min(1, 'breed.validation.nameEn.required')
-    .max(200, 'breed.validation.nameEn.maxLength'),
+    .min(1, 'validation.nameEn.required')
+    .max(200, 'validation.nameEn.maxLength'),
 
   /**
    * Nom en arabe (optionnel)
    * - Max 200 caractères
    */
   nameAr: z.string()
-    .max(200, 'breed.validation.nameAr.maxLength')
+    .max(200, 'validation.nameAr.maxLength')
     .optional()
     .or(z.literal('')), // Accepte chaîne vide
 
@@ -66,7 +67,7 @@ export const breedSchema = z.object({
    * - Max 1000 caractères
    */
   description: z.string()
-    .max(1000, 'breed.validation.description.maxLength')
+    .max(1000, 'validation.description.maxLength')
     .optional()
     .or(z.literal('')), // Accepte chaîne vide
 
@@ -76,8 +77,8 @@ export const breedSchema = z.object({
    * - Format UUID
    */
   speciesId: z.string()
-    .min(1, 'breed.validation.speciesId.required')
-    .uuid('breed.validation.speciesId.invalid'),
+    .min(1, 'validation.speciesId.required')
+    .uuid('validation.speciesId.invalid'),
 
   /**
    * Ordre d'affichage (optionnel)
@@ -86,8 +87,8 @@ export const breedSchema = z.object({
    * - ✅ z.number() simple (pas de z.coerce)
    */
   displayOrder: z.number()
-    .int('breed.validation.displayOrder.integer')
-    .min(0, 'breed.validation.displayOrder.min')
+    .int('validation.displayOrder.integer')
+    .min(0, 'validation.displayOrder.min')
     .optional(),
 
   /**
@@ -106,8 +107,8 @@ export const updateBreedSchema = breedSchema.extend({
    * Doit être un entier positif
    */
   version: z.number()
-    .int('breed.validation.version.integer')
-    .positive('breed.validation.version.positive'),
+    .int('validation.version.integer')
+    .positive('validation.version.positive'),
 })
 
 /**

@@ -332,6 +332,7 @@ export default function BreedsPage() {
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onView={handleView}
+            onRowClick={handleView}
             loading={loading}
             emptyMessage={t('messages.noResults')}
             searchPlaceholder={t('search.placeholder')}
