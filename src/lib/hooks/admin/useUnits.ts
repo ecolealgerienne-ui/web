@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useTranslations } from '@/lib/i18n'
+import { useTranslations } from 'next-intl'
 import { unitsService } from '@/lib/services/admin/units.service'
 import { useToast } from '@/lib/hooks/useToast'
-import { handleApiError } from '@/lib/utils/api-errors'
+import { handleApiError } from '@/lib/utils/api-error-handler'
 import type { Unit, CreateUnitDto, UpdateUnitDto } from '@/lib/types/admin/unit'
 import type { PaginationParams } from '@/lib/types/common/api'
 

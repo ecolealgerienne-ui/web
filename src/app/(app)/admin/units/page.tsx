@@ -1,16 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations } from '@/lib/i18n'
+import { useTranslations } from 'next-intl'
 import { useUnits } from '@/lib/hooks/admin/useUnits'
-import { DataTable } from '@/components/ui/data-table'
+import { DataTable } from '@/components/admin/common/DataTable'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { DeleteConfirmModal } from '@/components/ui/delete-confirm-modal'
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
 import { UnitFormDialog } from '@/components/admin/units/UnitFormDialog'
-import type { Unit, CreateUnitDto, UpdateUnitDto } from '@/lib/types/admin/unit'
-import type { ColumnDef } from '@/components/ui/data-table'
-import { Pencil, Trash2, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import type { Unit } from '@/lib/types/admin/unit'
+
+/**
+ * Définition locale de ColumnDef (pas exportée de DataTable)
+ */
+interface ColumnDef<T> {
+  key: keyof T | string
+  header: string
+  sortable?: boolean
+  render?: (item: T) => React.ReactNode
+  width?: string
+  align?: 'left' | 'center' | 'right'
+}
 
 /**
  * Page d'administration des unités de mesure
