@@ -138,6 +138,7 @@
       "units": "Unités de Mesure",
       "administrationRoutes": "Voies d'Administration",
       "species": "Espèces",
+      "breeds": "Races",
       "ageCategories": "Catégories d'Âge",
       "countries": "Pays",
       "veterinarians": "Vétérinaires",
@@ -758,6 +759,94 @@
       "createError": "Le code existe déjà ou une erreur s'est produite",
       "updateError": "Conflit de version ou erreur lors de la mise à jour",
       "deleteError": "Impossible de supprimer : la catégorie est utilisée"
+    }
+  },
+  "breed": {
+    "title": "Races",
+    "description": "Gestion des races par espèce animale",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "species": "Espèce",
+      "description": "Description",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom en anglais est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "maxLength": "Le nom en arabe ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "displayOrder": {
+        "integer": "L'ordre d'affichage doit être un nombre entier",
+        "min": "L'ordre d'affichage doit être supérieur ou égal à 0"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer une race",
+      "editTitle": "Modifier la race",
+      "codePlaceholder": "PER, SIA, HOL...",
+      "nameFrPlaceholder": "Persan, Siamois, Holstein...",
+      "nameEnPlaceholder": "Persian, Siamese, Holstein...",
+      "nameArPlaceholder": "فارسي، سيامي، هولشتاين...",
+      "descriptionPlaceholder": "Caractéristiques, origines...",
+      "displayOrderPlaceholder": "Ex: 1, 2, 3...",
+      "selectSpecies": "Sélectionner une espèce"
+    },
+    "actions": {
+      "create": "Créer une race",
+      "edit": "Modifier la race",
+      "delete": "Supprimer la race",
+      "restore": "Restaurer la race"
+    },
+    "filters": {
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces"
+    },
+    "search": {
+      "placeholder": "Rechercher une race..."
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "messages": {
+      "createSuccess": "Race créée avec succès",
+      "updateSuccess": "Race mise à jour avec succès",
+      "deleteSuccess": "Race supprimée avec succès",
+      "restoreSuccess": "Race restaurée avec succès",
+      "noResults": "Aucune race trouvée",
+      "createError": "Le code existe déjà ou une erreur s'est produite",
+      "updateError": "Conflit de version ou erreur lors de la mise à jour",
+      "deleteError": "Impossible de supprimer : la race est utilisée"
+    },
+    "detail": {
+      "title": "Détails de la race"
     }
   },
   "administrationRoute": {
