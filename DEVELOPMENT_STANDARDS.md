@@ -540,6 +540,194 @@ function MyForm() {
 }
 ```
 
+### 5.3 Champs Numériques : Pattern valueAsNumber ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `z.coerce.number()` ou `z.preprocess()` pour les champs numériques**
+
+**Problème** : Ces méthodes causent des erreurs TypeScript où le type est inféré comme `unknown` au lieu de `number`, rendant `zodResolver` incompatible avec `react-hook-form`.
+
+```typescript
+// ❌ MAUVAIS - Cause type 'unknown'
+export const schema = z.object({
+  age: z.coerce.number().min(0),  // ❌ Type inféré = unknown
+  // ou
+  age: z.preprocess(
+    (val) => Number(val),
+    z.number().min(0)
+  ),  // ❌ Type inféré = unknown
+})
+
+// ✅ BON - Type number garanti
+export const schema = z.object({
+  age: z.number().min(0),  // ✅ Type inféré = number
+})
+
+// Dans le composant React
+<Input
+  type="number"
+  {...register('age', { valueAsNumber: true })}  // ✅ Convertit automatiquement
+/>
+```
+
+**Règles pour les champs numériques :**
+
+1. **Schéma Zod** : Utiliser `z.number()` simple
+   ```typescript
+   ageMinDays: z.number()
+     .int('validation.integer')
+     .min(0, 'validation.min')
+   ```
+
+2. **Formulaire** : Ajouter `valueAsNumber: true`
+   ```typescript
+   <Input type="number" {...register('ageMinDays', { valueAsNumber: true })} />
+   ```
+
+3. **Messages d'erreur** : `z.number()` n'accepte PAS `required_error`
+   ```typescript
+   // ❌ ERREUR - z.number() ne supporte pas required_error
+   z.number({
+     required_error: 'message',      // ❌ Erreur TypeScript
+     invalid_type_error: 'message'   // ✅ OK (optionnel)
+   })
+
+   // ✅ CORRECT - Utiliser sans options
+   z.number().min(0, 'message')
+   ```
+
+**Cas d'usage typiques :**
+- Âges (en jours, mois, années)
+- Quantités, poids, volumes
+- Ordres d'affichage (displayOrder)
+- Prix, montants
+
+---
+
+### 5.4 Schémas avec Refine : Pattern d'Extension ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `.extend()` sur un schéma contenant `.refine()`**
+
+**Problème** : Zod ne permet pas d'étendre un schéma qui contient déjà des refinements (validations cross-field avec `.refine()`). Cela génère l'erreur : `"Object schemas containing refinements cannot be extended. Use .safeExtend() instead."`
+
+**✅ SOLUTION : Créer un schéma de base, puis étendre AVANT d'ajouter le refine**
+
+```typescript
+// ❌ MAUVAIS - Erreur Zod
+export const createSchema = z.object({
+  ageMin: z.number().min(0),
+  ageMax: z.number().min(0).optional(),
+}).refine(
+  (data) => !data.ageMax || data.ageMax > data.ageMin,
+  { message: 'ageMax must be greater than ageMin', path: ['ageMax'] }
+)
+
+// ❌ ERREUR : Cannot extend schema with refinements
+export const updateSchema = createSchema.extend({
+  version: z.number().positive(),
+})
+
+// ✅ BON - Pattern correct avec schéma de base
+const baseSchema = z.object({
+  ageMin: z.number().min(0),
+  ageMax: z.number().min(0).optional(),
+})
+
+// Schéma de création : base + refine
+export const createSchema = baseSchema.refine(
+  (data) => !data.ageMax || data.ageMax > data.ageMin,
+  { message: 'ageMax must be greater than ageMin', path: ['ageMax'] }
+)
+
+// Schéma de mise à jour : base + extend + refine
+export const updateSchema = baseSchema
+  .extend({
+    version: z.number().positive(),
+  })
+  .refine(
+    (data) => !data.ageMax || data.ageMax > data.ageMin,
+    { message: 'ageMax must be greater than ageMin', path: ['ageMax'] }
+  )
+```
+
+**Pattern Standard pour les Entités Admin :**
+
+```typescript
+// 1. Schéma de base (ne pas exporter)
+const entityBaseSchema = z.object({
+  code: z.string().min(1).max(50),
+  name: z.string().min(1).max(200),
+  // ... autres champs
+})
+
+// 2. Schéma de création (exporter)
+export const entitySchema = entityBaseSchema
+  .refine(
+    (data) => {
+      // Validation cross-field
+      return true
+    },
+    { message: 'validation error', path: ['field'] }
+  )
+
+// 3. Schéma de mise à jour (exporter)
+export const updateEntitySchema = entityBaseSchema
+  .extend({
+    version: z.number().int().positive(),
+  })
+  .refine(
+    (data) => {
+      // Même validation cross-field que pour la création
+      return true
+    },
+    { message: 'validation error', path: ['field'] }
+  )
+
+// 4. Types explicites (exporter)
+export type EntityFormData = {
+  code: string
+  name: string
+  // ... autres champs
+}
+
+export type UpdateEntityFormData = EntityFormData & {
+  version: number
+}
+```
+
+**Règles :**
+
+1. **Créer un schéma de base** sans `.refine()` (ne pas l'exporter)
+2. **Schéma de création** : `baseSchema.refine(...)`
+3. **Schéma de mise à jour** : `baseSchema.extend({ version }).refine(...)`
+4. **Dupliquer la validation `.refine()`** dans les deux schémas (création et mise à jour)
+5. **Exporter des types explicites** au lieu de se fier uniquement à `z.infer`
+
+**Exemple réel (Age-Categories) :**
+
+```typescript
+// Ne pas exporter
+const ageCategoryBaseSchema = z.object({
+  code: z.string().min(1),
+  ageMinDays: z.number().min(0),
+  ageMaxDays: z.number().min(0).optional(),
+  // ...
+})
+
+// Exporter
+export const ageCategorySchema = ageCategoryBaseSchema.refine(
+  (data) => !data.ageMaxDays || data.ageMaxDays > data.ageMinDays,
+  { message: 'ageMaxDays must be greater than ageMinDays', path: ['ageMaxDays'] }
+)
+
+// Exporter
+export const updateAgeCategorySchema = ageCategoryBaseSchema
+  .extend({ version: z.number().int().positive() })
+  .refine(
+    (data) => !data.ageMaxDays || data.ageMaxDays > data.ageMinDays,
+    { message: 'ageMaxDays must be greater than ageMinDays', path: ['ageMaxDays'] }
+  )
+```
+
 ---
 
 ## 6. TypeScript & Types
@@ -943,6 +1131,231 @@ export function DataTable<T extends BaseEntity>({
   // Generic table implementation
 }
 ```
+
+---
+
+### 7.4 React Hooks - Dépendances Exhaustives
+
+⚠️ **RÈGLE OBLIGATOIRE** : Toujours respecter `react-hooks/exhaustive-deps`
+
+**Problème fréquent** : Utiliser un état dans `useEffect` sans l'inclure dans les dépendances
+
+```typescript
+// ❌ MAUVAIS - Warning: React Hook useEffect has missing dependencies
+useEffect(() => {
+  setParams({
+    ...params,  // ❌ 'params' utilisé mais pas dans les dépendances
+    newField: value,
+  })
+}, [value])  // ❌ Manque 'params'
+```
+
+**✅ SOLUTION : Utiliser la forme callback de setState**
+
+```typescript
+// ✅ BON - Évite la dépendance circulaire
+useEffect(() => {
+  setParams((prevParams) => ({
+    ...prevParams,  // ✅ Utilise la valeur précédente
+    newField: value,
+  }))
+}, [value, setParams])  // ✅ Dépendances complètes
+```
+
+**Règles :**
+
+1. **setState avec valeur précédente** : Toujours utiliser la forme callback
+   ```typescript
+   setState((prev) => ({ ...prev, newValue }))  // ✅ Correct
+   setState({ ...state, newValue })             // ❌ Crée dépendance
+   ```
+
+2. **Inclure TOUTES les dépendances** utilisées dans le useEffect
+   ```typescript
+   useEffect(() => {
+     // Si vous utilisez foo, bar, baz
+     doSomething(foo, bar, baz)
+   }, [foo, bar, baz])  // ✅ Toutes incluses
+   ```
+
+3. **Ne JAMAIS désactiver la règle** sans raison TRÈS valable
+   ```typescript
+   // ❌ INTERDIT sauf cas exceptionnel documenté
+   useEffect(() => {
+     // ...
+   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+   ```
+
+4. **Functions dans dépendances** : Utiliser `useCallback`
+   ```typescript
+   const fetchData = useCallback(async () => {
+     // ...
+   }, [dep1, dep2])
+
+   useEffect(() => {
+     fetchData()
+   }, [fetchData])  // ✅ fetchData stable avec useCallback
+   ```
+
+**Exemple complet (Age-Categories) :**
+
+```typescript
+// ✅ Pattern correct pour mettre à jour params selon un filtre
+const [params, setParams] = useState<FilterParams>({ page: 1, limit: 25 })
+const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('')
+
+useEffect(() => {
+  setParams((prevParams) => ({
+    ...prevParams,
+    speciesId: selectedSpeciesId || undefined,
+    page: 1,  // Reset page lors du changement de filtre
+  }))
+}, [selectedSpeciesId, setParams])  // ✅ Toutes les dépendances incluses
+```
+
+---
+
+### 7.5 Radix UI Select - Valeurs Vides Interdites ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `value=""` dans un `<SelectItem />`**
+
+**Problème** : Radix UI Select génère une erreur si un `SelectItem` a une valeur vide :
+```
+Error: A <Select.Item /> must have a value prop that is not an empty string.
+This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+```
+
+**✅ SOLUTION : Utiliser une constante spéciale pour représenter "Tous" ou "Aucun"**
+
+```typescript
+// ❌ MAUVAIS - Erreur Radix UI
+<Select value={selectedId} onValueChange={setSelectedId}>
+  <SelectTrigger>
+    <SelectValue placeholder="Sélectionner..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="">Tous</SelectItem>  {/* ❌ ERREUR */}
+    <SelectItem value="1">Option 1</SelectItem>
+    <SelectItem value="2">Option 2</SelectItem>
+  </SelectContent>
+</Select>
+
+// ✅ BON - Constante spéciale
+const ALL_ITEMS = '__all__'  // Ou 'ALL', ou autre valeur unique
+
+const [selectedId, setSelectedId] = useState<string>(ALL_ITEMS)
+
+<Select value={selectedId} onValueChange={setSelectedId}>
+  <SelectTrigger>
+    <SelectValue placeholder="Sélectionner..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value={ALL_ITEMS}>Tous</SelectItem>  {/* ✅ OK */}
+    <SelectItem value="1">Option 1</SelectItem>
+    <SelectItem value="2">Option 2</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+**Pattern Standard : Filtre avec Option "Tous"**
+
+```typescript
+// 1. Définir la constante (en dehors du composant)
+const ALL_SPECIES = '__all__'
+
+export default function MyPage() {
+  // 2. État initial avec la constante
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>(ALL_SPECIES)
+
+  // 3. Convertir en undefined pour l'API
+  const { data } = useItems({
+    speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId
+  })
+
+  // 4. Dans le Select
+  return (
+    <Select value={selectedSpeciesId} onValueChange={setSelectedSpeciesId}>
+      <SelectContent>
+        <SelectItem value={ALL_SPECIES}>{t('filters.all')}</SelectItem>
+        {species.map(sp => (
+          <SelectItem key={sp.id} value={sp.id}>
+            {sp.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+**Règles :**
+
+1. **Définir une constante** pour la valeur "Tous" (ex: `ALL_ITEMS`, `ALL_SPECIES`)
+   ```typescript
+   const ALL_SPECIES = '__all__'  // ✅ Valeur unique et reconnaissable
+   const ALL_SPECIES = 'ALL'      // ✅ Alternative simple
+   const ALL_SPECIES = ''         // ❌ INTERDIT
+   ```
+
+2. **État initial** : Utiliser la constante
+   ```typescript
+   useState<string>(ALL_SPECIES)  // ✅ Démarre avec "Tous" sélectionné
+   ```
+
+3. **Conversion pour API** : Convertir la constante en `undefined` ou `null`
+   ```typescript
+   speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId
+   ```
+
+4. **Utiliser partout** : Toute logique qui dépend de "tous sélectionnés" doit vérifier la constante
+   ```typescript
+   if (selectedId === ALL_ITEMS) {
+     // Logique pour "tous"
+   }
+   ```
+
+**Exemple Complet (Age-Categories Filter) :**
+
+```typescript
+// Constante globale (hors composant)
+const ALL_SPECIES = '__all__'
+
+export default function AgeCategoriesPage() {
+  // État avec constante
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>(ALL_SPECIES)
+
+  // Hook avec conversion
+  const { data } = useAgeCategories({
+    speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId
+  })
+
+  // useEffect avec conversion
+  useEffect(() => {
+    setParams(prev => ({
+      ...prev,
+      speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId,
+      page: 1
+    }))
+  }, [selectedSpeciesId])
+
+  // Select avec constante
+  return (
+    <Select value={selectedSpeciesId} onValueChange={setSelectedSpeciesId}>
+      <SelectContent>
+        <SelectItem value={ALL_SPECIES}>Toutes les espèces</SelectItem>
+        {species.map(sp => (
+          <SelectItem key={sp.id} value={sp.id}>{sp.name}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+**Cas d'usage typiques :**
+- Filtres "Tous / Toutes" dans les listes
+- Option "Aucun / Non sélectionné" dans les formulaires
+- Réinitialisation de sélection
 
 ---
 
@@ -3338,6 +3751,114 @@ feature/admin-products-crud
 fix/datatable-pagination-bug
 refactor/extract-api-error-handler
 docs/update-development-standards
+```
+
+---
+
+### 11.5 Checklist TypeScript & React (Avant Chaque Commit)
+
+⚠️ **RÈGLE OBLIGATOIRE** : Valider TOUS ces points avant chaque commit
+
+**TypeScript :**
+- [ ] `npm run build` ou `npx tsc --noEmit` passe sans erreur
+- [ ] Aucun type `any` non documenté
+- [ ] Aucun `@ts-ignore` sans commentaire justificatif
+- [ ] Tous les imports résolus correctement
+- [ ] Aucune erreur de type dans les fonctions/composants
+
+**React Hooks :**
+- [ ] Aucun warning `react-hooks/exhaustive-deps`
+- [ ] Tous les `useEffect` ont des dépendances complètes
+- [ ] `setState` utilise la forme callback si dépend de l'état précédent
+- [ ] `useCallback` utilisé pour les fonctions dans les dépendances
+- [ ] Pas de dépendances circulaires
+
+**Zod & Forms :**
+- [ ] Champs numériques : `z.number()` + `valueAsNumber: true`
+- [ ] Pas de `z.coerce.number()` ou `z.preprocess()` pour types simples
+- [ ] Pas de `required_error` dans `z.number()`
+- [ ] Messages d'erreur Zod sont des clés i18n (pas de texte en dur)
+- [ ] Schémas Zod exportent des types explicites (pas seulement `z.infer`)
+
+**i18n :**
+- [ ] Aucun texte en dur dans les composants (labels, messages, placeholders)
+- [ ] Toutes les clés i18n existent dans `messages/fr.json`
+- [ ] Messages d'erreur Zod pointent vers des clés i18n valides
+- [ ] Navigation/menu utilise les clés i18n
+
+**Composants Génériques :**
+- [ ] DataTable utilisé pour toutes les listes admin
+- [ ] DeleteConfirmModal utilisé pour toutes les suppressions
+- [ ] DetailSheet utilisé pour tous les détails
+- [ ] Pas de duplication de ces composants
+
+**API & Services :**
+- [ ] Services étendent `CrudService<T, CreateDto, UpdateDto>`
+- [ ] Utilisation de `apiClient` (pas de fetch direct)
+- [ ] Utilisation de `logger` pour toutes les erreurs
+- [ ] Gestion d'erreurs avec `handleApiError`
+- [ ] Constantes HTTP_STATUS (pas de magic numbers)
+
+**Exemple de processus avant commit :**
+
+```bash
+# 1. Vérifier TypeScript
+npm run build
+# ou pour vérification rapide :
+npx tsc --noEmit
+
+# 2. Vérifier ESLint (warnings hooks, etc.)
+npm run lint
+
+# 3. Si tout passe ✅ :
+git add .
+git commit -m "feat(admin): add Age-Categories CRUD"
+git push
+
+# 4. Si erreurs ❌ :
+# - Corriger TOUTES les erreurs
+# - Re-vérifier (retour à l'étape 1)
+# - ALORS commiter
+```
+
+**Erreurs courantes à éviter :**
+
+```typescript
+// ❌ ERREUR 1 : Missing dependencies
+useEffect(() => {
+  setParams({ ...params, newValue })
+}, [newValue])  // ❌ Manque 'params'
+
+// ✅ CORRECT 1
+useEffect(() => {
+  setParams((prev) => ({ ...prev, newValue }))
+}, [newValue, setParams])  // ✅
+
+// ❌ ERREUR 2 : z.coerce.number() cause type 'unknown'
+z.object({
+  age: z.coerce.number().min(0)  // ❌ Type inféré = unknown
+})
+
+// ✅ CORRECT 2
+z.object({
+  age: z.number().min(0)  // ✅ Type inféré = number
+})
+// Dans le formulaire :
+<Input type="number" {...register('age', { valueAsNumber: true })} />
+
+// ❌ ERREUR 3 : Texte en dur
+<Button>Create</Button>  // ❌
+
+// ✅ CORRECT 3
+const t = useTranslations('entity')
+<Button>{t('actions.create')}</Button>  // ✅
+
+// ❌ ERREUR 4 : Magic numbers HTTP
+if (response.status === 404) { }  // ❌
+
+// ✅ CORRECT 4
+import { HTTP_STATUS } from '@/lib/constants/http-status'
+if (response.status === HTTP_STATUS.NOT_FOUND) { }  // ✅
 ```
 
 ---
