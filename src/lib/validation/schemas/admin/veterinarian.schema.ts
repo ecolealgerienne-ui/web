@@ -17,6 +17,11 @@
 import { z } from 'zod'
 
 /**
+ * Constantes de validation
+ */
+export const MAX_SPECIALTIES = 10 // Limite maximale de spécialités par vétérinaire
+
+/**
  * Schéma pour les informations de contact
  */
 const contactInfoSchema = z.object({
@@ -114,7 +119,7 @@ export const veterinarianSchema = z.object({
         .max(100, 'veterinarian.validation.specialties.item.maxLength')
     )
     .min(1, 'veterinarian.validation.specialties.required')
-    .max(10, 'veterinarian.validation.specialties.maxItems'),
+    .max(MAX_SPECIALTIES, 'veterinarian.validation.specialties.maxItems'),
 
   clinic: z
     .string()
@@ -174,7 +179,7 @@ export const updateVeterinarianSchema = z.object({
         .max(100, 'veterinarian.validation.specialties.item.maxLength')
     )
     .min(1, 'veterinarian.validation.specialties.required')
-    .max(10, 'veterinarian.validation.specialties.maxItems')
+    .max(MAX_SPECIALTIES, 'veterinarian.validation.specialties.maxItems')
     .optional(),
 
   clinic: z
