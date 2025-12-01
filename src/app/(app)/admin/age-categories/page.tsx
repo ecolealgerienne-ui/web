@@ -36,6 +36,12 @@ interface ColumnDef<T> {
 }
 
 /**
+ * Constante pour représenter "Toutes les espèces" dans le filtre
+ * (Select.Item ne peut pas avoir value="")
+ */
+const ALL_SPECIES = '__all__'
+
+/**
  * Page d'administration des Catégories d'Âge
  *
  * ✅ RÈGLE #3 : Utilise DataTable générique
@@ -54,7 +60,7 @@ export default function AgeCategoriesPage() {
 
   // État local pour liste des espèces (dropdown filter)
   const [species, setSpecies] = useState<Species[]>([])
-  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('')
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>(ALL_SPECIES)
 
   // Hook personnalisé pour CRUD
   const {
@@ -71,7 +77,7 @@ export default function AgeCategoriesPage() {
     limit: 25,
     sortBy: 'displayOrder',
     sortOrder: 'asc',
-    speciesId: selectedSpeciesId || undefined,
+    speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId,
   })
 
   // États locaux pour modales
@@ -106,7 +112,7 @@ export default function AgeCategoriesPage() {
   useEffect(() => {
     setParams((prevParams: AgeCategoryFilterParams) => ({
       ...prevParams,
-      speciesId: selectedSpeciesId || undefined,
+      speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId,
       page: 1, // Reset page quand on change de filtre
     }))
   }, [selectedSpeciesId, setParams])
@@ -256,7 +262,7 @@ export default function AgeCategoriesPage() {
                 <SelectValue placeholder={t('filters.allSpecies')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t('filters.allSpecies')}</SelectItem>
+                <SelectItem value={ALL_SPECIES}>{t('filters.allSpecies')}</SelectItem>
                 {species.map((sp: Species) => (
                   <SelectItem key={sp.id} value={sp.id}>
                     {sp.name} ({sp.code})
@@ -301,7 +307,7 @@ export default function AgeCategoriesPage() {
         ageCategory={editingAgeCategory}
         onSubmit={handleFormSubmit}
         loading={submitting}
-        preSelectedSpeciesId={selectedSpeciesId}
+        preSelectedSpeciesId={selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId}
       />
 
       {/* Dialog de détail */}
