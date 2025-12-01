@@ -31,7 +31,8 @@
       "loading": "جاري التحميل...",
       "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
       "actionIrreversible": "هذا الإجراء لا رجعة فيه.",
-      "loadError": "خطأ في تحميل البيانات"
+      "loadError": "خطأ في تحميل البيانات",
+      "selectedCount": "{count} محدد"
     },
     "fields": {
       "name": "الاسم",
@@ -75,6 +76,21 @@
       "isUsedBy": "لأنه مستخدم من قبل",
       "mustDeleteDependencies": "يجب عليك حذف هذه التبعيات أولاً.",
       "confirmDeleteItem": "هل أنت متأكد من حذف"
+    },
+    "sections": {
+      "mainInfo": "المعلومات الأساسية",
+      "additionalInfo": "معلومات إضافية",
+      "options": "الخيارات"
+    },
+    "placeholders": {
+      "select": "اختر",
+      "optional": "اختياري"
+    },
+    "loading": "جاري التحميل...",
+    "admin": {
+      "products": {
+        "subtitle": "إدارة كتالوج المنتجات البيطرية"
+      }
     }
   },
   "header": {

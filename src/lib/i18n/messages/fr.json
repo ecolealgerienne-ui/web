@@ -31,7 +31,8 @@
       "loading": "Chargement en cours...",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
       "actionIrreversible": "Cette action est irréversible.",
-      "loadError": "Erreur lors du chargement des données"
+      "loadError": "Erreur lors du chargement des données",
+      "selectedCount": "{count} sélectionné(s)"
     },
     "fields": {
       "name": "Nom",
@@ -75,6 +76,21 @@
       "isUsedBy": "car il est utilisé par",
       "mustDeleteDependencies": "Vous devez d'abord supprimer ces dépendances.",
       "confirmDeleteItem": "Voulez-vous vraiment supprimer"
+    },
+    "sections": {
+      "mainInfo": "Informations principales",
+      "additionalInfo": "Informations complémentaires",
+      "options": "Options"
+    },
+    "placeholders": {
+      "select": "Sélectionner",
+      "optional": "Optionnel"
+    },
+    "loading": "Chargement...",
+    "admin": {
+      "products": {
+        "subtitle": "Gestion du catalogue des produits vétérinaires"
+      }
     }
   },
   "header": {
