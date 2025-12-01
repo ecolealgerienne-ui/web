@@ -68,7 +68,8 @@ export function VeterinarianFormDialog({
 
   const isEditMode = Boolean(veterinarian)
 
-  // Utilise le schéma approprié selon le mode (création/édition)
+  // Utilise toujours le schéma de création pour permettre useFieldArray
+  // En mode édition, le champ version est ajouté manuellement via hidden input
   const {
     register,
     handleSubmit: handleFormSubmit,
@@ -76,11 +77,7 @@ export function VeterinarianFormDialog({
     reset,
     control,
   } = useForm<VeterinarianFormData>({
-    // Note: Utilise VeterinarianFormData (type complet) pour le typing de useForm
-    // Le schéma conditionnel gère la validation (create vs update)
-    resolver: zodResolver(
-      isEditMode ? updateVeterinarianSchema : veterinarianSchema
-    ) as any,
+    resolver: zodResolver(veterinarianSchema),
     defaultValues: {
       code: '',
       firstName: '',
@@ -129,8 +126,9 @@ export function VeterinarianFormDialog({
           country: veterinarian.contactInfo.country || '',
         },
         isActive: veterinarian.isActive ?? true,
-        ...(isEditMode && { version: veterinarian.version || 1 }),
-      } as UpdateVeterinarianFormData)
+        // Version sera géré par le hidden input
+        version: veterinarian.version || 1,
+      } as any)
     } else if (!veterinarian && open) {
       // Réinitialise en mode création
       reset({
@@ -154,13 +152,18 @@ export function VeterinarianFormDialog({
     }
   }, [veterinarian, open, reset, isEditMode])
 
-  const handleFormSubmission = async (data: VeterinarianFormData) => {
+  const handleFormSubmission = async (data: any) => {
     // Filtrer les spécialités vides
     const cleanedData = {
       ...data,
-      specialties: data.specialties?.filter((s) => s.trim() !== '') || [],
+      specialties: data.specialties?.filter((s: string) => s.trim() !== '') || [],
     }
-    // Cast to union type for onSubmit (validation schema handles create vs update)
+
+    // En mode édition, s'assurer que version est présente
+    if (isEditMode && veterinarian) {
+      cleanedData.version = data.version || veterinarian.version || 1
+    }
+
     await onSubmit(cleanedData as VeterinarianFormData | UpdateVeterinarianFormData)
   }
 
