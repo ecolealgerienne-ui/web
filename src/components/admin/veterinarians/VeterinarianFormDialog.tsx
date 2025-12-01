@@ -99,7 +99,7 @@ export function VeterinarianFormDialog({
   })
 
   // useFieldArray pour gérer les spécialités (array dynamique)
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove } = useFieldArray<VeterinarianFormData>({
     control,
     name: 'specialties',
   })
