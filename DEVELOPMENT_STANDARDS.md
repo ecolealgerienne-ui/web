@@ -919,6 +919,119 @@ if (error.status === HTTP_STATUS.NOT_FOUND) { /* ... */ }
 
 ---
 
+### 6.5 Imports Standardisés - Chemins Corrects ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS inventer des chemins d'import - Toujours vérifier les imports existants**
+
+**Problème** : Utiliser des chemins d'import incorrects ou inventés cause des erreurs de compilation difficiles à déboguer.
+
+**✅ SOLUTION : Vérifier les imports dans les entités similaires existantes**
+
+```typescript
+// ❌ MAUVAIS - Chemins inventés (n'existent pas)
+import { handleApiError } from '@/lib/utils/error-handler'     // ❌ N'existe pas
+import { useToast } from '@/lib/contexts/toast'                // ❌ Mauvais chemin
+import { Switch } from '@/components/ui/switch'                 // ❌ N'existe pas
+
+// ✅ BON - Chemins vérifiés et corrects
+import { handleApiError } from '@/lib/utils/api-error-handler' // ✅ Existe
+import { useToast } from '@/contexts/toast-context'            // ✅ Existe
+// Utiliser <input type="checkbox"> au lieu de Switch          // ✅ Pattern standard
+```
+
+**Imports Communs Standards (OBLIGATOIRES)** :
+
+```typescript
+// Error handling
+import { handleApiError } from '@/lib/utils/api-error-handler'
+
+// Toast notifications
+import { useToast } from '@/contexts/toast-context'
+
+// Authentication
+import { useAuth } from '@/contexts/auth-context'
+
+// Logging
+import { logger } from '@/lib/utils/logger'
+
+// API Client
+import { apiClient } from '@/lib/api/client'
+
+// Internationalization
+import { useTranslations } from 'next-intl'
+
+// Types communs
+import type { BaseEntity } from '@/lib/types/common/base-entity'
+import type { PaginatedResponse, PaginationParams } from '@/lib/types/common/api'
+import type { CrudService } from '@/lib/types/common/crud-service'
+
+// UI Components (shadcn/ui)
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+// Admin Generic Components
+import { DataTable } from '@/components/admin/common/DataTable'
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
+```
+
+**Règles de Vérification** :
+
+1. **Consulter les entités similaires** : Regarder Age-Categories, Breeds, Species pour les imports
+   ```bash
+   # Exemple : Trouver le bon import pour handleApiError
+   grep -r "handleApiError" src/lib/hooks/admin/
+   ```
+
+2. **Vérifier l'existence du fichier** :
+   ```bash
+   # Vérifier si le fichier existe
+   ls src/lib/utils/api-error-handler.ts
+   ```
+
+3. **Pattern de recherche** : Si incertain, chercher dans le codebase
+   ```bash
+   # Trouver tous les usages d'un import
+   grep -r "import.*useToast" src/
+   ```
+
+4. **Tester la compilation** : Toujours vérifier que `npm run build` ou `npx tsc --noEmit` passe
+
+**Erreurs Courantes à Éviter** :
+
+```typescript
+// ❌ ERREUR 1 : Chemin trop court
+import { handleApiError } from '@/lib/utils/error'  // ❌ Manque "-handler"
+
+// ✅ CORRECT 1
+import { handleApiError } from '@/lib/utils/api-error-handler'  // ✅
+
+// ❌ ERREUR 2 : Mauvais dossier
+import { useToast } from '@/lib/contexts/toast-context'  // ❌ /lib/ au lieu de /
+
+// ✅ CORRECT 2
+import { useToast } from '@/contexts/toast-context'  // ✅
+
+// ❌ ERREUR 3 : Composant inexistant
+import { Switch } from '@/components/ui/switch'  // ❌ N'existe pas
+
+// ✅ CORRECT 3 : Utiliser pattern standard
+<input type="checkbox" {...register('isActive')} />  // ✅
+```
+
+**Checklist Avant d'Ajouter un Import** :
+
+- [ ] J'ai vérifié dans une entité similaire existante
+- [ ] J'ai confirmé que le fichier existe avec `ls` ou `grep`
+- [ ] J'ai testé la compilation (`npx tsc --noEmit`)
+- [ ] Le chemin suit la convention `@/` du projet
+- [ ] L'import est documenté dans cette section ou utilisé ailleurs
+
+---
+
 ## 7. Composants React
 
 ### 7.1 Structure d'un Composant
@@ -1356,6 +1469,206 @@ export default function AgeCategoriesPage() {
 - Filtres "Tous / Toutes" dans les listes
 - Option "Aucun / Non sélectionné" dans les formulaires
 - Réinitialisation de sélection
+
+---
+
+### 7.6 Champs Booléens - Pattern Checkbox Standard ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser un composant Switch inexistant**
+
+**Problème** : Le composant `@/components/ui/switch` n'existe pas dans ce projet. Tenter de l'utiliser cause une erreur de compilation.
+
+**✅ SOLUTION : Utiliser `<input type="checkbox">` avec react-hook-form**
+
+```typescript
+// ❌ MAUVAIS - Composant Switch n'existe pas
+import { Switch } from '@/components/ui/switch'  // ❌ Module not found
+
+const isActive = watch('isActive')
+
+<Switch
+  id="isActive"
+  checked={isActive}
+  onCheckedChange={(checked) => setValue('isActive', checked)}
+  disabled={loading}
+/>
+
+// ✅ BON - Input checkbox standard avec react-hook-form
+<div className="flex items-center space-x-2 pt-6">
+  <input
+    type="checkbox"
+    id="isActive"
+    {...register('isActive')}
+    className="h-4 w-4 rounded border-input"
+    disabled={loading}
+  />
+  <Label htmlFor="isActive" className="cursor-pointer">
+    {t('fields.isActive')}
+  </Label>
+</div>
+```
+
+**Pattern Complet pour Champs Booléens** :
+
+**1. Schéma Zod** :
+```typescript
+export const entitySchema = z.object({
+  // ... autres champs
+  isActive: z.boolean().optional(),
+})
+
+export type EntityFormData = {
+  // ... autres champs
+  isActive?: boolean
+}
+```
+
+**2. Valeurs par Défaut du Formulaire** :
+```typescript
+const { register, ... } = useForm<EntityFormData>({
+  resolver: zodResolver(entitySchema),
+  defaultValues: {
+    // ... autres champs
+    isActive: true,  // ✅ Actif par défaut
+  },
+})
+```
+
+**3. Input Checkbox dans le Formulaire** :
+```typescript
+{/* Statut actif */}
+<div className="flex items-center space-x-2 pt-6">
+  <input
+    type="checkbox"
+    id="isActive"
+    {...register('isActive')}
+    className="h-4 w-4 rounded border-input"
+    disabled={loading}
+  />
+  <Label htmlFor="isActive" className="cursor-pointer">
+    {t('fields.isActive')}
+  </Label>
+</div>
+```
+
+**Règles** :
+
+1. **Utiliser `{...register('isActive')}`** directement
+   - ❌ Ne PAS utiliser `watch('isActive')` + `setValue`
+   - ✅ Le register gère automatiquement la valeur
+
+2. **Classes CSS obligatoires** :
+   - Input : `h-4 w-4 rounded border-input`
+   - Wrapper : `flex items-center space-x-2 pt-6`
+   - Label : `cursor-pointer` (pour meilleure UX)
+
+3. **Pré-remplir en mode édition** :
+   ```typescript
+   useEffect(() => {
+     if (entity) {
+       reset({
+         // ... autres champs
+         isActive: entity.isActive,  // ✅ Valeur de l'entité
+       })
+     }
+   }, [entity, reset])
+   ```
+
+4. **Disabled state** : Toujours lier au loading du formulaire
+   ```typescript
+   disabled={loading}
+   ```
+
+**Erreurs Courantes à Éviter** :
+
+```typescript
+// ❌ ERREUR 1 : Importer Switch
+import { Switch } from '@/components/ui/switch'  // ❌ N'existe pas
+
+// ✅ CORRECT 1 : Pas besoin d'import supplémentaire
+// Utiliser <input type="checkbox"> directement
+
+// ❌ ERREUR 2 : Observer et setter manuellement
+const isActive = watch('isActive')
+<Switch
+  checked={isActive}
+  onCheckedChange={(checked) => setValue('isActive', checked)}
+/>
+
+// ✅ CORRECT 2 : Laisser register gérer
+<input type="checkbox" {...register('isActive')} />
+
+// ❌ ERREUR 3 : Oublier les classes CSS
+<input type="checkbox" {...register('isActive')} />  // ❌ Pas de style
+
+// ✅ CORRECT 3 : Classes obligatoires
+<input
+  type="checkbox"
+  {...register('isActive')}
+  className="h-4 w-4 rounded border-input"
+/>
+```
+
+**Exemple Complet (Breeds)** :
+
+```typescript
+// Schema
+export const breedSchema = z.object({
+  code: z.string().min(1),
+  nameFr: z.string().min(1),
+  speciesId: z.string().uuid(),
+  isActive: z.boolean().optional(),  // ✅
+})
+
+// Form Component
+export function BreedFormDialog({ breed, ... }: Props) {
+  const { register, reset, ... } = useForm<BreedFormData>({
+    resolver: zodResolver(breedSchema),
+    defaultValues: {
+      code: '',
+      nameFr: '',
+      speciesId: '',
+      isActive: true,  // ✅ Actif par défaut
+    },
+  })
+
+  // Pré-remplir si édition
+  useEffect(() => {
+    if (breed) {
+      reset({
+        code: breed.code,
+        nameFr: breed.nameFr,
+        speciesId: breed.speciesId,
+        isActive: breed.isActive,  // ✅
+      })
+    }
+  }, [breed, reset])
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* ... autres champs ... */}
+
+      {/* Statut actif */}
+      <div className="flex items-center space-x-2 pt-6">
+        <input
+          type="checkbox"
+          id="isActive"
+          {...register('isActive')}
+          className="h-4 w-4 rounded border-input"
+          disabled={loading}
+        />
+        <Label htmlFor="isActive" className="cursor-pointer">
+          {t('fields.isActive')}
+        </Label>
+      </div>
+    </form>
+  )
+}
+```
+
+**Cas d'usage typiques** :
+- `isActive` : Statut actif/inactif d'une entité
+- Tout champ booléen dans les formulaires admin (isPublic, isDefault, etc.)
 
 ---
 
