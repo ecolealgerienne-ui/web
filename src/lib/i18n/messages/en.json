@@ -1762,6 +1762,7 @@
     "sections": {
       "profile": "Profile",
       "farm": "Farm",
+      "generalSettings": "General Settings",
       "myVeterinarians": "My Veterinarians",
       "myBreeds": "My Breeds",
       "myVaccines": "My Vaccines",
