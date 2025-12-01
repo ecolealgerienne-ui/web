@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { breedsService, type BreedFilterParams } from '@/lib/services/admin/breeds.service'
 import type { Breed, CreateBreedDto, UpdateBreedDto } from '@/lib/types/admin/breed'
 import { useToast } from '@/contexts/toast-context'
-import { handleApiError } from '@/lib/utils/error-handler'
+import { handleApiError } from '@/lib/utils/api-error-handler'
 
 /**
  * Hook personnalisé pour gérer les Races (Breeds)
