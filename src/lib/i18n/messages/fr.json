@@ -140,6 +140,7 @@
       "species": "Espèces",
       "countries": "Pays",
       "veterinarians": "Vétérinaires",
+      "nationalCampaigns": "Campagnes Nationales",
       "products": "Produits Vétérinaires"
     }
   },
@@ -853,6 +854,98 @@
       "updateError": "Erreur lors de la mise à jour du vétérinaire",
       "deleteError": "Erreur lors de la suppression du vétérinaire",
       "noResults": "Aucun vétérinaire trouvé"
+    }
+  },
+  "nationalCampaign": {
+    "title": {
+      "singular": "Campagne Nationale",
+      "plural": "Campagnes Nationales"
+    },
+    "subtitle": "Gestion du catalogue des campagnes de santé animale nationales",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "nameAr": "Nom (AR)",
+      "type": "Type",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "types": {
+      "vaccination": "Vaccination",
+      "deworming": "Déparasitage",
+      "screening": "Dépistage",
+      "treatment": "Traitement",
+      "census": "Recensement",
+      "other": "Autre"
+    },
+    "sections": {
+      "names": "Noms multilingues",
+      "dates": "Période",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom français est requis",
+        "maxLength": "Le nom français ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom anglais est requis",
+        "maxLength": "Le nom anglais ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom arabe est requis",
+        "maxLength": "Le nom arabe ne doit pas dépasser 200 caractères"
+      },
+      "type": {
+        "invalid": "Le type doit être vaccination, déparasitage, dépistage, traitement, recensement ou autre"
+      },
+      "startDate": {
+        "required": "La date de début est requise",
+        "invalid": "La date de début est invalide"
+      },
+      "endDate": {
+        "required": "La date de fin est requise",
+        "invalid": "La date de fin est invalide",
+        "afterStart": "La date de fin doit être postérieure ou égale à la date de début"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      }
+    },
+    "placeholders": {
+      "code": "VACC2024, DEWORM-2024-Q1...",
+      "nameFr": "Campagne de Vaccination 2024",
+      "nameEn": "Vaccination Campaign 2024",
+      "nameAr": "حملة التطعيم 2024",
+      "type": "Sélectionnez le type",
+      "description": "Description de la campagne..."
+    },
+    "actions": {
+      "create": "Créer une campagne",
+      "edit": "Modifier la campagne",
+      "delete": "Supprimer la campagne",
+      "restore": "Restaurer la campagne"
+    },
+    "search": {
+      "placeholder": "Rechercher une campagne..."
+    },
+    "messages": {
+      "created": "Campagne créée avec succès",
+      "updated": "Campagne mise à jour avec succès",
+      "deleted": "Campagne supprimée avec succès",
+      "restored": "Campagne restaurée avec succès",
+      "createError": "Erreur lors de la création de la campagne",
+      "updateError": "Erreur lors de la mise à jour de la campagne",
+      "deleteError": "Erreur lors de la suppression de la campagne",
+      "noResults": "Aucune campagne trouvée"
     }
   },
   "campaigns": {
