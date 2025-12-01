@@ -128,6 +128,7 @@
       "title": "Administration",
       "activeSubstances": "Active Substances",
       "productCategories": "Product Categories",
+      "units": "Units of Measure",
       "products": "Veterinary Products"
     }
   },
@@ -460,6 +461,68 @@
       "deleteError": "Error deleting category",
       "confirmDelete": "Do you really want to delete the category «{name}»?",
       "noResults": "No category found"
+    }
+  },
+  "unit": {
+    "title": {
+      "singular": "Unit of Measure",
+      "plural": "Units of Measure"
+    },
+    "subtitle": "Management of measurement units (weight, volume, concentration)",
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "symbol": "Symbol",
+      "type": "Type",
+      "isActive": "Active"
+    },
+    "types": {
+      "WEIGHT": "Weight",
+      "VOLUME": "Volume",
+      "CONCENTRATION": "Concentration"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, hyphens and underscores"
+      },
+      "name": {
+        "required": "Name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "symbol": {
+        "required": "Symbol is required",
+        "maxLength": "Symbol must not exceed 20 characters"
+      },
+      "type": {
+        "invalid": "Invalid type"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "placeholders": {
+      "code": "MG, ML, KG...",
+      "name": "Milligram, Milliliter...",
+      "symbol": "mg, ml, kg..."
+    },
+    "actions": {
+      "create": "Create unit",
+      "edit": "Edit unit",
+      "delete": "Delete unit",
+      "restore": "Restore unit"
+    },
+    "search": {
+      "placeholder": "Search for a unit..."
+    },
+    "messages": {
+      "created": "Unit created successfully",
+      "updated": "Unit updated successfully",
+      "deleted": "Unit deleted successfully",
+      "restored": "Unit restored successfully",
+      "noResults": "No unit found"
     }
   },
   "errors": {
