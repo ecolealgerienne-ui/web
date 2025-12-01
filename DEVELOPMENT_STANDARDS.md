@@ -363,6 +363,108 @@ function MyComponent() {
 - Clés à plat sans hiérarchie
 - Textes en anglais seulement
 
+### 4.5 Préparation des Clés i18n pour Nouveaux Composants
+
+✅ **Pattern recommandé** : Ajouter TOUTES les clés i18n nécessaires AVANT l'implémentation UI
+
+**Workflow obligatoire :**
+
+1. **Analyser les besoins** - Identifier tous les champs qui seront affichés
+2. **Créer les clés** - Ajouter toutes les clés dans les 3 langues (FR, EN, AR)
+3. **Vérifier la complétude** - S'assurer qu'aucune clé ne manque
+4. **Implémenter l'UI** - Utiliser les clés créées
+
+**Exemple - Ajout d'un DetailSheet pour Products :**
+
+```typescript
+// 1. Analyser: DetailSheet affichera withdrawalPeriodMeat, withdrawalPeriodMilk
+// 2. Créer les clés AVANT l'implémentation:
+
+// fr.json
+{
+  "product": {
+    "fields": {
+      // ... champs existants
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "withdrawalPeriodMilk": "Délai d'attente Lait",
+      "days": "jours"  // Unité de mesure réutilisable
+    }
+  }
+}
+
+// en.json
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "Withdrawal Period Meat",
+      "withdrawalPeriodMilk": "Withdrawal Period Milk",
+      "days": "days"
+    }
+  }
+}
+
+// ar.json
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "فترة السحب اللحوم",
+      "withdrawalPeriodMilk": "فترة السحب الحليب",
+      "days": "أيام"
+    }
+  }
+}
+
+// 3. Vérifier: Toutes les clés sont présentes dans les 3 langues
+// 4. Implémenter: Utiliser les clés dans DetailSheet
+{
+  key: 'withdrawalPeriodMeat',
+  label: t('fields.withdrawalPeriodMeat'),
+  render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+}
+```
+
+**Cas d'usage :**
+- ✅ Ajout d'un nouveau composant (DetailSheet, Form, etc.)
+- ✅ Ajout de nouveaux champs à une entité existante
+- ✅ Création d'une nouvelle entité admin
+- ✅ Ajout de messages d'erreur ou de validation
+
+**Raison :**
+- Éviter les erreurs MISSING_MESSAGE en production
+- Détecter les clés manquantes lors du build TypeScript
+- Assurer la cohérence i18n dès le début
+- Faciliter la revue de code (toutes les traductions visibles)
+
+**Conséquence violation :**
+- Erreur MISSING_MESSAGE au runtime
+- Page blanche ou composant cassé
+- Correctif d'urgence nécessaire en production
+- Perte de temps en debug
+
+**Pattern pour les champs avec unités de mesure :**
+
+Créer des clés séparées pour les unités réutilisables dans `{entity}.fields` ou `common.fields`:
+
+```json
+// ✅ Bon - Unités réutilisables
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "days": "jours",
+      "hours": "heures",
+      "weeks": "semaines"
+    }
+  }
+}
+
+// Utilisation
+render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+
+// ❌ Mauvais - Hardcoder l'unité
+render: (value) => value ? `${value} jours` : '-'
+```
+
 ---
 
 ## 5. Validation des Données
@@ -2169,6 +2271,219 @@ const handleRowClick = (species: Species) => {
 - UX moins intuitive (obligation de cliquer sur bouton "Voir")
 - Code dupliqué si chaque page implémente son propre detail dialog
 - Pas de standardisation du pattern d'affichage des détails
+
+---
+
+#### 8.3.17 Affichage des Champs Relationnels dans DetailSheet
+
+✅ **Pattern recommandé** : Utiliser `render` personnalisé avec Badges pour afficher les relations many-to-many ou one-to-many
+
+**Pattern pour collections (many-to-many, one-to-many) :**
+
+```typescript
+// Dans DetailSheet fields
+{
+  key: 'activeSubstances',
+  label: t('fields.activeSubstances'),
+  render: (value) => value && value.length > 0 ? (
+    <div className="flex flex-wrap gap-1">
+      {value.map((substance: any) => (
+        <Badge key={substance.id} variant="default" className="text-xs">
+          {substance.code} - {substance.name}
+        </Badge>
+      ))}
+    </div>
+  ) : '-'
+}
+```
+
+**Pattern pour relation simple (many-to-one) :**
+
+```typescript
+// Pour afficher une seule relation
+{
+  key: 'category',
+  label: t('fields.category'),
+  render: (value) => value ? (
+    <Badge variant="default">
+      {value.code} - {value.name}
+    </Badge>
+  ) : '-'
+}
+```
+
+**Pattern pour relations avec données supplémentaires :**
+
+```typescript
+// Afficher code + name + info supplémentaire
+{
+  key: 'suppliers',
+  label: t('fields.suppliers'),
+  render: (value) => value && value.length > 0 ? (
+    <div className="flex flex-col gap-1">
+      {value.map((supplier: any) => (
+        <div key={supplier.id} className="flex items-center gap-2">
+          <Badge variant="default" className="text-xs">
+            {supplier.code}
+          </Badge>
+          <span className="text-sm">{supplier.name}</span>
+          <span className="text-xs text-muted-foreground">
+            ({supplier.location})
+          </span>
+        </div>
+      ))}
+    </div>
+  ) : '-'
+}
+```
+
+**Cas d'usage :**
+- ✅ Relations many-to-many (activeSubstances, categories, tags, etc.)
+- ✅ Relations one-to-many (comments, attachments, etc.)
+- ✅ Relations many-to-one avec affichage enrichi
+- ✅ Toute collection d'objets liés à afficher
+
+**Raison :**
+- Affichage visuel clair et structuré des relations
+- Cohérence avec le design system (Badges)
+- Facile à identifier visuellement (code + name)
+- Support des relations vides (affiche '-')
+
+**Conséquence violation :**
+- Affichage brut difficile à lire (ex: [object Object])
+- UX incohérente entre différentes pages
+- Informations importantes masquées (uniquement ID)
+
+**Bonnes pratiques :**
+
+```typescript
+// ✅ Bon - Affichage code + name
+<Badge>{item.code} - {item.name}</Badge>
+
+// ✅ Bon - Vérification de la collection vide
+value && value.length > 0 ? (...) : '-'
+
+// ✅ Bon - Key unique pour chaque Badge
+{value.map((item) => <Badge key={item.id}>...</Badge>)}
+
+// ❌ Mauvais - Afficher uniquement l'ID
+<Badge>{item.id}</Badge>
+
+// ❌ Mauvais - Pas de gestion du cas vide
+value.map((item) => ...) // Crash si value est null/undefined
+```
+
+---
+
+#### 8.3.18 Affichage des Champs Numériques avec Unités
+
+✅ **Pattern recommandé** : Concaténer la valeur avec l'unité traduite via une clé i18n séparée
+
+**Pattern standard :**
+
+```typescript
+// 1. Créer la clé i18n pour l'unité (Règle 4.5)
+// fr.json
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "days": "jours"  // Unité réutilisable
+    }
+  }
+}
+
+// 2. Utiliser dans le render
+{
+  key: 'withdrawalPeriodMeat',
+  label: t('fields.withdrawalPeriodMeat'),
+  render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+}
+```
+
+**Pattern pour unités multiples :**
+
+```typescript
+// Créer plusieurs unités dans common.fields pour réutilisation
+// common.fields dans fr.json
+{
+  "common": {
+    "fields": {
+      "days": "jours",
+      "hours": "heures",
+      "weeks": "semaines",
+      "months": "mois",
+      "years": "ans",
+      "kg": "kg",
+      "liters": "litres",
+      "percent": "%"
+    }
+  }
+}
+
+// Utilisation avec tc (common translation)
+const tc = useTranslations('common')
+
+{
+  key: 'weight',
+  label: t('fields.weight'),
+  render: (value) => value ? `${value} ${tc('fields.kg')}` : '-'
+}
+```
+
+**Pattern pour unités conditionnelles :**
+
+```typescript
+// Afficher l'unité selon le type
+{
+  key: 'quantity',
+  label: t('fields.quantity'),
+  render: (value, item) => {
+    if (!value) return '-'
+    const unit = item.unit?.symbol || tc('fields.units')
+    return `${value} ${unit}`
+  }
+}
+```
+
+**Cas d'usage :**
+- ✅ Durées (days, hours, weeks, months, years)
+- ✅ Poids (kg, g, mg)
+- ✅ Volumes (liters, ml)
+- ✅ Pourcentages
+- ✅ Températures
+- ✅ Toute mesure avec unité
+
+**Raison :**
+- Support multilingue des unités (jours/days/أيام)
+- Réutilisation des clés d'unités communes
+- Cohérence dans l'affichage des mesures
+- Facilite la maintenance (changement d'unité centralisé)
+
+**Conséquence violation :**
+- Unités hardcodées (toujours en français)
+- Duplication des traductions d'unités
+- Non-respect de l'i18n
+- Incohérence entre les entités
+
+**Bonnes pratiques :**
+
+```typescript
+// ✅ Bon - Unité traduite
+render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+
+// ✅ Bon - Unité réutilisable dans common
+render: (value) => value ? `${value} ${tc('fields.kg')}` : '-'
+
+// ✅ Bon - Gestion du cas null/undefined
+render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+
+// ❌ Mauvais - Unité hardcodée
+render: (value) => value ? `${value} jours` : '-'
+
+// ❌ Mauvais - Pas de gestion du null
+render: (value) => `${value} ${t('fields.days')}` // Affiche "undefined jours"
+```
 
 ---
 
