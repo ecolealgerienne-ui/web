@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.2
+**Version:** 1.3
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout règle 8.3.11 (Protection appels API concurrents) - Fix error loops
+**Dernière mise à jour:** Ajout règles 8.3.12-13 (Validation Swagger + i18n défensif) - Fix Products integration
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -1538,6 +1538,197 @@ const fetchData = useCallback(async () => {
 - ✅ Particulièrement important pour hooks avec auto-fetch (useEffect)
 - ✅ useProducts, useActiveSubstances, useTherapeuticIndications, etc.
 
+#### 8.3.12 Validation contre Swagger avant Implémentation de Services
+
+⚠️ **PROBLÈME :** Services frontend avec URLs ou paramètres incorrects causent des erreurs 404/400
+
+❌ **SYMPTÔMES :**
+- Erreurs HTTP 404 (endpoint introuvable)
+- Erreurs HTTP 400 (paramètres invalides)
+- Appels API qui échouent systématiquement au premier test
+
+✅ **SOLUTION :** TOUJOURS consulter Swagger avant d'implémenter un service API
+
+**Checklist obligatoire avant d'écrire un service :**
+
+```typescript
+// ❌ NE JAMAIS FAIRE : Deviner les URLs et paramètres
+
+class MyService {
+  // Devine l'URL sans vérifier
+  private readonly baseUrl = '/api/v1/admin/my-entity'  // ❌
+
+  async getAll(params?: PaginationParams) {
+    // Devine les noms de paramètres
+    queryParams.append('sortBy', params.sortBy)  // ❌
+    queryParams.append('sortOrder', params.sortOrder)  // ❌
+  }
+}
+```
+
+```typescript
+// ✅ OBLIGATOIRE : Vérifier Swagger puis implémenter
+
+// 1. CONSULTER SWAGGER (http://localhost:3000/api/docs)
+//    - Trouver l'endpoint exact : GET /api/v1/products (sans /admin/)
+//    - Noter les paramètres acceptés : sort, order, page, limit
+//    - Noter les valeurs par défaut : sort=nameFr, order=asc
+
+class ProductsService {
+  // ✅ URL exacte de Swagger
+  private readonly baseUrl = '/api/v1/products'
+
+  async getAll(params?: PaginationParams) {
+    // ✅ Noms de paramètres de Swagger
+    if (params?.sortBy) queryParams.append('sort', params.sortBy)     // Backend: 'sort'
+    if (params?.sortOrder) queryParams.append('order', params.sortOrder) // Backend: 'order'
+
+    // ✅ Commentaire pour expliquer le mapping
+    // ⚠️ Backend utilise 'sort' et 'order' (pas 'sortBy' et 'sortOrder')
+  }
+}
+```
+
+**Process obligatoire :**
+
+1. **Ouvrir Swagger** : http://localhost:3000/api/docs
+2. **Trouver l'endpoint** : Vérifier le chemin exact (avec/sans `/admin/`)
+3. **Noter les paramètres** : Noms exacts, types, valeurs par défaut
+4. **Noter les filtres** : Valeurs enum possibles
+5. **Documenter les différences** : Ajouter commentaires si mapping nécessaire
+
+**Exemples de différences courantes :**
+
+| Frontend (standard) | Backend (peut varier) | Action |
+|---------------------|----------------------|--------|
+| `sortBy` | `sort` | Mapper dans le service |
+| `sortOrder` | `order` | Mapper dans le service |
+| `page=1, limit=25` | `page=1, limit=50` | Vérifier défauts |
+| `code` | `nameFr` | Vérifier champ de tri |
+
+**Impact :**
+- Évite les erreurs 404/400 au premier test
+- Réduit le temps de debugging
+- Documentation claire des différences backend/frontend
+
+**Quand appliquer :**
+- ✅ Avant d'écrire TOUT nouveau service API
+- ✅ Quand un endpoint retourne 400/404
+- ✅ Lors de l'ajout de nouveaux filtres
+
+#### 8.3.13 Gestion Défensive des Valeurs en i18n
+
+⚠️ **PROBLÈME :** Erreurs `MISSING_MESSAGE` quand le backend retourne des valeurs undefined ou non traduites
+
+❌ **SYMPTÔMES :**
+```
+MISSING_MESSAGE: Could not resolve `entity.field.undefined` in messages
+```
+
+✅ **SOLUTION :** TOUJOURS valider avant d'utiliser une clé de traduction dynamique
+
+**Pattern obligatoire pour traductions dynamiques :**
+
+```typescript
+// ❌ MAUVAIS : Traduction directe sans validation
+render: (item) => (
+  <Badge>
+    {t(`statuses.${item.status}`)}  // ❌ Crash si status=undefined
+  </Badge>
+)
+```
+
+```typescript
+// ✅ BON : Validation en 3 étapes
+
+// 1. Définir la liste des valeurs valides
+const validStatuses = ['active', 'inactive', 'pending', 'archived']
+
+render: (item) => {
+  // 2. Gérer undefined/null
+  if (!item.status) {
+    return <span className="text-muted-foreground">-</span>
+  }
+
+  // 3. Vérifier si la valeur a une traduction
+  if (validStatuses.includes(item.status)) {
+    return <Badge>{t(`statuses.${item.status}`)}</Badge>
+  }
+
+  // 4. Fallback : afficher la valeur brute
+  return (
+    <Badge variant="default" className="opacity-60">
+      {item.status}
+    </Badge>
+  )
+}
+```
+
+**Pattern avec helper function (réutilisable) :**
+
+```typescript
+// Dans le composant
+const validTherapeuticForms = [
+  'injectable', 'oral', 'topical', 'intramammary',
+  'pour-on', 'bolus', 'powder', 'suspension', 'tablet'
+]
+
+// Helper pour rendu safe
+const renderTranslatedBadge = (
+  value: string | undefined,
+  translationKey: string,
+  validValues: string[]
+) => {
+  if (!value) return <span className="text-muted-foreground text-xs">-</span>
+
+  if (validValues.includes(value)) {
+    return <Badge variant="default">{t(`${translationKey}.${value}`)}</Badge>
+  }
+
+  return <Badge variant="default" className="opacity-60">{value}</Badge>
+}
+
+// Utilisation
+render: (product) => renderTranslatedBadge(
+  product.therapeuticForm,
+  'therapeuticForms',
+  validTherapeuticForms
+)
+```
+
+**Cas d'usage critiques :**
+
+1. **Enums du backend** : status, type, category, role, etc.
+2. **Relations many-to-one** : categoryId → category.name
+3. **Champs optionnels** : description, notes, metadata
+4. **Valeurs calculées** : pourcentages, compteurs dérivés
+
+**Liste de validValues :**
+
+Options pour définir `validValues` :
+
+```typescript
+// Option 1 : Hardcodé (simple, rapide)
+const validStatuses = ['active', 'inactive', 'pending']
+
+// Option 2 : Import depuis types (mieux)
+import { ProductTherapeuticForm } from '@/lib/types/admin/product'
+const validForms = Object.values(ProductTherapeuticForm)
+
+// Option 3 : Récupéré du backend (idéal mais async)
+const { data: validCategories } = useCategoriesEnum()
+```
+
+**Impact :**
+- Évite les crashes i18n sur valeurs inattendues
+- UX résiliente : affiche toujours quelque chose
+- Facilite le debugging (valeurs brutes visibles)
+
+**Quand appliquer :**
+- ✅ Toute traduction avec clé dynamique : `t(\`key.\${variable}\`)`
+- ✅ Champs enum venant du backend
+- ✅ Champs optionnels pouvant être null/undefined
+
 ---
 
 ## 9. State Management
@@ -2114,5 +2305,5 @@ Logger  State    i18n + Toast
 ---
 
 **Dernière mise à jour :** 2025-12-01
-**Version :** 1.2
+**Version :** 1.3
 **Mainteneur :** Équipe AniTra
