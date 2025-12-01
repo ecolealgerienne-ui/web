@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
 import { UnitFormDialog } from '@/components/admin/units/UnitFormDialog'
 import { useUnits } from '@/lib/hooks/admin/useUnits'
 import type { Unit, CreateUnitDto, UpdateUnitDto } from '@/lib/types/admin/unit'
@@ -59,6 +60,8 @@ export default function UnitsPage() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingUnit, setDeletingUnit] = useState<Unit | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   /**
@@ -122,6 +125,14 @@ export default function UnitsPage() {
   const handleCreate = () => {
     setEditingUnit(null)
     setFormOpen(true)
+  }
+
+  /**
+   * Affiche le détail d'une unité
+   */
+  const handleRowClick = (unit: Unit) => {
+    setSelectedUnit(unit)
+    setDetailOpen(true)
   }
 
   /**
@@ -214,6 +225,7 @@ export default function UnitsPage() {
             onSortChange={(sortBy, sortOrder) =>
               setParams({ ...params, sortBy, sortOrder })
             }
+            onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             loading={loading}
@@ -230,6 +242,54 @@ export default function UnitsPage() {
         unit={editingUnit}
         onSubmit={handleSubmit}
         loading={submitting}
+      />
+
+      {/* Dialog de détail (RÈGLE #8.3.16) */}
+      <DetailSheet<Unit>
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        item={selectedUnit}
+        title={t('title.singular')}
+        description={selectedUnit?.name}
+        fields={[
+          { key: 'code', label: t('fields.code') },
+          { key: 'name', label: t('fields.name') },
+          { key: 'symbol', label: t('fields.symbol') },
+          {
+            key: 'type',
+            label: t('fields.type'),
+            render: (value) => value ? t(`types.${value}`) : '-'
+          },
+          {
+            key: 'description',
+            label: t('fields.description'),
+            render: (value) => value || <span className="text-muted-foreground italic">-</span>
+          },
+          { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
+        ]}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedUnit) handleEdit(selectedUnit)
+              }}
+            >
+              {tc('actions.edit')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedUnit) handleDeleteClick(selectedUnit)
+              }}
+            >
+              {tc('actions.delete')}
+            </Button>
+          </>
+        }
       />
 
       {/* Modale de suppression - ✅ RÈGLE #8.3.3 : Seulement itemName */}

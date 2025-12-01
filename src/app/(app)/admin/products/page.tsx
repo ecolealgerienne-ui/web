@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
 import { ProductFormDialog } from '@/components/admin/products/ProductFormDialog'
 import { useProducts } from '@/lib/hooks/admin/useProducts'
 import type { Product } from '@/lib/types/admin/product'
@@ -56,6 +57,8 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   // Liste des formes thérapeutiques traduites
@@ -177,6 +180,11 @@ export default function ProductsPage() {
     setFormOpen(true)
   }
 
+  const handleRowClick = (product: Product) => {
+    setSelectedProduct(product)
+    setDetailOpen(true)
+  }
+
   const handleEdit = (product: Product) => {
     setEditingProduct(product)
     setFormOpen(true)
@@ -252,6 +260,7 @@ export default function ProductsPage() {
             onSortChange={(sortBy, sortOrder) =>
               setParams({ ...params, sortBy, sortOrder })
             }
+            onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             loading={loading}
@@ -268,6 +277,86 @@ export default function ProductsPage() {
         product={editingProduct}
         onSubmit={handleFormSubmit}
         loading={submitting}
+      />
+
+      {/* Dialog de détail (RÈGLE #8.3.16) */}
+      <DetailSheet<Product>
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        item={selectedProduct}
+        title={t('title.singular')}
+        description={selectedProduct?.commercialName}
+        fields={[
+          { key: 'code', label: t('fields.code') },
+          { key: 'commercialName', label: t('fields.commercialName') },
+          { key: 'laboratoryName', label: t('fields.laboratoryName') },
+          {
+            key: 'therapeuticForm',
+            label: t('fields.therapeuticForm'),
+            render: (value) => value ? (
+              <Badge variant="default">
+                {validTherapeuticForms.includes(value) ? t(`therapeuticForms.${value}`) : value}
+              </Badge>
+            ) : '-'
+          },
+          { key: 'dosage', label: t('fields.dosage') },
+          {
+            key: 'activeSubstances',
+            label: t('fields.activeSubstances'),
+            render: (value) => value && value.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {value.map((substance: any) => (
+                  <Badge key={substance.id} variant="default" className="text-xs">
+                    {substance.code} - {substance.name}
+                  </Badge>
+                ))}
+              </div>
+            ) : '-'
+          },
+          {
+            key: 'withdrawalPeriodMeat',
+            label: t('fields.withdrawalPeriodMeat'),
+            render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+          },
+          {
+            key: 'withdrawalPeriodMilk',
+            label: t('fields.withdrawalPeriodMilk'),
+            render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+          },
+          {
+            key: 'isVeterinaryPrescriptionRequired',
+            label: t('fields.isVeterinaryPrescriptionRequired'),
+            render: (value) => value ? (
+              <Badge variant="destructive">Rx</Badge>
+            ) : (
+              <Badge variant="default">{tc('status.inactive')}</Badge>
+            )
+          },
+          { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
+        ]}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedProduct) handleEdit(selectedProduct)
+              }}
+            >
+              {tc('actions.edit')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedProduct) handleDeleteClick(selectedProduct)
+              }}
+            >
+              {tc('actions.delete')}
+            </Button>
+          </>
+        }
       />
 
       {/* Modale de confirmation de suppression (RÈGLE #3) */}

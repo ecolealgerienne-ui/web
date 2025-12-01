@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
 import { ActiveSubstanceFormDialog } from '@/components/admin/active-substances/ActiveSubstanceFormDialog'
 import { useActiveSubstances } from '@/lib/hooks/admin/useActiveSubstances'
 import type { ActiveSubstance } from '@/lib/types/admin/active-substance'
@@ -55,6 +56,8 @@ export default function ActiveSubstancesPage() {
   const [editingSubstance, setEditingSubstance] = useState<ActiveSubstance | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingSubstance, setDeletingSubstance] = useState<ActiveSubstance | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedSubstance, setSelectedSubstance] = useState<ActiveSubstance | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   /**
@@ -103,6 +106,11 @@ export default function ActiveSubstancesPage() {
   const handleAdd = () => {
     setEditingSubstance(null)
     setFormOpen(true)
+  }
+
+  const handleRowClick = (substance: ActiveSubstance) => {
+    setSelectedSubstance(substance)
+    setDetailOpen(true)
   }
 
   const handleEdit = (substance: ActiveSubstance) => {
@@ -182,6 +190,7 @@ export default function ActiveSubstancesPage() {
             onSortChange={(sortBy, sortOrder) =>
               setParams({ ...params, sortBy, sortOrder })
             }
+            onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             loading={loading}
@@ -198,6 +207,48 @@ export default function ActiveSubstancesPage() {
         substance={editingSubstance}
         onSubmit={handleFormSubmit}
         loading={submitting}
+      />
+
+      {/* Dialog de détail (RÈGLE #8.3.16) */}
+      <DetailSheet<ActiveSubstance>
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        item={selectedSubstance}
+        title={t('title.singular')}
+        description={selectedSubstance?.name}
+        fields={[
+          { key: 'code', label: t('fields.code') },
+          { key: 'name', label: t('fields.name') },
+          {
+            key: 'description',
+            label: t('fields.description'),
+            render: (value) => value || <span className="text-muted-foreground italic">-</span>
+          },
+          { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
+        ]}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedSubstance) handleEdit(selectedSubstance)
+              }}
+            >
+              {tc('actions.edit')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedSubstance) handleDeleteClick(selectedSubstance)
+              }}
+            >
+              {tc('actions.delete')}
+            </Button>
+          </>
+        }
       />
 
       {/* Modale de confirmation de suppression (RÈGLE #3) */}
