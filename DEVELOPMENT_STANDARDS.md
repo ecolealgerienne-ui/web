@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout 6 nouvelles règles (8.3.5 à 8.3.10) - Sprint 1 Products
+**Dernière mise à jour:** Ajout règle 8.3.11 (Protection appels API concurrents) - Fix error loops
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -1436,6 +1436,108 @@ const tc = useTranslations('common')  // ✅ Traductions communes
 - Facilite maintenance des traductions
 - Cohérence terminologique sur toute l'application
 
+#### 8.3.11 Protection contre Appels API Concurrents dans les Hooks
+
+⚠️ **PROBLÈME :** Hooks avec auto-fetch peuvent créer des boucles infinies d'erreurs quand le backend est indisponible
+
+❌ **SYMPTÔMES :**
+- Console remplie d'erreurs API répétées
+- Application qui "boucle" sans rendre la main
+- Multiple appels API simultanés au même endpoint
+
+✅ **SOLUTION :** TOUJOURS utiliser `useRef` pour empêcher les appels concurrents
+
+**Pattern obligatoire pour tous les hooks avec fetch :**
+
+```typescript
+import { useState, useEffect, useCallback, useRef } from 'react'
+
+export function useEntity(params?: PaginationParams) {
+  const [data, setData] = useState<Entity[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  // ✅ OBLIGATOIRE : Ref pour empêcher appels concurrents
+  // Ne PAS utiliser useState (causerait des re-renders)
+  const isFetchingRef = useRef(false)
+
+  const fetchData = useCallback(async () => {
+    // ✅ OBLIGATOIRE : Vérifier si fetch déjà en cours
+    if (isFetchingRef.current) {
+      return  // Ignorer l'appel si fetch en cours
+    }
+
+    isFetchingRef.current = true
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await entityService.getAll(params)
+      setData(response.data)
+    } catch (err) {
+      setError(err as Error)
+      handleApiError(err, 'fetch entity', toast)
+    } finally {
+      setLoading(false)
+      isFetchingRef.current = false  // ✅ Réinitialiser dans finally
+    }
+  }, [params, toast])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  return { data, loading, error, refetch: fetchData }
+}
+```
+
+**❌ À NE PAS FAIRE :**
+
+```typescript
+// ❌ MAUVAIS : Utiliser useState (déclenche re-render)
+const [isFetching, setIsFetching] = useState(false)
+
+const fetchData = useCallback(async () => {
+  if (isFetching) return  // ❌ Race condition possible
+
+  setIsFetching(true)  // ❌ Déclenche re-render
+  // ...
+  setIsFetching(false)  // ❌ Déclenche re-render
+}, [params, toast, isFetching])  // ❌ isFetching dans les deps
+```
+
+**❌ À NE PAS FAIRE :**
+
+```typescript
+// ❌ MAUVAIS : Pas de protection contre appels concurrents
+const fetchData = useCallback(async () => {
+  setLoading(true)  // ❌ Plusieurs appels peuvent se chevaucher
+  try {
+    const response = await entityService.getAll(params)
+    setData(response.data)
+  } finally {
+    setLoading(false)
+  }
+}, [params, toast])
+```
+
+**Pourquoi useRef et pas useState ?**
+
+1. **useRef ne déclenche PAS de re-render** quand la valeur change
+2. **useState déclenche un re-render** → peut causer des boucles avec useEffect
+3. **isFetchingRef.current** est accessible immédiatement (pas de closure)
+4. **Plus performant** : pas de re-render inutile
+
+**Impact :**
+- Évite les boucles infinies d'erreurs quand backend indisponible
+- Empêche les requêtes concurrentes au même endpoint
+- Améliore la stabilité de l'application en environnement instable
+
+**Applicable à :**
+- ✅ Tous les hooks personnalisés qui font des appels API
+- ✅ Particulièrement important pour hooks avec auto-fetch (useEffect)
+- ✅ useProducts, useActiveSubstances, useTherapeuticIndications, etc.
+
 ---
 
 ## 9. State Management
@@ -2011,6 +2113,6 @@ Logger  State    i18n + Toast
 
 ---
 
-**Dernière mise à jour :** 2025-11-30
-**Version :** 1.0
+**Dernière mise à jour :** 2025-12-01
+**Version :** 1.2
 **Mainteneur :** Équipe AniTra
