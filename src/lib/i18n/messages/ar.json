@@ -66,7 +66,8 @@
       "firstPage": "الصفحة الأولى",
       "previousPage": "الصفحة السابقة",
       "nextPage": "الصفحة التالية",
-      "lastPage": "الصفحة الأخيرة"
+      "lastPage": "الصفحة الأخيرة",
+      "totalItems": "{count, plural, =0 {لا توجد عناصر} one {عنصر واحد} other {# عناصر}}"
     },
     "table": {
       "actions": "الإجراءات",
@@ -84,7 +85,9 @@
     },
     "placeholders": {
       "select": "اختر",
-      "optional": "اختياري"
+      "optional": "اختياري",
+      "name": "أدخل اسمًا",
+      "description": "أدخل وصفًا"
     },
     "loading": "جاري التحميل...",
     "admin": {
