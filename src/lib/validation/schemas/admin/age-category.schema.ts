@@ -74,30 +74,44 @@ export const ageCategorySchema = z.object({
    * - Requis
    * - Doit être >= 0
    */
-  ageMinDays: z.coerce.number()
-    .int('ageCategory.validation.ageMinDays.integer')
-    .min(0, 'ageCategory.validation.ageMinDays.min'),
+  ageMinDays: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+    z.number({
+      required_error: 'ageCategory.validation.ageMinDays.required',
+      invalid_type_error: 'ageCategory.validation.ageMinDays.integer',
+    })
+      .int('ageCategory.validation.ageMinDays.integer')
+      .min(0, 'ageCategory.validation.ageMinDays.min')
+  ),
 
   /**
    * Âge maximum en jours (optionnel)
    * - Si fourni, doit être > ageMinDays
    * - Doit être >= 0
    */
-  ageMaxDays: z.coerce.number()
-    .int('ageCategory.validation.ageMaxDays.integer')
-    .min(0, 'ageCategory.validation.ageMaxDays.min')
-    .optional()
-    .or(z.literal(null))
-    .or(z.literal('')), // Accepte chaîne vide depuis input
+  ageMaxDays: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+    z.number({
+      invalid_type_error: 'ageCategory.validation.ageMaxDays.integer',
+    })
+      .int('ageCategory.validation.ageMaxDays.integer')
+      .min(0, 'ageCategory.validation.ageMaxDays.min')
+      .optional()
+  ),
 
   /**
    * Ordre d'affichage (optionnel)
    * - Doit être >= 0
    */
-  displayOrder: z.coerce.number()
-    .int('ageCategory.validation.displayOrder.integer')
-    .min(0, 'ageCategory.validation.displayOrder.min')
-    .optional(),
+  displayOrder: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+    z.number({
+      invalid_type_error: 'ageCategory.validation.displayOrder.integer',
+    })
+      .int('ageCategory.validation.displayOrder.integer')
+      .min(0, 'ageCategory.validation.displayOrder.min')
+      .optional()
+  ),
 
   /**
    * Statut actif/inactif (optionnel)
@@ -107,11 +121,10 @@ export const ageCategorySchema = z.object({
   // Validation cross-field : ageMaxDays doit être > ageMinDays
   .refine(
     (data) => {
-      if (data.ageMaxDays === null || data.ageMaxDays === undefined || data.ageMaxDays === '') {
+      if (!data.ageMaxDays || data.ageMaxDays === undefined) {
         return true // Pas de limite supérieure, valide
       }
-      const maxDays = typeof data.ageMaxDays === 'string' ? parseInt(data.ageMaxDays) : data.ageMaxDays
-      return maxDays > data.ageMinDays
+      return data.ageMaxDays > data.ageMinDays
     },
     {
       message: 'ageCategory.validation.ageMaxDays.greaterThanMin',
@@ -134,13 +147,27 @@ export const updateAgeCategorySchema = ageCategorySchema.extend({
 })
 
 /**
- * Type inféré pour les formulaires de création
+ * Type explicite pour les formulaires de création
  * Utilisé avec react-hook-form
+ *
+ * ✅ Type explicite au lieu de z.infer pour éviter unknown avec z.preprocess
  */
-export type AgeCategoryFormData = z.infer<typeof ageCategorySchema>
+export type AgeCategoryFormData = {
+  code: string
+  nameFr: string
+  nameEn: string
+  nameAr?: string
+  speciesId: string
+  ageMinDays: number
+  ageMaxDays?: number
+  displayOrder?: number
+  isActive?: boolean
+}
 
 /**
- * Type inféré pour les formulaires de mise à jour
+ * Type pour les formulaires de mise à jour
  * Utilisé avec react-hook-form
  */
-export type UpdateAgeCategoryFormData = z.infer<typeof updateAgeCategorySchema>
+export type UpdateAgeCategoryFormData = AgeCategoryFormData & {
+  version: number
+}
