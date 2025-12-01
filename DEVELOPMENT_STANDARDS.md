@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout règles 8.3.12-13 (Validation Swagger + i18n défensif) - Fix Products integration
+**Dernière mise à jour:** Ajout 5 nouvelles règles suite audit Units/ProductCategories (Règles 1.1, 2.3, 8.3.14-15, 11.3, 14.8)
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -58,10 +58,14 @@
   - Ces types sont dans `/src/lib/types/common/api.ts` et `/src/lib/constants/http-status.ts`
   - Voir section 6 pour documentation complète
 
-- ❌ **Aucun commit sans build réussi**
-  - Toujours exécuter `npm run build` avant commit
-  - Corriger toutes les erreurs TypeScript
-  - Vérifier qu'il n'y a pas d'erreurs ESLint critiques
+- ❌ **Aucun commit sans build réussi** ⚠️ **RÈGLE NON NÉGOCIABLE**
+  - **AVANT CHAQUE COMMIT** : exécuter `npm run build`
+  - Si build échoue : ❌ NE PAS commiter - Corriger TOUTES les erreurs TypeScript
+  - Re-build jusqu'à succès ✅ ALORS commiter
+  - **AUCUNE EXCEPTION** - même pas "erreur réseau Google Fonts"
+  - Vérification rapide alternative : `npx tsc --noEmit`
+  - **Conséquence violation** : Erreurs runtime en production, blocage CI/CD, perte de confiance du code
+  - Voir section 11.3 pour renforcement détaillé de cette règle
 
 ✅ **OBLIGATIONS :**
 
@@ -146,6 +150,29 @@
 - Props interface : `[ComponentName]Props` (ex: `DataTableProps`)
 - Event handlers : `handle[Event]` (ex: `handleSubmit`, `handleDelete`)
 - Boolean props : `is[State]`, `has[Feature]`, `can[Action]` (ex: `isLoading`, `hasError`, `canDelete`)
+
+### 2.3 Chemins d'Import Standardisés
+
+⚠️ **IMPORTANT** : Utiliser TOUJOURS les chemins canoniques suivants
+
+**Imports Communs :**
+
+| Import | Chemin Correct | ❌ Chemins Incorrects |
+|--------|---------------|---------------------|
+| `useToast` | `@/contexts/toast-context` | `@/lib/hooks/useToast` |
+| `BaseEntity` | `@/lib/types/common/api` | `../common/entity`, `@/lib/types/common/entity` |
+| `handleApiError` | `@/lib/utils/api-error-handler` | `@/lib/utils/api-errors` |
+| `useTranslations` | `next-intl` | `@/lib/i18n` |
+
+**Vérification :**
+- En cas de doute, vérifier dans un fichier existant (ex: `active-substances/page.tsx`)
+- Utiliser la recherche globale pour trouver l'import correct
+- Ne JAMAIS inventer de nouveaux chemins
+
+**Conséquence violation :**
+- Erreurs d'import TypeScript
+- Inconsistance dans le codebase
+- Build failures
 
 ---
 
@@ -1729,6 +1756,155 @@ const { data: validCategories } = useCategoriesEnum()
 - ✅ Champs enum venant du backend
 - ✅ Champs optionnels pouvant être null/undefined
 
+#### 8.3.14 API DataTable - Props Plates (Flat Props)
+
+⚠️ **ERREUR FRÉQUENTE** : Utiliser des props objets au lieu de props plates
+
+❌ **INCORRECT** (props objets - NE FONCTIONNE PAS):
+```tsx
+<DataTable
+  pagination={{ page: 1, limit: 25, total: 100 }}
+  sorting={{ sortBy: 'name', sortOrder: 'asc' }}
+  search={{ value: '', placeholder: '...' }}
+/>
+```
+
+✅ **CORRECT** (props plates - API réelle):
+```tsx
+<DataTable<Entity>
+  data={data}
+  columns={columns}
+  totalItems={total}              // ✅ Flat prop (pas "total")
+  page={params.page || 1}         // ✅ Flat prop
+  limit={params.limit || 25}      // ✅ Flat prop
+  onPageChange={(page) => setParams({ ...params, page })}
+  onLimitChange={(limit) => setParams({ ...params, limit, page: 1 })}
+  sortBy={params.sortBy}          // ✅ Flat prop
+  sortOrder={params.sortOrder}    // ✅ Flat prop
+  onSortChange={(sortBy, sortOrder) =>
+    setParams({ ...params, sortBy, sortOrder })
+  }
+  onEdit={handleEdit}             // ✅ DataTable gère les boutons
+  onDelete={handleDeleteClick}    // ✅ DataTable gère les boutons
+  loading={loading}
+  emptyMessage={t('messages.noResults')}
+  searchPlaceholder={t('search.placeholder')}
+/>
+```
+
+**Wrapping obligatoire :**
+```tsx
+{/* ✅ TOUJOURS wrapper dans Card + CardContent */}
+<Card>
+  <CardContent className="pt-6">
+    <DataTable<Entity> {...props} />
+  </CardContent>
+</Card>
+```
+
+**Actions dans DataTable :**
+```tsx
+// ❌ NE PAS définir manuellement une colonne 'actions'
+const columns: ColumnDef<Unit>[] = [
+  { key: 'code', header: 'Code' },
+  { key: 'name', header: 'Name' },
+  // ❌ PAS de colonne actions ici
+]
+
+// ✅ DataTable gère automatiquement via onEdit/onDelete
+<DataTable
+  columns={columns}
+  onEdit={handleEdit}      // ✅ Boutons générés automatiquement
+  onDelete={handleDelete}  // ✅ Boutons générés automatiquement
+/>
+```
+
+**Raison :**
+- L'API DataTable utilise des props plates pour plus de flexibilité
+- Les props objets ne sont PAS supportées
+- Pattern cohérent avec tous les composants shadcn/ui
+
+**Vérification :**
+- TOUJOURS lire `/src/components/admin/common/DataTable.tsx` pour l'API exacte
+- TOUJOURS copier le pattern de `active-substances/page.tsx`
+
+**Conséquence violation :**
+- Pagination/recherche/tri ne fonctionnent pas
+- Props ignorées silencieusement
+- Bugs difficiles à debugger
+
+#### 8.3.15 Gestion Défensive des Enums Avant Traduction
+
+⚠️ **CAS PARTICULIER** de la règle 8.3.13 pour les enums TypeScript
+
+❌ **INCORRECT** (crash si undefined/null):
+```tsx
+render: (item) => (
+  <span>{t(`types.${item.type}`)}</span>  // ❌ Crash si type=undefined
+)
+```
+
+✅ **CORRECT** (défensif):
+```tsx
+render: (item) => (
+  <span>
+    {item.type ? t(`types.${item.type}`) : '-'}  // ✅ Garde défensive
+  </span>
+)
+```
+
+**Exemple concret - Enum UnitType :**
+
+```typescript
+// Type definition
+export enum UnitType {
+  WEIGHT = 'WEIGHT',
+  VOLUME = 'VOLUME',
+  CONCENTRATION = 'CONCENTRATION',
+}
+
+// Dans le composant
+{
+  key: 'type',
+  header: t('fields.type'),
+  sortable: true,
+  render: (unit: Unit) => (
+    <span className="text-sm">
+      {/* ✅ RÈGLE 8.3.15 : Gestion défensive enum */}
+      {unit.type ? t(`types.${unit.type}`) : '-'}
+    </span>
+  ),
+}
+```
+
+**Cas d'usage :**
+- ✅ Enum traduit dynamiquement via i18n (UnitType, ProductTherapeuticForm, etc.)
+- ✅ Champs enum pouvant être null/undefined (edge case, données corrompues)
+- ✅ Tout `t(\`...${enumVariable}\`)` dans une fonction render
+
+**Pattern générique :**
+```tsx
+// Pour tous les enums
+{enumValue ? t(`namespace.${enumValue}`) : '-'}
+
+// Avec style conditionnel
+{enumValue ? (
+  <Badge variant="default">{t(`namespace.${enumValue}`)}</Badge>
+) : (
+  <span className="text-muted-foreground">-</span>
+)}
+```
+
+**Raison :**
+- Éviter crash runtime si la valeur est undefined/null
+- UX résiliente même avec données corrompues
+- Facilite le debugging (affiche '-' au lieu de crasher)
+
+**Conséquence violation :**
+- Crash runtime avec `MISSING_MESSAGE` error
+- Page blanche pour l'utilisateur
+- Erreur difficile à reproduire (cas edge)
+
 ---
 
 ## 9. State Management
@@ -1982,7 +2158,103 @@ git commit -m "i18n(admin): add Active-Substances translations (FR/EN/AR)"
 git commit -m "test(services): add ActiveSubstances service tests"
 ```
 
-### 11.3 Branches
+### 11.3 Règle du Build Obligatoire - Renforcement
+
+⚠️ **RÈGLE CRITIQUE NON NÉGOCIABLE**
+
+Cette règle est **LA PLUS IMPORTANTE** de tous les standards de développement. Sa violation entraîne des conséquences graves en production.
+
+**Processus Obligatoire :**
+
+```bash
+# ❌ MAUVAIS - Commit sans build
+git add .
+git commit -m "feat: add new feature"  # ❌ ERREUR!
+
+# ✅ CORRECT - Toujours build AVANT commit
+npm run build                          # 1. Build d'abord
+# Si succès ✅ :
+git add .
+git commit -m "feat: add new feature"  # 2. Commit ensuite
+git push
+
+# Si échec ❌ :
+# - NE PAS commiter
+# - Corriger TOUTES les erreurs TypeScript
+# - Re-build jusqu'à succès
+# - ALORS commiter
+```
+
+**Vérification Rapide (Alternative) :**
+
+```bash
+# Pour vérifier TypeScript sans full build
+npx tsc --noEmit
+
+# Si 0 erreurs → OK pour commiter
+# Si erreurs → Corriger puis re-vérifier
+```
+
+**Conséquences de la Violation :**
+
+1. **Erreurs Runtime en Production** 🔥
+   - Types incorrects non détectés
+   - Imports manquants
+   - API incompatibles
+   - Crash applicatif
+
+2. **Blocage du Pipeline CI/CD** 🚫
+   - Build échoue sur le serveur
+   - Déploiement impossible
+   - Blocage de toute l'équipe
+   - Rollback nécessaire
+
+3. **Perte de Confiance du Code** 📉
+   - Code non fiable
+   - Régressions fréquentes
+   - Temps perdu en debugging
+   - Dette technique croissante
+
+**Exceptions Autorisées : AUCUNE**
+
+Même les "erreurs de réseau Google Fonts" ou autres warnings doivent être investigués et résolus.
+
+**Vérification du Succès du Build :**
+
+```bash
+npm run build
+
+# ✅ SUCCÈS - Exemple de sortie OK :
+#    ✓ Compiled successfully
+#    Route (app)                              Size     First Load JS
+#    ┌ ○ /                                    137 B          87 kB
+#    └ ○ /admin/units                         145 B          89 kB
+
+# ❌ ÉCHEC - Exemple de sortie KO :
+#    Failed to compile.
+#
+#    ./src/app/(app)/admin/units/page.tsx:12:14
+#    Type error: Cannot find module '@/lib/types/admin/unit'
+#
+#    > 12 | import type { Unit } from '@/lib/types/admin/unit'
+#         |              ^
+```
+
+**Rappel de la Règle :**
+
+> **AVANT CHAQUE COMMIT** : exécuter `npm run build`
+>
+> **Si build échoue** : ❌ NE PAS commiter
+>
+> **Corriger TOUTES les erreurs** : TypeScript, ESLint, imports
+>
+> **Re-build jusqu'à succès** : ✅ ALORS commiter
+>
+> **AUCUNE EXCEPTION** : Cette règle s'applique à 100% des commits
+
+---
+
+### 11.4 Branches
 
 **Nommage :**
 - `feature/[description]` : Nouvelles fonctionnalités
@@ -2249,6 +2521,106 @@ const schema = z.object({
 - [ ] Vérifier respect standards
 - [ ] Vérifier i18n complet
 - [ ] Vérifier aucune valeur hardcodée
+
+### Phase 9: Modèle de Référence Obligatoire
+
+⚠️ **RÈGLE CRITIQUE : TOUJOURS COPIER DEPUIS LE MODÈLE**
+
+Cette phase est **OBLIGATOIRE AVANT TOUTE IMPLÉMENTATION** d'une nouvelle entité admin.
+
+#### 14.8 Utilisation du Modèle de Référence
+
+**Modèle Pilote Officiel :**
+
+Le fichier **`/src/app/(app)/admin/active-substances/page.tsx`** est le **SEUL modèle de référence** approuvé pour toutes les implémentations d'entités admin simples (référentiel global sans relations complexes).
+
+**Processus Obligatoire :**
+
+```bash
+# 1. TOUJOURS commencer par copier le modèle
+cp src/app/(app)/admin/active-substances/page.tsx \
+   src/app/(app)/admin/[new-entity]/page.tsx
+
+# 2. ENSUITE adapter les noms d'entité
+# Remplacer "ActiveSubstance" par "YourEntity"
+# Remplacer "active-substances" par "your-entities"
+```
+
+**Pourquoi ce Modèle est Obligatoire :**
+
+1. ✅ **API DataTable Correcte** (props plates, pas d'objets)
+2. ✅ **Imports Standardisés** (chemins canoniques vérifiés)
+3. ✅ **Pattern Hook Correct** (useCallback, useEffect, pagination)
+4. ✅ **Gestion Erreurs Complète** (Toast, logging, error boundaries)
+5. ✅ **i18n Défensif** (gestion enum null/undefined)
+6. ✅ **DeleteConfirmModal API** (itemName uniquement)
+7. ✅ **Card Wrapper** (DataTable wrappé correctement)
+8. ✅ **TypeScript Strict** (pas d'any, types complets)
+
+**❌ INTERDICTIONS ABSOLUES :**
+
+- ❌ **NE JAMAIS** inventer une nouvelle API pour DataTable
+- ❌ **NE JAMAIS** deviner les imports (toujours copier du modèle)
+- ❌ **NE JAMAIS** créer une structure différente sans justification
+- ❌ **NE JAMAIS** ignorer les patterns du modèle (defensive coding, etc.)
+
+**Exemple Concret - Création de l'entité "Units" :**
+
+```typescript
+// ❌ MAUVAIS - Inventer l'API
+<DataTable
+  pagination={{ page: 1, limit: 25, total: 100 }}  // ❌ N'existe pas!
+  sorting={{ sortBy: 'name', sortOrder: 'asc' }}   // ❌ N'existe pas!
+/>
+
+// ✅ CORRECT - Copier du modèle active-substances/page.tsx
+<DataTable<Unit>
+  data={data}
+  columns={columns}
+  totalItems={total}              // ✅ Props plates
+  page={params.page || 1}
+  limit={params.limit || 25}
+  onPageChange={(page) => setParams({ ...params, page })}
+  onLimitChange={(limit) => setParams({ ...params, limit, page: 1 })}
+  sortBy={params.sortBy}
+  sortOrder={params.sortOrder}
+  onSortChange={(sortBy, sortOrder) => setParams({ ...params, sortBy, sortOrder })}
+  onEdit={handleEdit}
+  onDelete={handleDeleteClick}
+  loading={loading}
+  emptyMessage={t('messages.noResults')}
+  searchPlaceholder={t('search.placeholder')}
+/>
+```
+
+**Checklist de Vérification :**
+
+Après avoir copié et adapté le modèle, vérifier :
+
+- [ ] Tous les imports correspondent au modèle
+- [ ] L'API DataTable est identique (props plates)
+- [ ] Les hooks utilisent useCallback et useEffect comme le modèle
+- [ ] La gestion des erreurs utilise Toast comme le modèle
+- [ ] Les enums sont défensifs avant traduction i18n
+- [ ] DeleteConfirmModal utilise uniquement `itemName`
+- [ ] DataTable est wrappé dans Card > CardContent
+- [ ] Les types sont stricts (pas d'any)
+- [ ] Le build passe : `npx tsc --noEmit`
+
+**En Cas de Doute :**
+
+> Si vous ne savez pas comment implémenter quelque chose, **REGARDEZ LE MODÈLE**.
+>
+> Si le modèle ne couvre pas votre cas d'usage, **DEMANDEZ AVANT D'INVENTER**.
+>
+> Le modèle active-substances/page.tsx a été validé et testé. Il contient toutes les bonnes pratiques.
+
+**Conséquences de la Non-Conformité :**
+
+- Build failures (imports incorrects, API incompatibles)
+- Runtime errors (props undefined, crashes)
+- Audit failures (violations des standards)
+- Refactoring massif nécessaire (perte de temps)
 
 ---
 
