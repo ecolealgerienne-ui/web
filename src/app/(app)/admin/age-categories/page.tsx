@@ -103,12 +103,12 @@ export default function AgeCategoriesPage() {
 
   // Mettre à jour les paramètres quand le filtre espèce change
   useEffect(() => {
-    setParams({
-      ...params,
+    setParams((prevParams) => ({
+      ...prevParams,
       speciesId: selectedSpeciesId || undefined,
       page: 1, // Reset page quand on change de filtre
-    })
-  }, [selectedSpeciesId])
+    }))
+  }, [selectedSpeciesId, setParams])
 
   /**
    * Définition des colonnes du DataTable
