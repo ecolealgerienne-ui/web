@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { useUnits } from '@/lib/hooks/admin/useUnits'
-import { DataTable } from '@/components/admin/common/DataTable'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { useTranslations } from 'next-intl'
+import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
 import { UnitFormDialog } from '@/components/admin/units/UnitFormDialog'
-import { Plus } from 'lucide-react'
-import type { Unit } from '@/lib/types/admin/unit'
+import { useUnits } from '@/lib/hooks/admin/useUnits'
+import type { Unit, CreateUnitDto, UpdateUnitDto } from '@/lib/types/admin/unit'
+import { Badge } from '@/components/ui/badge'
 
 /**
  * Définition locale de ColumnDef (pas exportée de DataTable)
@@ -28,17 +28,21 @@ interface ColumnDef<T> {
  * Page d'administration des unités de mesure
  *
  * ✅ RÈGLE #1 : Aucune valeur en dur (i18n)
- * ✅ RÈGLE #6 : Tous les textes via i18n
- * ✅ Pattern Simple Reference Data
+ * ✅ RÈGLE #3 : Utilise DataTable générique
+ * ✅ RÈGLE #3 : Utilise DeleteConfirmModal générique
+ * ✅ RÈGLE #6 : i18n complet
+ * ✅ RÈGLE #8.3.2 : ColumnDef défini localement
+ * ✅ RÈGLE #8.3.3 : DeleteConfirmModal avec itemName uniquement
+ * ✅ RÈGLE #8.3.13 : Gestion défensive i18n pour enum
  *
- * @example
- * URL: /admin/units
+ * Pattern: Simple Reference Data (suit active-substances)
+ * Sprint 1 - Entité 4/5
  */
 export default function UnitsPage() {
   const t = useTranslations('unit')
   const tc = useTranslations('common')
 
-  // Hook de gestion des unités
+  // Hook personnalisé pour CRUD
   const {
     data,
     total,
@@ -47,97 +51,43 @@ export default function UnitsPage() {
     setParams,
     create,
     update,
-    delete: deleteUnit,
+    delete: deleteItem,
   } = useUnits()
 
-  // États UI
+  // États locaux pour modales
   const [formOpen, setFormOpen] = useState(false)
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null)
+  const [deletingUnit, setDeletingUnit] = useState<Unit | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   /**
-   * Ouvrir le formulaire en mode création
+   * Définition des colonnes du DataTable
+   * ✅ RÈGLE #1 : Aucune valeur en dur (i18n pour headers)
+   * ✅ RÈGLE #8.3.13 : Gestion défensive pour enum (unit.type)
    */
-  const handleCreate = () => {
-    setEditingUnit(null)
-    setFormOpen(true)
-  }
-
-  /**
-   * Ouvrir le formulaire en mode édition
-   */
-  const handleEdit = (unit: Unit) => {
-    setEditingUnit(unit)
-    setFormOpen(true)
-  }
-
-  /**
-   * Ouvrir la modale de confirmation de suppression
-   */
-  const handleDeleteClick = (unit: Unit) => {
-    setUnitToDelete(unit)
-    setDeleteDialogOpen(true)
-  }
-
-  /**
-   * Soumettre le formulaire (create ou update)
-   */
-  const handleSubmit = async (data: CreateUnitDto | UpdateUnitDto) => {
-    setSubmitting(true)
-    try {
-      if (editingUnit) {
-        // Mode édition
-        await update(editingUnit.id, data as UpdateUnitDto)
-      } else {
-        // Mode création
-        await create(data as CreateUnitDto)
-      }
-      setFormOpen(false)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  /**
-   * Confirmer la suppression
-   */
-  const handleDeleteConfirm = async () => {
-    if (!unitToDelete) return
-
-    setSubmitting(true)
-    try {
-      const success = await deleteUnit(unitToDelete.id)
-      if (success) {
-        setDeleteDialogOpen(false)
-        setUnitToDelete(null)
-      }
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  // Définition des colonnes du tableau
   const columns: ColumnDef<Unit>[] = [
     {
       key: 'code',
       header: t('fields.code'),
       sortable: true,
-      render: (unit) => (
-        <span className="font-mono text-sm font-medium">{unit.code}</span>
+      render: (unit: Unit) => (
+        <span className="font-mono font-semibold">{unit.code}</span>
       ),
     },
     {
       key: 'name',
       header: t('fields.name'),
       sortable: true,
+      render: (unit: Unit) => (
+        <span className="font-medium">{unit.name}</span>
+      ),
     },
     {
       key: 'symbol',
       header: t('fields.symbol'),
       sortable: true,
-      render: (unit) => (
+      render: (unit: Unit) => (
         <span className="font-mono text-sm bg-muted px-2 py-0.5 rounded">
           {unit.symbol}
         </span>
@@ -147,87 +97,133 @@ export default function UnitsPage() {
       key: 'type',
       header: t('fields.type'),
       sortable: true,
-      render: (unit) => (
-        <span className="text-sm">{t(`types.${unit.type}`)}</span>
+      render: (unit: Unit) => (
+        <span className="text-sm">
+          {/* ✅ RÈGLE #8.3.13 : Gestion défensive i18n pour enum */}
+          {unit.type ? t(`types.${unit.type}`) : '-'}
+        </span>
       ),
     },
     {
       key: 'isActive',
       header: t('fields.isActive'),
-      render: (unit) => (
+      render: (unit: Unit) => (
         <Badge variant={unit.isActive ? 'success' : 'warning'}>
           {unit.isActive ? tc('status.active') : tc('status.inactive')}
         </Badge>
       ),
-    },
-    {
-      key: 'actions',
-      header: tc('table.actions'),
-      render: (unit) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleEdit(unit)}
-            title={t('actions.edit')}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDeleteClick(unit)}
-            title={t('actions.delete')}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
+      align: 'center',
     },
   ]
 
+  /**
+   * Ouvre le formulaire en mode création
+   */
+  const handleCreate = () => {
+    setEditingUnit(null)
+    setFormOpen(true)
+  }
+
+  /**
+   * Ouvre le formulaire en mode édition
+   */
+  const handleEdit = (unit: Unit) => {
+    setEditingUnit(unit)
+    setFormOpen(true)
+  }
+
+  /**
+   * Ouvre la modale de confirmation de suppression
+   */
+  const handleDeleteClick = (unit: Unit) => {
+    setDeletingUnit(unit)
+    setDeleteDialogOpen(true)
+  }
+
+  /**
+   * Soumet le formulaire (création ou édition)
+   */
+  const handleSubmit = async (data: CreateUnitDto | UpdateUnitDto) => {
+    setSubmitting(true)
+    try {
+      if (editingUnit) {
+        // Mode édition - ajouter version pour optimistic locking
+        await update(editingUnit.id, {
+          ...data,
+          version: editingUnit.version || 1,
+        } as UpdateUnitDto)
+      } else {
+        // Mode création
+        await create(data as CreateUnitDto)
+      }
+      setFormOpen(false)
+      setEditingUnit(null)
+    } catch (error) {
+      // L'erreur est déjà gérée par le hook (toast)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  /**
+   * Confirme la suppression
+   */
+  const handleDeleteConfirm = async () => {
+    if (!deletingUnit) return
+
+    try {
+      await deleteItem(deletingUnit.id)
+      setDeleteDialogOpen(false)
+      setDeletingUnit(null)
+    } catch (error) {
+      // L'erreur est déjà gérée par le hook (toast)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* En-tête */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('title.plural')}</h1>
-          <p className="text-muted-foreground">{t('subtitle')}</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t('title.plural')}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            {t('subtitle')}
+          </p>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           {t('actions.create')}
         </Button>
       </div>
 
-      {/* Table */}
-      <DataTable
-        columns={columns}
-        data={data}
-        loading={loading}
-        pagination={{
-          page: params.page || 1,
-          limit: params.limit || 25,
-          total,
-          onPageChange: (page) => setParams({ ...params, page }),
-          onLimitChange: (limit) => setParams({ ...params, limit, page: 1 }),
-        }}
-        sorting={{
-          sortBy: params.sortBy,
-          sortOrder: params.sortOrder,
-          onSortChange: (sortBy, sortOrder) =>
-            setParams({ ...params, sortBy, sortOrder }),
-        }}
-        search={{
-          value: params.search || '',
-          onSearchChange: (search) =>
-            setParams({ ...params, search, page: 1 }),
-          placeholder: t('search.placeholder'),
-        }}
-        emptyMessage={t('messages.noResults')}
-      />
+      {/* Table - ✅ Wrappée dans Card (RÈGLE #7.2) */}
+      <Card>
+        <CardContent className="pt-6">
+          <DataTable<Unit>
+            data={data}
+            columns={columns}
+            totalItems={total}
+            page={params.page || 1}
+            limit={params.limit || 25}
+            onPageChange={(page) => setParams({ ...params, page })}
+            onLimitChange={(limit) => setParams({ ...params, limit, page: 1 })}
+            sortBy={params.sortBy}
+            sortOrder={params.sortOrder}
+            onSortChange={(sortBy, sortOrder) =>
+              setParams({ ...params, sortBy, sortOrder })
+            }
+            onEdit={handleEdit}
+            onDelete={handleDeleteClick}
+            loading={loading}
+            emptyMessage={t('messages.noResults')}
+            searchPlaceholder={t('search.placeholder')}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Form Dialog */}
+      {/* Modale de formulaire */}
       <UnitFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
@@ -236,18 +232,12 @@ export default function UnitsPage() {
         loading={submitting}
       />
 
-      {/* Delete Confirmation */}
+      {/* Modale de suppression - ✅ RÈGLE #8.3.3 : Seulement itemName */}
       <DeleteConfirmModal
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        title={t('actions.delete')}
-        description={
-          unitToDelete
-            ? `${tc('table.confirmDeleteItem')} "${unitToDelete.name}" (${unitToDelete.code}) ?`
-            : ''
-        }
-        loading={submitting}
+        itemName={deletingUnit?.name || ''}
       />
     </div>
   )

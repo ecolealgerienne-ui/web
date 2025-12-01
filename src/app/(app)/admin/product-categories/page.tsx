@@ -180,26 +180,27 @@ export default function ProductCategoriesPage() {
         </Button>
       </div>
 
-      {/* Table */}
+      {/* Table - ✅ API correcte (flat props) */}
       <Card>
-        <CardContent className="p-0">
-          <DataTable
+        <CardContent className="pt-6">
+          <DataTable<ProductCategory>
             data={data}
             columns={columns}
-            loading={loading}
-            pagination={{
-              page: params.page || 1,
-              limit: params.limit || 25,
-              total,
-            }}
+            totalItems={total}
+            page={params.page || 1}
+            limit={params.limit || 25}
             onPageChange={(page) => setParams({ ...params, page })}
-            onPageSizeChange={(limit) => setParams({ ...params, limit, page: 1 })}
-            onSort={(sortBy, sortOrder) =>
+            onLimitChange={(limit) => setParams({ ...params, limit, page: 1 })}
+            sortBy={params.sortBy}
+            sortOrder={params.sortOrder}
+            onSortChange={(sortBy, sortOrder) =>
               setParams({ ...params, sortBy, sortOrder })
             }
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
+            loading={loading}
             emptyMessage={t('messages.noResults')}
+            searchPlaceholder={`${tc('actions.search')} ${t('title.plural').toLowerCase()}...`}
           />
         </CardContent>
       </Card>

@@ -4,39 +4,49 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
-import { Dialog } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select } from '@/components/ui/select'
-import { unitSchema, updateUnitSchema } from '@/lib/validation/schemas/admin/unit.schema'
-import { UnitType, type Unit, type CreateUnitDto, type UpdateUnitDto } from '@/lib/types/admin/unit'
+import {
+  unitSchema,
+  updateUnitSchema,
+  type UnitFormData,
+  type UpdateUnitFormData,
+} from '@/lib/validation/schemas/admin/unit.schema'
+import { UnitType, type Unit } from '@/lib/types/admin/unit'
 
-/**
- * Dialog pour créer ou éditer une unité de mesure
- *
- * ✅ RÈGLE #1 : Aucune valeur en dur (i18n)
- * ✅ RÈGLE #6 : Tous les textes via i18n
- *
- * @example
- * ```tsx
- * <UnitFormDialog
- *   open={formOpen}
- *   onOpenChange={setFormOpen}
- *   unit={editingUnit}
- *   onSubmit={handleSubmit}
- *   loading={loading}
- * />
- * ```
- */
 interface UnitFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   unit?: Unit | null
-  onSubmit: (data: CreateUnitDto | UpdateUnitDto) => Promise<void>
+  onSubmit: (data: UnitFormData | UpdateUnitFormData) => Promise<void>
   loading?: boolean
 }
 
+/**
+ * Formulaire de création/édition d'unité de mesure
+ *
+ * ✅ RÈGLE #1 : Aucune valeur en dur (i18n)
+ * ✅ RÈGLE #6 : i18n complet
+ *
+ * Utilise react-hook-form + Zod pour la validation côté client
+ */
 export function UnitFormDialog({
   open,
   onOpenChange,
@@ -49,16 +59,18 @@ export function UnitFormDialog({
 
   const isEditMode = Boolean(unit)
 
-  // Utiliser le bon schéma selon le mode (create/edit)
+  // Utilise le schéma approprié selon le mode (création/édition)
   const {
     register,
-    handleSubmit,
+    handleSubmit: handleFormSubmit,
     formState: { errors },
     reset,
     watch,
     setValue,
-  } = useForm<CreateUnitDto | UpdateUnitDto>({
-    resolver: zodResolver(isEditMode ? updateUnitSchema : unitSchema),
+  } = useForm<UnitFormData | UpdateUnitFormData>({
+    resolver: zodResolver(
+      isEditMode ? updateUnitSchema : unitSchema
+    ),
     defaultValues: {
       code: '',
       name: '',
@@ -69,8 +81,9 @@ export function UnitFormDialog({
   })
 
   const isActive = watch('isActive')
+  const selectedType = watch('type')
 
-  // Charger les données en mode édition
+  // Charge les données en mode édition
   useEffect(() => {
     if (unit && open) {
       reset({
@@ -80,9 +93,9 @@ export function UnitFormDialog({
         type: unit.type,
         isActive: unit.isActive ?? true,
         ...(isEditMode && { version: unit.version || 1 }),
-      })
-    } else if (!open) {
-      // Reset quand la dialog se ferme
+      } as UpdateUnitFormData)
+    } else if (!unit && open) {
+      // Réinitialise en mode création
       reset({
         code: '',
         name: '',
@@ -93,9 +106,10 @@ export function UnitFormDialog({
     }
   }, [unit, open, reset, isEditMode])
 
-  const handleFormSubmit = async (data: CreateUnitDto | UpdateUnitDto) => {
+  const handleFormSubmission = async (
+    data: UnitFormData | UpdateUnitFormData
+  ) => {
     await onSubmit(data)
-    onOpenChange(false)
   }
 
   // Options pour le select du type
@@ -107,110 +121,147 @@ export function UnitFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-card rounded-lg shadow-lg w-full max-w-md p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">
-              {isEditMode ? t('actions.edit') : t('actions.create')}
-            </h2>
-            <button
-              onClick={() => onOpenChange(false)}
-              className="text-muted-foreground hover:text-foreground"
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogClose onClose={() => onOpenChange(false)} />
+        <DialogHeader>
+          <DialogTitle>
+            {isEditMode ? t('actions.edit') : t('actions.create')}
+          </DialogTitle>
+        </DialogHeader>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleFormSubmit(handleFormSubmission)}
+          className="space-y-4"
+        >
+          <div className="grid grid-cols-1 gap-4">
             {/* Code */}
             <div>
-              <label htmlFor="code" className="block text-sm font-medium mb-1">
-                {t('fields.code')} *
-              </label>
+              <Label htmlFor="code">
+                {t('fields.code')} <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="code"
                 {...register('code')}
                 placeholder={t('placeholders.code')}
+                className={errors.code ? 'border-destructive' : ''}
                 disabled={loading}
-                error={errors.code?.message ? t(errors.code.message as any) : undefined}
               />
+              {errors.code && (
+                <p className="text-sm text-destructive mt-1">
+                  {t(errors.code.message as string)}
+                </p>
+              )}
             </div>
 
-            {/* Name */}
+            {/* Nom */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">
-                {t('fields.name')} *
-              </label>
+              <Label htmlFor="name">
+                {t('fields.name')} <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="name"
                 {...register('name')}
                 placeholder={t('placeholders.name')}
+                className={errors.name ? 'border-destructive' : ''}
                 disabled={loading}
-                error={errors.name?.message ? t(errors.name.message as any) : undefined}
               />
+              {errors.name && (
+                <p className="text-sm text-destructive mt-1">
+                  {t(errors.name.message as string)}
+                </p>
+              )}
             </div>
 
-            {/* Symbol */}
+            {/* Symbole */}
             <div>
-              <label htmlFor="symbol" className="block text-sm font-medium mb-1">
-                {t('fields.symbol')} *
-              </label>
+              <Label htmlFor="symbol">
+                {t('fields.symbol')} <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="symbol"
                 {...register('symbol')}
                 placeholder={t('placeholders.symbol')}
+                className={errors.symbol ? 'border-destructive' : ''}
                 disabled={loading}
-                error={errors.symbol?.message ? t(errors.symbol.message as any) : undefined}
               />
+              {errors.symbol && (
+                <p className="text-sm text-destructive mt-1">
+                  {t(errors.symbol.message as string)}
+                </p>
+              )}
             </div>
 
             {/* Type */}
             <div>
-              <label htmlFor="type" className="block text-sm font-medium mb-1">
-                {t('fields.type')} *
-              </label>
+              <Label htmlFor="type">
+                {t('fields.type')} <span className="text-destructive">*</span>
+              </Label>
               <Select
-                id="type"
-                {...register('type')}
-                options={unitTypeOptions}
+                value={selectedType}
+                onValueChange={(value) => setValue('type', value as UnitType)}
                 disabled={loading}
-                error={errors.type?.message ? t(errors.type.message as any) : undefined}
-              />
+              >
+                <SelectTrigger className={errors.type ? 'border-destructive' : ''}>
+                  <SelectValue placeholder={t('placeholders.name')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {unitTypeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.type && (
+                <p className="text-sm text-destructive mt-1">
+                  {String(errors.type.message)}
+                </p>
+              )}
             </div>
 
-            {/* IsActive */}
-            <div className="flex items-center gap-2">
+            {/* Statut Actif */}
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="isActive"
                 checked={isActive}
-                onCheckedChange={(checked) => setValue('isActive', checked as boolean)}
+                onCheckedChange={(checked) =>
+                  setValue('isActive', checked as boolean)
+                }
                 disabled={loading}
               />
-              <label htmlFor="isActive" className="text-sm font-medium">
+              <Label
+                htmlFor="isActive"
+                className="text-sm font-normal cursor-pointer"
+              >
                 {t('fields.isActive')}
-              </label>
+              </Label>
             </div>
 
-            {/* Actions */}
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={loading}
-              >
-                {tc('actions.cancel')}
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? tc('actions.saving') : tc('actions.save')}
-              </Button>
-            </div>
-          </form>
-        </div>
-      </div>
+            {/* Version (caché en mode édition) */}
+            {isEditMode && (
+              <input type="hidden" {...register('version')} />
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+            >
+              {tc('actions.cancel')}
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading
+                ? tc('actions.saving')
+                : isEditMode
+                  ? tc('actions.save')
+                  : tc('actions.create')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   )
 }

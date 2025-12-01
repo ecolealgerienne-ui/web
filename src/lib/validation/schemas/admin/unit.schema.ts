@@ -58,9 +58,7 @@ export const unitSchema = z.object({
    * - Requis
    * - Doit être l'une des valeurs : WEIGHT, VOLUME, CONCENTRATION
    */
-  type: z.nativeEnum(UnitType, {
-    errorMap: () => ({ message: 'unit.validation.type.invalid' })
-  }),
+  type: z.nativeEnum(UnitType),
 
   /**
    * Statut actif/inactif (optionnel)

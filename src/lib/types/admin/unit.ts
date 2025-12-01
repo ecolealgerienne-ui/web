@@ -1,4 +1,4 @@
-import type { BaseEntity } from '../common/entity'
+import type { BaseEntity } from '@/lib/types/common/api'
 
 /**
  * Type d'unité de mesure

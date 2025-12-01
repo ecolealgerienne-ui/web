@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { unitsService } from '@/lib/services/admin/units.service'
-import { useToast } from '@/lib/hooks/useToast'
+import { useToast } from '@/contexts/toast-context'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 import type { Unit, CreateUnitDto, UpdateUnitDto } from '@/lib/types/admin/unit'
 import type { PaginationParams } from '@/lib/types/common/api'
