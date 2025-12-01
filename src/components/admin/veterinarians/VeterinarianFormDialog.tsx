@@ -21,8 +21,8 @@
 
 'use client'
 
-import { useEffect } from 'react'
-import { useForm, useFieldArray, type Control } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
@@ -68,16 +68,17 @@ export function VeterinarianFormDialog({
 
   const isEditMode = Boolean(veterinarian)
 
-  // Utilise toujours le schéma de création pour permettre useFieldArray
-  // En mode édition, le champ version est ajouté manuellement via hidden input
+  // Gestion manuelle des spécialités avec useState (évite les problèmes de typage avec useFieldArray)
+  const [specialties, setSpecialties] = useState<string[]>([''])
+
   const {
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors },
     reset,
-    control,
+    setValue,
   } = useForm<VeterinarianFormData>({
-    resolver: zodResolver(veterinarianSchema),
+    resolver: zodResolver(veterinarianSchema) as any,
     defaultValues: {
       code: '',
       firstName: '',
@@ -98,23 +99,42 @@ export function VeterinarianFormDialog({
     },
   })
 
-  // useFieldArray pour gérer les spécialités (array dynamique)
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'specialties',
-  })
+  // Synchroniser specialties avec react-hook-form
+  useEffect(() => {
+    setValue('specialties', specialties)
+  }, [specialties, setValue])
+
+  // Fonctions pour gérer les spécialités
+  const addSpecialty = () => {
+    if (specialties.length < MAX_SPECIALTIES) {
+      setSpecialties([...specialties, ''])
+    }
+  }
+
+  const removeSpecialty = (index: number) => {
+    if (specialties.length > 1) {
+      setSpecialties(specialties.filter((_, i) => i !== index))
+    }
+  }
+
+  const updateSpecialty = (index: number, value: string) => {
+    const updated = [...specialties]
+    updated[index] = value
+    setSpecialties(updated)
+  }
 
   // Charge les données en mode édition
   useEffect(() => {
     if (veterinarian && open) {
+      const specs = veterinarian.specialties.length ? veterinarian.specialties : ['']
+      setSpecialties(specs)
+
       reset({
         code: veterinarian.code,
         firstName: veterinarian.firstName,
         lastName: veterinarian.lastName,
         licenseNumber: veterinarian.licenseNumber,
-        specialties: veterinarian.specialties.length
-          ? veterinarian.specialties
-          : [''],
+        specialties: specs,
         clinic: veterinarian.clinic || '',
         contactInfo: {
           phone: veterinarian.contactInfo.phone,
@@ -130,6 +150,7 @@ export function VeterinarianFormDialog({
         version: veterinarian.version || 1,
       } as any)
     } else if (!veterinarian && open) {
+      setSpecialties([''])
       // Réinitialise en mode création
       reset({
         code: '',
@@ -297,8 +318,8 @@ export function VeterinarianFormDialog({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => append('')}
-                disabled={loading || fields.length >= MAX_SPECIALTIES}
+                onClick={addSpecialty}
+                disabled={loading || specialties.length >= MAX_SPECIALTIES}
               >
                 <Plus className="h-4 w-4 mr-1" />
                 {t('actions.addSpecialty')}
@@ -306,10 +327,11 @@ export function VeterinarianFormDialog({
             </div>
 
             <div className="space-y-2">
-              {fields.map((field, index) => (
-                <div key={field.id} className="flex gap-2">
+              {specialties.map((specialty, index) => (
+                <div key={index} className="flex gap-2">
                   <Input
-                    {...register(`specialties.${index}` as const)}
+                    value={specialty}
+                    onChange={(e) => updateSpecialty(index, e.target.value)}
                     placeholder={t('placeholders.specialties')}
                     className={
                       errors.specialties?.[index]
@@ -318,12 +340,12 @@ export function VeterinarianFormDialog({
                     }
                     disabled={loading}
                   />
-                  {fields.length > 1 && (
+                  {specialties.length > 1 && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      onClick={() => remove(index)}
+                      onClick={() => removeSpecialty(index)}
                       disabled={loading}
                     >
                       <X className="h-4 w-4" />
