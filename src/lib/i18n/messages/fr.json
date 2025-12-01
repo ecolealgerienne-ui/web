@@ -135,6 +135,7 @@
       "activeSubstances": "Substances Actives",
       "productCategories": "Catégories de Produits",
       "units": "Unités de Mesure",
+      "administrationRoutes": "Voies d'Administration",
       "species": "Espèces",
       "countries": "Pays",
       "products": "Produits Vétérinaires"
@@ -660,6 +661,58 @@
       "deleted": "Pays supprimé avec succès",
       "restored": "Pays restauré avec succès",
       "noResults": "Aucun pays trouvé"
+    }
+  },
+  "administrationRoute": {
+    "title": {
+      "singular": "Voie d'Administration",
+      "plural": "Voies d'Administration"
+    },
+    "subtitle": "Gestion des voies d'administration des produits vétérinaires",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "ORAL, SC, IM, IV...",
+      "name": "Voie orale, Injection sous-cutanée...",
+      "description": "Description de la voie d'administration..."
+    },
+    "actions": {
+      "create": "Créer une voie d'administration",
+      "edit": "Modifier la voie d'administration",
+      "delete": "Supprimer la voie d'administration",
+      "restore": "Restaurer la voie d'administration"
+    },
+    "search": {
+      "placeholder": "Rechercher une voie d'administration..."
+    },
+    "messages": {
+      "created": "Voie d'administration créée avec succès",
+      "updated": "Voie d'administration mise à jour avec succès",
+      "deleted": "Voie d'administration supprimée avec succès",
+      "restored": "Voie d'administration restaurée avec succès",
+      "noResults": "Aucune voie d'administration trouvée"
     }
   },
   "campaigns": {

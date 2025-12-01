@@ -135,6 +135,7 @@
       "activeSubstances": "Active Substances",
       "productCategories": "Product Categories",
       "units": "Units of Measure",
+      "administrationRoutes": "Administration Routes",
       "species": "Species",
       "countries": "Countries",
       "products": "Veterinary Products"
@@ -660,6 +661,58 @@
       "deleted": "Country deleted successfully",
       "restored": "Country restored successfully",
       "noResults": "No country found"
+    }
+  },
+  "administrationRoute": {
+    "title": {
+      "singular": "Administration Route",
+      "plural": "Administration Routes"
+    },
+    "subtitle": "Management of veterinary product administration routes",
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, hyphens and underscores"
+      },
+      "name": {
+        "required": "Name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "placeholders": {
+      "code": "ORAL, SC, IM, IV...",
+      "name": "Oral route, Subcutaneous injection...",
+      "description": "Administration route description..."
+    },
+    "actions": {
+      "create": "Create administration route",
+      "edit": "Edit administration route",
+      "delete": "Delete administration route",
+      "restore": "Restore administration route"
+    },
+    "search": {
+      "placeholder": "Search for an administration route..."
+    },
+    "messages": {
+      "created": "Administration route created successfully",
+      "updated": "Administration route updated successfully",
+      "deleted": "Administration route deleted successfully",
+      "restored": "Administration route restored successfully",
+      "noResults": "No administration route found"
     }
   },
   "errors": {
