@@ -41,6 +41,7 @@ import {
   updateVeterinarianSchema,
   type VeterinarianFormData,
   type UpdateVeterinarianFormData,
+  MAX_SPECIALTIES,
 } from '@/lib/validation/schemas/admin/veterinarian.schema'
 import type { Veterinarian } from '@/lib/types/admin/veterinarian'
 import { useTranslations } from 'next-intl'
@@ -75,6 +76,8 @@ export function VeterinarianFormDialog({
     reset,
     control,
   } = useForm<VeterinarianFormData | UpdateVeterinarianFormData>({
+    // Note: 'as any' requis car zodResolver ne peut pas inférer le type union
+    // avec schémas conditionnels. Pattern standard pour formulaires create/edit.
     resolver: zodResolver(
       isEditMode ? updateVeterinarianSchema : veterinarianSchema
     ) as any,
@@ -293,7 +296,7 @@ export function VeterinarianFormDialog({
                 variant="outline"
                 size="sm"
                 onClick={() => append('')}
-                disabled={loading || fields.length >= 10}
+                disabled={loading || fields.length >= MAX_SPECIALTIES}
               >
                 <Plus className="h-4 w-4 mr-1" />
                 {t('actions.addSpecialty')}
