@@ -77,7 +77,7 @@ export function VeterinarianFormDialog({
     reset,
     control,
   } = useForm<VeterinarianFormData>({
-    resolver: zodResolver(veterinarianSchema) as any,
+    resolver: zodResolver(veterinarianSchema),
     defaultValues: {
       code: '',
       firstName: '',
@@ -99,9 +99,8 @@ export function VeterinarianFormDialog({
   })
 
   // useFieldArray pour gérer les spécialités (array dynamique)
-  // Cast du control requis car 'as any' sur zodResolver empêche l'inférence de type
   const { fields, append, remove } = useFieldArray({
-    control: control as Control<VeterinarianFormData>,
+    control,
     name: 'specialties',
   })
 
