@@ -99,8 +99,8 @@ export default function BreedsPage() {
   useEffect(() => {
     const fetchSpecies = async () => {
       try {
-        const response = await speciesService.list({ limit: 100, isActive: true })
-        setSpecies(response.data)
+        const response = await speciesService.getAll({ limit: 100 })
+        setSpecies(response.data.filter((s) => s.isActive))
       } catch (error) {
         console.error('Failed to load species:', error)
       }

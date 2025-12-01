@@ -1030,6 +1030,32 @@ import { Switch } from '@/components/ui/switch'  // ❌ N'existe pas
 - [ ] Le chemin suit la convention `@/` du projet
 - [ ] L'import est documenté dans cette section ou utilisé ailleurs
 
+**⚠️ ATTENTION : Inconsistance API - speciesService**
+
+Le `speciesService` utilise une nomenclature différente des autres services :
+
+```typescript
+// ❌ ERREUR - speciesService n'a PAS de méthode list()
+const response = await speciesService.list({ limit: 100 })  // ❌ Property 'list' does not exist
+
+// ✅ CORRECT - speciesService utilise getAll()
+const response = await speciesService.getAll({ limit: 100 })  // ✅ Fonctionne
+
+// Filtrer les espèces actives manuellement
+const activeSpecies = response.data.filter((s) => s.isActive)
+
+// Autres services utilisent list() (pattern standard)
+const breeds = await breedsService.list({ limit: 100 })        // ✅ Fonctionne
+const ageCategories = await ageCategoriesService.list({ ... }) // ✅ Fonctionne
+```
+
+**Pourquoi cette différence ?**
+- `speciesService` a été implémenté avec `getAll()` (ancienne convention)
+- Les services plus récents (breeds, age-categories) utilisent `list()` (nouvelle convention)
+- **Toujours vérifier la signature** du service avant utilisation
+
+**Pattern recommandé pour nouveaux services** : Utiliser `list()` au lieu de `getAll()`
+
 ---
 
 ## 7. Composants React
