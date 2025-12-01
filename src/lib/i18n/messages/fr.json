@@ -66,7 +66,8 @@
       "firstPage": "Première page",
       "previousPage": "Page précédente",
       "nextPage": "Page suivante",
-      "lastPage": "Dernière page"
+      "lastPage": "Dernière page",
+      "totalItems": "{count, plural, =0 {Aucun élément} one {# élément} other {# éléments}}"
     },
     "table": {
       "actions": "Actions",
@@ -84,7 +85,9 @@
     },
     "placeholders": {
       "select": "Sélectionner",
-      "optional": "Optionnel"
+      "optional": "Optionnel",
+      "name": "Saisir un nom",
+      "description": "Saisir une description"
     },
     "loading": "Chargement...",
     "admin": {
@@ -127,6 +130,8 @@
     "admin": {
       "title": "Administration",
       "activeSubstances": "Substances Actives",
+      "productCategories": "Catégories de Produits",
+      "units": "Unités de Mesure",
       "products": "Produits Vétérinaires"
     }
   },
@@ -412,6 +417,115 @@
       "powder": "Poudre",
       "suspension": "Suspension",
       "tablet": "Comprimé"
+    }
+  },
+  "productCategory": {
+    "title": {
+      "singular": "Catégorie de Produit",
+      "plural": "Catégories de Produits"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "actions": {
+      "create": "Créer une catégorie",
+      "edit": "Modifier la catégorie",
+      "delete": "Supprimer la catégorie",
+      "restore": "Restaurer la catégorie"
+    },
+    "messages": {
+      "created": "Catégorie créée avec succès",
+      "updated": "Catégorie mise à jour avec succès",
+      "deleted": "Catégorie supprimée avec succès",
+      "restored": "Catégorie restaurée avec succès",
+      "createError": "Erreur lors de la création de la catégorie",
+      "updateError": "Erreur lors de la mise à jour de la catégorie",
+      "deleteError": "Erreur lors de la suppression de la catégorie",
+      "confirmDelete": "Voulez-vous vraiment supprimer la catégorie «{name}» ?",
+      "noResults": "Aucune catégorie trouvée"
+    }
+  },
+  "unit": {
+    "title": {
+      "singular": "Unité de Mesure",
+      "plural": "Unités de Mesure"
+    },
+    "subtitle": "Gestion des unités de mesure (poids, volume, concentration)",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "symbol": "Symbole",
+      "type": "Type",
+      "isActive": "Actif"
+    },
+    "types": {
+      "WEIGHT": "Poids",
+      "VOLUME": "Volume",
+      "CONCENTRATION": "Concentration"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "symbol": {
+        "required": "Le symbole est requis",
+        "maxLength": "Le symbole ne doit pas dépasser 20 caractères"
+      },
+      "type": {
+        "invalid": "Type invalide"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "MG, ML, KG...",
+      "name": "Milligramme, Millilitre...",
+      "symbol": "mg, ml, kg..."
+    },
+    "actions": {
+      "create": "Créer une unité",
+      "edit": "Modifier l'unité",
+      "delete": "Supprimer l'unité",
+      "restore": "Restaurer l'unité"
+    },
+    "search": {
+      "placeholder": "Rechercher une unité..."
+    },
+    "messages": {
+      "created": "Unité créée avec succès",
+      "updated": "Unité mise à jour avec succès",
+      "deleted": "Unité supprimée avec succès",
+      "restored": "Unité restaurée avec succès",
+      "noResults": "Aucune unité trouvée"
     }
   },
   "campaigns": {

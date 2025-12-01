@@ -66,7 +66,8 @@
       "firstPage": "الصفحة الأولى",
       "previousPage": "الصفحة السابقة",
       "nextPage": "الصفحة التالية",
-      "lastPage": "الصفحة الأخيرة"
+      "lastPage": "الصفحة الأخيرة",
+      "totalItems": "{count, plural, =0 {لا توجد عناصر} one {عنصر واحد} other {# عناصر}}"
     },
     "table": {
       "actions": "الإجراءات",
@@ -84,7 +85,9 @@
     },
     "placeholders": {
       "select": "اختر",
-      "optional": "اختياري"
+      "optional": "اختياري",
+      "name": "أدخل اسمًا",
+      "description": "أدخل وصفًا"
     },
     "loading": "جاري التحميل...",
     "admin": {
@@ -127,6 +130,8 @@
     "admin": {
       "title": "الإدارة",
       "activeSubstances": "المواد الفعالة",
+      "productCategories": "فئات المنتجات",
+      "units": "وحدات القياس",
       "products": "المنتجات البيطرية"
     }
   },
@@ -412,6 +417,110 @@
       "powder": "مسحوق",
       "suspension": "معلق",
       "tablet": "قرص"
+    }
+  },
+  "productCategory": {
+    "title": {
+      "singular": "فئة المنتج",
+      "plural": "فئات المنتجات"
+    },
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "actions": {
+      "create": "إنشاء فئة",
+      "edit": "تعديل الفئة",
+      "delete": "حذف الفئة",
+      "restore": "استعادة الفئة"
+    },
+    "messages": {
+      "created": "تم إنشاء الفئة بنجاح",
+      "updated": "تم تحديث الفئة بنجاح",
+      "deleted": "تم حذف الفئة بنجاح",
+      "noResults": "لم يتم العثور على فئات"
+    }
+  },
+  "unit": {
+    "title": {
+      "singular": "وحدة القياس",
+      "plural": "وحدات القياس"
+    },
+    "subtitle": "إدارة وحدات القياس (الوزن، الحجم، التركيز)",
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "symbol": "الرمز المختصر",
+      "type": "النوع",
+      "isActive": "نشط"
+    },
+    "types": {
+      "WEIGHT": "الوزن",
+      "VOLUME": "الحجم",
+      "CONCENTRATION": "التركيز"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "symbol": {
+        "required": "الرمز المختصر مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز المختصر 20 حرفًا"
+      },
+      "type": {
+        "invalid": "نوع غير صالح"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "MG, ML, KG...",
+      "name": "ملليجرام، ملليلتر...",
+      "symbol": "mg, ml, kg..."
+    },
+    "actions": {
+      "create": "إنشاء وحدة",
+      "edit": "تعديل الوحدة",
+      "delete": "حذف الوحدة",
+      "restore": "استعادة الوحدة"
+    },
+    "search": {
+      "placeholder": "البحث عن وحدة..."
+    },
+    "messages": {
+      "created": "تم إنشاء الوحدة بنجاح",
+      "updated": "تم تحديث الوحدة بنجاح",
+      "deleted": "تم حذف الوحدة بنجاح",
+      "restored": "تم استعادة الوحدة بنجاح",
+      "noResults": "لم يتم العثور على وحدات"
     }
   },
   "errors": {
