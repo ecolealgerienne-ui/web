@@ -100,20 +100,26 @@ export default function VeterinariansPage() {
     {
       key: 'specialties',
       header: t('fields.specialties'),
-      render: (vet: Veterinarian) => (
-        <div className="flex flex-wrap gap-1">
-          {vet.specialties.slice(0, 2).map((specialty, idx) => (
-            <Badge key={idx} variant="default" className="text-xs">
-              {specialty}
-            </Badge>
-          ))}
-          {vet.specialties.length > 2 && (
-            <Badge variant="default" className="text-xs">
-              +{vet.specialties.length - 2}
-            </Badge>
-          )}
-        </div>
-      ),
+      render: (vet: Veterinarian) => {
+        const specialties = Array.isArray(vet.specialties) ? vet.specialties : []
+        return (
+          <div className="flex flex-wrap gap-1">
+            {specialties.slice(0, 2).map((specialty, idx) => (
+              <Badge key={idx} variant="default" className="text-xs">
+                {specialty}
+              </Badge>
+            ))}
+            {specialties.length > 2 && (
+              <Badge variant="default" className="text-xs">
+                +{specialties.length - 2}
+              </Badge>
+            )}
+            {specialties.length === 0 && (
+              <span className="text-sm text-muted-foreground">-</span>
+            )}
+          </div>
+        )
+      },
     },
     {
       key: 'clinic',
