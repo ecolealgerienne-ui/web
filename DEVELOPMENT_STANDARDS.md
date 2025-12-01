@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.6
+**Version:** 1.7
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout 3 nouvelles règles suite implémentation National-Campaigns (Règles 8.3.21-23: Gestion dates avec input HTML5, Validation cross-field Zod, Conversion sort order ASC/DESC)
+**Dernière mise à jour:** Ajout règle 8.3.24 suite implémentation Breeds - Structure PaginatedResponse avec meta.total + Correction imports Section 6.5 (tous les types communs dans api.ts)
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -919,6 +919,198 @@ if (error.status === HTTP_STATUS.NOT_FOUND) { /* ... */ }
 
 ---
 
+### 6.5 Imports Standardisés - Chemins Corrects ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS inventer des chemins d'import - Toujours vérifier les imports existants**
+
+**Problème** : Utiliser des chemins d'import incorrects ou inventés cause des erreurs de compilation difficiles à déboguer.
+
+**✅ SOLUTION : Vérifier les imports dans les entités similaires existantes**
+
+```typescript
+// ❌ MAUVAIS - Chemins inventés (n'existent pas)
+import { handleApiError } from '@/lib/utils/error-handler'     // ❌ N'existe pas
+import { useToast } from '@/lib/contexts/toast'                // ❌ Mauvais chemin
+import { Switch } from '@/components/ui/switch'                 // ❌ N'existe pas
+
+// ✅ BON - Chemins vérifiés et corrects
+import { handleApiError } from '@/lib/utils/api-error-handler' // ✅ Existe
+import { useToast } from '@/contexts/toast-context'            // ✅ Existe
+// Utiliser <input type="checkbox"> au lieu de Switch          // ✅ Pattern standard
+```
+
+**Imports Communs Standards (OBLIGATOIRES)** :
+
+```typescript
+// Error handling
+import { handleApiError } from '@/lib/utils/api-error-handler'
+
+// Toast notifications
+import { useToast } from '@/contexts/toast-context'
+
+// Authentication
+import { useAuth } from '@/contexts/auth-context'
+
+// Logging
+import { logger } from '@/lib/utils/logger'
+
+// API Client
+import { apiClient } from '@/lib/api/client'
+
+// Internationalization
+import { useTranslations } from 'next-intl'
+
+// Types communs - TOUS dans api.ts
+import type { BaseEntity, PaginatedResponse, PaginationParams, CrudService } from '@/lib/types/common/api'
+
+// UI Components (shadcn/ui)
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+// Admin Generic Components
+import { DataTable } from '@/components/admin/common/DataTable'
+import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
+```
+
+**Règles de Vérification** :
+
+1. **Consulter les entités similaires** : Regarder Age-Categories, Breeds, Species pour les imports
+   ```bash
+   # Exemple : Trouver le bon import pour handleApiError
+   grep -r "handleApiError" src/lib/hooks/admin/
+   ```
+
+2. **Vérifier l'existence du fichier** :
+   ```bash
+   # Vérifier si le fichier existe
+   ls src/lib/utils/api-error-handler.ts
+   ```
+
+3. **Pattern de recherche** : Si incertain, chercher dans le codebase
+   ```bash
+   # Trouver tous les usages d'un import
+   grep -r "import.*useToast" src/
+   ```
+
+4. **Tester la compilation** : Toujours vérifier que `npm run build` ou `npx tsc --noEmit` passe
+
+**Erreurs Courantes à Éviter** :
+
+```typescript
+// ❌ ERREUR 1 : Chemin trop court
+import { handleApiError } from '@/lib/utils/error'  // ❌ Manque "-handler"
+
+// ✅ CORRECT 1
+import { handleApiError } from '@/lib/utils/api-error-handler'  // ✅
+
+// ❌ ERREUR 2 : Mauvais dossier
+import { useToast } from '@/lib/contexts/toast-context'  // ❌ /lib/ au lieu de /
+
+// ✅ CORRECT 2
+import { useToast } from '@/contexts/toast-context'  // ✅
+
+// ❌ ERREUR 3 : Composant inexistant
+import { Switch } from '@/components/ui/switch'  // ❌ N'existe pas
+
+// ✅ CORRECT 3 : Utiliser pattern standard
+<input type="checkbox" {...register('isActive')} />  // ✅
+```
+
+**Checklist Avant d'Ajouter un Import** :
+
+- [ ] J'ai vérifié dans une entité similaire existante
+- [ ] J'ai confirmé que le fichier existe avec `ls` ou `grep`
+- [ ] J'ai testé la compilation (`npx tsc --noEmit`)
+- [ ] Le chemin suit la convention `@/` du projet
+- [ ] L'import est documenté dans cette section ou utilisé ailleurs
+
+**⚠️ ATTENTION : Inconsistance API - speciesService**
+
+Le `speciesService` utilise une nomenclature différente des autres services :
+
+```typescript
+// ❌ ERREUR - speciesService n'a PAS de méthode list()
+const response = await speciesService.list({ limit: 100 })  // ❌ Property 'list' does not exist
+
+// ✅ CORRECT - speciesService utilise getAll()
+const response = await speciesService.getAll({ limit: 100 })  // ✅ Fonctionne
+
+// Filtrer les espèces actives manuellement
+const activeSpecies = response.data.filter((s) => s.isActive)
+
+// Autres services utilisent list() (pattern standard)
+const breeds = await breedsService.list({ limit: 100 })        // ✅ Fonctionne
+const ageCategories = await ageCategoriesService.list({ ... }) // ✅ Fonctionne
+```
+
+**Pourquoi cette différence ?**
+- `speciesService` a été implémenté avec `getAll()` (ancienne convention)
+- Les services plus récents (breeds, age-categories) utilisent `list()` (nouvelle convention)
+- **Toujours vérifier la signature** du service avant utilisation
+
+**Pattern recommandé pour nouveaux services** : Utiliser `list()` au lieu de `getAll()`
+
+**⚠️ ATTENTION : Badge Component - Variantes Limitées**
+
+Le composant `Badge` n'accepte que 4 variantes spécifiques :
+
+```typescript
+// ✅ Variantes acceptées
+variant: "default" | "destructive" | "warning" | "success"
+
+// ❌ ERREUR - 'secondary' n'existe pas
+<Badge variant="secondary">Inactif</Badge>  // ❌ Type error
+
+// ✅ CORRECT - Pattern pour statut actif/inactif
+{entity.isActive ? (
+  <Badge variant="success">{t('status.active')}</Badge>
+) : (
+  <Badge variant="warning">{t('status.inactive')}</Badge>
+)}
+```
+
+**Mapping Recommandé** :
+- **Active** : `variant="success"` (vert)
+- **Inactive** : `variant="warning"` (jaune)
+- **Error/Deleted** : `variant="destructive"` (rouge)
+- **Neutre** : `variant="default"` ou omis (gris)
+
+**Erreurs Courantes** :
+```typescript
+// ❌ Ces variantes n'existent PAS
+<Badge variant="secondary" />   // ❌ N'existe pas
+<Badge variant="info" />         // ❌ N'existe pas
+<Badge variant="primary" />      // ❌ N'existe pas
+<Badge variant="outline" />      // ❌ N'existe pas
+
+// ✅ Utiliser les 4 variantes existantes
+<Badge variant="default" />      // ✅ Gris
+<Badge variant="success" />      // ✅ Vert
+<Badge variant="warning" />      // ✅ Jaune
+<Badge variant="destructive" />  // ✅ Rouge
+```
+
+**Exemple Complet (Pattern Breeds/Age-Categories)** :
+```typescript
+{
+  key: 'isActive',
+  header: t('fields.isActive'),
+  align: 'center',
+  render: (item) =>
+    item.isActive ? (
+      <Badge variant="success">{t('status.active')}</Badge>
+    ) : (
+      <Badge variant="warning">{t('status.inactive')}</Badge>
+    ),
+}
+```
+
+---
+
 ## 7. Composants React
 
 ### 7.1 Structure d'un Composant
@@ -1356,6 +1548,206 @@ export default function AgeCategoriesPage() {
 - Filtres "Tous / Toutes" dans les listes
 - Option "Aucun / Non sélectionné" dans les formulaires
 - Réinitialisation de sélection
+
+---
+
+### 7.6 Champs Booléens - Pattern Checkbox Standard ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser un composant Switch inexistant**
+
+**Problème** : Le composant `@/components/ui/switch` n'existe pas dans ce projet. Tenter de l'utiliser cause une erreur de compilation.
+
+**✅ SOLUTION : Utiliser `<input type="checkbox">` avec react-hook-form**
+
+```typescript
+// ❌ MAUVAIS - Composant Switch n'existe pas
+import { Switch } from '@/components/ui/switch'  // ❌ Module not found
+
+const isActive = watch('isActive')
+
+<Switch
+  id="isActive"
+  checked={isActive}
+  onCheckedChange={(checked) => setValue('isActive', checked)}
+  disabled={loading}
+/>
+
+// ✅ BON - Input checkbox standard avec react-hook-form
+<div className="flex items-center space-x-2 pt-6">
+  <input
+    type="checkbox"
+    id="isActive"
+    {...register('isActive')}
+    className="h-4 w-4 rounded border-input"
+    disabled={loading}
+  />
+  <Label htmlFor="isActive" className="cursor-pointer">
+    {t('fields.isActive')}
+  </Label>
+</div>
+```
+
+**Pattern Complet pour Champs Booléens** :
+
+**1. Schéma Zod** :
+```typescript
+export const entitySchema = z.object({
+  // ... autres champs
+  isActive: z.boolean().optional(),
+})
+
+export type EntityFormData = {
+  // ... autres champs
+  isActive?: boolean
+}
+```
+
+**2. Valeurs par Défaut du Formulaire** :
+```typescript
+const { register, ... } = useForm<EntityFormData>({
+  resolver: zodResolver(entitySchema),
+  defaultValues: {
+    // ... autres champs
+    isActive: true,  // ✅ Actif par défaut
+  },
+})
+```
+
+**3. Input Checkbox dans le Formulaire** :
+```typescript
+{/* Statut actif */}
+<div className="flex items-center space-x-2 pt-6">
+  <input
+    type="checkbox"
+    id="isActive"
+    {...register('isActive')}
+    className="h-4 w-4 rounded border-input"
+    disabled={loading}
+  />
+  <Label htmlFor="isActive" className="cursor-pointer">
+    {t('fields.isActive')}
+  </Label>
+</div>
+```
+
+**Règles** :
+
+1. **Utiliser `{...register('isActive')}`** directement
+   - ❌ Ne PAS utiliser `watch('isActive')` + `setValue`
+   - ✅ Le register gère automatiquement la valeur
+
+2. **Classes CSS obligatoires** :
+   - Input : `h-4 w-4 rounded border-input`
+   - Wrapper : `flex items-center space-x-2 pt-6`
+   - Label : `cursor-pointer` (pour meilleure UX)
+
+3. **Pré-remplir en mode édition** :
+   ```typescript
+   useEffect(() => {
+     if (entity) {
+       reset({
+         // ... autres champs
+         isActive: entity.isActive,  // ✅ Valeur de l'entité
+       })
+     }
+   }, [entity, reset])
+   ```
+
+4. **Disabled state** : Toujours lier au loading du formulaire
+   ```typescript
+   disabled={loading}
+   ```
+
+**Erreurs Courantes à Éviter** :
+
+```typescript
+// ❌ ERREUR 1 : Importer Switch
+import { Switch } from '@/components/ui/switch'  // ❌ N'existe pas
+
+// ✅ CORRECT 1 : Pas besoin d'import supplémentaire
+// Utiliser <input type="checkbox"> directement
+
+// ❌ ERREUR 2 : Observer et setter manuellement
+const isActive = watch('isActive')
+<Switch
+  checked={isActive}
+  onCheckedChange={(checked) => setValue('isActive', checked)}
+/>
+
+// ✅ CORRECT 2 : Laisser register gérer
+<input type="checkbox" {...register('isActive')} />
+
+// ❌ ERREUR 3 : Oublier les classes CSS
+<input type="checkbox" {...register('isActive')} />  // ❌ Pas de style
+
+// ✅ CORRECT 3 : Classes obligatoires
+<input
+  type="checkbox"
+  {...register('isActive')}
+  className="h-4 w-4 rounded border-input"
+/>
+```
+
+**Exemple Complet (Breeds)** :
+
+```typescript
+// Schema
+export const breedSchema = z.object({
+  code: z.string().min(1),
+  nameFr: z.string().min(1),
+  speciesId: z.string().uuid(),
+  isActive: z.boolean().optional(),  // ✅
+})
+
+// Form Component
+export function BreedFormDialog({ breed, ... }: Props) {
+  const { register, reset, ... } = useForm<BreedFormData>({
+    resolver: zodResolver(breedSchema),
+    defaultValues: {
+      code: '',
+      nameFr: '',
+      speciesId: '',
+      isActive: true,  // ✅ Actif par défaut
+    },
+  })
+
+  // Pré-remplir si édition
+  useEffect(() => {
+    if (breed) {
+      reset({
+        code: breed.code,
+        nameFr: breed.nameFr,
+        speciesId: breed.speciesId,
+        isActive: breed.isActive,  // ✅
+      })
+    }
+  }, [breed, reset])
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* ... autres champs ... */}
+
+      {/* Statut actif */}
+      <div className="flex items-center space-x-2 pt-6">
+        <input
+          type="checkbox"
+          id="isActive"
+          {...register('isActive')}
+          className="h-4 w-4 rounded border-input"
+          disabled={loading}
+        />
+        <Label htmlFor="isActive" className="cursor-pointer">
+          {t('fields.isActive')}
+        </Label>
+      </div>
+    </form>
+  )
+}
+```
+
+**Cas d'usage typiques** :
+- `isActive` : Statut actif/inactif d'une entité
+- Tout champ booléen dans les formulaires admin (isPublic, isDefault, etc.)
 
 ---
 
@@ -3386,6 +3778,126 @@ export interface NationalCampaignFilterParams {
 - [ ] Spécifier `path` dans refine pour cibler le bon champ d'erreur
 - [ ] Convertir sort order : `.toLowerCase()` pour DataTable, `.toUpperCase()` pour backend
 - [ ] Afficher dates avec `toLocaleDateString('fr-FR')` dans les tableaux
+
+#### 8.3.24 Structure de PaginatedResponse - Accès via meta.total ⚠️ RÈGLE CRITIQUE
+
+✅ **RÈGLE OBLIGATOIRE** : `PaginatedResponse<T>` utilise `meta.total`, PAS `total` directement
+
+**Problème :**
+L'interface `PaginatedResponse<T>` a changé de structure. Le total n'est plus à la racine mais dans l'objet `meta`.
+
+**Structure correcte de PaginatedResponse :**
+
+```typescript
+// /src/lib/types/common/api.ts
+export interface PaginationMeta {
+  total: number        // ✅ Total d'éléments
+  page: number         // Page actuelle
+  limit: number        // Éléments par page
+  totalPages: number   // Nombre total de pages
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]            // ✅ Array des données
+  meta: PaginationMeta // ✅ Métadonnées dans un objet 'meta'
+}
+```
+
+**Pattern correct dans les services :**
+
+```typescript
+// ✅ CORRECT : Accès via response.meta.total
+async getAll(params: FilterParams = {}): Promise<PaginatedResponse<MyEntity>> {
+  const response = await apiClient.get<PaginatedResponse<MyEntity>>(
+    `${this.basePath}?${queryParams.toString()}`
+  )
+
+  logger.info('Entities fetched', {
+    total: response.meta.total,    // ✅ Accès via .meta
+    page: response.meta.page,      // ✅
+    totalPages: response.meta.totalPages  // ✅
+  })
+
+  return response
+}
+```
+
+**Pattern correct dans les hooks :**
+
+```typescript
+// ✅ CORRECT : Extraction via response.meta.total
+const fetchEntities = useCallback(async () => {
+  setLoading(true)
+  try {
+    const response = await myEntityService.getAll(params)
+    setData(response.data)           // ✅ Array directement
+    setTotal(response.meta.total)    // ✅ Total via .meta
+  } catch (error) {
+    handleApiError(error, 'entities.fetch', toast)
+  } finally {
+    setLoading(false)
+  }
+}, [params, toast])
+```
+
+**❌ Erreurs courantes :**
+
+```typescript
+// ❌ ERREUR 1 : Accès direct à response.total (n'existe pas)
+const response = await myService.getAll(params)
+setTotal(response.total)  // ❌ Property 'total' does not exist on type 'PaginatedResponse<T>'
+
+// ✅ CORRECT 1
+setTotal(response.meta.total)  // ✅
+
+// ❌ ERREUR 2 : Logger response.total
+logger.info('Entities fetched', {
+  total: response.total  // ❌ Undefined
+})
+
+// ✅ CORRECT 2
+logger.info('Entities fetched', {
+  total: response.meta.total  // ✅
+})
+
+// ❌ ERREUR 3 : Déstructuration incorrecte
+const { data, total } = await myService.getAll()  // ❌ total undefined
+
+// ✅ CORRECT 3
+const { data, meta } = await myService.getAll()
+const total = meta.total  // ✅
+
+// Ou directement
+const response = await myService.getAll()
+setData(response.data)
+setTotal(response.meta.total)
+```
+
+**Types d'erreur TypeScript :**
+
+```
+Property 'total' does not exist on type 'PaginatedResponse<Breed>'.
+```
+
+**Raison du changement :**
+- Séparation des données et des métadonnées
+- Structure plus évolutive (ajout de nouvelles métadonnées sans polluer la racine)
+- Cohérence avec les standards REST modernes
+
+**Impact violation :**
+- ❌ Build error TypeScript
+- ❌ `total` sera `undefined` au runtime
+- ❌ Pagination cassée (affichage "0 résultats" même si données présentes)
+- ❌ Logs incorrects
+
+**Checklist PaginatedResponse :**
+- [ ] Import `PaginatedResponse<T>` depuis `@/lib/types/common/api`
+- [ ] Accéder au total via `response.meta.total` (pas `response.total`)
+- [ ] Accéder à la page via `response.meta.page`
+- [ ] Accéder au nombre de pages via `response.meta.totalPages`
+- [ ] Dans les hooks : `setTotal(response.meta.total)`
+- [ ] Dans les logs : `total: response.meta.total`
+- [ ] Vérifier avec `npx tsc --noEmit` avant commit
 
 ---
 
