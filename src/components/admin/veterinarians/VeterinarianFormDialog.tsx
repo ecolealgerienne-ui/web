@@ -99,7 +99,8 @@ export function VeterinarianFormDialog({
   })
 
   // useFieldArray pour gérer les spécialités (array dynamique)
-  const { fields, append, remove } = useFieldArray({
+  // Type explicite requis à cause du 'as any' sur zodResolver
+  const { fields, append, remove } = useFieldArray<VeterinarianFormData, 'specialties', 'id'>({
     control,
     name: 'specialties',
   })
