@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.7
+**Version:** 1.8
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout règle 8.3.24 suite implémentation Breeds - Structure PaginatedResponse avec meta.total + Correction imports Section 6.5 (tous les types communs dans api.ts)
+**Dernière mise à jour:** Ajout règle 5.5 suite implémentation Breeds - Messages d'erreur Zod avec clés relatives (sans préfixe entité) pour éviter duplication avec useTranslations()
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -726,6 +726,121 @@ export const updateAgeCategorySchema = ageCategoryBaseSchema
     (data) => !data.ageMaxDays || data.ageMaxDays > data.ageMinDays,
     { message: 'ageMaxDays must be greater than ageMinDays', path: ['ageMaxDays'] }
   )
+```
+
+### 5.5 Messages d'Erreur Zod : Clés Relatives (Sans Préfixe Entité) ⚠️ RÈGLE CRITIQUE
+
+✅ **RÈGLE OBLIGATOIRE** : Les messages d'erreur Zod doivent être des clés i18n **RELATIVES** (sans préfixe d'entité)
+
+**Problème :**
+Quand on utilise `useTranslations('breed')`, le fonction `t()` ajoute automatiquement le préfixe `breed.` aux clés.
+Si le message Zod contient déjà `'breed.validation.code.required'`, alors `t('breed.validation.code.required')` cherche `breed.breed.validation.code.required` → MISSING_MESSAGE.
+
+**✅ Pattern CORRECT :**
+
+```typescript
+// /src/lib/validation/schemas/admin/breed.schema.ts
+import { z } from 'zod'
+
+export const breedSchema = z.object({
+  code: z.string()
+    .min(1, 'validation.code.required')        // ✅ Clé RELATIVE (sans 'breed.')
+    .max(50, 'validation.code.maxLength'),
+
+  nameFr: z.string()
+    .min(1, 'validation.nameFr.required')      // ✅ RELATIVE
+    .max(200, 'validation.nameFr.maxLength'),
+
+  speciesId: z.string()
+    .min(1, 'validation.speciesId.required')   // ✅ RELATIVE
+    .uuid('validation.speciesId.invalid'),
+})
+
+// Dans le composant
+const t = useTranslations('breed')  // Namespace = 'breed'
+
+{errors.code && (
+  <p>{t(errors.code.message!)}</p>
+  // t('validation.code.required') → cherche 'breed.validation.code.required' ✅
+)}
+```
+
+**❌ Pattern INCORRECT :**
+
+```typescript
+// ❌ ERREUR : Messages avec préfixe complet
+export const breedSchema = z.object({
+  code: z.string()
+    .min(1, 'breed.validation.code.required')    // ❌ Préfixe 'breed.' inclus
+})
+
+// Dans le composant
+const t = useTranslations('breed')
+
+{errors.code && (
+  <p>{t(errors.code.message!)}</p>
+  // t('breed.validation.code.required') → cherche 'breed.breed.validation.code.required' ❌
+  // ERREUR: MISSING_MESSAGE
+)}
+```
+
+**Structure i18n correspondante :**
+
+```json
+{
+  "breed": {
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      }
+    }
+  }
+}
+```
+
+**Raison :**
+- `useTranslations('entity')` ajoute automatiquement le préfixe `'entity.'`
+- Messages Zod doivent être compatibles avec ce mécanisme
+- Évite la duplication du préfixe (entity.entity.validation.*)
+
+**Impact violation :**
+- ❌ Erreur runtime : `MISSING_MESSAGE: Could not resolve 'breed.breed.validation.code.required'`
+- ❌ Messages de validation non traduits affichés aux utilisateurs
+- ❌ Expérience utilisateur dégradée
+
+**Checklist messages Zod :**
+- [ ] Messages Zod utilisent clés **RELATIVES** : `'validation.field.error'` (sans préfixe entité)
+- [ ] Dans composant : `useTranslations('entity')` + `t(error.message!)`
+- [ ] Traductions dans `fr.json` : `entity.validation.field.error`
+- [ ] Tester la validation pour vérifier que les messages s'affichent correctement
+- [ ] Aucune erreur MISSING_MESSAGE dans la console
+
+**Pattern cohérent dans tous les schémas :**
+
+```typescript
+// age-category.schema.ts
+speciesId: z.string()
+  .min(1, 'validation.speciesId.required')   // ✅ Pas 'ageCategory.validation...'
+
+// breed.schema.ts
+code: z.string()
+  .min(1, 'validation.code.required')        // ✅ Pas 'breed.validation...'
+
+// product.schema.ts
+name: z.string()
+  .min(1, 'validation.name.required')        // ✅ Pas 'product.validation...'
 ```
 
 ---
