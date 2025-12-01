@@ -715,6 +715,128 @@
       "noResults": "No administration route found"
     }
   },
+  "veterinarian": {
+    "title": {
+      "singular": "Veterinarian",
+      "plural": "Veterinarians"
+    },
+    "subtitle": "Management of professional veterinarians catalog",
+    "fields": {
+      "code": "Code",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "fullName": "Full Name",
+      "licenseNumber": "License Number",
+      "specialties": "Specialties",
+      "clinic": "Clinic",
+      "contactInfo": "Contact Information",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, dashes and underscores"
+      },
+      "firstName": {
+        "required": "First name is required",
+        "maxLength": "First name must not exceed 100 characters"
+      },
+      "lastName": {
+        "required": "Last name is required",
+        "maxLength": "Last name must not exceed 100 characters"
+      },
+      "licenseNumber": {
+        "required": "License number is required",
+        "maxLength": "License number must not exceed 50 characters",
+        "pattern": "License number must contain only uppercase letters, numbers and dashes"
+      },
+      "specialties": {
+        "required": "At least one specialty is required",
+        "maxItems": "You cannot add more than 10 specialties",
+        "item": {
+          "required": "Specialty cannot be empty",
+          "maxLength": "Specialty must not exceed 100 characters"
+        }
+      },
+      "clinic": {
+        "maxLength": "Clinic name must not exceed 200 characters"
+      },
+      "contactInfo": {
+        "phone": {
+          "required": "Phone number is required",
+          "maxLength": "Phone number must not exceed 20 characters",
+          "pattern": "Phone number contains invalid characters"
+        },
+        "mobile": {
+          "maxLength": "Mobile number must not exceed 20 characters",
+          "pattern": "Mobile number contains invalid characters"
+        },
+        "email": {
+          "invalid": "Email address is invalid",
+          "maxLength": "Email address must not exceed 100 characters"
+        },
+        "address": {
+          "maxLength": "Address must not exceed 200 characters"
+        },
+        "city": {
+          "maxLength": "City must not exceed 100 characters"
+        },
+        "postalCode": {
+          "maxLength": "Postal code must not exceed 20 characters"
+        },
+        "country": {
+          "maxLength": "Country must not exceed 100 characters"
+        }
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "placeholders": {
+      "code": "VET001, VET-US-123...",
+      "firstName": "John",
+      "lastName": "Doe",
+      "licenseNumber": "VET-US-12345",
+      "specialties": "Surgery, Dermatology...",
+      "clinic": "Central Veterinary Clinic",
+      "phone": "+1 234 567 8900",
+      "mobile": "+1 234 567 8901",
+      "email": "john.doe@vet-clinic.com",
+      "address": "123 Main Street",
+      "city": "New York",
+      "postalCode": "10001",
+      "country": "United States"
+    },
+    "actions": {
+      "create": "Create veterinarian",
+      "edit": "Edit veterinarian",
+      "delete": "Delete veterinarian",
+      "restore": "Restore veterinarian",
+      "addSpecialty": "Add specialty"
+    },
+    "search": {
+      "placeholder": "Search for a veterinarian..."
+    },
+    "messages": {
+      "created": "Veterinarian created successfully",
+      "updated": "Veterinarian updated successfully",
+      "deleted": "Veterinarian deleted successfully",
+      "restored": "Veterinarian restored successfully",
+      "createError": "Error creating veterinarian",
+      "updateError": "Error updating veterinarian",
+      "deleteError": "Error deleting veterinarian",
+      "noResults": "No veterinarian found"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",
