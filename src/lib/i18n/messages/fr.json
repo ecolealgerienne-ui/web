@@ -588,6 +588,79 @@
       "noResults": "Aucune espèce trouvée"
     }
   },
+  "country": {
+    "title": {
+      "singular": "Pays",
+      "plural": "Pays"
+    },
+    "subtitle": "Gestion du référentiel géographique des pays",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "isoCode2": "Code ISO 2",
+      "isoCode3": "Code ISO 3",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom en anglais est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom en arabe est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "isoCode2": {
+        "required": "Le code ISO 2 est requis",
+        "length": "Le code ISO 2 doit contenir exactement 2 caractères",
+        "pattern": "Le code ISO 2 doit contenir uniquement des lettres majuscules"
+      },
+      "isoCode3": {
+        "required": "Le code ISO 3 est requis",
+        "length": "Le code ISO 3 doit contenir exactement 3 caractères",
+        "pattern": "Le code ISO 3 doit contenir uniquement des lettres majuscules"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "DZA, FRA, MAR...",
+      "nameFr": "Algérie, France, Maroc...",
+      "nameEn": "Algeria, France, Morocco...",
+      "nameAr": "الجزائر، فرنسا، المغرب...",
+      "isoCode2": "DZ, FR, MA...",
+      "isoCode3": "DZA, FRA, MAR..."
+    },
+    "actions": {
+      "create": "Créer un pays",
+      "edit": "Modifier le pays",
+      "delete": "Supprimer le pays",
+      "restore": "Restaurer le pays"
+    },
+    "search": {
+      "placeholder": "Rechercher un pays..."
+    },
+    "messages": {
+      "created": "Pays créé avec succès",
+      "updated": "Pays mis à jour avec succès",
+      "deleted": "Pays supprimé avec succès",
+      "restored": "Pays restauré avec succès",
+      "noResults": "Aucun pays trouvé"
+    }
+  },
   "campaigns": {
     "title": "Campagnes",
     "subtitle": "Gérez vos campagnes de vaccination, traitement et pesée",

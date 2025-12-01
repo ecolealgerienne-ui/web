@@ -588,6 +588,79 @@
       "noResults": "No species found"
     }
   },
+  "country": {
+    "title": {
+      "singular": "Country",
+      "plural": "Countries"
+    },
+    "subtitle": "Geographic reference data management",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Name (French)",
+      "nameEn": "Name (English)",
+      "nameAr": "Name (Arabic)",
+      "isoCode2": "ISO Code 2",
+      "isoCode3": "ISO Code 3",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, hyphens and underscores"
+      },
+      "nameFr": {
+        "required": "French name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "nameEn": {
+        "required": "English name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "nameAr": {
+        "required": "Arabic name is required",
+        "maxLength": "Name must not exceed 200 characters"
+      },
+      "isoCode2": {
+        "required": "ISO 2 code is required",
+        "length": "ISO 2 code must be exactly 2 characters",
+        "pattern": "ISO 2 code must contain only uppercase letters"
+      },
+      "isoCode3": {
+        "required": "ISO 3 code is required",
+        "length": "ISO 3 code must be exactly 3 characters",
+        "pattern": "ISO 3 code must contain only uppercase letters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "placeholders": {
+      "code": "DZA, FRA, MAR...",
+      "nameFr": "Algérie, France, Maroc...",
+      "nameEn": "Algeria, France, Morocco...",
+      "nameAr": "الجزائر، فرنسا، المغرب...",
+      "isoCode2": "DZ, FR, MA...",
+      "isoCode3": "DZA, FRA, MAR..."
+    },
+    "actions": {
+      "create": "Create country",
+      "edit": "Edit country",
+      "delete": "Delete country",
+      "restore": "Restore country"
+    },
+    "search": {
+      "placeholder": "Search for a country..."
+    },
+    "messages": {
+      "created": "Country created successfully",
+      "updated": "Country updated successfully",
+      "deleted": "Country deleted successfully",
+      "restored": "Country restored successfully",
+      "noResults": "No country found"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",
