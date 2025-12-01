@@ -540,6 +540,67 @@ function MyForm() {
 }
 ```
 
+### 5.3 Champs Numériques : Pattern valueAsNumber ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `z.coerce.number()` ou `z.preprocess()` pour les champs numériques**
+
+**Problème** : Ces méthodes causent des erreurs TypeScript où le type est inféré comme `unknown` au lieu de `number`, rendant `zodResolver` incompatible avec `react-hook-form`.
+
+```typescript
+// ❌ MAUVAIS - Cause type 'unknown'
+export const schema = z.object({
+  age: z.coerce.number().min(0),  // ❌ Type inféré = unknown
+  // ou
+  age: z.preprocess(
+    (val) => Number(val),
+    z.number().min(0)
+  ),  // ❌ Type inféré = unknown
+})
+
+// ✅ BON - Type number garanti
+export const schema = z.object({
+  age: z.number().min(0),  // ✅ Type inféré = number
+})
+
+// Dans le composant React
+<Input
+  type="number"
+  {...register('age', { valueAsNumber: true })}  // ✅ Convertit automatiquement
+/>
+```
+
+**Règles pour les champs numériques :**
+
+1. **Schéma Zod** : Utiliser `z.number()` simple
+   ```typescript
+   ageMinDays: z.number()
+     .int('validation.integer')
+     .min(0, 'validation.min')
+   ```
+
+2. **Formulaire** : Ajouter `valueAsNumber: true`
+   ```typescript
+   <Input type="number" {...register('ageMinDays', { valueAsNumber: true })} />
+   ```
+
+3. **Messages d'erreur** : `z.number()` n'accepte PAS `required_error`
+   ```typescript
+   // ❌ ERREUR - z.number() ne supporte pas required_error
+   z.number({
+     required_error: 'message',      // ❌ Erreur TypeScript
+     invalid_type_error: 'message'   // ✅ OK (optionnel)
+   })
+
+   // ✅ CORRECT - Utiliser sans options
+   z.number().min(0, 'message')
+   ```
+
+**Cas d'usage typiques :**
+- Âges (en jours, mois, années)
+- Quantités, poids, volumes
+- Ordres d'affichage (displayOrder)
+- Prix, montants
+
 ---
 
 ## 6. TypeScript & Types
@@ -942,6 +1003,87 @@ export function DataTable<T extends BaseEntity>({
 }: DataTableProps<T>) {
   // Generic table implementation
 }
+```
+
+---
+
+### 7.4 React Hooks - Dépendances Exhaustives
+
+⚠️ **RÈGLE OBLIGATOIRE** : Toujours respecter `react-hooks/exhaustive-deps`
+
+**Problème fréquent** : Utiliser un état dans `useEffect` sans l'inclure dans les dépendances
+
+```typescript
+// ❌ MAUVAIS - Warning: React Hook useEffect has missing dependencies
+useEffect(() => {
+  setParams({
+    ...params,  // ❌ 'params' utilisé mais pas dans les dépendances
+    newField: value,
+  })
+}, [value])  // ❌ Manque 'params'
+```
+
+**✅ SOLUTION : Utiliser la forme callback de setState**
+
+```typescript
+// ✅ BON - Évite la dépendance circulaire
+useEffect(() => {
+  setParams((prevParams) => ({
+    ...prevParams,  // ✅ Utilise la valeur précédente
+    newField: value,
+  }))
+}, [value, setParams])  // ✅ Dépendances complètes
+```
+
+**Règles :**
+
+1. **setState avec valeur précédente** : Toujours utiliser la forme callback
+   ```typescript
+   setState((prev) => ({ ...prev, newValue }))  // ✅ Correct
+   setState({ ...state, newValue })             // ❌ Crée dépendance
+   ```
+
+2. **Inclure TOUTES les dépendances** utilisées dans le useEffect
+   ```typescript
+   useEffect(() => {
+     // Si vous utilisez foo, bar, baz
+     doSomething(foo, bar, baz)
+   }, [foo, bar, baz])  // ✅ Toutes incluses
+   ```
+
+3. **Ne JAMAIS désactiver la règle** sans raison TRÈS valable
+   ```typescript
+   // ❌ INTERDIT sauf cas exceptionnel documenté
+   useEffect(() => {
+     // ...
+   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+   ```
+
+4. **Functions dans dépendances** : Utiliser `useCallback`
+   ```typescript
+   const fetchData = useCallback(async () => {
+     // ...
+   }, [dep1, dep2])
+
+   useEffect(() => {
+     fetchData()
+   }, [fetchData])  // ✅ fetchData stable avec useCallback
+   ```
+
+**Exemple complet (Age-Categories) :**
+
+```typescript
+// ✅ Pattern correct pour mettre à jour params selon un filtre
+const [params, setParams] = useState<FilterParams>({ page: 1, limit: 25 })
+const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('')
+
+useEffect(() => {
+  setParams((prevParams) => ({
+    ...prevParams,
+    speciesId: selectedSpeciesId || undefined,
+    page: 1,  // Reset page lors du changement de filtre
+  }))
+}, [selectedSpeciesId, setParams])  // ✅ Toutes les dépendances incluses
 ```
 
 ---
@@ -3338,6 +3480,114 @@ feature/admin-products-crud
 fix/datatable-pagination-bug
 refactor/extract-api-error-handler
 docs/update-development-standards
+```
+
+---
+
+### 11.5 Checklist TypeScript & React (Avant Chaque Commit)
+
+⚠️ **RÈGLE OBLIGATOIRE** : Valider TOUS ces points avant chaque commit
+
+**TypeScript :**
+- [ ] `npm run build` ou `npx tsc --noEmit` passe sans erreur
+- [ ] Aucun type `any` non documenté
+- [ ] Aucun `@ts-ignore` sans commentaire justificatif
+- [ ] Tous les imports résolus correctement
+- [ ] Aucune erreur de type dans les fonctions/composants
+
+**React Hooks :**
+- [ ] Aucun warning `react-hooks/exhaustive-deps`
+- [ ] Tous les `useEffect` ont des dépendances complètes
+- [ ] `setState` utilise la forme callback si dépend de l'état précédent
+- [ ] `useCallback` utilisé pour les fonctions dans les dépendances
+- [ ] Pas de dépendances circulaires
+
+**Zod & Forms :**
+- [ ] Champs numériques : `z.number()` + `valueAsNumber: true`
+- [ ] Pas de `z.coerce.number()` ou `z.preprocess()` pour types simples
+- [ ] Pas de `required_error` dans `z.number()`
+- [ ] Messages d'erreur Zod sont des clés i18n (pas de texte en dur)
+- [ ] Schémas Zod exportent des types explicites (pas seulement `z.infer`)
+
+**i18n :**
+- [ ] Aucun texte en dur dans les composants (labels, messages, placeholders)
+- [ ] Toutes les clés i18n existent dans `messages/fr.json`
+- [ ] Messages d'erreur Zod pointent vers des clés i18n valides
+- [ ] Navigation/menu utilise les clés i18n
+
+**Composants Génériques :**
+- [ ] DataTable utilisé pour toutes les listes admin
+- [ ] DeleteConfirmModal utilisé pour toutes les suppressions
+- [ ] DetailSheet utilisé pour tous les détails
+- [ ] Pas de duplication de ces composants
+
+**API & Services :**
+- [ ] Services étendent `CrudService<T, CreateDto, UpdateDto>`
+- [ ] Utilisation de `apiClient` (pas de fetch direct)
+- [ ] Utilisation de `logger` pour toutes les erreurs
+- [ ] Gestion d'erreurs avec `handleApiError`
+- [ ] Constantes HTTP_STATUS (pas de magic numbers)
+
+**Exemple de processus avant commit :**
+
+```bash
+# 1. Vérifier TypeScript
+npm run build
+# ou pour vérification rapide :
+npx tsc --noEmit
+
+# 2. Vérifier ESLint (warnings hooks, etc.)
+npm run lint
+
+# 3. Si tout passe ✅ :
+git add .
+git commit -m "feat(admin): add Age-Categories CRUD"
+git push
+
+# 4. Si erreurs ❌ :
+# - Corriger TOUTES les erreurs
+# - Re-vérifier (retour à l'étape 1)
+# - ALORS commiter
+```
+
+**Erreurs courantes à éviter :**
+
+```typescript
+// ❌ ERREUR 1 : Missing dependencies
+useEffect(() => {
+  setParams({ ...params, newValue })
+}, [newValue])  // ❌ Manque 'params'
+
+// ✅ CORRECT 1
+useEffect(() => {
+  setParams((prev) => ({ ...prev, newValue }))
+}, [newValue, setParams])  // ✅
+
+// ❌ ERREUR 2 : z.coerce.number() cause type 'unknown'
+z.object({
+  age: z.coerce.number().min(0)  // ❌ Type inféré = unknown
+})
+
+// ✅ CORRECT 2
+z.object({
+  age: z.number().min(0)  // ✅ Type inféré = number
+})
+// Dans le formulaire :
+<Input type="number" {...register('age', { valueAsNumber: true })} />
+
+// ❌ ERREUR 3 : Texte en dur
+<Button>Create</Button>  // ❌
+
+// ✅ CORRECT 3
+const t = useTranslations('entity')
+<Button>{t('actions.create')}</Button>  // ✅
+
+// ❌ ERREUR 4 : Magic numbers HTTP
+if (response.status === 404) { }  // ❌
+
+// ✅ CORRECT 4
+import { HTTP_STATUS } from '@/lib/constants/http-status'
+if (response.status === HTTP_STATUS.NOT_FOUND) { }  // ✅
 ```
 
 ---
