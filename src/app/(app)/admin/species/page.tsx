@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
 import { SpeciesFormDialog } from '@/components/admin/species/SpeciesFormDialog'
 import { useSpecies } from '@/lib/hooks/admin/useSpecies'
 import type { Species } from '@/lib/types/admin/species'
@@ -57,6 +58,8 @@ export default function SpeciesPage() {
   const [editingSpecies, setEditingSpecies] = useState<Species | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingSpecies, setDeletingSpecies] = useState<Species | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   /**
@@ -105,6 +108,11 @@ export default function SpeciesPage() {
   const handleAdd = () => {
     setEditingSpecies(null)
     setFormOpen(true)
+  }
+
+  const handleRowClick = (species: Species) => {
+    setSelectedSpecies(species)
+    setDetailOpen(true)
   }
 
   const handleEdit = (species: Species) => {
@@ -184,6 +192,7 @@ export default function SpeciesPage() {
             onSortChange={(sortBy, sortOrder) =>
               setParams({ ...params, sortBy, sortOrder })
             }
+            onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             loading={loading}
@@ -200,6 +209,48 @@ export default function SpeciesPage() {
         species={editingSpecies}
         onSubmit={handleFormSubmit}
         loading={submitting}
+      />
+
+      {/* Dialog de détail */}
+      <DetailSheet<Species>
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        item={selectedSpecies}
+        title={t('title.singular')}
+        description={selectedSpecies?.name}
+        fields={[
+          { key: 'code', label: t('fields.code') },
+          { key: 'name', label: t('fields.name') },
+          {
+            key: 'description',
+            label: t('fields.description'),
+            render: (value) => value || <span className="text-muted-foreground italic">-</span>
+          },
+          { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
+        ]}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedSpecies) handleEdit(selectedSpecies)
+              }}
+            >
+              {tc('actions.edit')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedSpecies) handleDeleteClick(selectedSpecies)
+              }}
+            >
+              {tc('actions.delete')}
+            </Button>
+          </>
+        }
       />
 
       {/* Modale de confirmation de suppression (RÈGLE #3 + #8.3.3) */}

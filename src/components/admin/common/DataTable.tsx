@@ -115,6 +115,9 @@ interface DataTableProps<T extends BaseEntity> {
   onSortChange?: (sortBy: string, sortOrder: 'asc' | 'desc') => void
 
   // Actions
+  /** Callback clic sur ligne (affichage détail) */
+  onRowClick?: (item: T) => void
+
   /** Callback édition */
   onEdit?: (item: T) => void
 
@@ -174,6 +177,7 @@ export function DataTable<T extends BaseEntity>({
   sortBy,
   sortOrder = 'asc',
   onSortChange,
+  onRowClick,
   onEdit,
   onDelete,
   onView,
@@ -318,7 +322,13 @@ export function DataTable<T extends BaseEntity>({
               data.map((item) => (
                 <TableRow
                   key={item.id}
-                  className={item.deletedAt ? 'opacity-50' : ''}
+                  className={`${item.deletedAt ? 'opacity-50' : ''} ${onRowClick ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''}`}
+                  onClick={(e) => {
+                    // Ne pas déclencher onRowClick si on clique sur un bouton d'action
+                    const target = e.target as HTMLElement
+                    if (target.closest('button')) return
+                    onRowClick?.(item)
+                  }}
                 >
                   {columns.map((column) => (
                     <TableCell
