@@ -49,12 +49,13 @@ class VeterinariansService implements CrudService<Veterinarian, CreateVeterinari
     logger.info('Fetching veterinarians', { params })
 
     // Construire URL avec query params manuellement (RÈGLE 8.3.1)
+    // ⚠️ Backend utilise 'sort' et 'order' (pas 'sortBy' et 'sortOrder')
     const queryParams = new URLSearchParams()
     if (params?.page) queryParams.append('page', String(params.page))
     if (params?.limit) queryParams.append('limit', String(params.limit))
     if (params?.search) queryParams.append('search', params.search)
-    if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
-    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder)
+    if (params?.sortBy) queryParams.append('sort', params.sortBy) // Backend: 'sort'
+    if (params?.sortOrder) queryParams.append('order', params.sortOrder) // Backend: 'order'
     if (params?.includeDeleted) queryParams.append('includeDeleted', 'true')
 
     const url = queryParams.toString()
