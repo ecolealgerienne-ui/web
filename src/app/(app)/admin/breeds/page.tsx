@@ -172,7 +172,7 @@ export default function BreedsPage() {
         breed.isActive ? (
           <Badge variant="success">{t('status.active')}</Badge>
         ) : (
-          <Badge variant="secondary">{t('status.inactive')}</Badge>
+          <Badge variant="warning">{t('status.inactive')}</Badge>
         ),
     },
   ]
