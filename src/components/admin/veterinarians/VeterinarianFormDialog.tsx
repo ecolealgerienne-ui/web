@@ -74,7 +74,7 @@ export function VeterinarianFormDialog({
     formState: { errors },
     reset,
     control,
-  } = useForm<VeterinarianFormData>({
+  } = useForm<VeterinarianFormData | UpdateVeterinarianFormData>({
     resolver: zodResolver(
       isEditMode ? updateVeterinarianSchema : veterinarianSchema
     ) as any,
@@ -99,9 +99,9 @@ export function VeterinarianFormDialog({
   })
 
   // useFieldArray pour gérer les spécialités (array dynamique)
-  const { fields, append, remove } = useFieldArray<VeterinarianFormData>({
+  const { fields, append, remove } = useFieldArray({
     control,
-    name: 'specialties',
+    name: 'specialties' as const,
   })
 
   // Charge les données en mode édition
@@ -151,13 +151,15 @@ export function VeterinarianFormDialog({
     }
   }, [veterinarian, open, reset, isEditMode])
 
-  const handleFormSubmission = async (data: VeterinarianFormData) => {
+  const handleFormSubmission = async (
+    data: VeterinarianFormData | UpdateVeterinarianFormData
+  ) => {
     // Filtrer les spécialités vides
     const cleanedData = {
       ...data,
       specialties: data.specialties?.filter((s) => s.trim() !== '') || [],
     }
-    await onSubmit(cleanedData as any)
+    await onSubmit(cleanedData)
   }
 
   return (
