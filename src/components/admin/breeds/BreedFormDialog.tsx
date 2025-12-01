@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -111,9 +110,6 @@ export function BreedFormDialog({
       isActive: true,
     },
   })
-
-  // Observer le champ isActive pour le Switch
-  const isActive = watch('isActive')
 
   /**
    * Charger les espèces au montage
@@ -320,14 +316,17 @@ export function BreedFormDialog({
           </div>
 
           {/* Statut actif */}
-          <div className="flex items-center space-x-2">
-            <Switch
+          <div className="flex items-center space-x-2 pt-6">
+            <input
+              type="checkbox"
               id="isActive"
-              checked={isActive}
-              onCheckedChange={(checked) => setValue('isActive', checked)}
+              {...register('isActive')}
+              className="h-4 w-4 rounded border-input"
               disabled={loading}
             />
-            <Label htmlFor="isActive">{t('fields.isActive')}</Label>
+            <Label htmlFor="isActive" className="cursor-pointer">
+              {t('fields.isActive')}
+            </Label>
           </div>
 
           {/* Actions */}
