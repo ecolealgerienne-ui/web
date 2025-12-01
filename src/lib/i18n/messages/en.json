@@ -294,6 +294,105 @@
       "noResults": "No active substances found"
     }
   },
+  "product": {
+    "title": {
+      "singular": "Veterinary Product",
+      "plural": "Veterinary Products"
+    },
+    "fields": {
+      "code": "Product Code",
+      "commercialName": "Commercial Name",
+      "laboratoryName": "Laboratory",
+      "therapeuticForm": "Therapeutic Form",
+      "dosage": "Dosage",
+      "packaging": "Packaging",
+      "activeSubstances": "Active Substances",
+      "description": "Description",
+      "usageInstructions": "Usage Instructions",
+      "contraindications": "Contraindications",
+      "storageConditions": "Storage Conditions",
+      "isVeterinaryPrescriptionRequired": "Veterinary Prescription Required",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Product code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, dashes and underscores"
+      },
+      "commercialName": {
+        "required": "Commercial name is required",
+        "maxLength": "Commercial name must not exceed 200 characters"
+      },
+      "laboratoryName": {
+        "required": "Laboratory name is required",
+        "maxLength": "Laboratory name must not exceed 200 characters"
+      },
+      "therapeuticForm": {
+        "required": "Therapeutic form is required",
+        "maxLength": "Therapeutic form must not exceed 100 characters"
+      },
+      "dosage": {
+        "required": "Dosage is required",
+        "maxLength": "Dosage must not exceed 100 characters"
+      },
+      "packaging": {
+        "required": "Packaging is required",
+        "maxLength": "Packaging must not exceed 200 characters"
+      },
+      "activeSubstanceIds": {
+        "required": "At least one active substance is required",
+        "maxLength": "Maximum 10 active substances",
+        "invalidUuid": "Invalid active substance ID"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 2000 characters"
+      },
+      "usageInstructions": {
+        "maxLength": "Instructions must not exceed 2000 characters"
+      },
+      "contraindications": {
+        "maxLength": "Contraindications must not exceed 1000 characters"
+      },
+      "storageConditions": {
+        "maxLength": "Storage conditions must not exceed 500 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      },
+      "noChanges": "No changes detected"
+    },
+    "actions": {
+      "create": "Create product",
+      "edit": "Edit product",
+      "delete": "Delete product",
+      "restore": "Restore product",
+      "selectSubstances": "Select active substances"
+    },
+    "messages": {
+      "created": "Product created successfully",
+      "updated": "Product updated successfully",
+      "deleted": "Product deleted successfully",
+      "restored": "Product restored successfully",
+      "createError": "Error creating product",
+      "updateError": "Error updating product",
+      "deleteError": "Error deleting product",
+      "confirmDelete": "Are you sure you want to delete the product \"{name}\"?",
+      "noResults": "No products found"
+    },
+    "therapeuticForms": {
+      "injectable": "Injectable",
+      "oral": "Oral",
+      "topical": "Topical",
+      "intramammary": "Intramammary",
+      "pour-on": "Pour-On",
+      "bolus": "Bolus",
+      "powder": "Powder",
+      "suspension": "Suspension",
+      "tablet": "Tablet"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",

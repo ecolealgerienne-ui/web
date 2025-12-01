@@ -294,6 +294,105 @@
       "noResults": "لم يتم العثور على مواد فعالة"
     }
   },
+  "product": {
+    "title": {
+      "singular": "منتج بيطري",
+      "plural": "المنتجات البيطرية"
+    },
+    "fields": {
+      "code": "رمز المنتج",
+      "commercialName": "الاسم التجاري",
+      "laboratoryName": "المختبر",
+      "therapeuticForm": "الشكل العلاجي",
+      "dosage": "الجرعة",
+      "packaging": "التغليف",
+      "activeSubstances": "المواد الفعالة",
+      "description": "الوصف",
+      "usageInstructions": "تعليمات الاستخدام",
+      "contraindications": "موانع الاستعمال",
+      "storageConditions": "ظروف التخزين",
+      "isVeterinaryPrescriptionRequired": "وصفة بيطرية مطلوبة",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "رمز المنتج مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفاً",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات فقط"
+      },
+      "commercialName": {
+        "required": "الاسم التجاري مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم التجاري 200 حرف"
+      },
+      "laboratoryName": {
+        "required": "اسم المختبر مطلوب",
+        "maxLength": "يجب ألا يتجاوز اسم المختبر 200 حرف"
+      },
+      "therapeuticForm": {
+        "required": "الشكل العلاجي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الشكل العلاجي 100 حرف"
+      },
+      "dosage": {
+        "required": "الجرعة مطلوبة",
+        "maxLength": "يجب ألا تتجاوز الجرعة 100 حرف"
+      },
+      "packaging": {
+        "required": "التغليف مطلوب",
+        "maxLength": "يجب ألا يتجاوز التغليف 200 حرف"
+      },
+      "activeSubstanceIds": {
+        "required": "مادة فعالة واحدة على الأقل مطلوبة",
+        "maxLength": "10 مواد فعالة كحد أقصى",
+        "invalidUuid": "معرف مادة فعالة غير صالح"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 2000 حرف"
+      },
+      "usageInstructions": {
+        "maxLength": "يجب ألا تتجاوز التعليمات 2000 حرف"
+      },
+      "contraindications": {
+        "maxLength": "يجب ألا تتجاوز موانع الاستعمال 1000 حرف"
+      },
+      "storageConditions": {
+        "maxLength": "يجب ألا تتجاوز ظروف التخزين 500 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقماً صحيحاً",
+        "positive": "يجب أن يكون الإصدار موجباً"
+      },
+      "noChanges": "لم يتم اكتشاف أي تغييرات"
+    },
+    "actions": {
+      "create": "إنشاء منتج",
+      "edit": "تعديل المنتج",
+      "delete": "حذف المنتج",
+      "restore": "استعادة المنتج",
+      "selectSubstances": "اختيار المواد الفعالة"
+    },
+    "messages": {
+      "created": "تم إنشاء المنتج بنجاح",
+      "updated": "تم تحديث المنتج بنجاح",
+      "deleted": "تم حذف المنتج بنجاح",
+      "restored": "تمت استعادة المنتج بنجاح",
+      "createError": "خطأ في إنشاء المنتج",
+      "updateError": "خطأ في تحديث المنتج",
+      "deleteError": "خطأ في حذف المنتج",
+      "confirmDelete": "هل تريد حقاً حذف المنتج \"{name}\"؟",
+      "noResults": "لم يتم العثور على منتجات"
+    },
+    "therapeuticForms": {
+      "injectable": "حقن",
+      "oral": "فموي",
+      "topical": "موضعي",
+      "intramammary": "داخل الضرع",
+      "pour-on": "صب على الظهر",
+      "bolus": "بلعة",
+      "powder": "مسحوق",
+      "suspension": "معلق",
+      "tablet": "قرص"
+    }
+  },
   "errors": {
     "generic": "حدث خطأ",
     "networkError": "خطأ في الاتصال بالخادم",

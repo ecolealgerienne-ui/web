@@ -294,6 +294,105 @@
       "noResults": "Aucune substance active trouvée"
     }
   },
+  "product": {
+    "title": {
+      "singular": "Produit Vétérinaire",
+      "plural": "Produits Vétérinaires"
+    },
+    "fields": {
+      "code": "Code Produit",
+      "commercialName": "Nom Commercial",
+      "laboratoryName": "Laboratoire",
+      "therapeuticForm": "Forme Thérapeutique",
+      "dosage": "Dosage",
+      "packaging": "Conditionnement",
+      "activeSubstances": "Substances Actives",
+      "description": "Description",
+      "usageInstructions": "Instructions d'Utilisation",
+      "contraindications": "Contre-indications",
+      "storageConditions": "Conditions de Stockage",
+      "isVeterinaryPrescriptionRequired": "Prescription Vétérinaire Obligatoire",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code produit est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "commercialName": {
+        "required": "Le nom commercial est requis",
+        "maxLength": "Le nom commercial ne doit pas dépasser 200 caractères"
+      },
+      "laboratoryName": {
+        "required": "Le nom du laboratoire est requis",
+        "maxLength": "Le nom du laboratoire ne doit pas dépasser 200 caractères"
+      },
+      "therapeuticForm": {
+        "required": "La forme thérapeutique est requise",
+        "maxLength": "La forme thérapeutique ne doit pas dépasser 100 caractères"
+      },
+      "dosage": {
+        "required": "Le dosage est requis",
+        "maxLength": "Le dosage ne doit pas dépasser 100 caractères"
+      },
+      "packaging": {
+        "required": "Le conditionnement est requis",
+        "maxLength": "Le conditionnement ne doit pas dépasser 200 caractères"
+      },
+      "activeSubstanceIds": {
+        "required": "Au moins une substance active est requise",
+        "maxLength": "Maximum 10 substances actives",
+        "invalidUuid": "ID de substance active invalide"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 2000 caractères"
+      },
+      "usageInstructions": {
+        "maxLength": "Les instructions ne doivent pas dépasser 2000 caractères"
+      },
+      "contraindications": {
+        "maxLength": "Les contre-indications ne doivent pas dépasser 1000 caractères"
+      },
+      "storageConditions": {
+        "maxLength": "Les conditions de stockage ne doivent pas dépasser 500 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      },
+      "noChanges": "Aucune modification détectée"
+    },
+    "actions": {
+      "create": "Créer un produit",
+      "edit": "Modifier le produit",
+      "delete": "Supprimer le produit",
+      "restore": "Restaurer le produit",
+      "selectSubstances": "Sélectionner les substances actives"
+    },
+    "messages": {
+      "created": "Produit créé avec succès",
+      "updated": "Produit mis à jour avec succès",
+      "deleted": "Produit supprimé avec succès",
+      "restored": "Produit restauré avec succès",
+      "createError": "Erreur lors de la création du produit",
+      "updateError": "Erreur lors de la mise à jour du produit",
+      "deleteError": "Erreur lors de la suppression du produit",
+      "confirmDelete": "Voulez-vous vraiment supprimer le produit «{name}» ?",
+      "noResults": "Aucun produit trouvé"
+    },
+    "therapeuticForms": {
+      "injectable": "Injectable",
+      "oral": "Oral",
+      "topical": "Topique",
+      "intramammary": "Intramammaire",
+      "pour-on": "Pour-On",
+      "bolus": "Bolus",
+      "powder": "Poudre",
+      "suspension": "Suspension",
+      "tablet": "Comprimé"
+    }
+  },
   "campaigns": {
     "title": "Campagnes",
     "subtitle": "Gérez vos campagnes de vaccination, traitement et pesée",
