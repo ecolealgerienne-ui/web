@@ -8,9 +8,9 @@ import { useTranslations } from 'next-intl'
 import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
 import { DetailSheet } from '@/components/admin/common/DetailSheet'
-import { UnitFormDialog } from '@/components/admin/units/UnitFormDialog'
-import { useUnits } from '@/lib/hooks/admin/useUnits'
-import type { Unit, CreateUnitDto, UpdateUnitDto } from '@/lib/types/admin/unit'
+import { SpeciesFormDialog } from '@/components/admin/species/SpeciesFormDialog'
+import { useSpecies } from '@/lib/hooks/admin/useSpecies'
+import type { Species } from '@/lib/types/admin/species'
 import { Badge } from '@/components/ui/badge'
 
 /**
@@ -26,21 +26,19 @@ interface ColumnDef<T> {
 }
 
 /**
- * Page d'administration des unités de mesure
+ * Page d'administration des Espèces
  *
- * ✅ RÈGLE #1 : Aucune valeur en dur (i18n)
  * ✅ RÈGLE #3 : Utilise DataTable générique
+ * ✅ RÈGLE #3 : Utilise Pagination générique
  * ✅ RÈGLE #3 : Utilise DeleteConfirmModal générique
  * ✅ RÈGLE #6 : i18n complet
- * ✅ RÈGLE #8.3.2 : ColumnDef défini localement
- * ✅ RÈGLE #8.3.3 : DeleteConfirmModal avec itemName uniquement
- * ✅ RÈGLE #8.3.13 : Gestion défensive i18n pour enum
+ * ✅ RÈGLE #14.8 : Copié depuis active-substances (modèle de référence)
  *
- * Pattern: Simple Reference Data (suit active-substances)
- * Sprint 1 - Entité 4/5
+ * Suit le modèle pilote Active-Substances (Phase 3)
+ * Sprint 1 - Entité 5/5
  */
-export default function UnitsPage() {
-  const t = useTranslations('unit')
+export default function SpeciesPage() {
+  const t = useTranslations('species')
   const tc = useTranslations('common')
 
   // Hook personnalisé pour CRUD
@@ -53,166 +51,135 @@ export default function UnitsPage() {
     create,
     update,
     delete: deleteItem,
-  } = useUnits()
+  } = useSpecies()
 
   // États locaux pour modales
   const [formOpen, setFormOpen] = useState(false)
-  const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
+  const [editingSpecies, setEditingSpecies] = useState<Species | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deletingUnit, setDeletingUnit] = useState<Unit | null>(null)
+  const [deletingSpecies, setDeletingSpecies] = useState<Species | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null)
+  const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   /**
    * Définition des colonnes du DataTable
    * ✅ RÈGLE #1 : Aucune valeur en dur (i18n pour headers)
-   * ✅ RÈGLE #8.3.13 : Gestion défensive pour enum (unit.type)
    */
-  const columns: ColumnDef<Unit>[] = [
+  const columns: ColumnDef<Species>[] = [
     {
       key: 'code',
       header: t('fields.code'),
       sortable: true,
-      render: (unit: Unit) => (
-        <span className="font-mono font-semibold">{unit.code}</span>
+      render: (species: Species) => (
+        <span className="font-mono font-semibold">{species.code}</span>
       ),
     },
     {
       key: 'name',
       header: t('fields.name'),
       sortable: true,
-      render: (unit: Unit) => (
-        <span className="font-medium">{unit.name}</span>
+      render: (species: Species) => (
+        <span className="font-medium">{species.name}</span>
       ),
     },
     {
-      key: 'symbol',
-      header: t('fields.symbol'),
-      sortable: true,
-      render: (unit: Unit) => (
-        <span className="font-mono text-sm bg-muted px-2 py-0.5 rounded">
-          {unit.symbol}
-        </span>
-      ),
-    },
-    {
-      key: 'type',
-      header: t('fields.type'),
-      sortable: true,
-      render: (unit: Unit) => (
-        <span className="text-sm">
-          {/* ✅ RÈGLE #8.3.13 : Gestion défensive i18n pour enum */}
-          {unit.type ? t(`types.${unit.type}`) : '-'}
+      key: 'description',
+      header: t('fields.description'),
+      render: (species: Species) => (
+        <span className="text-muted-foreground text-sm">
+          {species.description || '-'}
         </span>
       ),
     },
     {
       key: 'isActive',
       header: t('fields.isActive'),
-      render: (unit: Unit) => (
-        <Badge variant={unit.isActive ? 'success' : 'warning'}>
-          {unit.isActive ? tc('status.active') : tc('status.inactive')}
+      render: (species: Species) => (
+        <Badge variant={species.isActive ? 'success' : 'warning'}>
+          {species.isActive ? tc('status.active') : tc('status.inactive')}
         </Badge>
       ),
       align: 'center',
     },
   ]
 
-  /**
-   * Ouvre le formulaire en mode création
-   */
-  const handleCreate = () => {
-    setEditingUnit(null)
+  // Handlers
+  const handleAdd = () => {
+    setEditingSpecies(null)
     setFormOpen(true)
   }
 
-  /**
-   * Affiche le détail d'une unité
-   */
-  const handleRowClick = (unit: Unit) => {
-    setSelectedUnit(unit)
+  const handleRowClick = (species: Species) => {
+    setSelectedSpecies(species)
     setDetailOpen(true)
   }
 
-  /**
-   * Ouvre le formulaire en mode édition
-   */
-  const handleEdit = (unit: Unit) => {
-    setEditingUnit(unit)
+  const handleEdit = (species: Species) => {
+    setEditingSpecies(species)
     setFormOpen(true)
   }
 
-  /**
-   * Ouvre la modale de confirmation de suppression
-   */
-  const handleDeleteClick = (unit: Unit) => {
-    setDeletingUnit(unit)
+  const handleDeleteClick = (species: Species) => {
+    setDeletingSpecies(species)
     setDeleteDialogOpen(true)
   }
 
-  /**
-   * Soumet le formulaire (création ou édition)
-   */
-  const handleSubmit = async (data: CreateUnitDto | UpdateUnitDto) => {
+  const handleDeleteConfirm = async () => {
+    if (!deletingSpecies) return
+
     setSubmitting(true)
     try {
-      if (editingUnit) {
-        // Mode édition - ajouter version pour optimistic locking
-        await update(editingUnit.id, {
-          ...data,
-          version: editingUnit.version || 1,
-        } as UpdateUnitDto)
-      } else {
-        // Mode création
-        await create(data as CreateUnitDto)
-      }
-      setFormOpen(false)
-      setEditingUnit(null)
-    } catch (error) {
-      // L'erreur est déjà gérée par le hook (toast)
+      await deleteItem(deletingSpecies.id)
+      setDeleteDialogOpen(false)
+      setDeletingSpecies(null)
     } finally {
       setSubmitting(false)
     }
   }
 
-  /**
-   * Confirme la suppression
-   */
-  const handleDeleteConfirm = async () => {
-    if (!deletingUnit) return
-
+  const handleFormSubmit = async (
+    data: any
+  ) => {
+    setSubmitting(true)
     try {
-      await deleteItem(deletingUnit.id)
-      setDeleteDialogOpen(false)
-      setDeletingUnit(null)
-    } catch (error) {
-      // L'erreur est déjà gérée par le hook (toast)
+      if (editingSpecies) {
+        // Mode édition
+        await update(editingSpecies.id, {
+          ...data,
+          version: editingSpecies.version || 1,
+        })
+      } else {
+        // Mode création
+        await create(data)
+      }
+      setFormOpen(false)
+      setEditingSpecies(null)
+    } finally {
+      setSubmitting(false)
     }
   }
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t('title.plural')}
-          </h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-3xl font-bold">{t('title.plural')}</h1>
+          <p className="text-muted-foreground mt-1">
             {t('subtitle')}
           </p>
         </div>
-        <Button onClick={handleCreate}>
+        <Button onClick={handleAdd}>
           <Plus className="mr-2 h-4 w-4" />
           {t('actions.create')}
         </Button>
       </div>
 
-      {/* Table - ✅ Wrappée dans Card (RÈGLE #7.2) */}
+      {/* DataTable générique (RÈGLE #3 + #8.3.14) */}
       <Card>
         <CardContent className="pt-6">
-          <DataTable<Unit>
+          <DataTable<Species>
             data={data}
             columns={columns}
             totalItems={total}
@@ -235,31 +202,25 @@ export default function UnitsPage() {
         </CardContent>
       </Card>
 
-      {/* Modale de formulaire */}
-      <UnitFormDialog
+      {/* Formulaire de création/édition */}
+      <SpeciesFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
-        unit={editingUnit}
-        onSubmit={handleSubmit}
+        species={editingSpecies}
+        onSubmit={handleFormSubmit}
         loading={submitting}
       />
 
-      {/* Dialog de détail (RÈGLE #8.3.16) */}
-      <DetailSheet<Unit>
+      {/* Dialog de détail */}
+      <DetailSheet<Species>
         open={detailOpen}
         onOpenChange={setDetailOpen}
-        item={selectedUnit}
+        item={selectedSpecies}
         title={t('title.singular')}
-        description={selectedUnit?.name}
+        description={selectedSpecies?.name}
         fields={[
           { key: 'code', label: t('fields.code') },
           { key: 'name', label: t('fields.name') },
-          { key: 'symbol', label: t('fields.symbol') },
-          {
-            key: 'type',
-            label: t('fields.type'),
-            render: (value) => value ? t(`types.${value}`) : '-'
-          },
           {
             key: 'description',
             label: t('fields.description'),
@@ -273,7 +234,7 @@ export default function UnitsPage() {
               variant="outline"
               onClick={() => {
                 setDetailOpen(false)
-                if (selectedUnit) handleEdit(selectedUnit)
+                if (selectedSpecies) handleEdit(selectedSpecies)
               }}
             >
               {tc('actions.edit')}
@@ -283,7 +244,7 @@ export default function UnitsPage() {
               className="text-destructive"
               onClick={() => {
                 setDetailOpen(false)
-                if (selectedUnit) handleDeleteClick(selectedUnit)
+                if (selectedSpecies) handleDeleteClick(selectedSpecies)
               }}
             >
               {tc('actions.delete')}
@@ -292,12 +253,12 @@ export default function UnitsPage() {
         }
       />
 
-      {/* Modale de suppression - ✅ RÈGLE #8.3.3 : Seulement itemName */}
+      {/* Modale de confirmation de suppression (RÈGLE #3 + #8.3.3) */}
       <DeleteConfirmModal
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        itemName={deletingUnit?.name || ''}
+        itemName={deletingSpecies?.name || ''}
       />
     </div>
   )

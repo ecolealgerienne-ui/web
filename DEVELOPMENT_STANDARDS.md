@@ -363,6 +363,108 @@ function MyComponent() {
 - Clés à plat sans hiérarchie
 - Textes en anglais seulement
 
+### 4.5 Préparation des Clés i18n pour Nouveaux Composants
+
+✅ **Pattern recommandé** : Ajouter TOUTES les clés i18n nécessaires AVANT l'implémentation UI
+
+**Workflow obligatoire :**
+
+1. **Analyser les besoins** - Identifier tous les champs qui seront affichés
+2. **Créer les clés** - Ajouter toutes les clés dans les 3 langues (FR, EN, AR)
+3. **Vérifier la complétude** - S'assurer qu'aucune clé ne manque
+4. **Implémenter l'UI** - Utiliser les clés créées
+
+**Exemple - Ajout d'un DetailSheet pour Products :**
+
+```typescript
+// 1. Analyser: DetailSheet affichera withdrawalPeriodMeat, withdrawalPeriodMilk
+// 2. Créer les clés AVANT l'implémentation:
+
+// fr.json
+{
+  "product": {
+    "fields": {
+      // ... champs existants
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "withdrawalPeriodMilk": "Délai d'attente Lait",
+      "days": "jours"  // Unité de mesure réutilisable
+    }
+  }
+}
+
+// en.json
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "Withdrawal Period Meat",
+      "withdrawalPeriodMilk": "Withdrawal Period Milk",
+      "days": "days"
+    }
+  }
+}
+
+// ar.json
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "فترة السحب اللحوم",
+      "withdrawalPeriodMilk": "فترة السحب الحليب",
+      "days": "أيام"
+    }
+  }
+}
+
+// 3. Vérifier: Toutes les clés sont présentes dans les 3 langues
+// 4. Implémenter: Utiliser les clés dans DetailSheet
+{
+  key: 'withdrawalPeriodMeat',
+  label: t('fields.withdrawalPeriodMeat'),
+  render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+}
+```
+
+**Cas d'usage :**
+- ✅ Ajout d'un nouveau composant (DetailSheet, Form, etc.)
+- ✅ Ajout de nouveaux champs à une entité existante
+- ✅ Création d'une nouvelle entité admin
+- ✅ Ajout de messages d'erreur ou de validation
+
+**Raison :**
+- Éviter les erreurs MISSING_MESSAGE en production
+- Détecter les clés manquantes lors du build TypeScript
+- Assurer la cohérence i18n dès le début
+- Faciliter la revue de code (toutes les traductions visibles)
+
+**Conséquence violation :**
+- Erreur MISSING_MESSAGE au runtime
+- Page blanche ou composant cassé
+- Correctif d'urgence nécessaire en production
+- Perte de temps en debug
+
+**Pattern pour les champs avec unités de mesure :**
+
+Créer des clés séparées pour les unités réutilisables dans `{entity}.fields` ou `common.fields`:
+
+```json
+// ✅ Bon - Unités réutilisables
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "days": "jours",
+      "hours": "heures",
+      "weeks": "semaines"
+    }
+  }
+}
+
+// Utilisation
+render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+
+// ❌ Mauvais - Hardcoder l'unité
+render: (value) => value ? `${value} jours` : '-'
+```
+
 ---
 
 ## 5. Validation des Données
@@ -1904,6 +2006,484 @@ export enum UnitType {
 - Crash runtime avec `MISSING_MESSAGE` error
 - Page blanche pour l'utilisateur
 - Erreur difficile à reproduire (cas edge)
+
+---
+
+#### 8.3.16 Affichage du Détail par Clic sur Ligne (DataTable + DetailSheet)
+
+✅ **Pattern recommandé** : Utiliser `onRowClick` + `DetailSheet` pour afficher le détail d'une entité
+
+**Composants impliqués :**
+
+1. **DataTable.tsx** - Ajouter prop `onRowClick` avec protection des boutons
+2. **DetailSheet.tsx** - Dialog générique pour afficher les détails
+3. **Page component** - Gérer l'état et les handlers
+
+**1. Modification DataTable.tsx :**
+
+```typescript
+interface DataTableProps<T extends BaseEntity> {
+  // ... autres props
+
+  /** Callback clic sur ligne (affichage détail) */
+  onRowClick?: (item: T) => void
+}
+
+// Dans TableRow
+<TableRow
+  key={item.id}
+  className={`${item.deletedAt ? 'opacity-50' : ''} ${
+    onRowClick ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''
+  }`}
+  onClick={(e) => {
+    // Ne pas déclencher onRowClick si on clique sur un bouton d'action
+    const target = e.target as HTMLElement
+    if (target.closest('button')) return
+    onRowClick?.(item)
+  }}
+>
+```
+
+**2. Composant DetailSheet.tsx :**
+
+```typescript
+// /src/components/admin/common/DetailSheet.tsx
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import type { BaseEntity } from '@/lib/types/common/api'
+
+interface DetailField {
+  /** Clé du champ */
+  key: string
+
+  /** Label du champ (clé i18n) */
+  label: string
+
+  /** Render personnalisé de la valeur */
+  render?: (value: any) => React.ReactNode
+
+  /** Type de champ (pour render par défaut) */
+  type?: 'text' | 'date' | 'boolean' | 'badge'
+}
+
+interface DetailSheetProps<T extends BaseEntity> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  item: T | null
+  title: string
+  description?: string
+  fields: DetailField[]
+  actions?: React.ReactNode
+}
+
+export function DetailSheet<T extends BaseEntity>({
+  open,
+  onOpenChange,
+  item,
+  title,
+  description,
+  fields,
+  actions,
+}: DetailSheetProps<T>) {
+  const tc = useTranslations('common')
+
+  if (!item) return null
+
+  const renderValue = (field: DetailField, value: any) => {
+    if (field.render) return field.render(value)
+    if (value === null || value === undefined || value === '') {
+      return <span className="text-muted-foreground italic">-</span>
+    }
+
+    switch (field.type) {
+      case 'date':
+        return new Date(value).toLocaleString('fr-FR', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        })
+      case 'boolean':
+      case 'badge':
+        return value ? (
+          <Badge variant="success">{tc('status.active')}</Badge>
+        ) : (
+          <Badge variant="warning">{tc('status.inactive')}</Badge>
+        )
+      default:
+        return <span>{String(value)}</span>
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+
+        <div className="mt-6 space-y-6">
+          {/* Champs principaux */}
+          <div className="space-y-4">
+            {fields.map((field) => (
+              <div key={field.key} className="space-y-1">
+                <dt className="text-sm font-medium text-muted-foreground">
+                  {field.label}
+                </dt>
+                <dd className="text-base">
+                  {renderValue(field, (item as any)[field.key])}
+                </dd>
+              </div>
+            ))}
+          </div>
+
+          {/* Métadonnées BaseEntity */}
+          <div className="mt-6 pt-6 border-t space-y-4">
+            <h3 className="text-sm font-semibold">{tc('fields.metadata')}</h3>
+
+            {item.createdAt && (
+              <div className="space-y-1">
+                <dt className="text-sm font-medium text-muted-foreground">
+                  {tc('fields.createdAt')}
+                </dt>
+                <dd className="text-sm">
+                  {new Date(item.createdAt).toLocaleString('fr-FR', {
+                    dateStyle: 'long',
+                    timeStyle: 'short',
+                  })}
+                </dd>
+              </div>
+            )}
+
+            {item.updatedAt && (
+              <div className="space-y-1">
+                <dt className="text-sm font-medium text-muted-foreground">
+                  {tc('fields.updatedAt')}
+                </dt>
+                <dd className="text-sm">
+                  {new Date(item.updatedAt).toLocaleString('fr-FR', {
+                    dateStyle: 'long',
+                    timeStyle: 'short',
+                  })}
+                </dd>
+              </div>
+            )}
+
+            {item.version !== undefined && (
+              <div className="space-y-1">
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Version
+                </dt>
+                <dd className="text-sm">
+                  <Badge variant="default">v{item.version}</Badge>
+                </dd>
+              </div>
+            )}
+          </div>
+
+          {/* Actions personnalisées */}
+          {actions && (
+            <div className="mt-6 pt-6 border-t flex gap-2">{actions}</div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+**3. Utilisation dans page.tsx :**
+
+```typescript
+const [detailOpen, setDetailOpen] = useState(false)
+const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null)
+
+const handleRowClick = (species: Species) => {
+  setSelectedSpecies(species)
+  setDetailOpen(true)
+}
+
+// DataTable avec onRowClick
+<DataTable<Species>
+  data={species}
+  columns={columns}
+  totalItems={total}
+  page={page}
+  limit={limit}
+  onPageChange={setPage}
+  onRowClick={handleRowClick}  // ← Clic sur ligne
+  onEdit={handleEdit}
+  onDelete={handleDeleteClick}
+  // ... autres props
+/>
+
+// DetailSheet
+<DetailSheet<Species>
+  open={detailOpen}
+  onOpenChange={setDetailOpen}
+  item={selectedSpecies}
+  title={t('title.singular')}
+  fields={[
+    { key: 'code', label: t('fields.code') },
+    { key: 'name', label: t('fields.name') },
+    {
+      key: 'description',
+      label: t('fields.description'),
+      render: (value) => value || <span className="text-muted-foreground italic">-</span>,
+    },
+    { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
+  ]}
+  actions={
+    <>
+      <Button variant="outline" onClick={() => {
+        setDetailOpen(false)
+        handleEdit(selectedSpecies!)
+      }}>
+        {tc('actions.edit')}
+      </Button>
+      <Button variant="ghost" className="text-destructive" onClick={() => {
+        setDetailOpen(false)
+        handleDeleteClick(selectedSpecies!)
+      }}>
+        {tc('actions.delete')}
+      </Button>
+    </>
+  }
+/>
+```
+
+**Avantages :**
+- ✅ Pattern générique réutilisable pour toutes les entités
+- ✅ Séparation des concerns (DataTable = liste, DetailSheet = détail)
+- ✅ Protection des clics sur boutons (ne déclenche pas onRowClick)
+- ✅ Feedback visuel (cursor-pointer, hover) uniquement si cliquable
+- ✅ Type-safe avec génériques
+- ✅ Métadonnées BaseEntity affichées automatiquement
+
+**Cas d'usage :**
+- ✅ Afficher le détail d'une entité au clic sur ligne
+- ✅ Actions contextuelles dans le DetailSheet (Edit, Delete, Custom)
+- ✅ Render personnalisé pour champs complexes (enums, relations, etc.)
+
+**Conséquence violation :**
+- UX moins intuitive (obligation de cliquer sur bouton "Voir")
+- Code dupliqué si chaque page implémente son propre detail dialog
+- Pas de standardisation du pattern d'affichage des détails
+
+---
+
+#### 8.3.17 Affichage des Champs Relationnels dans DetailSheet
+
+✅ **Pattern recommandé** : Utiliser `render` personnalisé avec Badges pour afficher les relations many-to-many ou one-to-many
+
+**Pattern pour collections (many-to-many, one-to-many) :**
+
+```typescript
+// Dans DetailSheet fields
+{
+  key: 'activeSubstances',
+  label: t('fields.activeSubstances'),
+  render: (value) => value && value.length > 0 ? (
+    <div className="flex flex-wrap gap-1">
+      {value.map((substance: any) => (
+        <Badge key={substance.id} variant="default" className="text-xs">
+          {substance.code} - {substance.name}
+        </Badge>
+      ))}
+    </div>
+  ) : '-'
+}
+```
+
+**Pattern pour relation simple (many-to-one) :**
+
+```typescript
+// Pour afficher une seule relation
+{
+  key: 'category',
+  label: t('fields.category'),
+  render: (value) => value ? (
+    <Badge variant="default">
+      {value.code} - {value.name}
+    </Badge>
+  ) : '-'
+}
+```
+
+**Pattern pour relations avec données supplémentaires :**
+
+```typescript
+// Afficher code + name + info supplémentaire
+{
+  key: 'suppliers',
+  label: t('fields.suppliers'),
+  render: (value) => value && value.length > 0 ? (
+    <div className="flex flex-col gap-1">
+      {value.map((supplier: any) => (
+        <div key={supplier.id} className="flex items-center gap-2">
+          <Badge variant="default" className="text-xs">
+            {supplier.code}
+          </Badge>
+          <span className="text-sm">{supplier.name}</span>
+          <span className="text-xs text-muted-foreground">
+            ({supplier.location})
+          </span>
+        </div>
+      ))}
+    </div>
+  ) : '-'
+}
+```
+
+**Cas d'usage :**
+- ✅ Relations many-to-many (activeSubstances, categories, tags, etc.)
+- ✅ Relations one-to-many (comments, attachments, etc.)
+- ✅ Relations many-to-one avec affichage enrichi
+- ✅ Toute collection d'objets liés à afficher
+
+**Raison :**
+- Affichage visuel clair et structuré des relations
+- Cohérence avec le design system (Badges)
+- Facile à identifier visuellement (code + name)
+- Support des relations vides (affiche '-')
+
+**Conséquence violation :**
+- Affichage brut difficile à lire (ex: [object Object])
+- UX incohérente entre différentes pages
+- Informations importantes masquées (uniquement ID)
+
+**Bonnes pratiques :**
+
+```typescript
+// ✅ Bon - Affichage code + name
+<Badge>{item.code} - {item.name}</Badge>
+
+// ✅ Bon - Vérification de la collection vide
+value && value.length > 0 ? (...) : '-'
+
+// ✅ Bon - Key unique pour chaque Badge
+{value.map((item) => <Badge key={item.id}>...</Badge>)}
+
+// ❌ Mauvais - Afficher uniquement l'ID
+<Badge>{item.id}</Badge>
+
+// ❌ Mauvais - Pas de gestion du cas vide
+value.map((item) => ...) // Crash si value est null/undefined
+```
+
+---
+
+#### 8.3.18 Affichage des Champs Numériques avec Unités
+
+✅ **Pattern recommandé** : Concaténer la valeur avec l'unité traduite via une clé i18n séparée
+
+**Pattern standard :**
+
+```typescript
+// 1. Créer la clé i18n pour l'unité (Règle 4.5)
+// fr.json
+{
+  "product": {
+    "fields": {
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "days": "jours"  // Unité réutilisable
+    }
+  }
+}
+
+// 2. Utiliser dans le render
+{
+  key: 'withdrawalPeriodMeat',
+  label: t('fields.withdrawalPeriodMeat'),
+  render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+}
+```
+
+**Pattern pour unités multiples :**
+
+```typescript
+// Créer plusieurs unités dans common.fields pour réutilisation
+// common.fields dans fr.json
+{
+  "common": {
+    "fields": {
+      "days": "jours",
+      "hours": "heures",
+      "weeks": "semaines",
+      "months": "mois",
+      "years": "ans",
+      "kg": "kg",
+      "liters": "litres",
+      "percent": "%"
+    }
+  }
+}
+
+// Utilisation avec tc (common translation)
+const tc = useTranslations('common')
+
+{
+  key: 'weight',
+  label: t('fields.weight'),
+  render: (value) => value ? `${value} ${tc('fields.kg')}` : '-'
+}
+```
+
+**Pattern pour unités conditionnelles :**
+
+```typescript
+// Afficher l'unité selon le type
+{
+  key: 'quantity',
+  label: t('fields.quantity'),
+  render: (value, item) => {
+    if (!value) return '-'
+    const unit = item.unit?.symbol || tc('fields.units')
+    return `${value} ${unit}`
+  }
+}
+```
+
+**Cas d'usage :**
+- ✅ Durées (days, hours, weeks, months, years)
+- ✅ Poids (kg, g, mg)
+- ✅ Volumes (liters, ml)
+- ✅ Pourcentages
+- ✅ Températures
+- ✅ Toute mesure avec unité
+
+**Raison :**
+- Support multilingue des unités (jours/days/أيام)
+- Réutilisation des clés d'unités communes
+- Cohérence dans l'affichage des mesures
+- Facilite la maintenance (changement d'unité centralisé)
+
+**Conséquence violation :**
+- Unités hardcodées (toujours en français)
+- Duplication des traductions d'unités
+- Non-respect de l'i18n
+- Incohérence entre les entités
+
+**Bonnes pratiques :**
+
+```typescript
+// ✅ Bon - Unité traduite
+render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+
+// ✅ Bon - Unité réutilisable dans common
+render: (value) => value ? `${value} ${tc('fields.kg')}` : '-'
+
+// ✅ Bon - Gestion du cas null/undefined
+render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+
+// ❌ Mauvais - Unité hardcodée
+render: (value) => value ? `${value} jours` : '-'
+
+// ❌ Mauvais - Pas de gestion du null
+render: (value) => `${value} ${t('fields.days')}` // Affiche "undefined jours"
+```
 
 ---
 

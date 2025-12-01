@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useTranslations } from 'next-intl'
 import { DataTable } from '@/components/admin/common/DataTable'
 import { DeleteConfirmModal } from '@/components/admin/common/DeleteConfirmModal'
+import { DetailSheet } from '@/components/admin/common/DetailSheet'
 import { ProductCategoryFormDialog } from '@/components/admin/product-categories/ProductCategoryFormDialog'
 import { useProductCategories } from '@/lib/hooks/admin/useProductCategories'
 import type { ProductCategory } from '@/lib/types/admin/product-category'
@@ -56,6 +57,8 @@ export default function ProductCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState<ProductCategory | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   /**
@@ -106,6 +109,14 @@ export default function ProductCategoriesPage() {
   const handleCreate = () => {
     setEditingCategory(null)
     setFormOpen(true)
+  }
+
+  /**
+   * Affiche le détail d'une catégorie
+   */
+  const handleRowClick = (category: ProductCategory) => {
+    setSelectedCategory(category)
+    setDetailOpen(true)
   }
 
   /**
@@ -196,6 +207,7 @@ export default function ProductCategoriesPage() {
             onSortChange={(sortBy, sortOrder) =>
               setParams({ ...params, sortBy, sortOrder })
             }
+            onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             loading={loading}
@@ -212,6 +224,48 @@ export default function ProductCategoriesPage() {
         category={editingCategory}
         onSubmit={handleSubmit}
         loading={submitting}
+      />
+
+      {/* Dialog de détail (RÈGLE #8.3.16) */}
+      <DetailSheet<ProductCategory>
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        item={selectedCategory}
+        title={t('title.singular')}
+        description={selectedCategory?.name}
+        fields={[
+          { key: 'code', label: t('fields.code') },
+          { key: 'name', label: t('fields.name') },
+          {
+            key: 'description',
+            label: t('fields.description'),
+            render: (value) => value || <span className="text-muted-foreground italic">-</span>
+          },
+          { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
+        ]}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedCategory) handleEdit(selectedCategory)
+              }}
+            >
+              {tc('actions.edit')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => {
+                setDetailOpen(false)
+                if (selectedCategory) handleDeleteClick(selectedCategory)
+              }}
+            >
+              {tc('actions.delete')}
+            </Button>
+          </>
+        }
       />
 
       {/* Modale de suppression */}
