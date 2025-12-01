@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useToast } from '@/contexts/toast-context'
 import { useTranslations } from 'next-intl'
 import { productsService } from '@/lib/services/admin/products.service'
@@ -58,10 +58,19 @@ export function useProducts(
     }
   )
 
+  // Ref pour empêcher les appels concurrents (ne déclenche pas de re-render)
+  const isFetchingRef = useRef(false)
+
   /**
    * Charge les produits avec les paramètres actuels
    */
   const fetchData = useCallback(async () => {
+    // Empêcher les appels concurrents
+    if (isFetchingRef.current) {
+      return
+    }
+
+    isFetchingRef.current = true
     setLoading(true)
     setError(null)
 
@@ -74,6 +83,7 @@ export function useProducts(
       handleApiError(err, 'fetch products', toast)
     } finally {
       setLoading(false)
+      isFetchingRef.current = false
     }
   }, [params, toast])
 

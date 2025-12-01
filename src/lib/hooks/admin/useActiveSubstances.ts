@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useToast } from '@/contexts/toast-context'
 import { useTranslations } from 'next-intl'
 import { activeSubstancesService } from '@/lib/services/admin/active-substances.service'
@@ -55,10 +55,19 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
     }
   )
 
+  // Ref pour empêcher les appels concurrents (ne déclenche pas de re-render)
+  const isFetchingRef = useRef(false)
+
   /**
    * Charge les substances actives avec les paramètres actuels
    */
   const fetchData = useCallback(async () => {
+    // Empêcher les appels concurrents
+    if (isFetchingRef.current) {
+      return
+    }
+
+    isFetchingRef.current = true
     setLoading(true)
     setError(null)
 
@@ -71,6 +80,7 @@ export function useActiveSubstances(initialParams?: PaginationParams) {
       handleApiError(err, 'fetch active substances', toast)
     } finally {
       setLoading(false)
+      isFetchingRef.current = false
     }
   }, [params, toast])
 
