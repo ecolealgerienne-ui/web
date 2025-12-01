@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -23,8 +23,10 @@ const adminMenuItems = [
   { icon: TestTube2, key: "activeSubstances", href: "/admin/active-substances" },
   { icon: Layers, key: "productCategories", href: "/admin/product-categories" },
   { icon: Ruler, key: "units", href: "/admin/units" },
+  { icon: Activity, key: "administrationRoutes", href: "/admin/administration-routes" },
   { icon: Bird, key: "species", href: "/admin/species" },
   { icon: Globe, key: "countries", href: "/admin/countries" },
+  { icon: Stethoscope, key: "veterinarians", href: "/admin/veterinarians" },
   { icon: PackageOpen, key: "products", href: "/admin/products" },
 ];
 

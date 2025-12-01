@@ -83,6 +83,7 @@
     },
     "sections": {
       "mainInfo": "Informations principales",
+      "basicInfo": "Informations de base",
       "additionalInfo": "Informations complémentaires",
       "options": "Options"
     },
@@ -135,8 +136,10 @@
       "activeSubstances": "Substances Actives",
       "productCategories": "Catégories de Produits",
       "units": "Unités de Mesure",
+      "administrationRoutes": "Voies d'Administration",
       "species": "Espèces",
       "countries": "Pays",
+      "veterinarians": "Vétérinaires",
       "products": "Produits Vétérinaires"
     }
   },
@@ -660,6 +663,196 @@
       "deleted": "Pays supprimé avec succès",
       "restored": "Pays restauré avec succès",
       "noResults": "Aucun pays trouvé"
+    }
+  },
+  "administrationRoute": {
+    "title": {
+      "singular": "Voie d'Administration",
+      "plural": "Voies d'Administration"
+    },
+    "subtitle": "Gestion des voies d'administration des produits vétérinaires",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "ORAL, SC, IM, IV...",
+      "name": "Voie orale, Injection sous-cutanée...",
+      "description": "Description de la voie d'administration..."
+    },
+    "actions": {
+      "create": "Créer une voie d'administration",
+      "edit": "Modifier la voie d'administration",
+      "delete": "Supprimer la voie d'administration",
+      "restore": "Restaurer la voie d'administration"
+    },
+    "search": {
+      "placeholder": "Rechercher une voie d'administration..."
+    },
+    "messages": {
+      "created": "Voie d'administration créée avec succès",
+      "updated": "Voie d'administration mise à jour avec succès",
+      "deleted": "Voie d'administration supprimée avec succès",
+      "restored": "Voie d'administration restaurée avec succès",
+      "noResults": "Aucune voie d'administration trouvée"
+    }
+  },
+  "veterinarian": {
+    "title": {
+      "singular": "Vétérinaire",
+      "plural": "Vétérinaires"
+    },
+    "subtitle": "Gestion du catalogue des vétérinaires professionnels",
+    "fields": {
+      "code": "Code",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "fullName": "Nom complet",
+      "licenseNumber": "Numéro de licence",
+      "specialties": "Spécialités",
+      "clinic": "Clinique",
+      "scope": "Portée",
+      "department": "Département",
+      "isAvailable": "Disponible",
+      "emergencyService": "Service d'urgence",
+      "contactInfo": "Coordonnées",
+      "phone": "Téléphone",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Adresse",
+      "city": "Ville",
+      "postalCode": "Code postal",
+      "country": "Pays",
+      "isActive": "Actif"
+    },
+    "scope": {
+      "global": "Global",
+      "local": "Local"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "firstName": {
+        "required": "Le prénom est requis",
+        "maxLength": "Le prénom ne doit pas dépasser 100 caractères"
+      },
+      "lastName": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 100 caractères"
+      },
+      "licenseNumber": {
+        "required": "Le numéro de licence est requis",
+        "maxLength": "Le numéro de licence ne doit pas dépasser 50 caractères",
+        "pattern": "Le numéro de licence doit contenir uniquement des lettres majuscules, chiffres et tirets"
+      },
+      "specialties": {
+        "required": "Au moins une spécialité est requise",
+        "maxItems": "Vous ne pouvez pas ajouter plus de 10 spécialités",
+        "item": {
+          "required": "La spécialité ne peut pas être vide",
+          "maxLength": "La spécialité ne doit pas dépasser 100 caractères"
+        }
+      },
+      "clinic": {
+        "maxLength": "Le nom de la clinique ne doit pas dépasser 200 caractères"
+      },
+      "scope": {
+        "invalid": "La portée doit être 'global' ou 'local'"
+      },
+      "department": {
+        "maxLength": "Le département ne doit pas dépasser 10 caractères"
+      },
+      "contactInfo": {
+        "phone": {
+          "required": "Le numéro de téléphone est requis",
+          "maxLength": "Le numéro de téléphone ne doit pas dépasser 20 caractères",
+          "pattern": "Le numéro de téléphone contient des caractères invalides"
+        },
+        "mobile": {
+          "maxLength": "Le numéro mobile ne doit pas dépasser 20 caractères",
+          "pattern": "Le numéro mobile contient des caractères invalides"
+        },
+        "email": {
+          "invalid": "L'adresse email est invalide",
+          "maxLength": "L'adresse email ne doit pas dépasser 100 caractères"
+        },
+        "address": {
+          "maxLength": "L'adresse ne doit pas dépasser 200 caractères"
+        },
+        "city": {
+          "maxLength": "La ville ne doit pas dépasser 100 caractères"
+        },
+        "postalCode": {
+          "maxLength": "Le code postal ne doit pas dépasser 20 caractères"
+        },
+        "country": {
+          "maxLength": "Le pays ne doit pas dépasser 100 caractères"
+        }
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "VET001, VET-DZ-123...",
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "licenseNumber": "VET-FR-12345",
+      "specialties": "Chirurgie, Dermatologie...",
+      "clinic": "Clinique Vétérinaire Centrale",
+      "scope": "Sélectionnez la portée",
+      "department": "75, 16, DZ-16...",
+      "phone": "+33 1 23 45 67 89",
+      "mobile": "+33 6 12 34 56 78",
+      "email": "jean.dupont@vet-clinic.fr",
+      "address": "123 Rue de la République",
+      "city": "Paris",
+      "postalCode": "75001",
+      "country": "France"
+    },
+    "actions": {
+      "create": "Créer un vétérinaire",
+      "edit": "Modifier le vétérinaire",
+      "delete": "Supprimer le vétérinaire",
+      "restore": "Restaurer le vétérinaire",
+      "addSpecialty": "Ajouter une spécialité"
+    },
+    "search": {
+      "placeholder": "Rechercher un vétérinaire..."
+    },
+    "messages": {
+      "created": "Vétérinaire créé avec succès",
+      "updated": "Vétérinaire mis à jour avec succès",
+      "deleted": "Vétérinaire supprimé avec succès",
+      "restored": "Vétérinaire restauré avec succès",
+      "createError": "Erreur lors de la création du vétérinaire",
+      "updateError": "Erreur lors de la mise à jour du vétérinaire",
+      "deleteError": "Erreur lors de la suppression du vétérinaire",
+      "noResults": "Aucun vétérinaire trouvé"
     }
   },
   "campaigns": {
