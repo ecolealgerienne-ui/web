@@ -58,22 +58,20 @@ class ProductsService
       logger.info('Fetching products', { params })
 
       // Construire l'URL avec les query params
+      // ⚠️ Backend utilise 'sort' et 'order' (pas 'sortBy' et 'sortOrder')
       const queryParams = new URLSearchParams()
       if (params?.page) queryParams.append('page', String(params.page))
       if (params?.limit) queryParams.append('limit', String(params.limit))
-      if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
-      if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder)
+      if (params?.sortBy) queryParams.append('sort', params.sortBy) // Backend: 'sort'
+      if (params?.sortOrder) queryParams.append('order', params.sortOrder) // Backend: 'order'
       if (params?.search) queryParams.append('search', params.search)
-      if (params?.laboratoryName)
-        queryParams.append('laboratoryName', params.laboratoryName)
-      if (params?.therapeuticForm)
-        queryParams.append('therapeuticForm', params.therapeuticForm)
-      if (params?.activeSubstanceId)
-        queryParams.append('activeSubstanceId', params.activeSubstanceId)
-      if (params?.prescriptionRequired !== undefined)
-        queryParams.append('prescriptionRequired', String(params.prescriptionRequired))
-      if (params?.includeInactive)
-        queryParams.append('includeInactive', 'true')
+
+      // TODO: Mapper les filtres quand utilisés dans l'UI
+      // - isActive (boolean)
+      // - scope (global, local, all)
+      // - type (antibiotic, anti_inflammatory, etc.)
+      // - categoryId
+      // - vaccinesOnly
 
       const url = queryParams.toString()
         ? `${this.baseUrl}?${queryParams.toString()}`

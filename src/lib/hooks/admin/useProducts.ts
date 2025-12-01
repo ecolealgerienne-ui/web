@@ -53,7 +53,7 @@ export function useProducts(
     initialParams || {
       page: 1,
       limit: 25,
-      sortBy: 'code',
+      sortBy: 'nameFr', // Backend default: 'nameFr'
       sortOrder: 'asc',
     }
   )
