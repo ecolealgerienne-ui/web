@@ -293,7 +293,7 @@ export function AgeCategoryFormDialog({
                 id="ageMinDays"
                 type="number"
                 min="0"
-                {...register('ageMinDays')}
+                {...register('ageMinDays', { valueAsNumber: true })}
                 placeholder="0"
                 className={errors.ageMinDays ? 'border-destructive' : ''}
                 disabled={loading}
@@ -312,7 +312,7 @@ export function AgeCategoryFormDialog({
                 id="ageMaxDays"
                 type="number"
                 min="0"
-                {...register('ageMaxDays')}
+                {...register('ageMaxDays', { valueAsNumber: true })}
                 placeholder={t('placeholders.ageMaxDays')}
                 className={errors.ageMaxDays ? 'border-destructive' : ''}
                 disabled={loading}
@@ -331,7 +331,7 @@ export function AgeCategoryFormDialog({
                 id="displayOrder"
                 type="number"
                 min="0"
-                {...register('displayOrder')}
+                {...register('displayOrder', { valueAsNumber: true })}
                 placeholder="0"
                 className={errors.displayOrder ? 'border-destructive' : ''}
                 disabled={loading}

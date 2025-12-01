@@ -73,45 +73,39 @@ export const ageCategorySchema = z.object({
    * Âge minimum en jours
    * - Requis
    * - Doit être >= 0
+   * - Converti par react-hook-form avec valueAsNumber: true
    */
-  ageMinDays: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
-    z.number({
-      required_error: 'ageCategory.validation.ageMinDays.required',
-      invalid_type_error: 'ageCategory.validation.ageMinDays.integer',
-    })
-      .int('ageCategory.validation.ageMinDays.integer')
-      .min(0, 'ageCategory.validation.ageMinDays.min')
-  ),
+  ageMinDays: z.number({
+    required_error: 'ageCategory.validation.ageMinDays.required',
+    invalid_type_error: 'ageCategory.validation.ageMinDays.integer',
+  })
+    .int('ageCategory.validation.ageMinDays.integer')
+    .min(0, 'ageCategory.validation.ageMinDays.min'),
 
   /**
    * Âge maximum en jours (optionnel)
    * - Si fourni, doit être > ageMinDays
    * - Doit être >= 0
+   * - Converti par react-hook-form avec valueAsNumber: true
    */
-  ageMaxDays: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
-    z.number({
-      invalid_type_error: 'ageCategory.validation.ageMaxDays.integer',
-    })
-      .int('ageCategory.validation.ageMaxDays.integer')
-      .min(0, 'ageCategory.validation.ageMaxDays.min')
-      .optional()
-  ),
+  ageMaxDays: z.number({
+    invalid_type_error: 'ageCategory.validation.ageMaxDays.integer',
+  })
+    .int('ageCategory.validation.ageMaxDays.integer')
+    .min(0, 'ageCategory.validation.ageMaxDays.min')
+    .optional(),
 
   /**
    * Ordre d'affichage (optionnel)
    * - Doit être >= 0
+   * - Converti par react-hook-form avec valueAsNumber: true
    */
-  displayOrder: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
-    z.number({
-      invalid_type_error: 'ageCategory.validation.displayOrder.integer',
-    })
-      .int('ageCategory.validation.displayOrder.integer')
-      .min(0, 'ageCategory.validation.displayOrder.min')
-      .optional()
-  ),
+  displayOrder: z.number({
+    invalid_type_error: 'ageCategory.validation.displayOrder.integer',
+  })
+    .int('ageCategory.validation.displayOrder.integer')
+    .min(0, 'ageCategory.validation.displayOrder.min')
+    .optional(),
 
   /**
    * Statut actif/inactif (optionnel)
