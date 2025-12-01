@@ -75,10 +75,7 @@ export const ageCategorySchema = z.object({
    * - Doit être >= 0
    * - Converti par react-hook-form avec valueAsNumber: true
    */
-  ageMinDays: z.number({
-    required_error: 'ageCategory.validation.ageMinDays.required',
-    invalid_type_error: 'ageCategory.validation.ageMinDays.integer',
-  })
+  ageMinDays: z.number()
     .int('ageCategory.validation.ageMinDays.integer')
     .min(0, 'ageCategory.validation.ageMinDays.min'),
 
@@ -88,9 +85,7 @@ export const ageCategorySchema = z.object({
    * - Doit être >= 0
    * - Converti par react-hook-form avec valueAsNumber: true
    */
-  ageMaxDays: z.number({
-    invalid_type_error: 'ageCategory.validation.ageMaxDays.integer',
-  })
+  ageMaxDays: z.number()
     .int('ageCategory.validation.ageMaxDays.integer')
     .min(0, 'ageCategory.validation.ageMaxDays.min')
     .optional(),
@@ -100,9 +95,7 @@ export const ageCategorySchema = z.object({
    * - Doit être >= 0
    * - Converti par react-hook-form avec valueAsNumber: true
    */
-  displayOrder: z.number({
-    invalid_type_error: 'ageCategory.validation.displayOrder.integer',
-  })
+  displayOrder: z.number()
     .int('ageCategory.validation.displayOrder.integer')
     .min(0, 'ageCategory.validation.displayOrder.min')
     .optional(),
