@@ -138,6 +138,7 @@
       "administrationRoutes": "Administration Routes",
       "species": "Species",
       "countries": "Countries",
+      "veterinarians": "Veterinarians",
       "products": "Veterinary Products"
     }
   },
