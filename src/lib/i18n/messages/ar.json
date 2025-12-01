@@ -140,6 +140,8 @@
       "species": "أنواع الحيوانات",
       "countries": "البلدان",
       "veterinarians": "الأطباء البيطريون",
+      "nationalCampaigns": "الحملات الوطنية",
+      "alertTemplates": "نماذج التنبيهات",
       "products": "المنتجات البيطرية"
     }
   },
@@ -848,6 +850,201 @@
       "updateError": "خطأ في تحديث الطبيب البيطري",
       "deleteError": "خطأ في حذف الطبيب البيطري",
       "noResults": "لم يتم العثور على طبيب بيطري"
+    }
+  },
+  "nationalCampaign": {
+    "title": {
+      "singular": "حملة وطنية",
+      "plural": "الحملات الوطنية"
+    },
+    "subtitle": "إدارة كتالوج الحملات الوطنية للصحة الحيوانية",
+    "fields": {
+      "code": "الرمز",
+      "nameFr": "الاسم (FR)",
+      "nameEn": "الاسم (EN)",
+      "nameAr": "الاسم (AR)",
+      "type": "النوع",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "types": {
+      "vaccination": "التطعيم",
+      "deworming": "إزالة الديدان",
+      "screening": "الفحص",
+      "treatment": "العلاج",
+      "census": "الإحصاء",
+      "other": "أخرى"
+    },
+    "sections": {
+      "names": "الأسماء متعددة اللغات",
+      "dates": "الفترة",
+      "description": "الوصف"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "nameFr": {
+        "required": "الاسم الفرنسي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الفرنسي 200 حرف"
+      },
+      "nameEn": {
+        "required": "الاسم الإنجليزي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الإنجليزي 200 حرف"
+      },
+      "nameAr": {
+        "required": "الاسم العربي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم العربي 200 حرف"
+      },
+      "type": {
+        "invalid": "يجب أن يكون النوع تطعيم، إزالة الديدان، فحص، علاج، إحصاء أو أخرى"
+      },
+      "startDate": {
+        "required": "تاريخ البدء مطلوب",
+        "invalid": "تاريخ البدء غير صالح"
+      },
+      "endDate": {
+        "required": "تاريخ الانتهاء مطلوب",
+        "invalid": "تاريخ الانتهاء غير صالح",
+        "afterStart": "يجب أن يكون تاريخ الانتهاء مساويًا أو بعد تاريخ البدء"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      }
+    },
+    "placeholders": {
+      "code": "VACC2024, DEWORM-2024-Q1...",
+      "nameFr": "Campagne de Vaccination 2024",
+      "nameEn": "Vaccination Campaign 2024",
+      "nameAr": "حملة التطعيم 2024",
+      "type": "اختر النوع",
+      "description": "وصف الحملة..."
+    },
+    "actions": {
+      "create": "إنشاء حملة",
+      "edit": "تعديل الحملة",
+      "delete": "حذف الحملة",
+      "restore": "استعادة الحملة"
+    },
+    "search": {
+      "placeholder": "البحث عن حملة..."
+    },
+    "messages": {
+      "created": "تم إنشاء الحملة بنجاح",
+      "updated": "تم تحديث الحملة بنجاح",
+      "deleted": "تم حذف الحملة بنجاح",
+      "restored": "تم استعادة الحملة بنجاح",
+      "createError": "خطأ في إنشاء الحملة",
+      "updateError": "خطأ في تحديث الحملة",
+      "deleteError": "خطأ في حذف الحملة",
+      "noResults": "لم يتم العثور على حملة"
+    }
+  },
+  "alertTemplate": {
+    "title": {
+      "singular": "نموذج التنبيه",
+      "plural": "نماذج التنبيهات"
+    },
+    "subtitle": "إدارة نماذج الإشعارات والتذكيرات في النظام",
+    "fields": {
+      "code": "الرمز",
+      "nameFr": "الاسم (FR)",
+      "nameEn": "الاسم (EN)",
+      "nameAr": "الاسم (AR)",
+      "category": "الفئة",
+      "priority": "الأولوية",
+      "description": "الوصف",
+      "messageTemplateFr": "نموذج الرسالة (FR)",
+      "messageTemplateEn": "نموذج الرسالة (EN)",
+      "messageTemplateAr": "نموذج الرسالة (AR)",
+      "isActive": "نشط"
+    },
+    "categories": {
+      "health": "الصحة",
+      "vaccination": "التطعيم",
+      "treatment": "العلاج",
+      "reproduction": "التكاثر",
+      "nutrition": "التغذية",
+      "administrative": "إداري",
+      "other": "أخرى"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "urgent": "عاجلة"
+    },
+    "sections": {
+      "names": "الأسماء متعددة اللغات",
+      "description": "الوصف"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "nameFr": {
+        "required": "الاسم الفرنسي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الفرنسي 200 حرف"
+      },
+      "nameEn": {
+        "required": "الاسم الإنجليزي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الإنجليزي 200 حرف"
+      },
+      "nameAr": {
+        "required": "الاسم العربي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم العربي 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "messageTemplateFr": {
+        "maxLength": "يجب ألا يتجاوز نموذج الرسالة الفرنسية 500 حرف"
+      },
+      "messageTemplateEn": {
+        "maxLength": "يجب ألا يتجاوز نموذج الرسالة الإنجليزية 500 حرف"
+      },
+      "messageTemplateAr": {
+        "maxLength": "يجب ألا يتجاوز نموذج الرسالة العربية 500 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار عددًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "ALERT_VACC_REMINDER, ALERT_TREATMENT...",
+      "nameFr": "تذكير بالتطعيم",
+      "nameEn": "Vaccination reminder",
+      "nameAr": "تذكير بالتطعيم",
+      "description": "وصف نموذج التنبيه...",
+      "messageTemplateFr": "يحتاج حيوانك إلى التطعيم...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "يحتاج حيوانك إلى التطعيم..."
+    },
+    "actions": {
+      "create": "إنشاء نموذج",
+      "edit": "تعديل النموذج",
+      "delete": "حذف النموذج",
+      "restore": "استعادة النموذج"
+    },
+    "search": {
+      "placeholder": "البحث عن نموذج..."
+    },
+    "messages": {
+      "created": "تم إنشاء نموذج التنبيه بنجاح",
+      "updated": "تم تحديث نموذج التنبيه بنجاح",
+      "deleted": "تم حذف نموذج التنبيه بنجاح",
+      "restored": "تمت استعادة نموذج التنبيه بنجاح",
+      "createError": "خطأ في إنشاء النموذج",
+      "updateError": "خطأ في تحديث النموذج",
+      "deleteError": "خطأ في حذف النموذج",
+      "noResults": "لم يتم العثور على نموذج تنبيه"
     }
   },
   "errors": {
@@ -1560,6 +1757,7 @@
     "sections": {
       "profile": "الملف الشخصي",
       "farm": "المزرعة",
+      "generalSettings": "الإعدادات العامة",
       "myVeterinarians": "أطبائي البيطريون",
       "myBreeds": "سلالاتي",
       "myVaccines": "لقاحاتي",

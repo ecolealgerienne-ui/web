@@ -140,6 +140,8 @@
       "species": "Espèces",
       "countries": "Pays",
       "veterinarians": "Vétérinaires",
+      "nationalCampaigns": "Campagnes Nationales",
+      "alertTemplates": "Modèles d'Alertes",
       "products": "Produits Vétérinaires"
     }
   },
@@ -855,6 +857,201 @@
       "noResults": "Aucun vétérinaire trouvé"
     }
   },
+  "nationalCampaign": {
+    "title": {
+      "singular": "Campagne Nationale",
+      "plural": "Campagnes Nationales"
+    },
+    "subtitle": "Gestion du catalogue des campagnes de santé animale nationales",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "nameAr": "Nom (AR)",
+      "type": "Type",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "types": {
+      "vaccination": "Vaccination",
+      "deworming": "Déparasitage",
+      "screening": "Dépistage",
+      "treatment": "Traitement",
+      "census": "Recensement",
+      "other": "Autre"
+    },
+    "sections": {
+      "names": "Noms multilingues",
+      "dates": "Période",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom français est requis",
+        "maxLength": "Le nom français ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom anglais est requis",
+        "maxLength": "Le nom anglais ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom arabe est requis",
+        "maxLength": "Le nom arabe ne doit pas dépasser 200 caractères"
+      },
+      "type": {
+        "invalid": "Le type doit être vaccination, déparasitage, dépistage, traitement, recensement ou autre"
+      },
+      "startDate": {
+        "required": "La date de début est requise",
+        "invalid": "La date de début est invalide"
+      },
+      "endDate": {
+        "required": "La date de fin est requise",
+        "invalid": "La date de fin est invalide",
+        "afterStart": "La date de fin doit être postérieure ou égale à la date de début"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      }
+    },
+    "placeholders": {
+      "code": "VACC2024, DEWORM-2024-Q1...",
+      "nameFr": "Campagne de Vaccination 2024",
+      "nameEn": "Vaccination Campaign 2024",
+      "nameAr": "حملة التطعيم 2024",
+      "type": "Sélectionnez le type",
+      "description": "Description de la campagne..."
+    },
+    "actions": {
+      "create": "Créer une campagne",
+      "edit": "Modifier la campagne",
+      "delete": "Supprimer la campagne",
+      "restore": "Restaurer la campagne"
+    },
+    "search": {
+      "placeholder": "Rechercher une campagne..."
+    },
+    "messages": {
+      "created": "Campagne créée avec succès",
+      "updated": "Campagne mise à jour avec succès",
+      "deleted": "Campagne supprimée avec succès",
+      "restored": "Campagne restaurée avec succès",
+      "createError": "Erreur lors de la création de la campagne",
+      "updateError": "Erreur lors de la mise à jour de la campagne",
+      "deleteError": "Erreur lors de la suppression de la campagne",
+      "noResults": "Aucune campagne trouvée"
+    }
+  },
+  "alertTemplate": {
+    "title": {
+      "singular": "Modèle d'Alerte",
+      "plural": "Modèles d'Alertes"
+    },
+    "subtitle": "Gestion des modèles de notifications et rappels du système",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "nameAr": "Nom (AR)",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "description": "Description",
+      "messageTemplateFr": "Modèle de message (FR)",
+      "messageTemplateEn": "Modèle de message (EN)",
+      "messageTemplateAr": "Modèle de message (AR)",
+      "isActive": "Actif"
+    },
+    "categories": {
+      "health": "Santé",
+      "vaccination": "Vaccination",
+      "treatment": "Traitement",
+      "reproduction": "Reproduction",
+      "nutrition": "Nutrition",
+      "administrative": "Administratif",
+      "other": "Autre"
+    },
+    "priorities": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée",
+      "urgent": "Urgente"
+    },
+    "sections": {
+      "names": "Noms multilingues",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom français est requis",
+        "maxLength": "Le nom français ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom anglais est requis",
+        "maxLength": "Le nom anglais ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom arabe est requis",
+        "maxLength": "Le nom arabe ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "messageTemplateFr": {
+        "maxLength": "Le modèle de message français ne doit pas dépasser 500 caractères"
+      },
+      "messageTemplateEn": {
+        "maxLength": "Le modèle de message anglais ne doit pas dépasser 500 caractères"
+      },
+      "messageTemplateAr": {
+        "maxLength": "Le modèle de message arabe ne doit pas dépasser 500 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "ALERT_VACC_REMINDER, ALERT_TREATMENT...",
+      "nameFr": "Rappel de vaccination",
+      "nameEn": "Vaccination reminder",
+      "nameAr": "تذكير التطعيم",
+      "description": "Description du modèle d'alerte...",
+      "messageTemplateFr": "Votre animal nécessite une vaccination...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "يحتاج حيوانك إلى التطعيم..."
+    },
+    "actions": {
+      "create": "Créer un modèle",
+      "edit": "Modifier le modèle",
+      "delete": "Supprimer le modèle",
+      "restore": "Restaurer le modèle"
+    },
+    "search": {
+      "placeholder": "Rechercher un modèle..."
+    },
+    "messages": {
+      "created": "Modèle d'alerte créé avec succès",
+      "updated": "Modèle d'alerte mis à jour avec succès",
+      "deleted": "Modèle d'alerte supprimé avec succès",
+      "restored": "Modèle d'alerte restauré avec succès",
+      "createError": "Erreur lors de la création du modèle",
+      "updateError": "Erreur lors de la mise à jour du modèle",
+      "deleteError": "Erreur lors de la suppression du modèle",
+      "noResults": "Aucun modèle d'alerte trouvé"
+    }
+  },
   "campaigns": {
     "title": "Campagnes",
     "subtitle": "Gérez vos campagnes de vaccination, traitement et pesée",
@@ -1565,6 +1762,7 @@
     "sections": {
       "profile": "Profil",
       "farm": "Ferme",
+      "generalSettings": "Paramètres généraux",
       "myVeterinarians": "Mes Vétérinaires",
       "myBreeds": "Mes Races",
       "myVaccines": "Mes Vaccins",

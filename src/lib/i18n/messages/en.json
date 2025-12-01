@@ -140,6 +140,8 @@
       "species": "Species",
       "countries": "Countries",
       "veterinarians": "Veterinarians",
+      "nationalCampaigns": "National Campaigns",
+      "alertTemplates": "Alert Templates",
       "products": "Veterinary Products"
     }
   },
@@ -855,6 +857,201 @@
       "noResults": "No veterinarian found"
     }
   },
+  "nationalCampaign": {
+    "title": {
+      "singular": "National Campaign",
+      "plural": "National Campaigns"
+    },
+    "subtitle": "Management of national animal health campaigns catalog",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Name (FR)",
+      "nameEn": "Name (EN)",
+      "nameAr": "Name (AR)",
+      "type": "Type",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "types": {
+      "vaccination": "Vaccination",
+      "deworming": "Deworming",
+      "screening": "Screening",
+      "treatment": "Treatment",
+      "census": "Census",
+      "other": "Other"
+    },
+    "sections": {
+      "names": "Multilingual Names",
+      "dates": "Period",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, dashes and underscores"
+      },
+      "nameFr": {
+        "required": "French name is required",
+        "maxLength": "French name must not exceed 200 characters"
+      },
+      "nameEn": {
+        "required": "English name is required",
+        "maxLength": "English name must not exceed 200 characters"
+      },
+      "nameAr": {
+        "required": "Arabic name is required",
+        "maxLength": "Arabic name must not exceed 200 characters"
+      },
+      "type": {
+        "invalid": "Type must be vaccination, deworming, screening, treatment, census or other"
+      },
+      "startDate": {
+        "required": "Start date is required",
+        "invalid": "Start date is invalid"
+      },
+      "endDate": {
+        "required": "End date is required",
+        "invalid": "End date is invalid",
+        "afterStart": "End date must be on or after start date"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      }
+    },
+    "placeholders": {
+      "code": "VACC2024, DEWORM-2024-Q1...",
+      "nameFr": "Campagne de Vaccination 2024",
+      "nameEn": "Vaccination Campaign 2024",
+      "nameAr": "حملة التطعيم 2024",
+      "type": "Select type",
+      "description": "Campaign description..."
+    },
+    "actions": {
+      "create": "Create campaign",
+      "edit": "Edit campaign",
+      "delete": "Delete campaign",
+      "restore": "Restore campaign"
+    },
+    "search": {
+      "placeholder": "Search for a campaign..."
+    },
+    "messages": {
+      "created": "Campaign created successfully",
+      "updated": "Campaign updated successfully",
+      "deleted": "Campaign deleted successfully",
+      "restored": "Campaign restored successfully",
+      "createError": "Error creating campaign",
+      "updateError": "Error updating campaign",
+      "deleteError": "Error deleting campaign",
+      "noResults": "No campaign found"
+    }
+  },
+  "alertTemplate": {
+    "title": {
+      "singular": "Alert Template",
+      "plural": "Alert Templates"
+    },
+    "subtitle": "Management of system notification and reminder templates",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Name (FR)",
+      "nameEn": "Name (EN)",
+      "nameAr": "Name (AR)",
+      "category": "Category",
+      "priority": "Priority",
+      "description": "Description",
+      "messageTemplateFr": "Message template (FR)",
+      "messageTemplateEn": "Message template (EN)",
+      "messageTemplateAr": "Message template (AR)",
+      "isActive": "Active"
+    },
+    "categories": {
+      "health": "Health",
+      "vaccination": "Vaccination",
+      "treatment": "Treatment",
+      "reproduction": "Reproduction",
+      "nutrition": "Nutrition",
+      "administrative": "Administrative",
+      "other": "Other"
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "sections": {
+      "names": "Multilingual names",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Code is required",
+        "maxLength": "Code must not exceed 50 characters",
+        "pattern": "Code must contain only uppercase letters, numbers, dashes and underscores"
+      },
+      "nameFr": {
+        "required": "French name is required",
+        "maxLength": "French name must not exceed 200 characters"
+      },
+      "nameEn": {
+        "required": "English name is required",
+        "maxLength": "English name must not exceed 200 characters"
+      },
+      "nameAr": {
+        "required": "Arabic name is required",
+        "maxLength": "Arabic name must not exceed 200 characters"
+      },
+      "description": {
+        "maxLength": "Description must not exceed 1000 characters"
+      },
+      "messageTemplateFr": {
+        "maxLength": "French message template must not exceed 500 characters"
+      },
+      "messageTemplateEn": {
+        "maxLength": "English message template must not exceed 500 characters"
+      },
+      "messageTemplateAr": {
+        "maxLength": "Arabic message template must not exceed 500 characters"
+      },
+      "version": {
+        "integer": "Version must be an integer",
+        "positive": "Version must be positive"
+      }
+    },
+    "placeholders": {
+      "code": "ALERT_VACC_REMINDER, ALERT_TREATMENT...",
+      "nameFr": "Vaccination reminder",
+      "nameEn": "Vaccination reminder",
+      "nameAr": "Vaccination reminder",
+      "description": "Alert template description...",
+      "messageTemplateFr": "Your animal requires vaccination...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "Your animal requires vaccination..."
+    },
+    "actions": {
+      "create": "Create template",
+      "edit": "Edit template",
+      "delete": "Delete template",
+      "restore": "Restore template"
+    },
+    "search": {
+      "placeholder": "Search for a template..."
+    },
+    "messages": {
+      "created": "Alert template created successfully",
+      "updated": "Alert template updated successfully",
+      "deleted": "Alert template deleted successfully",
+      "restored": "Alert template restored successfully",
+      "createError": "Error creating template",
+      "updateError": "Error updating template",
+      "deleteError": "Error deleting template",
+      "noResults": "No alert template found"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "networkError": "Server connection error",
@@ -1565,6 +1762,7 @@
     "sections": {
       "profile": "Profile",
       "farm": "Farm",
+      "generalSettings": "General Settings",
       "myVeterinarians": "My Veterinarians",
       "myBreeds": "My Breeds",
       "myVaccines": "My Vaccines",

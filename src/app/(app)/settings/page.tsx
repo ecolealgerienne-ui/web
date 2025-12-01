@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -20,6 +20,7 @@ import {
   Syringe,
   Pill,
   Bell,
+  Settings,
 } from 'lucide-react'
 
 // Import des nouveaux composants de configuration
@@ -29,9 +30,23 @@ import { MyVaccines } from '@/components/settings/my-vaccines'
 import { MyMedications } from '@/components/settings/my-medications'
 import { MyAlerts } from '@/components/settings/my-alerts'
 
+// Import pour les paramètres généraux
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useFarmPreferences } from '@/lib/hooks/useFarmPreferences'
+import { UpdateFarmPreferenceDto } from '@/lib/types/farm-preference'
+import { farmPreferencesService } from '@/lib/services/farm-preferences.service'
+import { useToast } from '@/lib/hooks/useToast'
+
 type SectionId =
   | 'profile'
   | 'farm'
+  | 'general-settings'
   | 'my-veterinarians'
   | 'my-breeds'
   | 'my-vaccines'
@@ -56,6 +71,7 @@ const sections: Section[] = [
   { id: 'farm', labelKey: 'farm', icon: Building2, group: 'general' },
 
   // Mes Données
+  { id: 'general-settings', labelKey: 'generalSettings', icon: Settings, group: 'my-data' },
   { id: 'my-veterinarians', labelKey: 'myVeterinarians', icon: Stethoscope, group: 'my-data' },
   { id: 'my-breeds', labelKey: 'myBreeds', icon: Dna, group: 'my-data' },
   { id: 'my-vaccines', labelKey: 'myVaccines', icon: Syringe, group: 'my-data' },
@@ -137,6 +153,8 @@ export default function SettingsPage() {
         return <ProfileSection />
       case 'farm':
         return <FarmSection />
+      case 'general-settings':
+        return <GeneralSettingsSection />
       case 'my-veterinarians':
         return <MyVeterinarians />
       case 'my-breeds':
@@ -543,6 +561,220 @@ function DataSection() {
           </Button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function GeneralSettingsSection() {
+  const t = useTranslations('farmPreferences')
+  const ta = useTranslations('settings.actions')
+  const tc = useTranslations('common')
+  const { success, error: showError } = useToast()
+  const { preferences, loading, refetch } = useFarmPreferences()
+  const [saving, setSaving] = useState(false)
+
+  const [formData, setFormData] = useState({
+    defaultVeterinarianId: '',
+    defaultSpeciesId: '',
+    defaultBreedId: '',
+    weightUnit: 'kg',
+    currency: 'EUR',
+    language: 'fr',
+    dateFormat: 'DD/MM/YYYY',
+    enableNotifications: true,
+  })
+
+  // Charger les préférences existantes
+  useEffect(() => {
+    if (preferences) {
+      setFormData({
+        defaultVeterinarianId: preferences.defaultVeterinarianId || '',
+        defaultSpeciesId: preferences.defaultSpeciesId || '',
+        defaultBreedId: preferences.defaultBreedId || '',
+        weightUnit: preferences.weightUnit || 'kg',
+        currency: preferences.currency || 'EUR',
+        language: preferences.language || 'fr',
+        dateFormat: preferences.dateFormat || 'DD/MM/YYYY',
+        enableNotifications: preferences.enableNotifications ?? true,
+      })
+    }
+  }, [preferences])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+
+    try {
+      const updateData: UpdateFarmPreferenceDto = { ...formData }
+      await farmPreferencesService.update(updateData)
+      success(t('messages.updated'))
+      refetch()
+    } catch (error) {
+      showError(t('messages.updateError'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="text-center py-12">{tc('messages.loading')}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Section: Valeurs par défaut */}
+        <div>
+          <h3 className="font-medium mb-3">{t('sections.defaults')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="defaultVeterinarianId">{t('fields.defaultVeterinarianId')}</Label>
+              <Input
+                id="defaultVeterinarianId"
+                value={formData.defaultVeterinarianId}
+                onChange={(e) => setFormData({ ...formData, defaultVeterinarianId: e.target.value })}
+                placeholder={t('placeholders.defaultVeterinarianId')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="defaultSpeciesId">{t('fields.defaultSpeciesId')}</Label>
+              <Select
+                value={formData.defaultSpeciesId || undefined}
+                onValueChange={(value) => setFormData({ ...formData, defaultSpeciesId: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('placeholders.selectSpecies')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cattle">{t('species.cattle')}</SelectItem>
+                  <SelectItem value="sheep">{t('species.sheep')}</SelectItem>
+                  <SelectItem value="goat">{t('species.goat')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="defaultBreedId">{t('fields.defaultBreedId')}</Label>
+              <Input
+                id="defaultBreedId"
+                value={formData.defaultBreedId}
+                onChange={(e) => setFormData({ ...formData, defaultBreedId: e.target.value })}
+                placeholder={t('placeholders.defaultBreedId')}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Section: Unités et formats */}
+        <div className="border-t pt-6">
+          <h3 className="font-medium mb-3">{t('sections.unitsFormats')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="weightUnit">{t('fields.weightUnit')}</Label>
+              <Select
+                value={formData.weightUnit}
+                onValueChange={(value) => setFormData({ ...formData, weightUnit: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="kg">kg</SelectItem>
+                  <SelectItem value="lb">lb</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="currency">{t('fields.currency')}</Label>
+              <Select
+                value={formData.currency}
+                onValueChange={(value) => setFormData({ ...formData, currency: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EUR">EUR (€)</SelectItem>
+                  <SelectItem value="USD">USD ($)</SelectItem>
+                  <SelectItem value="DZD">DZD (دج)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="language">{t('fields.language')}</Label>
+              <Select
+                value={formData.language}
+                onValueChange={(value) => setFormData({ ...formData, language: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="ar">العربية</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="dateFormat">{t('fields.dateFormat')}</Label>
+              <Select
+                value={formData.dateFormat}
+                onValueChange={(value) => setFormData({ ...formData, dateFormat: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                  <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                  <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Section: Notifications */}
+        <div className="border-t pt-6">
+          <h3 className="font-medium mb-3">{t('sections.notifications')}</h3>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="enableNotifications"
+              checked={formData.enableNotifications}
+              onChange={(e) => setFormData({ ...formData, enableNotifications: e.target.checked })}
+              className="h-4 w-4 rounded border-input"
+            />
+            <Label htmlFor="enableNotifications" className="cursor-pointer">
+              {t('fields.enableNotifications')}
+            </Label>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            {t('messages.notificationsInfo')}
+          </p>
+        </div>
+
+        {/* Bouton de sauvegarde */}
+        <div className="flex justify-end pt-4 border-t">
+          <Button type="submit" disabled={saving}>
+            <Save className="me-2 h-4 w-4" />
+            {saving ? ta('saving') : ta('save')}
+          </Button>
+        </div>
+      </form>
     </div>
   )
 }

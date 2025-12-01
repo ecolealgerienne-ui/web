@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout 2 nouvelles règles suite implémentation Veterinarians (Règles 8.3.19-20: useState vs useFieldArray, Import CrudService)
+**Dernière mise à jour:** Ajout 3 nouvelles règles suite implémentation National-Campaigns (Règles 8.3.21-23: Gestion dates avec input HTML5, Validation cross-field Zod, Conversion sort order ASC/DESC)
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -2718,6 +2718,261 @@ class MyService { // Pas de garantie de l'interface CRUD
 - [ ] Logger toutes les opérations
 - [ ] Utiliser apiClient (jamais fetch direct)
 - [ ] Documenter avec JSDoc
+
+#### 8.3.21 Gestion des Champs Date dans les Formulaires
+
+✅ **RÈGLE** : Utiliser `<input type="date">` avec conversion ISO 8601 pour l'API
+
+**Pattern correct pour les champs date :**
+
+```tsx
+// 1. Formulaire HTML5 avec input type="date"
+<Input
+  id="startDate"
+  type="date"
+  {...register('startDate')}
+  disabled={loading}
+/>
+
+// 2. Conversion lors du chargement (ISO 8601 → YYYY-MM-DD)
+useEffect(() => {
+  if (campaign && open) {
+    reset({
+      startDate: campaign.startDate.split('T')[0], // ✅ Extraire date uniquement
+      endDate: campaign.endDate.split('T')[0],
+      // ... autres champs
+    })
+  }
+}, [campaign, open, reset])
+
+// 3. Conversion lors de la soumission (YYYY-MM-DD → ISO 8601)
+const handleFormSubmission = async (data: any) => {
+  const formattedData = {
+    ...data,
+    startDate: new Date(data.startDate).toISOString(), // ✅ Conversion ISO
+    endDate: new Date(data.endDate).toISOString(),
+  }
+  await onSubmit(formattedData)
+}
+
+// 4. Affichage formaté dans les tableaux
+{
+  key: 'startDate',
+  header: t('fields.startDate'),
+  sortable: true,
+  render: (item) => (
+    <span>{new Date(item.startDate).toLocaleDateString('fr-FR')}</span>
+  ),
+}
+```
+
+**Validation Zod pour dates :**
+
+```typescript
+import { z } from 'zod'
+
+export const campaignSchema = z.object({
+  startDate: z
+    .string()
+    .min(1, 'nationalCampaign.validation.startDate.required')
+    .refine((date) => !isNaN(Date.parse(date)), {
+      message: 'nationalCampaign.validation.startDate.invalid',
+    }),
+
+  endDate: z
+    .string()
+    .min(1, 'nationalCampaign.validation.endDate.required')
+    .refine((date) => !isNaN(Date.parse(date)), {
+      message: 'nationalCampaign.validation.endDate.invalid',
+    }),
+})
+```
+
+**Raison :**
+- `<input type="date">` fournit un date picker natif du navigateur
+- Format YYYY-MM-DD est standard HTML5 et facilement parsable
+- ISO 8601 est le format standard pour les APIs REST
+- `toLocaleDateString()` adapte l'affichage à la locale de l'utilisateur
+
+**Impact :**
+- UX native et accessible (date picker intégré au navigateur)
+- Validation automatique du format par le navigateur
+- Conversion simple et fiable entre formats
+
+#### 8.3.22 Validation Cross-Field avec Zod
+
+✅ **RÈGLE** : Utiliser `.refine()` au niveau du schéma pour valider plusieurs champs ensemble
+
+**Pattern pour validation inter-champs :**
+
+```typescript
+import { z } from 'zod'
+
+// ✅ CORRECT : Validation cross-field avec refine()
+export const campaignSchema = z.object({
+  startDate: z.string().min(1),
+  endDate: z.string().min(1),
+  // ... autres champs
+}).refine(
+  (data) => {
+    const start = new Date(data.startDate)
+    const end = new Date(data.endDate)
+    return end >= start // ✅ Vérification logique entre champs
+  },
+  {
+    message: 'nationalCampaign.validation.endDate.afterStart',
+    path: ['endDate'], // ✅ Cibler le champ qui affiche l'erreur
+  }
+)
+```
+
+**❌ Erreurs courantes :**
+
+```typescript
+// ❌ ERREUR 1 : Validation au niveau du champ (impossible de comparer)
+endDate: z.string().refine((date) => date > startDate) // startDate inaccessible ici
+
+// ❌ ERREUR 2 : Path manquant (erreur affichée au mauvais endroit)
+}).refine((data) => ..., {
+  message: 'error',
+  // path manquant → erreur au niveau du formulaire, pas du champ
+})
+
+// ❌ ERREUR 3 : Logique inversée
+return start >= end // FAUX : doit être end >= start
+```
+
+**Autres exemples de validation cross-field :**
+
+```typescript
+// Exemple 1 : Prix min/max
+z.object({
+  minPrice: z.number(),
+  maxPrice: z.number(),
+}).refine((data) => data.maxPrice >= data.minPrice, {
+  message: 'validation.maxPrice.greaterThanMin',
+  path: ['maxPrice'],
+})
+
+// Exemple 2 : Champs conditionnels
+z.object({
+  hasEmail: z.boolean(),
+  email: z.string().optional(),
+}).refine(
+  (data) => !data.hasEmail || (data.email && data.email.length > 0),
+  {
+    message: 'validation.email.requiredWhenChecked',
+    path: ['email'],
+  }
+)
+
+// Exemple 3 : Somme de pourcentages = 100%
+z.object({
+  percentage1: z.number(),
+  percentage2: z.number(),
+  percentage3: z.number(),
+}).refine(
+  (data) => data.percentage1 + data.percentage2 + data.percentage3 === 100,
+  {
+    message: 'validation.percentages.mustEqual100',
+    path: ['percentage3'], // Dernière erreur sur le dernier champ
+  }
+)
+```
+
+**Raison :**
+- Permet validation logique entre plusieurs champs
+- `path` cible le champ qui affiche l'erreur pour meilleure UX
+- Centralise la logique de validation dans le schéma
+
+**Impact :**
+- Validation cohérente côté client et serveur
+- Messages d'erreur affichés au bon endroit
+- Code de validation maintenable et réutilisable
+
+#### 8.3.23 Conversion Case pour Sort Order (Backend/Frontend)
+
+✅ **RÈGLE** : Convertir le case des paramètres de tri entre DataTable et Backend
+
+**Problème :**
+- Backend attend : `order=ASC` ou `order=DESC` (uppercase)
+- DataTable attend : `sortOrder='asc'` ou `sortOrder='desc'` (lowercase)
+
+**Pattern correct :**
+
+```tsx
+// Dans la page avec DataTable
+const [params, setParams] = useState<FilterParams>({
+  page: 1,
+  limit: 20,
+  orderBy: 'startDate',
+  order: 'DESC', // ✅ Backend format (uppercase)
+})
+
+// ✅ CORRECT : Conversion lors du passage à DataTable
+<DataTable<NationalCampaign>
+  data={data}
+  columns={columns}
+  sortBy={params.orderBy}
+  sortOrder={params.order?.toLowerCase() as 'asc' | 'desc' | undefined}
+  onSortChange={(sortBy, sortOrder) =>
+    setParams({
+      ...params,
+      orderBy: sortBy as any,
+      order: sortOrder?.toUpperCase() as 'ASC' | 'DESC' | undefined
+    })
+  }
+  // ... autres props
+/>
+```
+
+**❌ Erreurs courantes :**
+
+```tsx
+// ❌ ERREUR 1 : Passer directement sans conversion
+sortOrder={params.order} // Type error: 'ASC' not assignable to 'asc' | 'desc'
+
+// ❌ ERREUR 2 : Conversion dans le mauvais sens
+sortOrder={params.order?.toUpperCase()} // Erreur: attend lowercase
+
+// ❌ ERREUR 3 : Oublier la conversion dans onSortChange
+onSortChange={(sortBy, sortOrder) =>
+  setParams({ ...params, order: sortOrder }) // Backend recevra 'asc' au lieu de 'ASC'
+}
+```
+
+**Type definitions correctes :**
+
+```typescript
+// Types backend (dans FilterParams)
+export interface NationalCampaignFilterParams {
+  page?: number
+  limit?: number
+  orderBy?: 'nameFr' | 'nameEn' | 'code' | 'startDate' | 'endDate' | 'type'
+  order?: 'ASC' | 'DESC' // ✅ Uppercase pour backend
+}
+
+// DataTable attend (pas besoin de type spécial, juste conversion)
+// sortOrder: 'asc' | 'desc' | undefined
+```
+
+**Raison :**
+- Convention SQL standard utilise uppercase (ORDER BY field ASC/DESC)
+- Composants UI modernes utilisent lowercase pour cohérence
+- Conversion nécessaire pour compatibilité type-safe
+
+**Impact :**
+- Évite les erreurs TypeScript de type incompatible
+- Garantit que le tri fonctionne correctement
+- Maintient la cohérence entre frontend et backend
+
+**Checklist validation dates et tri :**
+- [ ] Utiliser `<input type="date">` pour les champs de date
+- [ ] Convertir dates : `.split('T')[0]` pour chargement, `.toISOString()` pour soumission
+- [ ] Validation Zod avec `.refine()` si validation cross-field
+- [ ] Spécifier `path` dans refine pour cibler le bon champ d'erreur
+- [ ] Convertir sort order : `.toLowerCase()` pour DataTable, `.toUpperCase()` pour backend
+- [ ] Afficher dates avec `toLocaleDateString('fr-FR')` dans les tableaux
 
 ---
 
