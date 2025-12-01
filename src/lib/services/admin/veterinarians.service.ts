@@ -25,8 +25,8 @@ import type {
 import type {
   PaginatedResponse,
   PaginationParams,
+  CrudService,
 } from '@/lib/types/common/api'
-import type { CrudService } from './types'
 
 /**
  * Service de gestion des vétérinaires
