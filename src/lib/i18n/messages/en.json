@@ -20,7 +20,8 @@
       "active": "Active",
       "inactive": "Inactive",
       "disabled": "Disabled",
-      "enabled": "Enabled"
+      "enabled": "Enabled",
+      "deleted": "Deleted"
     },
     "messages": {
       "success": "Success",
@@ -41,6 +42,8 @@
       "isActive": "Active",
       "createdAt": "Created At",
       "updatedAt": "Updated At",
+      "deletedAt": "Deleted At",
+      "metadata": "Metadata",
       "required": "Required"
     },
     "error": {

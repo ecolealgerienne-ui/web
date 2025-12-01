@@ -20,7 +20,8 @@
       "active": "نشط",
       "inactive": "غير نشط",
       "disabled": "معطل",
-      "enabled": "مفعل"
+      "enabled": "مفعل",
+      "deleted": "محذوف"
     },
     "messages": {
       "success": "نجح",
@@ -41,6 +42,8 @@
       "isActive": "نشط",
       "createdAt": "تاريخ الإنشاء",
       "updatedAt": "تاريخ التحديث",
+      "deletedAt": "تاريخ الحذف",
+      "metadata": "البيانات الوصفية",
       "required": "مطلوب"
     },
     "error": {
