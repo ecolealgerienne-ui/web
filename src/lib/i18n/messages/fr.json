@@ -138,6 +138,7 @@
       "units": "Unités de Mesure",
       "administrationRoutes": "Voies d'Administration",
       "species": "Espèces",
+      "ageCategories": "Catégories d'Âge",
       "countries": "Pays",
       "veterinarians": "Vétérinaires",
       "nationalCampaigns": "Campagnes Nationales",
@@ -665,6 +666,98 @@
       "deleted": "Pays supprimé avec succès",
       "restored": "Pays restauré avec succès",
       "noResults": "Aucun pays trouvé"
+    }
+  },
+  "ageCategory": {
+    "title": {
+      "singular": "Catégorie d'Âge",
+      "plural": "Catégories d'Âge"
+    },
+    "subtitle": "Gestion des catégories d'âge par espèce animale",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "speciesId": "Espèce",
+      "ageMinDays": "Âge minimum (jours)",
+      "ageMaxDays": "Âge maximum (jours)",
+      "ageRange": "Tranche d'âge",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif",
+      "days": "jours",
+      "noLimit": "Sans limite"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom en anglais est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "maxLength": "Le nom en arabe ne doit pas dépasser 200 caractères"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "ageMinDays": {
+        "required": "L'âge minimum est requis",
+        "integer": "L'âge minimum doit être un nombre entier",
+        "min": "L'âge minimum doit être supérieur ou égal à 0"
+      },
+      "ageMaxDays": {
+        "integer": "L'âge maximum doit être un nombre entier",
+        "min": "L'âge maximum doit être supérieur ou égal à 0",
+        "greaterThanMin": "L'âge maximum doit être supérieur à l'âge minimum"
+      },
+      "displayOrder": {
+        "integer": "L'ordre d'affichage doit être un nombre entier",
+        "min": "L'ordre d'affichage doit être supérieur ou égal à 0"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "VEAU, ADULTE, SENIOR...",
+      "nameFr": "Veau, Adulte, Senior...",
+      "nameEn": "Calf, Adult, Senior...",
+      "nameAr": "عجل، بالغ، كبير السن...",
+      "selectSpecies": "Sélectionner une espèce",
+      "ageMaxDays": "Laisser vide pour sans limite"
+    },
+    "actions": {
+      "create": "Créer une catégorie d'âge",
+      "edit": "Modifier la catégorie d'âge",
+      "delete": "Supprimer la catégorie d'âge",
+      "restore": "Restaurer la catégorie d'âge"
+    },
+    "filters": {
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces"
+    },
+    "search": {
+      "placeholder": "Rechercher une catégorie d'âge..."
+    },
+    "messages": {
+      "created": "Catégorie d'âge créée avec succès",
+      "updated": "Catégorie d'âge mise à jour avec succès",
+      "deleted": "Catégorie d'âge supprimée avec succès",
+      "restored": "Catégorie d'âge restaurée avec succès",
+      "noResults": "Aucune catégorie d'âge trouvée",
+      "createError": "Le code existe déjà ou une erreur s'est produite",
+      "updateError": "Conflit de version ou erreur lors de la mise à jour",
+      "deleteError": "Impossible de supprimer : la catégorie est utilisée"
     }
   },
   "administrationRoute": {

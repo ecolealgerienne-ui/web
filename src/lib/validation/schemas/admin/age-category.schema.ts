@@ -1,0 +1,146 @@
+import { z } from 'zod'
+
+/**
+ * Schéma de validation pour création/édition d'une catégorie d'âge
+ *
+ * ✅ RÈGLE #1 : Aucune valeur en dur
+ * ✅ RÈGLE #6 : Messages i18n (clés, pas de texte)
+ *
+ * Tous les messages d'erreur sont des clés i18n qui seront traduites
+ * dans le composant via `t(error.message)`
+ *
+ * @example
+ * ```typescript
+ * const result = ageCategorySchema.safeParse(data)
+ * if (!result.success) {
+ *   const errors = result.error.flatten().fieldErrors
+ *   // errors.code = ['ageCategory.validation.code.required']
+ * }
+ * ```
+ */
+export const ageCategorySchema = z.object({
+  /**
+   * Code unique
+   * - Requis
+   * - Max 50 caractères
+   * - Format : majuscules, chiffres, tirets, underscores
+   */
+  code: z.string()
+    .min(1, 'ageCategory.validation.code.required')
+    .max(50, 'ageCategory.validation.code.maxLength')
+    .regex(
+      /^[A-Z0-9_-]+$/,
+      'ageCategory.validation.code.pattern'
+    ),
+
+  /**
+   * Nom en français
+   * - Requis
+   * - Max 200 caractères
+   */
+  nameFr: z.string()
+    .min(1, 'ageCategory.validation.nameFr.required')
+    .max(200, 'ageCategory.validation.nameFr.maxLength'),
+
+  /**
+   * Nom en anglais
+   * - Requis
+   * - Max 200 caractères
+   */
+  nameEn: z.string()
+    .min(1, 'ageCategory.validation.nameEn.required')
+    .max(200, 'ageCategory.validation.nameEn.maxLength'),
+
+  /**
+   * Nom en arabe (optionnel)
+   * - Max 200 caractères
+   */
+  nameAr: z.string()
+    .max(200, 'ageCategory.validation.nameAr.maxLength')
+    .optional()
+    .or(z.literal('')), // Accepte chaîne vide
+
+  /**
+   * ID de l'espèce (foreign key)
+   * - Requis
+   * - Format UUID
+   */
+  speciesId: z.string()
+    .min(1, 'ageCategory.validation.speciesId.required')
+    .uuid('ageCategory.validation.speciesId.invalid'),
+
+  /**
+   * Âge minimum en jours
+   * - Requis
+   * - Doit être >= 0
+   */
+  ageMinDays: z.coerce.number()
+    .int('ageCategory.validation.ageMinDays.integer')
+    .min(0, 'ageCategory.validation.ageMinDays.min'),
+
+  /**
+   * Âge maximum en jours (optionnel)
+   * - Si fourni, doit être > ageMinDays
+   * - Doit être >= 0
+   */
+  ageMaxDays: z.coerce.number()
+    .int('ageCategory.validation.ageMaxDays.integer')
+    .min(0, 'ageCategory.validation.ageMaxDays.min')
+    .optional()
+    .or(z.literal(null))
+    .or(z.literal('')), // Accepte chaîne vide depuis input
+
+  /**
+   * Ordre d'affichage (optionnel)
+   * - Doit être >= 0
+   */
+  displayOrder: z.coerce.number()
+    .int('ageCategory.validation.displayOrder.integer')
+    .min(0, 'ageCategory.validation.displayOrder.min')
+    .optional(),
+
+  /**
+   * Statut actif/inactif (optionnel)
+   */
+  isActive: z.boolean().optional(),
+})
+  // Validation cross-field : ageMaxDays doit être > ageMinDays
+  .refine(
+    (data) => {
+      if (data.ageMaxDays === null || data.ageMaxDays === undefined || data.ageMaxDays === '') {
+        return true // Pas de limite supérieure, valide
+      }
+      const maxDays = typeof data.ageMaxDays === 'string' ? parseInt(data.ageMaxDays) : data.ageMaxDays
+      return maxDays > data.ageMinDays
+    },
+    {
+      message: 'ageCategory.validation.ageMaxDays.greaterThanMin',
+      path: ['ageMaxDays'],
+    }
+  )
+
+/**
+ * Schéma pour mise à jour
+ * Ajoute le champ `version` obligatoire pour optimistic locking
+ */
+export const updateAgeCategorySchema = ageCategorySchema.extend({
+  /**
+   * Version pour optimistic locking
+   * Doit être un entier positif
+   */
+  version: z.number()
+    .int('ageCategory.validation.version.integer')
+    .positive('ageCategory.validation.version.positive'),
+})
+
+/**
+ * Type inféré pour les formulaires de création
+ * Utilisé avec react-hook-form
+ */
+export type AgeCategoryFormData = z.infer<typeof ageCategorySchema>
+
+/**
+ * Type inféré pour les formulaires de mise à jour
+ * Utilisé avec react-hook-form
+ */
+export type UpdateAgeCategoryFormData = z.infer<typeof updateAgeCategorySchema>
