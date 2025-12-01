@@ -77,7 +77,7 @@ export function VeterinarianFormDialog({
     reset,
     control,
   } = useForm<VeterinarianFormData>({
-    resolver: zodResolver(veterinarianSchema),
+    resolver: zodResolver(veterinarianSchema) as any,
     defaultValues: {
       code: '',
       firstName: '',
