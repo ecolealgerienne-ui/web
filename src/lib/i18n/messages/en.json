@@ -341,6 +341,9 @@
       "usageInstructions": "Usage Instructions",
       "contraindications": "Contraindications",
       "storageConditions": "Storage Conditions",
+      "withdrawalPeriodMeat": "Withdrawal Period Meat",
+      "withdrawalPeriodMilk": "Withdrawal Period Milk",
+      "days": "days",
       "isVeterinaryPrescriptionRequired": "Veterinary Prescription Required",
       "isActive": "Active"
     },
@@ -481,6 +484,7 @@
       "name": "Name",
       "symbol": "Symbol",
       "type": "Type",
+      "description": "Description",
       "isActive": "Active"
     },
     "types": {

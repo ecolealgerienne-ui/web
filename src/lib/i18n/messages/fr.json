@@ -341,6 +341,9 @@
       "usageInstructions": "Instructions d'Utilisation",
       "contraindications": "Contre-indications",
       "storageConditions": "Conditions de Stockage",
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "withdrawalPeriodMilk": "Délai d'attente Lait",
+      "days": "jours",
       "isVeterinaryPrescriptionRequired": "Prescription Vétérinaire Obligatoire",
       "isActive": "Actif"
     },
@@ -481,6 +484,7 @@
       "name": "Nom",
       "symbol": "Symbole",
       "type": "Type",
+      "description": "Description",
       "isActive": "Actif"
     },
     "types": {
