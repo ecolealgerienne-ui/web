@@ -83,6 +83,7 @@
     },
     "sections": {
       "mainInfo": "Informations principales",
+      "basicInfo": "Informations de base",
       "additionalInfo": "Informations complémentaires",
       "options": "Options"
     },

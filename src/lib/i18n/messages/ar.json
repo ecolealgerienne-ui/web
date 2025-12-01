@@ -83,6 +83,7 @@
     },
     "sections": {
       "mainInfo": "المعلومات الأساسية",
+      "basicInfo": "المعلومات الأولية",
       "additionalInfo": "معلومات إضافية",
       "options": "الخيارات"
     },
