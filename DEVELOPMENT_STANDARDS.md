@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.6
+**Version:** 1.7
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout 3 nouvelles règles suite implémentation National-Campaigns (Règles 8.3.21-23: Gestion dates avec input HTML5, Validation cross-field Zod, Conversion sort order ASC/DESC)
+**Dernière mise à jour:** Ajout règle 8.3.24 suite implémentation Breeds - Structure PaginatedResponse avec meta.total + Correction imports Section 6.5 (tous les types communs dans api.ts)
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -960,10 +960,8 @@ import { apiClient } from '@/lib/api/client'
 // Internationalization
 import { useTranslations } from 'next-intl'
 
-// Types communs
-import type { BaseEntity } from '@/lib/types/common/base-entity'
-import type { PaginatedResponse, PaginationParams } from '@/lib/types/common/api'
-import type { CrudService } from '@/lib/types/common/crud-service'
+// Types communs - TOUS dans api.ts
+import type { BaseEntity, PaginatedResponse, PaginationParams, CrudService } from '@/lib/types/common/api'
 
 // UI Components (shadcn/ui)
 import { Button } from '@/components/ui/button'
@@ -3780,6 +3778,126 @@ export interface NationalCampaignFilterParams {
 - [ ] Spécifier `path` dans refine pour cibler le bon champ d'erreur
 - [ ] Convertir sort order : `.toLowerCase()` pour DataTable, `.toUpperCase()` pour backend
 - [ ] Afficher dates avec `toLocaleDateString('fr-FR')` dans les tableaux
+
+#### 8.3.24 Structure de PaginatedResponse - Accès via meta.total ⚠️ RÈGLE CRITIQUE
+
+✅ **RÈGLE OBLIGATOIRE** : `PaginatedResponse<T>` utilise `meta.total`, PAS `total` directement
+
+**Problème :**
+L'interface `PaginatedResponse<T>` a changé de structure. Le total n'est plus à la racine mais dans l'objet `meta`.
+
+**Structure correcte de PaginatedResponse :**
+
+```typescript
+// /src/lib/types/common/api.ts
+export interface PaginationMeta {
+  total: number        // ✅ Total d'éléments
+  page: number         // Page actuelle
+  limit: number        // Éléments par page
+  totalPages: number   // Nombre total de pages
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]            // ✅ Array des données
+  meta: PaginationMeta // ✅ Métadonnées dans un objet 'meta'
+}
+```
+
+**Pattern correct dans les services :**
+
+```typescript
+// ✅ CORRECT : Accès via response.meta.total
+async getAll(params: FilterParams = {}): Promise<PaginatedResponse<MyEntity>> {
+  const response = await apiClient.get<PaginatedResponse<MyEntity>>(
+    `${this.basePath}?${queryParams.toString()}`
+  )
+
+  logger.info('Entities fetched', {
+    total: response.meta.total,    // ✅ Accès via .meta
+    page: response.meta.page,      // ✅
+    totalPages: response.meta.totalPages  // ✅
+  })
+
+  return response
+}
+```
+
+**Pattern correct dans les hooks :**
+
+```typescript
+// ✅ CORRECT : Extraction via response.meta.total
+const fetchEntities = useCallback(async () => {
+  setLoading(true)
+  try {
+    const response = await myEntityService.getAll(params)
+    setData(response.data)           // ✅ Array directement
+    setTotal(response.meta.total)    // ✅ Total via .meta
+  } catch (error) {
+    handleApiError(error, 'entities.fetch', toast)
+  } finally {
+    setLoading(false)
+  }
+}, [params, toast])
+```
+
+**❌ Erreurs courantes :**
+
+```typescript
+// ❌ ERREUR 1 : Accès direct à response.total (n'existe pas)
+const response = await myService.getAll(params)
+setTotal(response.total)  // ❌ Property 'total' does not exist on type 'PaginatedResponse<T>'
+
+// ✅ CORRECT 1
+setTotal(response.meta.total)  // ✅
+
+// ❌ ERREUR 2 : Logger response.total
+logger.info('Entities fetched', {
+  total: response.total  // ❌ Undefined
+})
+
+// ✅ CORRECT 2
+logger.info('Entities fetched', {
+  total: response.meta.total  // ✅
+})
+
+// ❌ ERREUR 3 : Déstructuration incorrecte
+const { data, total } = await myService.getAll()  // ❌ total undefined
+
+// ✅ CORRECT 3
+const { data, meta } = await myService.getAll()
+const total = meta.total  // ✅
+
+// Ou directement
+const response = await myService.getAll()
+setData(response.data)
+setTotal(response.meta.total)
+```
+
+**Types d'erreur TypeScript :**
+
+```
+Property 'total' does not exist on type 'PaginatedResponse<Breed>'.
+```
+
+**Raison du changement :**
+- Séparation des données et des métadonnées
+- Structure plus évolutive (ajout de nouvelles métadonnées sans polluer la racine)
+- Cohérence avec les standards REST modernes
+
+**Impact violation :**
+- ❌ Build error TypeScript
+- ❌ `total` sera `undefined` au runtime
+- ❌ Pagination cassée (affichage "0 résultats" même si données présentes)
+- ❌ Logs incorrects
+
+**Checklist PaginatedResponse :**
+- [ ] Import `PaginatedResponse<T>` depuis `@/lib/types/common/api`
+- [ ] Accéder au total via `response.meta.total` (pas `response.total`)
+- [ ] Accéder à la page via `response.meta.page`
+- [ ] Accéder au nombre de pages via `response.meta.totalPages`
+- [ ] Dans les hooks : `setTotal(response.meta.total)`
+- [ ] Dans les logs : `total: response.meta.total`
+- [ ] Vérifier avec `npx tsc --noEmit` avant commit
 
 ---
 
