@@ -319,9 +319,9 @@ export function DataTable<T extends BaseEntity>({
               </TableRow>
             ) : (
               // Data rows
-              data.map((item) => (
+              data.map((item, index) => (
                 <TableRow
-                  key={item.id}
+                  key={item.id || `row-${index}`}
                   className={`${item.deletedAt ? 'opacity-50' : ''} ${onRowClick ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''}`}
                   onClick={(e) => {
                     // Ne pas déclencher onRowClick si on clique sur un bouton d'action
