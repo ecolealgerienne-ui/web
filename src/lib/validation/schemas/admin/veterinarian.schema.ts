@@ -127,6 +127,20 @@ export const veterinarianSchema = z.object({
     .optional()
     .or(z.literal('')),
 
+  scope: z.enum(['global', 'local'], {
+    message: 'veterinarian.validation.scope.invalid',
+  }),
+
+  department: z
+    .string()
+    .max(10, 'veterinarian.validation.department.maxLength')
+    .optional()
+    .or(z.literal('')),
+
+  isAvailable: z.boolean().optional().default(true),
+
+  emergencyService: z.boolean().optional().default(false),
+
   contactInfo: contactInfoSchema,
 
   isActive: z.boolean().default(true),
@@ -187,6 +201,22 @@ export const updateVeterinarianSchema = z.object({
     .max(200, 'veterinarian.validation.clinic.maxLength')
     .optional()
     .or(z.literal('')),
+
+  scope: z
+    .enum(['global', 'local'], {
+      message: 'veterinarian.validation.scope.invalid',
+    })
+    .optional(),
+
+  department: z
+    .string()
+    .max(10, 'veterinarian.validation.department.maxLength')
+    .optional()
+    .or(z.literal('')),
+
+  isAvailable: z.boolean().optional(),
+
+  emergencyService: z.boolean().optional(),
 
   contactInfo: contactInfoSchema.optional(),
 

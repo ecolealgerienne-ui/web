@@ -731,6 +731,10 @@
       "licenseNumber": "License Number",
       "specialties": "Specialties",
       "clinic": "Clinic",
+      "scope": "Scope",
+      "department": "Department",
+      "isAvailable": "Available",
+      "emergencyService": "Emergency Service",
       "contactInfo": "Contact Information",
       "phone": "Phone",
       "mobile": "Mobile",
@@ -740,6 +744,10 @@
       "postalCode": "Postal Code",
       "country": "Country",
       "isActive": "Active"
+    },
+    "scope": {
+      "global": "Global",
+      "local": "Local"
     },
     "validation": {
       "code": {
@@ -770,6 +778,12 @@
       },
       "clinic": {
         "maxLength": "Clinic name must not exceed 200 characters"
+      },
+      "scope": {
+        "invalid": "Scope must be 'global' or 'local'"
+      },
+      "department": {
+        "maxLength": "Department must not exceed 10 characters"
       },
       "contactInfo": {
         "phone": {
@@ -810,6 +824,8 @@
       "licenseNumber": "VET-US-12345",
       "specialties": "Surgery, Dermatology...",
       "clinic": "Central Veterinary Clinic",
+      "scope": "Select scope",
+      "department": "NY, CA, TX...",
       "phone": "+1 234 567 8900",
       "mobile": "+1 234 567 8901",
       "email": "john.doe@vet-clinic.com",

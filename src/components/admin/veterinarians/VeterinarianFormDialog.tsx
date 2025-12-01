@@ -35,7 +35,16 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Plus, X } from 'lucide-react'
+import { Controller } from 'react-hook-form'
 import {
   veterinarianSchema,
   updateVeterinarianSchema,
@@ -77,6 +86,7 @@ export function VeterinarianFormDialog({
     formState: { errors },
     reset,
     setValue,
+    control,
   } = useForm<VeterinarianFormData>({
     resolver: zodResolver(veterinarianSchema) as any,
     defaultValues: {
@@ -86,6 +96,10 @@ export function VeterinarianFormDialog({
       licenseNumber: '',
       specialties: [''],
       clinic: '',
+      scope: 'global',
+      department: '',
+      isAvailable: true,
+      emergencyService: false,
       contactInfo: {
         phone: '',
         mobile: '',
@@ -136,6 +150,10 @@ export function VeterinarianFormDialog({
         licenseNumber: veterinarian.licenseNumber,
         specialties: specs,
         clinic: veterinarian.clinic || '',
+        scope: veterinarian.scope || 'global',
+        department: veterinarian.department || '',
+        isAvailable: veterinarian.isAvailable ?? true,
+        emergencyService: veterinarian.emergencyService ?? false,
         contactInfo: {
           phone: veterinarian.contactInfo.phone,
           mobile: veterinarian.contactInfo.mobile || '',
@@ -159,6 +177,10 @@ export function VeterinarianFormDialog({
         licenseNumber: '',
         specialties: [''],
         clinic: '',
+        scope: 'global',
+        department: '',
+        isAvailable: true,
+        emergencyService: false,
         contactInfo: {
           phone: '',
           mobile: '',
@@ -303,6 +325,92 @@ export function VeterinarianFormDialog({
                     {t(errors.clinic.message as string)}
                   </p>
                 )}
+              </div>
+
+              {/* Scope */}
+              <div>
+                <Label htmlFor="scope">
+                  {t('fields.scope')} <span className="text-destructive">*</span>
+                </Label>
+                <Controller
+                  name="scope"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={loading}
+                    >
+                      <SelectTrigger className={errors.scope ? 'border-destructive' : ''}>
+                        <SelectValue placeholder={t('placeholders.scope')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="global">{t('scope.global')}</SelectItem>
+                        <SelectItem value="local">{t('scope.local')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.scope && (
+                  <p className="text-sm text-destructive mt-1">
+                    {t(errors.scope.message as string)}
+                  </p>
+                )}
+              </div>
+
+              {/* Department (optionnel) */}
+              <div>
+                <Label htmlFor="department">{t('fields.department')}</Label>
+                <Input
+                  id="department"
+                  {...register('department')}
+                  placeholder={t('placeholders.department')}
+                  className={errors.department ? 'border-destructive' : ''}
+                  disabled={loading}
+                />
+                {errors.department && (
+                  <p className="text-sm text-destructive mt-1">
+                    {t(errors.department.message as string)}
+                  </p>
+                )}
+              </div>
+
+              {/* isAvailable */}
+              <div className="flex items-center space-x-2">
+                <Controller
+                  name="isAvailable"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="isAvailable"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  )}
+                />
+                <Label htmlFor="isAvailable" className="cursor-pointer">
+                  {t('fields.isAvailable')}
+                </Label>
+              </div>
+
+              {/* emergencyService */}
+              <div className="flex items-center space-x-2">
+                <Controller
+                  name="emergencyService"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="emergencyService"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  )}
+                />
+                <Label htmlFor="emergencyService" className="cursor-pointer">
+                  {t('fields.emergencyService')}
+                </Label>
               </div>
             </div>
           </div>

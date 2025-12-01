@@ -34,10 +34,10 @@ import type {
   Veterinarian,
   CreateVeterinarianDto,
   UpdateVeterinarianDto,
+  VeterinarianFilterParams,
 } from '@/lib/types/admin/veterinarian'
-import type { PaginationParams } from '@/lib/types/common/api'
 
-export function useVeterinarians(initialParams?: PaginationParams) {
+export function useVeterinarians(initialParams?: VeterinarianFilterParams) {
   const toast = useToast()
   const t = useTranslations('veterinarian')
   const tc = useTranslations('common')
@@ -47,12 +47,12 @@ export function useVeterinarians(initialParams?: PaginationParams) {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  const [params, setParams] = useState<PaginationParams>(
+  const [params, setParams] = useState<VeterinarianFilterParams>(
     initialParams || {
       page: 1,
       limit: 25,
-      sortBy: 'lastName',
-      sortOrder: 'asc',
+      sort: 'lastName',
+      order: 'asc',
     }
   )
 

@@ -50,6 +50,31 @@ export interface Veterinarian extends BaseEntity {
   clinic?: string
 
   /**
+   * Scope du vétérinaire
+   * - global: Vétérinaire disponible pour tous
+   * - local: Vétérinaire local/régional
+   */
+  scope: 'global' | 'local'
+
+  /**
+   * Code du département (optionnel)
+   * Ex: "01", "75", "DZ-16"
+   */
+  department?: string
+
+  /**
+   * Disponibilité du vétérinaire
+   * Indique si le vétérinaire accepte de nouveaux patients
+   */
+  isAvailable?: boolean
+
+  /**
+   * Service d'urgence disponible
+   * Indique si le vétérinaire propose un service d'urgence
+   */
+  emergencyService?: boolean
+
+  /**
    * Informations de contact
    */
   contactInfo: {
@@ -100,6 +125,10 @@ export interface CreateVeterinarianDto {
   licenseNumber: string
   specialties: string[]
   clinic?: string
+  scope: 'global' | 'local'
+  department?: string
+  isAvailable?: boolean
+  emergencyService?: boolean
   contactInfo: {
     phone: string
     mobile?: string
@@ -123,6 +152,10 @@ export interface UpdateVeterinarianDto {
   licenseNumber?: string
   specialties?: string[]
   clinic?: string
+  scope?: 'global' | 'local'
+  department?: string
+  isAvailable?: boolean
+  emergencyService?: boolean
   contactInfo?: {
     phone?: string
     mobile?: string
@@ -134,4 +167,40 @@ export interface UpdateVeterinarianDto {
   }
   isActive?: boolean
   version: number
+}
+
+/**
+ * Paramètres de filtrage spécifiques aux vétérinaires
+ * Étend PaginationParams avec des filtres métier
+ */
+export interface VeterinarianFilterParams {
+  /** Numéro de page (1-indexed, défaut: 1) */
+  page?: number
+
+  /** Nombre d'éléments par page (défaut: 50, max: 100) */
+  limit?: number
+
+  /** Recherche dans les noms (firstName, lastName) */
+  search?: string
+
+  /** Filtrer par scope */
+  scope?: 'global' | 'local' | 'all'
+
+  /** Filtrer par code département */
+  department?: string
+
+  /** Filtrer par statut actif */
+  isActive?: boolean
+
+  /** Filtrer par disponibilité */
+  isAvailable?: boolean
+
+  /** Filtrer par service d'urgence */
+  emergencyService?: boolean
+
+  /** Champ de tri (défaut: lastName) */
+  sort?: string
+
+  /** Ordre de tri (défaut: asc) */
+  order?: 'asc' | 'desc'
 }

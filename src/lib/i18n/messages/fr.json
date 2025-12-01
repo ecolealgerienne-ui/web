@@ -731,6 +731,10 @@
       "licenseNumber": "Numéro de licence",
       "specialties": "Spécialités",
       "clinic": "Clinique",
+      "scope": "Portée",
+      "department": "Département",
+      "isAvailable": "Disponible",
+      "emergencyService": "Service d'urgence",
       "contactInfo": "Coordonnées",
       "phone": "Téléphone",
       "mobile": "Mobile",
@@ -740,6 +744,10 @@
       "postalCode": "Code postal",
       "country": "Pays",
       "isActive": "Actif"
+    },
+    "scope": {
+      "global": "Global",
+      "local": "Local"
     },
     "validation": {
       "code": {
@@ -770,6 +778,12 @@
       },
       "clinic": {
         "maxLength": "Le nom de la clinique ne doit pas dépasser 200 caractères"
+      },
+      "scope": {
+        "invalid": "La portée doit être 'global' ou 'local'"
+      },
+      "department": {
+        "maxLength": "Le département ne doit pas dépasser 10 caractères"
       },
       "contactInfo": {
         "phone": {
@@ -810,6 +824,8 @@
       "licenseNumber": "VET-FR-12345",
       "specialties": "Chirurgie, Dermatologie...",
       "clinic": "Clinique Vétérinaire Centrale",
+      "scope": "Sélectionnez la portée",
+      "department": "75, 16, DZ-16...",
       "phone": "+33 1 23 45 67 89",
       "mobile": "+33 6 12 34 56 78",
       "email": "jean.dupont@vet-clinic.fr",

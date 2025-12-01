@@ -215,10 +215,10 @@ export default function VeterinariansPage() {
             limit={params.limit || 25}
             onPageChange={(page) => setParams({ ...params, page })}
             onLimitChange={(limit) => setParams({ ...params, limit, page: 1 })}
-            sortBy={params.sortBy}
-            sortOrder={params.sortOrder}
+            sortBy={params.sort}
+            sortOrder={params.order}
             onSortChange={(sortBy, sortOrder) =>
-              setParams({ ...params, sortBy, sortOrder })
+              setParams({ ...params, sort: sortBy, order: sortOrder })
             }
             onRowClick={handleRowClick}
             onEdit={handleEdit}
