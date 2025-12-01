@@ -11,6 +11,7 @@ import { DetailSheet } from '@/components/admin/common/DetailSheet'
 import { AgeCategoryFormDialog } from '@/components/admin/age-categories/AgeCategoryFormDialog'
 import { useAgeCategories } from '@/lib/hooks/admin/useAgeCategories'
 import type { AgeCategory } from '@/lib/types/admin/age-category'
+import type { AgeCategoryFilterParams } from '@/lib/services/admin/age-categories.service'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -103,7 +104,7 @@ export default function AgeCategoriesPage() {
 
   // Mettre à jour les paramètres quand le filtre espèce change
   useEffect(() => {
-    setParams((prevParams) => ({
+    setParams((prevParams: AgeCategoryFilterParams) => ({
       ...prevParams,
       speciesId: selectedSpeciesId || undefined,
       page: 1, // Reset page quand on change de filtre

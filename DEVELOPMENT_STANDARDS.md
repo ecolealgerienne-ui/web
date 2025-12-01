@@ -603,6 +603,133 @@ export const schema = z.object({
 
 ---
 
+### 5.4 Schémas avec Refine : Pattern d'Extension ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `.extend()` sur un schéma contenant `.refine()`**
+
+**Problème** : Zod ne permet pas d'étendre un schéma qui contient déjà des refinements (validations cross-field avec `.refine()`). Cela génère l'erreur : `"Object schemas containing refinements cannot be extended. Use .safeExtend() instead."`
+
+**✅ SOLUTION : Créer un schéma de base, puis étendre AVANT d'ajouter le refine**
+
+```typescript
+// ❌ MAUVAIS - Erreur Zod
+export const createSchema = z.object({
+  ageMin: z.number().min(0),
+  ageMax: z.number().min(0).optional(),
+}).refine(
+  (data) => !data.ageMax || data.ageMax > data.ageMin,
+  { message: 'ageMax must be greater than ageMin', path: ['ageMax'] }
+)
+
+// ❌ ERREUR : Cannot extend schema with refinements
+export const updateSchema = createSchema.extend({
+  version: z.number().positive(),
+})
+
+// ✅ BON - Pattern correct avec schéma de base
+const baseSchema = z.object({
+  ageMin: z.number().min(0),
+  ageMax: z.number().min(0).optional(),
+})
+
+// Schéma de création : base + refine
+export const createSchema = baseSchema.refine(
+  (data) => !data.ageMax || data.ageMax > data.ageMin,
+  { message: 'ageMax must be greater than ageMin', path: ['ageMax'] }
+)
+
+// Schéma de mise à jour : base + extend + refine
+export const updateSchema = baseSchema
+  .extend({
+    version: z.number().positive(),
+  })
+  .refine(
+    (data) => !data.ageMax || data.ageMax > data.ageMin,
+    { message: 'ageMax must be greater than ageMin', path: ['ageMax'] }
+  )
+```
+
+**Pattern Standard pour les Entités Admin :**
+
+```typescript
+// 1. Schéma de base (ne pas exporter)
+const entityBaseSchema = z.object({
+  code: z.string().min(1).max(50),
+  name: z.string().min(1).max(200),
+  // ... autres champs
+})
+
+// 2. Schéma de création (exporter)
+export const entitySchema = entityBaseSchema
+  .refine(
+    (data) => {
+      // Validation cross-field
+      return true
+    },
+    { message: 'validation error', path: ['field'] }
+  )
+
+// 3. Schéma de mise à jour (exporter)
+export const updateEntitySchema = entityBaseSchema
+  .extend({
+    version: z.number().int().positive(),
+  })
+  .refine(
+    (data) => {
+      // Même validation cross-field que pour la création
+      return true
+    },
+    { message: 'validation error', path: ['field'] }
+  )
+
+// 4. Types explicites (exporter)
+export type EntityFormData = {
+  code: string
+  name: string
+  // ... autres champs
+}
+
+export type UpdateEntityFormData = EntityFormData & {
+  version: number
+}
+```
+
+**Règles :**
+
+1. **Créer un schéma de base** sans `.refine()` (ne pas l'exporter)
+2. **Schéma de création** : `baseSchema.refine(...)`
+3. **Schéma de mise à jour** : `baseSchema.extend({ version }).refine(...)`
+4. **Dupliquer la validation `.refine()`** dans les deux schémas (création et mise à jour)
+5. **Exporter des types explicites** au lieu de se fier uniquement à `z.infer`
+
+**Exemple réel (Age-Categories) :**
+
+```typescript
+// Ne pas exporter
+const ageCategoryBaseSchema = z.object({
+  code: z.string().min(1),
+  ageMinDays: z.number().min(0),
+  ageMaxDays: z.number().min(0).optional(),
+  // ...
+})
+
+// Exporter
+export const ageCategorySchema = ageCategoryBaseSchema.refine(
+  (data) => !data.ageMaxDays || data.ageMaxDays > data.ageMinDays,
+  { message: 'ageMaxDays must be greater than ageMinDays', path: ['ageMaxDays'] }
+)
+
+// Exporter
+export const updateAgeCategorySchema = ageCategoryBaseSchema
+  .extend({ version: z.number().int().positive() })
+  .refine(
+    (data) => !data.ageMaxDays || data.ageMaxDays > data.ageMinDays,
+    { message: 'ageMaxDays must be greater than ageMinDays', path: ['ageMaxDays'] }
+  )
+```
+
+---
+
 ## 6. TypeScript & Types
 
 ### 6.1 Types Communs Obligatoires
