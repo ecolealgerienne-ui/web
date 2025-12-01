@@ -34,7 +34,7 @@ import type {
  * Toutes les opérations utilisent apiClient et sont loggées.
  * Les erreurs sont propagées pour être gérées par handleApiError dans les hooks.
  */
-class VeterinariansService implements CrudService<Veterinarian> {
+class VeterinariansService implements CrudService<Veterinarian, CreateVeterinarianDto, UpdateVeterinarianDto> {
   private readonly baseUrl = '/api/v1/veterinarians'
 
   /**
