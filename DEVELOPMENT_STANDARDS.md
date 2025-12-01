@@ -1215,6 +1215,150 @@ useEffect(() => {
 
 ---
 
+### 7.5 Radix UI Select - Valeurs Vides Interdites ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `value=""` dans un `<SelectItem />`**
+
+**Problème** : Radix UI Select génère une erreur si un `SelectItem` a une valeur vide :
+```
+Error: A <Select.Item /> must have a value prop that is not an empty string.
+This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+```
+
+**✅ SOLUTION : Utiliser une constante spéciale pour représenter "Tous" ou "Aucun"**
+
+```typescript
+// ❌ MAUVAIS - Erreur Radix UI
+<Select value={selectedId} onValueChange={setSelectedId}>
+  <SelectTrigger>
+    <SelectValue placeholder="Sélectionner..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="">Tous</SelectItem>  {/* ❌ ERREUR */}
+    <SelectItem value="1">Option 1</SelectItem>
+    <SelectItem value="2">Option 2</SelectItem>
+  </SelectContent>
+</Select>
+
+// ✅ BON - Constante spéciale
+const ALL_ITEMS = '__all__'  // Ou 'ALL', ou autre valeur unique
+
+const [selectedId, setSelectedId] = useState<string>(ALL_ITEMS)
+
+<Select value={selectedId} onValueChange={setSelectedId}>
+  <SelectTrigger>
+    <SelectValue placeholder="Sélectionner..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value={ALL_ITEMS}>Tous</SelectItem>  {/* ✅ OK */}
+    <SelectItem value="1">Option 1</SelectItem>
+    <SelectItem value="2">Option 2</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+**Pattern Standard : Filtre avec Option "Tous"**
+
+```typescript
+// 1. Définir la constante (en dehors du composant)
+const ALL_SPECIES = '__all__'
+
+export default function MyPage() {
+  // 2. État initial avec la constante
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>(ALL_SPECIES)
+
+  // 3. Convertir en undefined pour l'API
+  const { data } = useItems({
+    speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId
+  })
+
+  // 4. Dans le Select
+  return (
+    <Select value={selectedSpeciesId} onValueChange={setSelectedSpeciesId}>
+      <SelectContent>
+        <SelectItem value={ALL_SPECIES}>{t('filters.all')}</SelectItem>
+        {species.map(sp => (
+          <SelectItem key={sp.id} value={sp.id}>
+            {sp.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+**Règles :**
+
+1. **Définir une constante** pour la valeur "Tous" (ex: `ALL_ITEMS`, `ALL_SPECIES`)
+   ```typescript
+   const ALL_SPECIES = '__all__'  // ✅ Valeur unique et reconnaissable
+   const ALL_SPECIES = 'ALL'      // ✅ Alternative simple
+   const ALL_SPECIES = ''         // ❌ INTERDIT
+   ```
+
+2. **État initial** : Utiliser la constante
+   ```typescript
+   useState<string>(ALL_SPECIES)  // ✅ Démarre avec "Tous" sélectionné
+   ```
+
+3. **Conversion pour API** : Convertir la constante en `undefined` ou `null`
+   ```typescript
+   speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId
+   ```
+
+4. **Utiliser partout** : Toute logique qui dépend de "tous sélectionnés" doit vérifier la constante
+   ```typescript
+   if (selectedId === ALL_ITEMS) {
+     // Logique pour "tous"
+   }
+   ```
+
+**Exemple Complet (Age-Categories Filter) :**
+
+```typescript
+// Constante globale (hors composant)
+const ALL_SPECIES = '__all__'
+
+export default function AgeCategoriesPage() {
+  // État avec constante
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>(ALL_SPECIES)
+
+  // Hook avec conversion
+  const { data } = useAgeCategories({
+    speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId
+  })
+
+  // useEffect avec conversion
+  useEffect(() => {
+    setParams(prev => ({
+      ...prev,
+      speciesId: selectedSpeciesId === ALL_SPECIES ? undefined : selectedSpeciesId,
+      page: 1
+    }))
+  }, [selectedSpeciesId])
+
+  // Select avec constante
+  return (
+    <Select value={selectedSpeciesId} onValueChange={setSelectedSpeciesId}>
+      <SelectContent>
+        <SelectItem value={ALL_SPECIES}>Toutes les espèces</SelectItem>
+        {species.map(sp => (
+          <SelectItem key={sp.id} value={sp.id}>{sp.name}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+**Cas d'usage typiques :**
+- Filtres "Tous / Toutes" dans les listes
+- Option "Aucun / Non sélectionné" dans les formulaires
+- Réinitialisation de sélection
+
+---
+
 ## 8. Services API
 
 ### 8.1 Structure d'un Service
