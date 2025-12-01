@@ -1,4 +1,4 @@
-import type { BaseEntity } from '@/lib/types/common/base-entity'
+import type { BaseEntity } from '@/lib/types/common/api'
 
 /**
  * Type complet d'une Race
