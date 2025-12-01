@@ -53,7 +53,7 @@ export function useProducts(
     initialParams || {
       page: 1,
       limit: 25,
-      sortBy: 'commercialName',
+      sortBy: 'code',
       sortOrder: 'asc',
     }
   )
