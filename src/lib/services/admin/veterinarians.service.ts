@@ -21,10 +21,10 @@ import type {
   Veterinarian,
   CreateVeterinarianDto,
   UpdateVeterinarianDto,
+  VeterinarianFilterParams,
 } from '@/lib/types/admin/veterinarian'
 import type {
   PaginatedResponse,
-  PaginationParams,
   CrudService,
 } from '@/lib/types/common/api'
 
@@ -40,23 +40,35 @@ class VeterinariansService implements CrudService<Veterinarian, CreateVeterinari
   /**
    * Récupère la liste paginée des vétérinaires
    *
-   * @param params - Paramètres de pagination et tri
+   * @param params - Paramètres de pagination, tri et filtres
    * @returns Liste paginée de vétérinaires
    */
   async getAll(
-    params?: PaginationParams
+    params?: VeterinarianFilterParams
   ): Promise<PaginatedResponse<Veterinarian>> {
     logger.info('Fetching veterinarians', { params })
 
     // Construire URL avec query params manuellement (RÈGLE 8.3.1)
     // ⚠️ Backend utilise 'sort' et 'order' (pas 'sortBy' et 'sortOrder')
     const queryParams = new URLSearchParams()
+
+    // Pagination
     if (params?.page) queryParams.append('page', String(params.page))
     if (params?.limit) queryParams.append('limit', String(params.limit))
+
+    // Recherche
     if (params?.search) queryParams.append('search', params.search)
-    if (params?.sortBy) queryParams.append('sort', params.sortBy) // Backend: 'sort'
-    if (params?.sortOrder) queryParams.append('order', params.sortOrder) // Backend: 'order'
-    if (params?.includeDeleted) queryParams.append('includeDeleted', 'true')
+
+    // Filtres spécifiques
+    if (params?.scope) queryParams.append('scope', params.scope)
+    if (params?.department) queryParams.append('department', params.department)
+    if (params?.isActive !== undefined) queryParams.append('isActive', String(params.isActive))
+    if (params?.isAvailable !== undefined) queryParams.append('isAvailable', String(params.isAvailable))
+    if (params?.emergencyService !== undefined) queryParams.append('emergencyService', String(params.emergencyService))
+
+    // Tri
+    if (params?.sort) queryParams.append('sort', params.sort)
+    if (params?.order) queryParams.append('order', params.order)
 
     const url = queryParams.toString()
       ? `${this.baseUrl}?${queryParams.toString()}`

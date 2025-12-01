@@ -726,6 +726,10 @@
       "licenseNumber": "رقم الترخيص",
       "specialties": "التخصصات",
       "clinic": "العيادة",
+      "scope": "النطاق",
+      "department": "الولاية",
+      "isAvailable": "متاح",
+      "emergencyService": "خدمة الطوارئ",
       "contactInfo": "معلومات الاتصال",
       "phone": "الهاتف",
       "mobile": "الجوال",
@@ -735,6 +739,10 @@
       "postalCode": "الرمز البريدي",
       "country": "البلد",
       "isActive": "نشط"
+    },
+    "scope": {
+      "global": "عالمي",
+      "local": "محلي"
     },
     "validation": {
       "code": {
@@ -765,6 +773,12 @@
       },
       "clinic": {
         "maxLength": "يجب ألا يتجاوز اسم العيادة 200 حرف"
+      },
+      "scope": {
+        "invalid": "يجب أن يكون النطاق 'عالمي' أو 'محلي'"
+      },
+      "department": {
+        "maxLength": "يجب ألا تتجاوز الولاية 10 أحرف"
       },
       "contactInfo": {
         "phone": {
@@ -805,6 +819,8 @@
       "licenseNumber": "VET-DZ-12345",
       "specialties": "الجراحة، الأمراض الجلدية...",
       "clinic": "العيادة البيطرية المركزية",
+      "scope": "اختر النطاق",
+      "department": "16، 01، 31...",
       "phone": "+213 21 12 34 56",
       "mobile": "+213 6 12 34 56 78",
       "email": "ahmed.benali@vet-clinic.dz",
