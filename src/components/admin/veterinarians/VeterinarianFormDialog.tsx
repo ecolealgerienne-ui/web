@@ -75,9 +75,9 @@ export function VeterinarianFormDialog({
     formState: { errors },
     reset,
     control,
-  } = useForm<VeterinarianFormData | UpdateVeterinarianFormData>({
-    // Note: 'as any' requis car zodResolver ne peut pas inférer le type union
-    // avec schémas conditionnels. Pattern standard pour formulaires create/edit.
+  } = useForm<VeterinarianFormData>({
+    // Note: Utilise VeterinarianFormData (type complet) pour le typing de useForm
+    // Le schéma conditionnel gère la validation (create vs update)
     resolver: zodResolver(
       isEditMode ? updateVeterinarianSchema : veterinarianSchema
     ) as any,
@@ -104,7 +104,7 @@ export function VeterinarianFormDialog({
   // useFieldArray pour gérer les spécialités (array dynamique)
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'specialties' as const,
+    name: 'specialties',
   })
 
   // Charge les données en mode édition
@@ -154,15 +154,14 @@ export function VeterinarianFormDialog({
     }
   }, [veterinarian, open, reset, isEditMode])
 
-  const handleFormSubmission = async (
-    data: VeterinarianFormData | UpdateVeterinarianFormData
-  ) => {
+  const handleFormSubmission = async (data: VeterinarianFormData) => {
     // Filtrer les spécialités vides
     const cleanedData = {
       ...data,
       specialties: data.specialties?.filter((s) => s.trim() !== '') || [],
     }
-    await onSubmit(cleanedData)
+    // Cast to union type for onSubmit (validation schema handles create vs update)
+    await onSubmit(cleanedData as VeterinarianFormData | UpdateVeterinarianFormData)
   }
 
   return (
