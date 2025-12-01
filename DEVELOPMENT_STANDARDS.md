@@ -1,7 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.0
-**Date:** 2025-11-30
+**Version:** 1.1
+**Date:** 2025-12-01
+**Dernière mise à jour:** Ajout 6 nouvelles règles (8.3.5 à 8.3.10) - Sprint 1 Products
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -1080,6 +1081,360 @@ const update = async (id: string, dto: UpdateActiveSubstanceDto) => {
 ```
 
 Le backend incrémente automatiquement la version à chaque mise à jour et retourne `409 Conflict` si la version envoyée ne correspond pas (détection de modifications concurrentes).
+
+#### 8.3.5 Formulaires Complexes - Organisation en Sections
+
+⚠️ **Problème** : Les formulaires avec 10+ champs deviennent illisibles et confus.
+
+✅ **SOLUTION :** Organiser en sections logiques avec titres séparés par bordure
+
+```tsx
+// ❌ MAUVAIS : Tous les champs mélangés
+<form>
+  <Input label="Code" />
+  <Input label="Commercial Name" />
+  <Input label="Description" />
+  <Input label="Usage Instructions" />
+  {/* ... 10+ champs */}
+</form>
+
+// ✅ BON : Sections organisées
+<form className="space-y-6">
+  {/* Section 1 : Informations principales */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.mainInfo')}
+    </h3>
+    <Input label={t('fields.code')} {...register('code')} />
+    <Input label={t('fields.commercialName')} {...register('commercialName')} />
+    <Input label={t('fields.laboratoryName')} {...register('laboratoryName')} />
+  </div>
+
+  {/* Section 2 : Informations complémentaires */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.additionalInfo')}
+    </h3>
+    <Textarea label={t('fields.description')} {...register('description')} />
+    <Textarea label={t('fields.usageInstructions')} {...register('usageInstructions')} />
+  </div>
+
+  {/* Section 3 : Options */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.options')}
+    </h3>
+    <Checkbox label={t('fields.isActive')} {...register('isActive')} />
+  </div>
+</form>
+```
+
+**Traductions communes à ajouter dans `common` namespace :**
+```json
+{
+  "common": {
+    "sections": {
+      "mainInfo": "Informations principales",
+      "additionalInfo": "Informations complémentaires",
+      "options": "Options"
+    }
+  }
+}
+```
+
+**Impact** : Améliore significativement l'UX pour formulaires avec 10+ champs (ex: Products avec 13 champs).
+
+#### 8.3.6 react-hook-form - Controller pour Select
+
+⚠️ **PROBLÈME :** Les composants shadcn/ui `<Select>` ne fonctionnent PAS avec `{...register()}`
+
+❌ **NE FONCTIONNE PAS :**
+```tsx
+// ❌ ERREUR : Le Select ne se synchronise pas avec react-hook-form
+<Select {...register('therapeuticForm')}>
+  <SelectTrigger>
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="injectable">Injectable</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+✅ **SOLUTION :** TOUJOURS utiliser `<Controller>` pour les Select shadcn/ui
+```tsx
+import { Controller } from 'react-hook-form'
+
+<Controller
+  name="therapeuticForm"
+  control={control}
+  render={({ field }) => (
+    <Select
+      onValueChange={field.onChange}
+      defaultValue={field.value}
+      disabled={loading}
+    >
+      <SelectTrigger className={errors.therapeuticForm ? 'border-destructive' : ''}>
+        <SelectValue placeholder={tc('placeholders.select')} />
+      </SelectTrigger>
+      <SelectContent>
+        {therapeuticForms.map((form) => (
+          <SelectItem key={form} value={form}>
+            {t(`therapeuticForms.${form}`)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )}
+/>
+```
+
+**Impact** : Évite les bugs silencieux où le Select n'est pas synchronisé avec le state du formulaire.
+
+#### 8.3.7 Multi-Select Pattern (Relations Many-to-Many)
+
+⚠️ **PROBLÈME :** Relations many-to-many nécessitent multi-select (ex: `activeSubstanceIds[]`)
+
+✅ **SOLUTION :** Pattern en 3 étapes avec checkboxes + useState + useEffect
+
+```tsx
+import { useState, useEffect } from 'react'
+
+function ProductFormDialog({ product, onSubmit }: Props) {
+  const { register, setValue, control } = useForm<ProductFormData>()
+
+  // 1. State local pour les IDs sélectionnés
+  const [selectedSubstanceIds, setSelectedSubstanceIds] = useState<string[]>([])
+
+  // 2. Synchroniser avec react-hook-form
+  useEffect(() => {
+    setValue('activeSubstanceIds', selectedSubstanceIds)
+  }, [selectedSubstanceIds, setValue])
+
+  // 3. Charger les données en mode édition
+  useEffect(() => {
+    if (product && open) {
+      const substanceIds = product.activeSubstances?.map((s) => s.id) || []
+      setSelectedSubstanceIds(substanceIds)
+    }
+  }, [product, open])
+
+  // Helper pour toggle checkbox
+  const toggleSubstance = (id: string) => {
+    setSelectedSubstanceIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((sid) => sid !== id)
+        : [...prev, id]
+    )
+  }
+
+  return (
+    <form>
+      {/* 4. Affichage checkboxes dans conteneur scrollable */}
+      <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
+        {activeSubstances.map((substance) => (
+          <div key={substance.id} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={`substance-${substance.id}`}
+              checked={selectedSubstanceIds.includes(substance.id)}
+              onChange={() => toggleSubstance(substance.id)}
+              className="h-4 w-4 rounded border-input"
+              disabled={loading}
+            />
+            <Label htmlFor={`substance-${substance.id}`}>
+              {substance.name} ({substance.code})
+            </Label>
+          </div>
+        ))}
+      </div>
+
+      {/* Message compteur */}
+      <p className="text-xs text-muted-foreground">
+        {tc('messages.selectedCount', { count: selectedSubstanceIds.length })}
+      </p>
+    </form>
+  )
+}
+```
+
+**Traduction à ajouter dans `common` :**
+```json
+{
+  "common": {
+    "messages": {
+      "selectedCount": "{count} sélectionné(s)"
+    }
+  }
+}
+```
+
+**Impact** : Pattern réutilisable pour toutes les relations many-to-many futures (Dosages, Withdrawal-Periods, etc.).
+
+#### 8.3.8 DTOs Many-to-Many - Toujours IDs Array
+
+⚠️ **RÈGLE IMPORTANTE :** Différence entre entité display (GET) et DTO création/update (POST/PATCH)
+
+✅ **PATTERN STANDARD :**
+
+```typescript
+// 1. Interface Product (pour GET - affichage)
+export interface Product extends BaseEntity {
+  code: string
+  commercialName: string
+  activeSubstances: ActiveSubstance[]  // ✅ Objets complets pour display
+  // ...
+}
+
+// 2. CreateProductDto (pour POST)
+export interface CreateProductDto {
+  code: string
+  commercialName: string
+  activeSubstanceIds: string[]  // ✅ IDs uniquement pour création
+  // ...
+}
+
+// 3. UpdateProductDto (pour PATCH)
+export interface UpdateProductDto {
+  code?: string
+  commercialName?: string
+  activeSubstanceIds?: string[]  // ✅ IDs uniquement pour update
+  version: number  // Optimistic locking
+}
+```
+
+**Utilisation dans le formulaire :**
+
+```tsx
+// Extraction des IDs en mode édition
+useEffect(() => {
+  if (product && open) {
+    const substanceIds = product.activeSubstances?.map((s) => s.id) || []
+    setSelectedSubstanceIds(substanceIds)  // ✅ Conversion vers IDs
+
+    reset({
+      code: product.code,
+      commercialName: product.commercialName,
+      activeSubstanceIds: substanceIds,  // ✅ IDs dans le formulaire
+      // ...
+    })
+  }
+}, [product, open])
+
+// Soumission
+const onSubmit = async (data: ProductFormData) => {
+  // data.activeSubstanceIds est déjà un string[]
+  await create(data)  // ✅ Envoi des IDs uniquement au backend
+}
+```
+
+**Impact** :
+- Performance : Évite d'envoyer des objets complets inutiles au backend
+- Simplicité : Le backend n'a besoin que des IDs pour gérer les relations
+
+#### 8.3.9 DataTable Relations - Limiter Affichage + Compteur
+
+⚠️ **PROBLÈME :** Afficher 10+ relations dans une cellule de tableau = illisible
+
+✅ **SOLUTION :** Max 2-3 items + badge compteur "+X"
+
+```tsx
+// Dans la définition des colonnes
+const columns: ColumnDef<Product>[] = [
+  // ... autres colonnes
+  {
+    key: 'activeSubstances',
+    header: t('fields.activeSubstances'),
+    render: (product: Product) => (
+      <div className="flex flex-wrap gap-1">
+        {/* Afficher max 2 premiers items */}
+        {product.activeSubstances?.slice(0, 2).map((substance) => (
+          <Badge
+            key={substance.id}
+            variant="default"
+            className="text-xs"
+          >
+            {substance.code}
+          </Badge>
+        ))}
+
+        {/* Badge compteur si plus de 2 items */}
+        {product.activeSubstances?.length > 2 && (
+          <Badge variant="default" className="text-xs">
+            +{product.activeSubstances.length - 2}
+          </Badge>
+        )}
+      </div>
+    ),
+  },
+]
+```
+
+**Exemples d'affichage :**
+- 1 substance : `AMOX`
+- 2 substances : `AMOX` `CLAV`
+- 5 substances : `AMOX` `CLAV` `+3`
+
+**Impact** : Tables restent lisibles même avec relations many-to-many complexes.
+
+#### 8.3.10 i18n Common Extensions - Namespace Partagé
+
+⚠️ **RÈGLE :** Éviter la duplication des traductions communes entre entités
+
+✅ **SOLUTION :** Ajouter dans namespace `common` quand utilisé par 2+ entités
+
+**Exemples de traductions communes :**
+
+```json
+// fr.json, en.json, ar.json
+{
+  "common": {
+    "sections": {
+      "mainInfo": "Informations principales",
+      "additionalInfo": "Informations complémentaires",
+      "options": "Options"
+    },
+    "placeholders": {
+      "select": "Sélectionner",
+      "optional": "Optionnel",
+      "search": "Rechercher..."
+    },
+    "messages": {
+      "selectedCount": "{count} sélectionné(s)",
+      "noData": "Aucune donnée disponible"
+    },
+    "admin": {
+      "products": {
+        "subtitle": "Gestion du catalogue des produits vétérinaires"
+      },
+      "activeSubstances": {
+        "subtitle": "Gestion des substances actives"
+      }
+    }
+  }
+}
+```
+
+**Utilisation :**
+```tsx
+const t = useTranslations('product')
+const tc = useTranslations('common')  // ✅ Traductions communes
+
+<h3>{tc('sections.mainInfo')}</h3>
+<SelectValue placeholder={tc('placeholders.select')} />
+<p>{tc('messages.selectedCount', { count: 5 })}</p>
+```
+
+**Quand ajouter dans `common` :**
+- ✅ Textes utilisés par 2+ entités différentes
+- ✅ Labels UI génériques (sections, placeholders, actions)
+- ✅ Messages de validation standards
+- ❌ Textes spécifiques à une seule entité (garder dans namespace dédié)
+
+**Impact** :
+- Réduit duplication i18n entre entités similaires
+- Facilite maintenance des traductions
+- Cohérence terminologique sur toute l'application
 
 ---
 
