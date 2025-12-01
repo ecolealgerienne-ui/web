@@ -255,8 +255,10 @@ export default function VeterinariansPage() {
           {
             key: 'fullName',
             label: t('fields.fullName'),
-            render: (value, item) =>
-              item ? `${item.firstName} ${item.lastName}` : '-',
+            render: () =>
+              selectedVeterinarian
+                ? `${selectedVeterinarian.firstName} ${selectedVeterinarian.lastName}`
+                : '-',
           },
           {
             key: 'licenseNumber',
@@ -288,11 +290,13 @@ export default function VeterinariansPage() {
               value || <span className="text-muted-foreground italic">-</span>,
           },
           {
-            key: 'contactInfo',
+            key: 'contactInfo.phone',
             label: t('fields.phone'),
-            render: (value, item) =>
-              item?.contactInfo?.phone ? (
-                <span className="font-mono">{item.contactInfo.phone}</span>
+            render: () =>
+              selectedVeterinarian?.contactInfo?.phone ? (
+                <span className="font-mono">
+                  {selectedVeterinarian.contactInfo.phone}
+                </span>
               ) : (
                 '-'
               ),
@@ -300,9 +304,11 @@ export default function VeterinariansPage() {
           {
             key: 'contactInfo.mobile',
             label: t('fields.mobile'),
-            render: (value, item) =>
-              item?.contactInfo?.mobile ? (
-                <span className="font-mono">{item.contactInfo.mobile}</span>
+            render: () =>
+              selectedVeterinarian?.contactInfo?.mobile ? (
+                <span className="font-mono">
+                  {selectedVeterinarian.contactInfo.mobile}
+                </span>
               ) : (
                 '-'
               ),
@@ -310,17 +316,17 @@ export default function VeterinariansPage() {
           {
             key: 'contactInfo.email',
             label: t('fields.email'),
-            render: (value, item) => item?.contactInfo?.email || '-',
+            render: () => selectedVeterinarian?.contactInfo?.email || '-',
           },
           {
             key: 'contactInfo.address',
             label: t('fields.address'),
-            render: (value, item) => item?.contactInfo?.address || '-',
+            render: () => selectedVeterinarian?.contactInfo?.address || '-',
           },
           {
             key: 'contactInfo.city',
             label: t('fields.city'),
-            render: (value, item) => item?.contactInfo?.city || '-',
+            render: () => selectedVeterinarian?.contactInfo?.city || '-',
           },
           { key: 'isActive', label: t('fields.isActive'), type: 'badge' },
         ]}
