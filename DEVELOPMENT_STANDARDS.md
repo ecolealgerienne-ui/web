@@ -1056,6 +1056,61 @@ const ageCategories = await ageCategoriesService.list({ ... }) // ✅ Fonctionne
 
 **Pattern recommandé pour nouveaux services** : Utiliser `list()` au lieu de `getAll()`
 
+**⚠️ ATTENTION : Badge Component - Variantes Limitées**
+
+Le composant `Badge` n'accepte que 4 variantes spécifiques :
+
+```typescript
+// ✅ Variantes acceptées
+variant: "default" | "destructive" | "warning" | "success"
+
+// ❌ ERREUR - 'secondary' n'existe pas
+<Badge variant="secondary">Inactif</Badge>  // ❌ Type error
+
+// ✅ CORRECT - Pattern pour statut actif/inactif
+{entity.isActive ? (
+  <Badge variant="success">{t('status.active')}</Badge>
+) : (
+  <Badge variant="warning">{t('status.inactive')}</Badge>
+)}
+```
+
+**Mapping Recommandé** :
+- **Active** : `variant="success"` (vert)
+- **Inactive** : `variant="warning"` (jaune)
+- **Error/Deleted** : `variant="destructive"` (rouge)
+- **Neutre** : `variant="default"` ou omis (gris)
+
+**Erreurs Courantes** :
+```typescript
+// ❌ Ces variantes n'existent PAS
+<Badge variant="secondary" />   // ❌ N'existe pas
+<Badge variant="info" />         // ❌ N'existe pas
+<Badge variant="primary" />      // ❌ N'existe pas
+<Badge variant="outline" />      // ❌ N'existe pas
+
+// ✅ Utiliser les 4 variantes existantes
+<Badge variant="default" />      // ✅ Gris
+<Badge variant="success" />      // ✅ Vert
+<Badge variant="warning" />      // ✅ Jaune
+<Badge variant="destructive" />  // ✅ Rouge
+```
+
+**Exemple Complet (Pattern Breeds/Age-Categories)** :
+```typescript
+{
+  key: 'isActive',
+  header: t('fields.isActive'),
+  align: 'center',
+  render: (item) =>
+    item.isActive ? (
+      <Badge variant="success">{t('status.active')}</Badge>
+    ) : (
+      <Badge variant="warning">{t('status.inactive')}</Badge>
+    ),
+}
+```
+
 ---
 
 ## 7. Composants React
