@@ -22,7 +22,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
@@ -99,9 +99,9 @@ export function VeterinarianFormDialog({
   })
 
   // useFieldArray pour gérer les spécialités (array dynamique)
-  // Type explicite requis à cause du 'as any' sur zodResolver
-  const { fields, append, remove } = useFieldArray<VeterinarianFormData, 'specialties', 'id'>({
-    control,
+  // Cast du control requis car 'as any' sur zodResolver empêche l'inférence de type
+  const { fields, append, remove } = useFieldArray({
+    control: control as Control<VeterinarianFormData>,
     name: 'specialties',
   })
 
