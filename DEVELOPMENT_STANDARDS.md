@@ -1866,6 +1866,183 @@ export function BreedFormDialog({ breed, ... }: Props) {
 
 ---
 
+### 7.7 Hooks Personnalisés - Gestion des Paramètres ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS gérer un état `params` local en parallèle de l'état du hook**
+
+**Problème** : Quand un hook personnalisé (comme `useProductPackagings`, `useBreeds`, etc.) gère un état `params` en interne, créer un état local séparé dans le composant page empêche la synchronisation et casse la pagination, le tri et les filtres.
+
+**✅ SOLUTION : Utiliser `params` et `setParams` retournés par le hook**
+
+```typescript
+// ❌ MAUVAIS - État params séparé dans la page
+const [params, setParams] = useState<FilterParams>({
+  page: 1,
+  limit: 25,
+  sortBy: 'name',
+  sortOrder: 'asc',
+})
+const { data, total, loading, create, update, delete } = useMyEntities(params)
+
+// Problème : Le hook reçoit les params initiaux mais ne voit pas les changements
+// quand on appelle setParams dans la page. Pagination et filtres ne fonctionnent pas.
+
+// ✅ BON - Utiliser params/setParams du hook
+const {
+  data,
+  total,
+  loading,
+  params,      // ✅ État géré par le hook
+  setParams,   // ✅ Fonction du hook
+  create,
+  update,
+  delete
+} = useMyEntities({
+  page: 1,
+  limit: 25,
+  sortBy: 'name',
+  sortOrder: 'asc',
+})
+
+// Les changements via setParams se propagent correctement dans le hook
+```
+
+**Exemple Complet (Product-Packagings)** :
+
+```typescript
+export default function ProductPackagingsPage() {
+  const t = useTranslations('productPackaging')
+
+  // Constante pour filtre "Tous les produits"
+  const ALL_PRODUCTS = '__all__'
+
+  // État local pour le filtre (seulement l'ID sélectionné)
+  const [selectedProductId, setSelectedProductId] = useState<string>(ALL_PRODUCTS)
+
+  // ✅ Hook gère les params en interne
+  const {
+    data,
+    total,
+    loading,
+    params,      // ✅ Du hook
+    setParams,   // ✅ Du hook
+    create,
+    update,
+    delete: deletePackaging
+  } = useProductPackagings({
+    page: 1,
+    limit: 25,
+    sortBy: 'packagingLabel',
+    sortOrder: 'asc',
+  })
+
+  // ✅ useEffect met à jour les params du hook quand le filtre change
+  useEffect(() => {
+    setParams((prev) => ({
+      ...prev,
+      productId: selectedProductId === ALL_PRODUCTS ? undefined : selectedProductId,
+      page: 1, // Reset à la page 1
+    }))
+  }, [selectedProductId, setParams])
+
+  // ✅ Les handlers utilisent setParams du hook
+  const handlePageChange = (page: number) => {
+    setParams((prev) => ({ ...prev, page }))
+  }
+
+  const handleSearchChange = (search: string) => {
+    setParams((prev) => ({ ...prev, search, page: 1 }))
+  }
+
+  const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
+    setParams((prev) => ({ ...prev, sortBy, sortOrder }))
+  }
+
+  return (
+    <DataTable
+      data={data}
+      totalItems={total}
+      page={params.page || 1}        // ✅ Lecture depuis params du hook
+      limit={params.limit || 25}      // ✅
+      onPageChange={handlePageChange} // ✅ Mise à jour via setParams du hook
+      onSearchChange={handleSearchChange}
+      onSortChange={handleSortChange}
+      // ...
+    />
+  )
+}
+```
+
+**Implémentation du Hook** :
+
+```typescript
+export function useProductPackagings(initialParams: FilterParams = {}) {
+  // ✅ Le hook gère son propre état params
+  const [params, setParams] = useState<FilterParams>({
+    page: 1,
+    limit: 25,
+    sortBy: 'packagingLabel',
+    sortOrder: 'asc',
+    ...initialParams,  // Fusion avec les params initiaux
+  })
+
+  const [data, setData] = useState<ProductPackaging[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  // Effet qui se déclenche quand params change
+  const fetchPackagings = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await productPackagingsService.getAll(params)
+      setData(response.data)
+      setTotal(response.meta.total)
+    } catch (error) {
+      handleApiError(error, 'productPackagings.fetch', toast)
+    } finally {
+      setLoading(false)
+    }
+  }, [params, toast])
+
+  useEffect(() => {
+    fetchPackagings()
+  }, [fetchPackagings])
+
+  // ✅ Retourner params et setParams
+  return {
+    data,
+    total,
+    loading,
+    params,      // ✅ Exposé au composant
+    setParams,   // ✅ Exposé au composant
+    create,
+    update,
+    delete: deletePackaging,
+  }
+}
+```
+
+**Raisons de cette règle** :
+
+1. **Source de vérité unique** : Le hook est la seule source de vérité pour `params`, évite les désynchronisations
+2. **Pagination fonctionnelle** : Les changements de page se propagent correctement
+3. **Filtres fonctionnels** : Les filtres déclenchent un nouveau fetch
+4. **Tri fonctionnel** : Les changements de tri sont reflétés dans les données
+5. **Cohérence** : Pattern identique pour tous les hooks CRUD (useBreeds, useSpecies, etc.)
+
+**Erreurs typiques si cette règle n'est pas suivie** :
+- ❌ Pagination : Cliquer sur "Page suivante" ne change rien
+- ❌ Filtres : Sélectionner un filtre ne rafraîchit pas les données
+- ❌ Tri : Cliquer sur une colonne ne trie pas
+- ❌ Recherche : Taper dans la recherche ne filtre pas
+
+**Pattern appliqué dans** :
+- `src/app/(app)/admin/breeds/page.tsx` ✅
+- `src/app/(app)/admin/product-packagings/page.tsx` ✅
+- `src/app/(app)/admin/species/page.tsx` ✅
+
+---
+
 ## 8. Services API
 
 ### 8.1 Structure d'un Service
