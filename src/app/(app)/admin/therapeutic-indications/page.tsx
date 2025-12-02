@@ -446,9 +446,9 @@ export default function TherapeuticIndicationsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VERIFIED}>{t('filters.allStatus')}</SelectItem>
-                  <SelectItem value="true">{t('filters.verifiedOnly')}</SelectItem>
-                  <SelectItem value="false">{t('filters.notVerifiedOnly')}</SelectItem>
+                  <SelectItem key="all" value={ALL_VERIFIED}>{t('filters.allStatus')}</SelectItem>
+                  <SelectItem key="true" value="true">{t('filters.verifiedOnly')}</SelectItem>
+                  <SelectItem key="false" value="false">{t('filters.notVerifiedOnly')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
