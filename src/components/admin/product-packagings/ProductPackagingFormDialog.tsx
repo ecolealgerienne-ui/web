@@ -35,6 +35,12 @@ import { unitsService } from '@/lib/services/admin/units.service'
 import { countriesService } from '@/lib/services/admin/countries.service'
 
 /**
+ * Constante pour représenter "Aucune unité" dans le Select
+ * ✅ RÈGLE Section 7.5 : Select.Item ne peut pas avoir value=""
+ */
+const NONE_UNIT = '__none__'
+
+/**
  * Props du formulaire de conditionnement
  *
  * ✅ RÈGLE #3 : Composant réutilisable pour création ET édition
@@ -336,15 +342,18 @@ export function ProductPackagingFormDialog({
             <div className="space-y-2">
               <Label htmlFor="unitId">{t('fields.unit')}</Label>
               <Select
-                value={watch('unitId')}
-                onValueChange={(value) => setValue('unitId', value, { shouldValidate: true })}
+                value={watch('unitId') || NONE_UNIT}
+                onValueChange={(value) => {
+                  // Convertir NONE_UNIT en '' pour le formulaire
+                  setValue('unitId', value === NONE_UNIT ? '' : value, { shouldValidate: true })
+                }}
                 disabled={loadingReferences || loading}
               >
                 <SelectTrigger id="unitId">
                   <SelectValue placeholder={t('form.selectUnit')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{tc('fields.none')}</SelectItem>
+                  <SelectItem value={NONE_UNIT}>{tc('fields.none')}</SelectItem>
                   {units.map((unit) => (
                     <SelectItem key={unit.id} value={unit.id}>
                       {unit.name} ({unit.symbol})
