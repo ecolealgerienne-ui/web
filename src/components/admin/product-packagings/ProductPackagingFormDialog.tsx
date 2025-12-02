@@ -259,7 +259,7 @@ export function ProductPackagingFormDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((country) => (
-                    <SelectItem key={country.id} value={country.isoCode2}>
+                    <SelectItem key={country.isoCode2} value={country.isoCode2}>
                       {country.nameFr} ({country.isoCode2})
                     </SelectItem>
                   ))}
