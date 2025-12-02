@@ -386,7 +386,7 @@ export default function TherapeuticIndicationsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_PRODUCTS}>{t('filters.allProducts')}</SelectItem>
+                  <SelectItem key="all" value={ALL_PRODUCTS}>{t('filters.allProducts')}</SelectItem>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
                       {product.commercialName}
@@ -406,7 +406,7 @@ export default function TherapeuticIndicationsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_SPECIES}>{t('filters.allSpecies')}</SelectItem>
+                  <SelectItem key="all" value={ALL_SPECIES}>{t('filters.allSpecies')}</SelectItem>
                   {speciesList.map((species) => (
                     <SelectItem key={species.id} value={species.id}>
                       {species.name}
@@ -426,7 +426,7 @@ export default function TherapeuticIndicationsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_COUNTRIES}>{t('filters.allCountries')}</SelectItem>
+                  <SelectItem key="all" value={ALL_COUNTRIES}>{t('filters.allCountries')}</SelectItem>
                   {countries.map((country) => (
                     <SelectItem key={country.isoCode2} value={country.isoCode2}>
                       {country.nameFr}
