@@ -34,6 +34,7 @@ const adminMenuItems = [
   { icon: PackageOpen, key: "products", href: "/admin/products" },
   { icon: Boxes, key: "productPackagings", href: "/admin/product-packagings" },
   { icon: Link2, key: "breedCountries", href: "/admin/breed-countries" },
+  { icon: Link2, key: "campaignCountries", href: "/admin/campaign-countries" },
 ];
 
 // Menu Données de référence (super admin uniquement)

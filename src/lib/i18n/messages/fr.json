@@ -148,7 +148,8 @@
       "alertTemplates": "Modèles d'Alertes",
       "products": "Produits Vétérinaires",
       "productPackagings": "Conditionnements",
-      "breedCountries": "Races par Pays"
+      "breedCountries": "Races par Pays",
+      "campaignCountries": "Campagnes par Pays"
     }
   },
   "breeds": {
@@ -1012,6 +1013,65 @@
     },
     "detail": {
       "title": "Détails de l'association race-pays"
+    }
+  },
+  "campaignCountry": {
+    "title": "Campagnes par Pays",
+    "description": "Gestion des associations entre campagnes nationales et pays autorisés",
+    "fields": {
+      "campaign": "Campagne",
+      "country": "Pays",
+      "countryCode": "Code pays",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "campaignId": {
+        "required": "La campagne est requise",
+        "invalid": "L'identifiant de la campagne est invalide"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "isActive": {
+        "required": "Le statut actif/inactif est requis",
+        "invalid": "Le statut doit être un booléen"
+      }
+    },
+    "form": {
+      "createTitle": "Lier une campagne à un pays",
+      "selectCampaign": "Sélectionner une campagne",
+      "selectCountry": "Sélectionner un pays"
+    },
+    "actions": {
+      "link": "Lier une campagne",
+      "unlink": "Délier",
+      "activate": "Activer",
+      "deactivate": "Désactiver"
+    },
+    "filters": {
+      "campaign": "Campagne",
+      "allCampaigns": "Toutes les campagnes",
+      "country": "Pays",
+      "allCountries": "Tous les pays"
+    },
+    "search": {
+      "placeholder": "Rechercher une association campagne-pays..."
+    },
+    "messages": {
+      "linkSuccess": "Association campagne-pays créée avec succès",
+      "unlinkSuccess": "Association supprimée avec succès",
+      "deleteSuccess": "Association supprimée avec succès",
+      "activateSuccess": "Association activée avec succès",
+      "deactivateSuccess": "Association désactivée avec succès",
+      "noResults": "Aucune association trouvée",
+      "linkError": "Erreur lors de la création de l'association",
+      "unlinkError": "Erreur lors de la suppression de l'association",
+      "toggleError": "Erreur lors du changement de statut"
+    },
+    "detail": {
+      "title": "Détails de l'association campagne-pays"
     }
   },
   "administrationRoute": {
