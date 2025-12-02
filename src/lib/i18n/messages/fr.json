@@ -148,6 +148,7 @@
       "alertTemplates": "Modèles d'Alertes",
       "products": "Produits Vétérinaires",
       "productPackagings": "Conditionnements",
+      "therapeuticIndications": "Indications Thérapeutiques",
       "breedCountries": "Races par Pays",
       "campaignCountries": "Campagnes par Pays"
     }
@@ -1074,6 +1075,157 @@
     },
     "detail": {
       "title": "Détails de l'association campagne-pays"
+    }
+  },
+  "therapeuticIndication": {
+    "title": "Indications Thérapeutiques",
+    "description": "Gestion des indications thérapeutiques pour les produits vétérinaires par espèce et pays",
+    "fields": {
+      "code": "Code",
+      "pathology": "Pathologie",
+      "product": "Produit",
+      "species": "Espèce",
+      "country": "Pays",
+      "route": "Voie d'administration",
+      "isVerified": "Vérifiée",
+      "dosage": "Dosage",
+      "frequency": "Fréquence",
+      "duration": "Durée",
+      "withdrawalMeat": "Délai viande (jours)",
+      "withdrawalMilk": "Délai lait (jours)",
+      "withdrawalEggs": "Délai œufs (jours)",
+      "instructions": "Instructions d'utilisation",
+      "contraindications": "Contre-indications",
+      "warnings": "Avertissements et précautions",
+      "isActive": "Active"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 100 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres, chiffres, tirets et underscores"
+      },
+      "pathology": {
+        "required": "La pathologie est requise",
+        "maxLength": "La pathologie ne doit pas dépasser 200 caractères"
+      },
+      "productId": {
+        "required": "Le produit est requis",
+        "invalid": "L'identifiant du produit est invalide"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "routeId": {
+        "required": "La voie d'administration est requise",
+        "invalid": "L'identifiant de la voie d'administration est invalide"
+      },
+      "dosage": {
+        "maxLength": "Le dosage ne doit pas dépasser 200 caractères"
+      },
+      "frequency": {
+        "maxLength": "La fréquence ne doit pas dépasser 200 caractères"
+      },
+      "duration": {
+        "maxLength": "La durée ne doit pas dépasser 200 caractères"
+      },
+      "withdrawalMeat": {
+        "integer": "Le délai viande doit être un nombre entier",
+        "min": "Le délai viande doit être supérieur ou égal à 0"
+      },
+      "withdrawalMilk": {
+        "integer": "Le délai lait doit être un nombre entier",
+        "min": "Le délai lait doit être supérieur ou égal à 0"
+      },
+      "withdrawalEggs": {
+        "integer": "Le délai œufs doit être un nombre entier",
+        "min": "Le délai œufs doit être supérieur ou égal à 0"
+      },
+      "instructions": {
+        "maxLength": "Les instructions ne doivent pas dépasser 2000 caractères"
+      },
+      "contraindications": {
+        "maxLength": "Les contre-indications ne doivent pas dépasser 2000 caractères"
+      },
+      "warnings": {
+        "maxLength": "Les avertissements ne doivent pas dépasser 2000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer une indication thérapeutique",
+      "editTitle": "Modifier l'indication thérapeutique",
+      "sectionGeneral": "Informations Générales",
+      "sectionTargeting": "Ciblage",
+      "sectionPosology": "Posologie",
+      "sectionWithdrawal": "Délais d'Attente",
+      "sectionAdditional": "Informations Supplémentaires",
+      "sectionStatus": "Statut",
+      "selectProduct": "Sélectionner un produit",
+      "selectSpecies": "Sélectionner une espèce",
+      "selectCountry": "Sélectionner un pays",
+      "selectRoute": "Sélectionner une voie",
+      "codePlaceholder": "Ex: AMOX-CAT-FR-ORAL",
+      "pathologyPlaceholder": "Ex: Infection respiratoire",
+      "dosagePlaceholder": "Ex: 10 mg/kg",
+      "frequencyPlaceholder": "Ex: 2 fois par jour",
+      "durationPlaceholder": "Ex: 5 jours",
+      "withdrawalPlaceholder": "Nombre de jours",
+      "instructionsPlaceholder": "Décrire les instructions d'utilisation...",
+      "contraindicationsPlaceholder": "Décrire les contre-indications...",
+      "warningsPlaceholder": "Décrire les avertissements et précautions..."
+    },
+    "actions": {
+      "create": "Créer une indication",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "restore": "Restaurer",
+      "verify": "Vérifier",
+      "unverify": "Révoquer la vérification"
+    },
+    "filters": {
+      "product": "Produit",
+      "allProducts": "Tous les produits",
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces",
+      "country": "Pays",
+      "allCountries": "Tous les pays",
+      "verified": "Statut de vérification",
+      "allStatus": "Tous les statuts",
+      "verifiedOnly": "Vérifiées uniquement",
+      "notVerifiedOnly": "Non vérifiées uniquement"
+    },
+    "search": {
+      "placeholder": "Rechercher par code ou pathologie..."
+    },
+    "messages": {
+      "createSuccess": "Indication thérapeutique créée avec succès",
+      "updateSuccess": "Indication thérapeutique mise à jour avec succès",
+      "deleteSuccess": "Indication thérapeutique supprimée avec succès",
+      "restoreSuccess": "Indication thérapeutique restaurée avec succès",
+      "verifySuccess": "Indication thérapeutique vérifiée avec succès",
+      "unverifySuccess": "Vérification révoquée avec succès",
+      "noResults": "Aucune indication thérapeutique trouvée",
+      "createError": "Erreur lors de la création",
+      "updateError": "Erreur lors de la mise à jour",
+      "deleteError": "Erreur lors de la suppression",
+      "verifyError": "Erreur lors de la vérification"
+    },
+    "status": {
+      "verified": "Vérifiée",
+      "notVerified": "Non vérifiée"
+    },
+    "detail": {
+      "title": "Détails de l'indication thérapeutique"
     }
   },
   "administrationRoute": {

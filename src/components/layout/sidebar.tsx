@@ -33,6 +33,7 @@ const adminMenuItems = [
   { icon: Bell, key: "alertTemplates", href: "/admin/alert-templates" },
   { icon: PackageOpen, key: "products", href: "/admin/products" },
   { icon: Boxes, key: "productPackagings", href: "/admin/product-packagings" },
+  { icon: Pill, key: "therapeuticIndications", href: "/admin/therapeutic-indications" },
   { icon: Link2, key: "breedCountries", href: "/admin/breed-countries" },
   { icon: Link2, key: "campaignCountries", href: "/admin/campaign-countries" },
 ];
