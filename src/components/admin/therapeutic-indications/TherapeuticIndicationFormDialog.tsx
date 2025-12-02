@@ -281,7 +281,7 @@ export function TherapeuticIndicationFormDialog({
                       <SelectItem value="">{tc('placeholders.optional')}</SelectItem>
                       {ageCategories.map((ac) => (
                         <SelectItem key={ac.id} value={ac.id}>
-                          {ac.name}
+                          {ac.nameFr}
                         </SelectItem>
                       ))}
                     </SelectContent>

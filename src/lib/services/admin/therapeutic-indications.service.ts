@@ -153,7 +153,7 @@ class TherapeuticIndicationsService implements CrudService<
   async getById(id: string): Promise<TherapeuticIndication> {
     try {
       const indication = await apiClient.get<TherapeuticIndication>(`${this.basePath}/${id}`)
-      logger.info('Therapeutic indication fetched', { id, code: indication.code })
+      logger.info('Therapeutic indication fetched', { id, productId: indication.productId })
       return indication
     } catch (error) {
       logger.error('Failed to fetch therapeutic indication', { error, id })
@@ -170,7 +170,7 @@ class TherapeuticIndicationsService implements CrudService<
   async create(data: CreateTherapeuticIndicationDto): Promise<TherapeuticIndication> {
     try {
       const indication = await apiClient.post<TherapeuticIndication>(this.basePath, data)
-      logger.info('Therapeutic indication created', { id: indication.id, code: indication.code })
+      logger.info('Therapeutic indication created', { id: indication.id, productId: indication.productId })
       return indication
     } catch (error) {
       logger.error('Failed to create therapeutic indication', { error, data })
@@ -188,7 +188,7 @@ class TherapeuticIndicationsService implements CrudService<
   async update(id: string, data: UpdateTherapeuticIndicationDto): Promise<TherapeuticIndication> {
     try {
       const indication = await apiClient.put<TherapeuticIndication>(`${this.basePath}/${id}`, data)
-      logger.info('Therapeutic indication updated', { id, code: indication.code, version: data.version })
+      logger.info('Therapeutic indication updated', { id, productId: indication.productId, version: data.version })
       return indication
     } catch (error) {
       logger.error('Failed to update therapeutic indication', { error, id, data })
@@ -221,7 +221,7 @@ class TherapeuticIndicationsService implements CrudService<
   async restore(id: string): Promise<TherapeuticIndication> {
     try {
       const indication = await apiClient.post<TherapeuticIndication>(`${this.basePath}/${id}/restore`)
-      logger.info('Therapeutic indication restored', { id, code: indication.code })
+      logger.info('Therapeutic indication restored', { id, productId: indication.productId })
       return indication
     } catch (error) {
       logger.error('Failed to restore therapeutic indication', { error, id })
@@ -263,7 +263,7 @@ class TherapeuticIndicationsService implements CrudService<
   async verify(id: string): Promise<TherapeuticIndication> {
     try {
       const indication = await apiClient.post<TherapeuticIndication>(`${this.basePath}/${id}/verify`)
-      logger.info('Therapeutic indication verified', { id, code: indication.code })
+      logger.info('Therapeutic indication verified', { id, productId: indication.productId })
       return indication
     } catch (error) {
       logger.error('Failed to verify therapeutic indication', { error, id })
@@ -280,7 +280,7 @@ class TherapeuticIndicationsService implements CrudService<
   async unverify(id: string): Promise<TherapeuticIndication> {
     try {
       const indication = await apiClient.post<TherapeuticIndication>(`${this.basePath}/${id}/unverify`)
-      logger.info('Therapeutic indication unverified', { id, code: indication.code })
+      logger.info('Therapeutic indication unverified', { id, productId: indication.productId })
       return indication
     } catch (error) {
       logger.error('Failed to unverify therapeutic indication', { error, id })
