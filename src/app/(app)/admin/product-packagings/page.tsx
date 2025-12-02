@@ -72,16 +72,13 @@ export default function ProductPackagingsPage() {
   const [packagingToDelete, setPackagingToDelete] = useState<ProductPackaging | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  // Paramètres de filtrage avec produit sélectionné
-  const [params, setParams] = useState<ProductPackagingFilterParams>({
+  // Hook pour la gestion CRUD - le hook gère les params en interne
+  const { data, total, loading, params, setParams, create, update, delete: deletePackaging } = useProductPackagings({
     page: 1,
     limit: 25,
     sortBy: 'packagingLabel',
     sortOrder: 'asc',
   })
-
-  // Hook pour la gestion CRUD
-  const { data, total, loading, create, update, delete: deletePackaging } = useProductPackagings(params)
 
   /**
    * Charger la liste des produits pour le filtre
@@ -108,7 +105,7 @@ export default function ProductPackagingsPage() {
       productId: selectedProductId === ALL_PRODUCTS ? undefined : selectedProductId,
       page: 1, // Reset à la page 1
     }))
-  }, [selectedProductId])
+  }, [selectedProductId, setParams])
 
   /**
    * Définition des colonnes du tableau
