@@ -144,7 +144,8 @@
       "veterinarians": "Vétérinaires",
       "nationalCampaigns": "Campagnes Nationales",
       "alertTemplates": "Modèles d'Alertes",
-      "products": "Produits Vétérinaires"
+      "products": "Produits Vétérinaires",
+      "productPackagings": "Conditionnements"
     }
   },
   "breeds": {
@@ -847,6 +848,108 @@
     },
     "detail": {
       "title": "Détails de la race"
+    }
+  },
+  "productPackaging": {
+    "title": "Conditionnements de Produits",
+    "description": "Gestion des conditionnements et formats de produits vétérinaires par pays",
+    "fields": {
+      "product": "Produit",
+      "packagingLabel": "Label du conditionnement",
+      "country": "Pays",
+      "countryCode": "Code pays",
+      "gtinEan": "Code GTIN/EAN",
+      "numeroAMM": "Numéro AMM",
+      "concentration": "Concentration",
+      "unit": "Unité",
+      "description": "Description",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "productId": {
+        "required": "Le produit est requis",
+        "invalid": "L'identifiant du produit est invalide"
+      },
+      "packagingLabel": {
+        "required": "Le label du conditionnement est requis",
+        "maxLength": "Le label ne doit pas dépasser 200 caractères"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "gtinEan": {
+        "maxLength": "Le code GTIN/EAN ne doit pas dépasser 50 caractères"
+      },
+      "numeroAMM": {
+        "maxLength": "Le numéro AMM ne doit pas dépasser 100 caractères"
+      },
+      "concentration": {
+        "maxLength": "La concentration ne doit pas dépasser 100 caractères"
+      },
+      "unitId": {
+        "invalid": "L'identifiant de l'unité est invalide"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "displayOrder": {
+        "integer": "L'ordre d'affichage doit être un nombre entier",
+        "min": "L'ordre d'affichage doit être supérieur ou égal à 0"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer un conditionnement",
+      "editTitle": "Modifier le conditionnement",
+      "selectProduct": "Sélectionner un produit",
+      "selectCountry": "Sélectionner un pays",
+      "selectUnit": "Sélectionner une unité (optionnel)",
+      "packagingLabelPlaceholder": "Flacon 100ml, Boîte 20 comprimés...",
+      "gtinEanPlaceholder": "3760123456789",
+      "numeroAMMPlaceholder": "DZ/VET/2023/001",
+      "concentrationPlaceholder": "500mg/ml, 10%, 1:1000...",
+      "descriptionPlaceholder": "Informations complémentaires sur le conditionnement...",
+      "displayOrderPlaceholder": "Ex: 1, 2, 3..."
+    },
+    "actions": {
+      "create": "Créer un conditionnement",
+      "edit": "Modifier le conditionnement",
+      "delete": "Supprimer le conditionnement",
+      "restore": "Restaurer le conditionnement"
+    },
+    "filters": {
+      "product": "Produit",
+      "allProducts": "Tous les produits"
+    },
+    "search": {
+      "placeholder": "Rechercher un conditionnement..."
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "messages": {
+      "createSuccess": "Conditionnement créé avec succès",
+      "updateSuccess": "Conditionnement mis à jour avec succès",
+      "deleteSuccess": "Conditionnement supprimé avec succès",
+      "restoreSuccess": "Conditionnement restauré avec succès",
+      "noResults": "Aucun conditionnement trouvé",
+      "createError": "Erreur lors de la création du conditionnement",
+      "updateError": "Conflit de version ou erreur lors de la mise à jour",
+      "deleteError": "Impossible de supprimer : le conditionnement est utilisé"
+    },
+    "detail": {
+      "title": "Détails du conditionnement"
+    },
+    "delete": {
+      "title": "Supprimer le conditionnement",
+      "description": "Êtes-vous sûr de vouloir supprimer le conditionnement \"{name}\" ? Cette action peut être annulée ultérieurement."
     }
   },
   "administrationRoute": {
