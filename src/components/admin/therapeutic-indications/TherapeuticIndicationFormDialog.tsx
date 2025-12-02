@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -31,72 +32,26 @@ import type { Product } from '@/lib/types/admin/product'
 import type { Species } from '@/lib/types/admin/species'
 import type { Country } from '@/lib/types/admin/country'
 import type { AdministrationRoute } from '@/lib/types/admin/administration-route'
+import type { AgeCategory } from '@/lib/types/admin/age-category'
+import type { Unit } from '@/lib/types/admin/unit'
 import { productsService } from '@/lib/services/admin/products.service'
 import { speciesService } from '@/lib/services/admin/species.service'
 import { countriesService } from '@/lib/services/admin/countries.service'
 import { administrationRoutesService } from '@/lib/services/admin/administration-routes.service'
+import { ageCategoriesService } from '@/lib/services/admin/age-categories.service'
+import { unitsService } from '@/lib/services/admin/units.service'
 
-/**
- * Props du formulaire d'indication thérapeutique
- *
- * ✅ RÈGLE #3 : Composant réutilisable pour création ET édition
- * Pattern: Simple Reference Data (entité la plus complexe)
- */
 interface TherapeuticIndicationFormDialogProps {
-  /**
-   * Dialog ouvert ou fermé
-   */
   open: boolean
-
-  /**
-   * Callback changement d'état
-   */
   onOpenChange: (open: boolean) => void
-
-  /**
-   * Indication thérapeutique à éditer (si null = mode création)
-   */
   indication: TherapeuticIndication | null
-
-  /**
-   * Callback soumission du formulaire
-   */
   onSubmit: (data: TherapeuticIndicationFormData) => Promise<void>
-
-  /**
-   * État de chargement lors de la soumission
-   */
   loading?: boolean
-
-  /**
-   * ID de produit pré-sélectionné (pour création depuis filtre)
-   */
   preSelectedProductId?: string
-
-  /**
-   * ID d'espèce pré-sélectionné (pour création depuis filtre)
-   */
   preSelectedSpeciesId?: string
-
-  /**
-   * Code pays pré-sélectionné (pour création depuis filtre)
-   */
   preSelectedCountryCode?: string
 }
 
-/**
- * Dialog de formulaire pour créer/éditer une Indication Thérapeutique
- *
- * ✅ RÈGLE #3 : Composant réutilisable pour création ET édition
- * ✅ RÈGLE #6 : i18n complet via useTranslations
- * ✅ RÈGLE #9 : react-hook-form + zodResolver
- * ✅ RÈGLE Section 5.3 : valueAsNumber: true pour délais
- * ✅ RÈGLE Section 5.5 : Messages Zod avec clés relatives
- * ✅ RÈGLE Section 7.6 : Pattern checkbox pour isActive et isVerified
- *
- * Pattern: Simple Reference Data (entité la plus complexe)
- * Formulaire organisé en sections : Général, Ciblage, Posologie, Délais, Infos supplémentaires
- */
 export function TherapeuticIndicationFormDialog({
   open,
   onOpenChange,
@@ -110,487 +65,508 @@ export function TherapeuticIndicationFormDialog({
   const t = useTranslations('therapeuticIndication')
   const tc = useTranslations('common')
 
-  // État local pour les listes de référence
+  // Listes de référence
   const [products, setProducts] = useState<Product[]>([])
-  const [speciesList, setSpeciesList] = useState<Species[]>([])
+  const [species, setSpecies] = useState<Species[]>([])
+  const [ageCategories, setAgeCategories] = useState<AgeCategory[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [routes, setRoutes] = useState<AdministrationRoute[]>([])
-  const [loadingReferences, setLoadingReferences] = useState(false)
+  const [units, setUnits] = useState<Unit[]>([])
+  const [loadingLists, setLoadingLists] = useState(true)
 
-  // Initialisation du formulaire
+  // Formulaire
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
     reset,
     setValue,
-    watch,
+    formState: { errors },
   } = useForm<TherapeuticIndicationFormData>({
     resolver: zodResolver(therapeuticIndicationSchema),
     defaultValues: {
-      code: '',
-      pathology: '',
       productId: preSelectedProductId || '',
       speciesId: preSelectedSpeciesId || '',
-      countryCode: preSelectedCountryCode || '',
+      ageCategoryId: null,
+      countryCode: preSelectedCountryCode || null,
       routeId: '',
+      doseUnitId: '',
+      doseMin: null,
+      doseMax: null,
+      doseOriginalText: null,
+      protocolDurationDays: null,
+      withdrawalMeatDays: null,
+      withdrawalMilkDays: null,
       isVerified: false,
-      dosage: '',
-      frequency: '',
-      duration: '',
-      withdrawalMeat: undefined,
-      withdrawalMilk: undefined,
-      withdrawalEggs: undefined,
-      instructions: '',
-      contraindications: '',
-      warnings: '',
+      validationNotes: null,
       isActive: true,
     },
   })
 
   /**
-   * Charger les données de référence (Products, Species, Countries, Routes)
-   * ✅ RÈGLE Section 7.4 : Charger les données au montage
+   * Charger les listes de référence
    */
   useEffect(() => {
-    const loadReferences = async () => {
-      setLoadingReferences(true)
+    const loadReferenceLists = async () => {
       try {
-        // Charger en parallèle
-        const [productsRes, speciesRes, countriesRes, routesRes] = await Promise.all([
+        setLoadingLists(true)
+        const [
+          productsRes,
+          speciesRes,
+          ageCategoriesRes,
+          countriesRes,
+          routesRes,
+          unitsRes,
+        ] = await Promise.all([
           productsService.getAll({ limit: 100 }),
           speciesService.getAll({ limit: 100 }),
+          ageCategoriesService.getAll({ limit: 100 }),
           countriesService.getAll({ limit: 100 }),
           administrationRoutesService.getAll({ limit: 100 }),
+          unitsService.getAll({ limit: 100 }),
         ])
-
-        // Filtrer uniquement les actifs
         setProducts(productsRes.data.filter((p) => p.isActive))
-        setSpeciesList(speciesRes.data.filter((s) => s.isActive))
+        setSpecies(speciesRes.data.filter((s) => s.isActive))
+        setAgeCategories(ageCategoriesRes.data.filter((a) => a.isActive))
         setCountries(countriesRes.data.filter((c) => c.isActive))
         setRoutes(routesRes.data.filter((r) => r.isActive))
+        setUnits(unitsRes.data.filter((u) => u.isActive))
       } catch (error) {
-        console.error('Failed to load reference data:', error)
+        console.error('Failed to load reference lists:', error)
       } finally {
-        setLoadingReferences(false)
+        setLoadingLists(false)
       }
     }
 
     if (open) {
-      loadReferences()
+      loadReferenceLists()
     }
   }, [open])
 
   /**
-   * Réinitialiser le formulaire quand l'indication change ou dialog s'ouvre
-   * ✅ RÈGLE Section 7.4 : Reset form on dialog open
+   * Charger les données en mode édition
    */
   useEffect(() => {
-    if (open) {
-      if (indication) {
-        // Mode édition : pré-remplir
-        reset({
-          code: indication.code,
-          pathology: indication.pathology,
-          productId: indication.productId,
-          speciesId: indication.speciesId,
-          countryCode: indication.countryCode,
-          routeId: indication.routeId,
-          isVerified: indication.isVerified,
-          dosage: indication.dosage || '',
-          frequency: indication.frequency || '',
-          duration: indication.duration || '',
-          withdrawalMeat: indication.withdrawalMeat || undefined,
-          withdrawalMilk: indication.withdrawalMilk || undefined,
-          withdrawalEggs: indication.withdrawalEggs || undefined,
-          instructions: indication.instructions || '',
-          contraindications: indication.contraindications || '',
-          warnings: indication.warnings || '',
-          isActive: indication.isActive,
-        })
-      } else {
-        // Mode création : réinitialiser
-        reset({
-          code: '',
-          pathology: '',
-          productId: preSelectedProductId || '',
-          speciesId: preSelectedSpeciesId || '',
-          countryCode: preSelectedCountryCode || '',
-          routeId: '',
-          isVerified: false,
-          dosage: '',
-          frequency: '',
-          duration: '',
-          withdrawalMeat: undefined,
-          withdrawalMilk: undefined,
-          withdrawalEggs: undefined,
-          instructions: '',
-          contraindications: '',
-          warnings: '',
-          isActive: true,
-        })
-      }
+    if (indication && open) {
+      setValue('productId', indication.productId)
+      setValue('speciesId', indication.speciesId)
+      setValue('ageCategoryId', indication.ageCategoryId)
+      setValue('countryCode', indication.countryCode)
+      setValue('routeId', indication.routeId)
+      setValue('doseUnitId', indication.doseUnitId)
+      setValue('doseMin', indication.doseMin)
+      setValue('doseMax', indication.doseMax)
+      setValue('doseOriginalText', indication.doseOriginalText)
+      setValue('protocolDurationDays', indication.protocolDurationDays)
+      setValue('withdrawalMeatDays', indication.withdrawalMeatDays)
+      setValue('withdrawalMilkDays', indication.withdrawalMilkDays)
+      setValue('isVerified', indication.isVerified)
+      setValue('validationNotes', indication.validationNotes)
+      setValue('isActive', indication.isActive)
     }
-  }, [open, indication, preSelectedProductId, preSelectedSpeciesId, preSelectedCountryCode, reset])
+  }, [indication, open, setValue])
+
+  /**
+   * Reset lors de la fermeture
+   */
+  useEffect(() => {
+    if (!open) {
+      reset()
+    }
+  }, [open, reset])
 
   /**
    * Soumission du formulaire
    */
-  const handleFormSubmit = handleSubmit(async (data) => {
+  const handleFormSubmit = async (data: TherapeuticIndicationFormData) => {
     await onSubmit(data)
-  })
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {indication ? t('form.editTitle') : t('form.createTitle')}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleFormSubmit} className="space-y-6">
-          {/* Section 1 : Informations Générales */}
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+          {/* Section 1: Relations/Ciblage */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t('form.sectionGeneral')}</h3>
+            <h3 className="text-sm font-semibold border-b pb-2">
+              {t('form.sectionTargeting')}
+            </h3>
+
+            {/* Produit */}
+            <div className="space-y-2">
+              <Label htmlFor="productId">
+                {t('fields.product')} <span className="text-destructive">*</span>
+              </Label>
+              <Controller
+                name="productId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loading || loadingLists}
+                  >
+                    <SelectTrigger className={errors.productId ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={t('form.selectProduct')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id}>
+                          {product.commercialName} ({product.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.productId && (
+                <p className="text-sm text-destructive">{t(errors.productId.message!)}</p>
+              )}
+            </div>
+
+            {/* Espèce */}
+            <div className="space-y-2">
+              <Label htmlFor="speciesId">
+                {t('fields.species')} <span className="text-destructive">*</span>
+              </Label>
+              <Controller
+                name="speciesId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loading || loadingLists}
+                  >
+                    <SelectTrigger className={errors.speciesId ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={t('form.selectSpecies')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {species.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name} ({s.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.speciesId && (
+                <p className="text-sm text-destructive">{t(errors.speciesId.message!)}</p>
+              )}
+            </div>
+
+            {/* Catégorie d'âge */}
+            <div className="space-y-2">
+              <Label htmlFor="ageCategoryId">{t('fields.ageCategory')}</Label>
+              <Controller
+                name="ageCategoryId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => field.onChange(value === '' ? null : value)}
+                    value={field.value || ''}
+                    disabled={loading || loadingLists}
+                  >
+                    <SelectTrigger className={errors.ageCategoryId ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={t('form.selectAgeCategory')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{tc('placeholders.optional')}</SelectItem>
+                      {ageCategories.map((ac) => (
+                        <SelectItem key={ac.id} value={ac.id}>
+                          {ac.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.ageCategoryId && (
+                <p className="text-sm text-destructive">{t(errors.ageCategoryId.message!)}</p>
+              )}
+            </div>
+
+            {/* Pays */}
+            <div className="space-y-2">
+              <Label htmlFor="countryCode">{t('fields.country')}</Label>
+              <Controller
+                name="countryCode"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => field.onChange(value === '' ? null : value)}
+                    value={field.value || ''}
+                    disabled={loading || loadingLists}
+                  >
+                    <SelectTrigger className={errors.countryCode ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={t('form.selectCountry')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{tc('placeholders.optional')}</SelectItem>
+                      {countries.map((country) => (
+                        <SelectItem key={country.isoCode2} value={country.isoCode2}>
+                          {country.nameFr} ({country.isoCode2})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.countryCode && (
+                <p className="text-sm text-destructive">{t(errors.countryCode.message!)}</p>
+              )}
+            </div>
+
+            {/* Voie d'administration */}
+            <div className="space-y-2">
+              <Label htmlFor="routeId">
+                {t('fields.route')} <span className="text-destructive">*</span>
+              </Label>
+              <Controller
+                name="routeId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loading || loadingLists}
+                  >
+                    <SelectTrigger className={errors.routeId ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={t('form.selectRoute')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {routes.map((route) => (
+                        <SelectItem key={route.id} value={route.id}>
+                          {route.name} ({route.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.routeId && (
+                <p className="text-sm text-destructive">{t(errors.routeId.message!)}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Section 2: Posologie */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold border-b pb-2">
+              {t('form.sectionDosage')}
+            </h3>
+
+            {/* Unité de dosage */}
+            <div className="space-y-2">
+              <Label htmlFor="doseUnitId">
+                {t('fields.doseUnit')} <span className="text-destructive">*</span>
+              </Label>
+              <Controller
+                name="doseUnitId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loading || loadingLists}
+                  >
+                    <SelectTrigger className={errors.doseUnitId ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={t('form.selectDoseUnit')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {units.map((unit) => (
+                        <SelectItem key={unit.id} value={unit.id}>
+                          {unit.name} ({unit.symbol})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.doseUnitId && (
+                <p className="text-sm text-destructive">{t(errors.doseUnitId.message!)}</p>
+              )}
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Code */}
+              {/* Dose minimale */}
               <div className="space-y-2">
-                <Label htmlFor="code">
-                  {t('fields.code')} <span className="text-destructive">*</span>
-                </Label>
+                <Label htmlFor="doseMin">{t('fields.doseMin')}</Label>
                 <Input
-                  id="code"
-                  {...register('code')}
-                  placeholder={t('form.codePlaceholder')}
+                  id="doseMin"
+                  type="number"
+                  step="0.01"
+                  placeholder={t('form.doseMinPlaceholder')}
+                  {...register('doseMin', { valueAsNumber: true })}
                   disabled={loading}
-                  className={errors.code ? 'border-destructive' : ''}
+                  className={errors.doseMin ? 'border-destructive' : ''}
                 />
-                {errors.code && (
-                  <p className="text-sm text-destructive">{t(errors.code.message!)}</p>
+                {errors.doseMin && (
+                  <p className="text-sm text-destructive">{t(errors.doseMin.message!)}</p>
                 )}
               </div>
 
-              {/* Pathologie */}
+              {/* Dose maximale */}
               <div className="space-y-2">
-                <Label htmlFor="pathology">
-                  {t('fields.pathology')} <span className="text-destructive">*</span>
-                </Label>
+                <Label htmlFor="doseMax">{t('fields.doseMax')}</Label>
                 <Input
-                  id="pathology"
-                  {...register('pathology')}
-                  placeholder={t('form.pathologyPlaceholder')}
+                  id="doseMax"
+                  type="number"
+                  step="0.01"
+                  placeholder={t('form.doseMaxPlaceholder')}
+                  {...register('doseMax', { valueAsNumber: true })}
                   disabled={loading}
-                  className={errors.pathology ? 'border-destructive' : ''}
+                  className={errors.doseMax ? 'border-destructive' : ''}
                 />
-                {errors.pathology && (
-                  <p className="text-sm text-destructive">{t(errors.pathology.message!)}</p>
+                {errors.doseMax && (
+                  <p className="text-sm text-destructive">{t(errors.doseMax.message!)}</p>
                 )}
               </div>
             </div>
+
+            {/* Texte original */}
+            <div className="space-y-2">
+              <Label htmlFor="doseOriginalText">{t('fields.doseOriginalText')}</Label>
+              <Textarea
+                id="doseOriginalText"
+                placeholder={t('form.doseOriginalTextPlaceholder')}
+                {...register('doseOriginalText')}
+                disabled={loading}
+                className={errors.doseOriginalText ? 'border-destructive' : ''}
+              />
+              {errors.doseOriginalText && (
+                <p className="text-sm text-destructive">{t(errors.doseOriginalText.message!)}</p>
+              )}
+            </div>
+
+            {/* Durée du protocole */}
+            <div className="space-y-2">
+              <Label htmlFor="protocolDurationDays">{t('fields.protocolDurationDays')}</Label>
+              <Input
+                id="protocolDurationDays"
+                type="number"
+                placeholder={t('form.protocolDurationPlaceholder')}
+                {...register('protocolDurationDays', { valueAsNumber: true })}
+                disabled={loading}
+                className={errors.protocolDurationDays ? 'border-destructive' : ''}
+              />
+              {errors.protocolDurationDays && (
+                <p className="text-sm text-destructive">{t(errors.protocolDurationDays.message!)}</p>
+              )}
+            </div>
           </div>
 
-          {/* Section 2 : Ciblage */}
+          {/* Section 3: Délais d'attente */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t('form.sectionTargeting')}</h3>
+            <h3 className="text-sm font-semibold border-b pb-2">
+              {t('form.sectionWithdrawal')}
+            </h3>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Produit */}
-              <div className="space-y-2">
-                <Label htmlFor="productId">
-                  {t('fields.product')} <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={watch('productId')}
-                  onValueChange={(value) => setValue('productId', value, { shouldValidate: true })}
-                  disabled={loadingReferences || loading}
-                >
-                  <SelectTrigger id="productId">
-                    <SelectValue placeholder={t('form.selectProduct')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        {product.commercialName} ({product.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.productId && (
-                  <p className="text-sm text-destructive">{t(errors.productId.message!)}</p>
-                )}
-              </div>
-
-              {/* Espèce */}
-              <div className="space-y-2">
-                <Label htmlFor="speciesId">
-                  {t('fields.species')} <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={watch('speciesId')}
-                  onValueChange={(value) => setValue('speciesId', value, { shouldValidate: true })}
-                  disabled={loadingReferences || loading}
-                >
-                  <SelectTrigger id="speciesId">
-                    <SelectValue placeholder={t('form.selectSpecies')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {speciesList.map((species) => (
-                      <SelectItem key={species.id} value={species.id}>
-                        {species.name} ({species.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.speciesId && (
-                  <p className="text-sm text-destructive">{t(errors.speciesId.message!)}</p>
-                )}
-              </div>
-
-              {/* Pays */}
-              <div className="space-y-2">
-                <Label htmlFor="countryCode">
-                  {t('fields.country')} <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={watch('countryCode')}
-                  onValueChange={(value) => setValue('countryCode', value, { shouldValidate: true })}
-                  disabled={loadingReferences || loading}
-                >
-                  <SelectTrigger id="countryCode">
-                    <SelectValue placeholder={t('form.selectCountry')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map((country) => (
-                      <SelectItem key={country.isoCode2} value={country.isoCode2}>
-                        {country.nameFr} ({country.isoCode2})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.countryCode && (
-                  <p className="text-sm text-destructive">{t(errors.countryCode.message!)}</p>
-                )}
-              </div>
-
-              {/* Voie d'administration */}
-              <div className="space-y-2">
-                <Label htmlFor="routeId">
-                  {t('fields.route')} <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={watch('routeId')}
-                  onValueChange={(value) => setValue('routeId', value, { shouldValidate: true })}
-                  disabled={loadingReferences || loading}
-                >
-                  <SelectTrigger id="routeId">
-                    <SelectValue placeholder={t('form.selectRoute')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {routes.map((route) => (
-                      <SelectItem key={route.id} value={route.id}>
-                        {route.name} ({route.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.routeId && (
-                  <p className="text-sm text-destructive">{t(errors.routeId.message!)}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Section 3 : Posologie */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t('form.sectionPosology')}</h3>
-
-            <div className="grid grid-cols-3 gap-4">
-              {/* Dosage */}
-              <div className="space-y-2">
-                <Label htmlFor="dosage">{t('fields.dosage')}</Label>
-                <Input
-                  id="dosage"
-                  {...register('dosage')}
-                  placeholder={t('form.dosagePlaceholder')}
-                  disabled={loading}
-                  className={errors.dosage ? 'border-destructive' : ''}
-                />
-                {errors.dosage && (
-                  <p className="text-sm text-destructive">{t(errors.dosage.message!)}</p>
-                )}
-              </div>
-
-              {/* Fréquence */}
-              <div className="space-y-2">
-                <Label htmlFor="frequency">{t('fields.frequency')}</Label>
-                <Input
-                  id="frequency"
-                  {...register('frequency')}
-                  placeholder={t('form.frequencyPlaceholder')}
-                  disabled={loading}
-                  className={errors.frequency ? 'border-destructive' : ''}
-                />
-                {errors.frequency && (
-                  <p className="text-sm text-destructive">{t(errors.frequency.message!)}</p>
-                )}
-              </div>
-
-              {/* Durée */}
-              <div className="space-y-2">
-                <Label htmlFor="duration">{t('fields.duration')}</Label>
-                <Input
-                  id="duration"
-                  {...register('duration')}
-                  placeholder={t('form.durationPlaceholder')}
-                  disabled={loading}
-                  className={errors.duration ? 'border-destructive' : ''}
-                />
-                {errors.duration && (
-                  <p className="text-sm text-destructive">{t(errors.duration.message!)}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Section 4 : Délais d'Attente */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t('form.sectionWithdrawal')}</h3>
-
-            <div className="grid grid-cols-3 gap-4">
               {/* Délai viande */}
               <div className="space-y-2">
-                <Label htmlFor="withdrawalMeat">{t('fields.withdrawalMeat')}</Label>
+                <Label htmlFor="withdrawalMeatDays">{t('fields.withdrawalMeat')}</Label>
                 <Input
-                  id="withdrawalMeat"
+                  id="withdrawalMeatDays"
                   type="number"
-                  {...register('withdrawalMeat', { valueAsNumber: true })}
                   placeholder={t('form.withdrawalPlaceholder')}
+                  {...register('withdrawalMeatDays', { valueAsNumber: true })}
                   disabled={loading}
-                  className={errors.withdrawalMeat ? 'border-destructive' : ''}
+                  className={errors.withdrawalMeatDays ? 'border-destructive' : ''}
                 />
-                {errors.withdrawalMeat && (
-                  <p className="text-sm text-destructive">{t(errors.withdrawalMeat.message!)}</p>
+                {errors.withdrawalMeatDays && (
+                  <p className="text-sm text-destructive">{t(errors.withdrawalMeatDays.message!)}</p>
                 )}
               </div>
 
               {/* Délai lait */}
               <div className="space-y-2">
-                <Label htmlFor="withdrawalMilk">{t('fields.withdrawalMilk')}</Label>
+                <Label htmlFor="withdrawalMilkDays">{t('fields.withdrawalMilk')}</Label>
                 <Input
-                  id="withdrawalMilk"
+                  id="withdrawalMilkDays"
                   type="number"
-                  {...register('withdrawalMilk', { valueAsNumber: true })}
                   placeholder={t('form.withdrawalPlaceholder')}
+                  {...register('withdrawalMilkDays', { valueAsNumber: true })}
                   disabled={loading}
-                  className={errors.withdrawalMilk ? 'border-destructive' : ''}
+                  className={errors.withdrawalMilkDays ? 'border-destructive' : ''}
                 />
-                {errors.withdrawalMilk && (
-                  <p className="text-sm text-destructive">{t(errors.withdrawalMilk.message!)}</p>
-                )}
-              </div>
-
-              {/* Délai œufs */}
-              <div className="space-y-2">
-                <Label htmlFor="withdrawalEggs">{t('fields.withdrawalEggs')}</Label>
-                <Input
-                  id="withdrawalEggs"
-                  type="number"
-                  {...register('withdrawalEggs', { valueAsNumber: true })}
-                  placeholder={t('form.withdrawalPlaceholder')}
-                  disabled={loading}
-                  className={errors.withdrawalEggs ? 'border-destructive' : ''}
-                />
-                {errors.withdrawalEggs && (
-                  <p className="text-sm text-destructive">{t(errors.withdrawalEggs.message!)}</p>
+                {errors.withdrawalMilkDays && (
+                  <p className="text-sm text-destructive">{t(errors.withdrawalMilkDays.message!)}</p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Section 5 : Informations Supplémentaires */}
+          {/* Section 4: Validation */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t('form.sectionAdditional')}</h3>
+            <h3 className="text-sm font-semibold border-b pb-2">
+              {t('form.sectionValidation')}
+            </h3>
 
-            {/* Instructions */}
+            {/* Notes de validation */}
             <div className="space-y-2">
-              <Label htmlFor="instructions">{t('fields.instructions')}</Label>
+              <Label htmlFor="validationNotes">{t('fields.validationNotes')}</Label>
               <Textarea
-                id="instructions"
-                {...register('instructions')}
-                placeholder={t('form.instructionsPlaceholder')}
-                rows={3}
+                id="validationNotes"
+                placeholder={t('form.validationNotesPlaceholder')}
+                {...register('validationNotes')}
                 disabled={loading}
-                className={errors.instructions ? 'border-destructive' : ''}
+                className={errors.validationNotes ? 'border-destructive' : ''}
               />
-              {errors.instructions && (
-                <p className="text-sm text-destructive">{t(errors.instructions.message!)}</p>
-              )}
-            </div>
-
-            {/* Contre-indications */}
-            <div className="space-y-2">
-              <Label htmlFor="contraindications">{t('fields.contraindications')}</Label>
-              <Textarea
-                id="contraindications"
-                {...register('contraindications')}
-                placeholder={t('form.contraindicationsPlaceholder')}
-                rows={3}
-                disabled={loading}
-                className={errors.contraindications ? 'border-destructive' : ''}
-              />
-              {errors.contraindications && (
-                <p className="text-sm text-destructive">{t(errors.contraindications.message!)}</p>
-              )}
-            </div>
-
-            {/* Avertissements */}
-            <div className="space-y-2">
-              <Label htmlFor="warnings">{t('fields.warnings')}</Label>
-              <Textarea
-                id="warnings"
-                {...register('warnings')}
-                placeholder={t('form.warningsPlaceholder')}
-                rows={3}
-                disabled={loading}
-                className={errors.warnings ? 'border-destructive' : ''}
-              />
-              {errors.warnings && (
-                <p className="text-sm text-destructive">{t(errors.warnings.message!)}</p>
+              {errors.validationNotes && (
+                <p className="text-sm text-destructive">{t(errors.validationNotes.message!)}</p>
               )}
             </div>
           </div>
 
-          {/* Section 6 : Statut */}
+          {/* Section 5: Statut */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{t('form.sectionStatus')}</h3>
+            <h3 className="text-sm font-semibold border-b pb-2">
+              {t('form.sectionStatus')}
+            </h3>
 
-            <div className="flex items-center gap-8">
-              {/* Vérifiée */}
+            <div className="space-y-4">
+              {/* isVerified */}
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isVerified"
-                  {...register('isVerified')}
-                  className="h-4 w-4 rounded border-input"
-                  disabled={loading}
+                <Controller
+                  name="isVerified"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="isVerified"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  )}
                 />
-                <Label htmlFor="isVerified" className="cursor-pointer">
+                <Label htmlFor="isVerified" className="cursor-pointer font-normal">
                   {t('fields.isVerified')}
                 </Label>
               </div>
 
-              {/* Active */}
+              {/* isActive */}
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  {...register('isActive')}
-                  className="h-4 w-4 rounded border-input"
-                  disabled={loading}
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="isActive"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  )}
                 />
-                <Label htmlFor="isActive" className="cursor-pointer">
+                <Label htmlFor="isActive" className="cursor-pointer font-normal">
                   {t('fields.isActive')}
                 </Label>
               </div>
@@ -598,11 +574,16 @@ export function TherapeuticIndicationFormDialog({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+            >
               {tc('actions.cancel')}
             </Button>
-            <Button type="submit" disabled={loading || loadingReferences}>
-              {loading ? tc('actions.saving') : indication ? tc('actions.update') : tc('actions.create')}
+            <Button type="submit" disabled={loading || loadingLists}>
+              {loading ? tc('actions.saving') : tc('actions.save')}
             </Button>
           </DialogFooter>
         </form>
