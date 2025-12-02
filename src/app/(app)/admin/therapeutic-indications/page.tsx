@@ -205,11 +205,12 @@ export default function TherapeuticIndicationsPage() {
           <div className="flex items-center gap-2">
             {indication.isVerified ? (
               <>
-                <Badge variant="success" className="flex items-center gap-1">
+                <Badge key="badge" variant="success" className="flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" />
                   {t('status.verified')}
                 </Badge>
                 <Button
+                  key="button"
                   variant="ghost"
                   size="sm"
                   onClick={(e) => {
@@ -222,11 +223,12 @@ export default function TherapeuticIndicationsPage() {
               </>
             ) : (
               <>
-                <Badge variant="warning" className="flex items-center gap-1">
+                <Badge key="badge" variant="warning" className="flex items-center gap-1">
                   <XCircle className="h-3 w-3" />
                   {t('status.notVerified')}
                 </Badge>
                 <Button
+                  key="button"
                   variant="ghost"
                   size="sm"
                   onClick={(e) => {
