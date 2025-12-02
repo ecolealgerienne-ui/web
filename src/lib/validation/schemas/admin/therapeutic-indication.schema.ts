@@ -1,183 +1,121 @@
-import { z } from 'zod'
-
 /**
- * Schéma de validation pour création/édition d'une indication thérapeutique
+ * Schéma de validation Zod pour Therapeutic-Indication
  *
  * ✅ RÈGLE #1 : Aucune valeur en dur
  * ✅ RÈGLE #6 : Messages i18n (clés relatives, pas de texte)
- * ✅ RÈGLE Section 5.3 : z.number() pour délais (pas de z.coerce)
+ * ✅ RÈGLE Section 5.3 : z.number() pour champs numériques (pas de z.coerce)
  * ✅ RÈGLE Section 5.5 : Messages avec clés RELATIVES (sans préfixe entité)
  *
- * Tous les messages d'erreur sont des clés i18n relatives qui seront traduites
- * dans le composant via `t(error.message)` avec useTranslations('therapeuticIndication')
+ * Pattern: Simple Reference Data (basé sur les données réelles du backend)
  *
  * @example
  * ```typescript
  * const result = therapeuticIndicationSchema.safeParse(data)
  * if (!result.success) {
  *   const errors = result.error.flatten().fieldErrors
- *   // errors.code = ['validation.code.required']
- *   // Avec useTranslations('therapeuticIndication'), t('validation.code.required')
- *   // → therapeuticIndication.validation.code.required
+ *   // errors.productId = ['validation.productId.required']
+ *   // Avec useTranslations('therapeuticIndication'), t('validation.productId.required')
+ *   // → therapeuticIndication.validation.productId.required
  * }
  * ```
  */
+
+import { z } from 'zod'
+
+/**
+ * Schéma pour Therapeutic-Indication
+ * Basé sur les champs réels retournés par le backend
+ */
 export const therapeuticIndicationSchema = z.object({
-  /**
-   * Code unique de l'indication
-   * - Requis
-   * - Max 100 caractères
-   * - Pattern: lettres, chiffres, tirets, underscores
-   */
-  code: z.string()
-    .min(1, 'validation.code.required')
-    .max(100, 'validation.code.maxLength')
-    .regex(/^[A-Z0-9_-]+$/i, 'validation.code.pattern'),
-
-  /**
-   * Pathologie traitée
-   * - Requis
-   * - Max 200 caractères
-   */
-  pathology: z.string()
-    .min(1, 'validation.pathology.required')
-    .max(200, 'validation.pathology.maxLength'),
-
-  /**
-   * ID du produit (foreign key)
-   * - Requis
-   * - Format UUID
-   */
-  productId: z.string()
+  // ===== IDs Relations (Foreign Keys) =====
+  productId: z
+    .string()
     .min(1, 'validation.productId.required')
     .uuid('validation.productId.invalid'),
 
-  /**
-   * ID de l'espèce (foreign key)
-   * - Requis
-   * - Format UUID
-   */
-  speciesId: z.string()
-    .min(1, 'validation.speciesId.required')
-    .uuid('validation.speciesId.invalid'),
+  speciesId: z
+    .string()
+    .min(1, 'validation.speciesId.required'),
 
-  /**
-   * Code pays ISO 3166-1 alpha-2
-   * - Requis
-   * - Format: 2 caractères majuscules (ex: DZ, FR, MA)
-   */
-  countryCode: z.string()
-    .min(1, 'validation.countryCode.required')
+  ageCategoryId: z
+    .string()
+    .uuid('validation.ageCategoryId.invalid')
+    .optional()
+    .nullable()
+    .or(z.literal('')), // Accepte chaîne vide
+
+  countryCode: z
+    .string()
     .length(2, 'validation.countryCode.length')
-    .regex(/^[A-Z]{2}$/, 'validation.countryCode.pattern'),
+    .regex(/^[A-Z]{2}$/i, 'validation.countryCode.pattern')
+    .optional()
+    .nullable()
+    .or(z.literal('')), // Accepte chaîne vide
 
-  /**
-   * ID de la voie d'administration (foreign key)
-   * - Requis
-   * - Format UUID
-   */
-  routeId: z.string()
+  routeId: z
+    .string()
     .min(1, 'validation.routeId.required')
     .uuid('validation.routeId.invalid'),
 
-  /**
-   * Vérifiée (optionnel)
-   * Par défaut: false
-   */
-  isVerified: z.boolean().optional(),
+  doseUnitId: z
+    .string()
+    .min(1, 'validation.doseUnitId.required')
+    .uuid('validation.doseUnitId.invalid'),
 
-  /**
-   * Dosage recommandé (optionnel)
-   * - Max 200 caractères
-   * - Ex: "10 mg/kg", "500 mg par animal"
-   */
-  dosage: z.string()
-    .max(200, 'validation.dosage.maxLength')
+  // ===== Dosage =====
+  doseMin: z
+    .number()
+    .min(0, 'validation.doseMin.min')
     .optional()
+    .nullable(),
+
+  doseMax: z
+    .number()
+    .min(0, 'validation.doseMax.min')
+    .optional()
+    .nullable(),
+
+  doseOriginalText: z
+    .string()
+    .max(500, 'validation.doseOriginalText.maxLength')
+    .optional()
+    .nullable()
     .or(z.literal('')), // Accepte chaîne vide
 
-  /**
-   * Fréquence d'administration (optionnel)
-   * - Max 200 caractères
-   * - Ex: "2 fois par jour", "1 fois par semaine"
-   */
-  frequency: z.string()
-    .max(200, 'validation.frequency.maxLength')
+  // ===== Durée protocole =====
+  protocolDurationDays: z
+    .number()
+    .int('validation.protocolDurationDays.integer')
+    .min(1, 'validation.protocolDurationDays.min')
     .optional()
+    .nullable(),
+
+  // ===== Délais d'attente =====
+  withdrawalMeatDays: z
+    .number()
+    .int('validation.withdrawalMeatDays.integer')
+    .min(0, 'validation.withdrawalMeatDays.min')
+    .optional()
+    .nullable(),
+
+  withdrawalMilkDays: z
+    .number()
+    .int('validation.withdrawalMilkDays.integer')
+    .min(0, 'validation.withdrawalMilkDays.min')
+    .optional()
+    .nullable(),
+
+  // ===== Validation & Statut =====
+  isVerified: z.boolean().default(false),
+
+  validationNotes: z
+    .string()
+    .max(1000, 'validation.validationNotes.maxLength')
+    .optional()
+    .nullable()
     .or(z.literal('')), // Accepte chaîne vide
 
-  /**
-   * Durée du traitement (optionnel)
-   * - Max 200 caractères
-   * - Ex: "5 jours", "3 semaines"
-   */
-  duration: z.string()
-    .max(200, 'validation.duration.maxLength')
-    .optional()
-    .or(z.literal('')), // Accepte chaîne vide
-
-  /**
-   * Délai d'attente viande en jours (optionnel)
-   * - Doit être >= 0
-   * - Converti par react-hook-form avec valueAsNumber: true
-   * - ✅ z.number() simple (pas de z.coerce)
-   */
-  withdrawalMeat: z.number()
-    .int('validation.withdrawalMeat.integer')
-    .min(0, 'validation.withdrawalMeat.min')
-    .optional(),
-
-  /**
-   * Délai d'attente lait en jours (optionnel)
-   * - Doit être >= 0
-   * - Converti par react-hook-form avec valueAsNumber: true
-   */
-  withdrawalMilk: z.number()
-    .int('validation.withdrawalMilk.integer')
-    .min(0, 'validation.withdrawalMilk.min')
-    .optional(),
-
-  /**
-   * Délai d'attente œufs en jours (optionnel)
-   * - Doit être >= 0
-   * - Converti par react-hook-form avec valueAsNumber: true
-   */
-  withdrawalEggs: z.number()
-    .int('validation.withdrawalEggs.integer')
-    .min(0, 'validation.withdrawalEggs.min')
-    .optional(),
-
-  /**
-   * Instructions détaillées (optionnel)
-   * - Max 2000 caractères
-   */
-  instructions: z.string()
-    .max(2000, 'validation.instructions.maxLength')
-    .optional()
-    .or(z.literal('')), // Accepte chaîne vide
-
-  /**
-   * Contre-indications (optionnel)
-   * - Max 2000 caractères
-   */
-  contraindications: z.string()
-    .max(2000, 'validation.contraindications.maxLength')
-    .optional()
-    .or(z.literal('')), // Accepte chaîne vide
-
-  /**
-   * Avertissements et précautions (optionnel)
-   * - Max 2000 caractères
-   */
-  warnings: z.string()
-    .max(2000, 'validation.warnings.maxLength')
-    .optional()
-    .or(z.literal('')), // Accepte chaîne vide
-
-  /**
-   * Statut actif/inactif (optionnel)
-   */
-  isActive: z.boolean().optional(),
+  isActive: z.boolean().default(true),
 })
 
 /**
@@ -195,28 +133,26 @@ export const updateTherapeuticIndicationSchema = therapeuticIndicationSchema.ext
 })
 
 /**
- * Type explicite pour les formulaires de création
+ * Type explicite pour les formulaires
  * Utilisé avec react-hook-form
  *
  * ✅ Type explicite au lieu de z.infer pour éviter unknown avec z.preprocess
  */
 export type TherapeuticIndicationFormData = {
-  code: string
-  pathology: string
   productId: string
   speciesId: string
-  countryCode: string
+  ageCategoryId?: string | null
+  countryCode?: string | null
   routeId: string
+  doseUnitId: string
+  doseMin?: number | null
+  doseMax?: number | null
+  doseOriginalText?: string | null
+  protocolDurationDays?: number | null
+  withdrawalMeatDays?: number | null
+  withdrawalMilkDays?: number | null
   isVerified?: boolean
-  dosage?: string
-  frequency?: string
-  duration?: string
-  withdrawalMeat?: number
-  withdrawalMilk?: number
-  withdrawalEggs?: number
-  instructions?: string
-  contraindications?: string
-  warnings?: string
+  validationNotes?: string | null
   isActive?: boolean
 }
 
