@@ -72,6 +72,7 @@ export default function BreedCountriesPage() {
 
   // État pour la sélection
   const [selectedBreedCountry, setSelectedBreedCountry] = useState<BreedCountry | null>(null)
+  const [editingBreedCountry, setEditingBreedCountry] = useState<BreedCountry | null>(null)
   const [breedCountryToDelete, setBreedCountryToDelete] = useState<BreedCountry | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -182,6 +183,15 @@ export default function BreedCountriesPage() {
    * Ouvrir le formulaire de création (link)
    */
   const handleCreate = () => {
+    setEditingBreedCountry(null)
+    setFormOpen(true)
+  }
+
+  /**
+   * Ouvrir le formulaire d'édition
+   */
+  const handleEdit = (breedCountry: BreedCountry) => {
+    setEditingBreedCountry(breedCountry)
     setFormOpen(true)
   }
 
@@ -222,13 +232,20 @@ export default function BreedCountriesPage() {
   }
 
   /**
-   * Soumission du formulaire (création/link)
+   * Soumission du formulaire (création/link ou édition)
    */
   const handleFormSubmit = async (data: BreedCountryFormData) => {
     setSubmitting(true)
     try {
-      await link(data)
+      if (editingBreedCountry) {
+        // Mode édition : update isActive uniquement
+        await toggleActive(editingBreedCountry.id, data.isActive ?? true)
+      } else {
+        // Mode création : link
+        await link(data)
+      }
       setFormOpen(false)
+      setEditingBreedCountry(null)
     } catch (error) {
       console.error('Form submission error:', error)
     } finally {
@@ -335,6 +352,7 @@ export default function BreedCountriesPage() {
             page={params.page || 1}
             limit={params.limit || 50}
             onPageChange={handlePageChange}
+            onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onView={handleView}
             onRowClick={handleView}
@@ -356,6 +374,7 @@ export default function BreedCountriesPage() {
         onOpenChange={setFormOpen}
         onSubmit={handleFormSubmit}
         loading={submitting}
+        breedCountry={editingBreedCountry}
         preSelectedBreedId={selectedBreedId === ALL_BREEDS ? undefined : selectedBreedId}
         preSelectedCountryCode={
           selectedCountryCode === ALL_COUNTRIES ? undefined : selectedCountryCode

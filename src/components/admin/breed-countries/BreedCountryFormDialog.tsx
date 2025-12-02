@@ -24,6 +24,7 @@ import {
   breedCountrySchema,
   type BreedCountryFormData,
 } from '@/lib/validation/schemas/admin/breed-country.schema'
+import type { BreedCountry } from '@/lib/types/admin/breed-country'
 import type { Breed } from '@/lib/types/admin/breed'
 import type { Country } from '@/lib/types/admin/country'
 import { breedsService } from '@/lib/services/admin/breeds.service'
@@ -57,6 +58,12 @@ interface BreedCountryFormDialogProps {
   loading?: boolean
 
   /**
+   * BreedCountry à éditer (mode édition)
+   * Si null/undefined, c'est le mode création
+   */
+  breedCountry?: BreedCountry | null
+
+  /**
    * ID de race pré-sélectionné (pour création depuis filtre)
    */
   preSelectedBreedId?: string
@@ -68,7 +75,7 @@ interface BreedCountryFormDialogProps {
 }
 
 /**
- * Dialog de formulaire pour créer un lien Race-Pays
+ * Dialog de formulaire pour créer/éditer un lien Race-Pays
  *
  * ✅ RÈGLE #6 : i18n complet via useTranslations
  * ✅ RÈGLE #9 : react-hook-form + zodResolver
@@ -76,13 +83,14 @@ interface BreedCountryFormDialogProps {
  * ✅ RÈGLE Section 7.6 : Pattern checkbox pour isActive
  *
  * Pattern: Junction Table (Many-to-Many)
- * Mode création uniquement (pas d'édition)
+ * Mode création et édition (édition = modifier isActive uniquement)
  */
 export function BreedCountryFormDialog({
   open,
   onOpenChange,
   onSubmit,
   loading = false,
+  breedCountry,
   preSelectedBreedId,
   preSelectedCountryCode,
 }: BreedCountryFormDialogProps) {
@@ -93,6 +101,9 @@ export function BreedCountryFormDialog({
   const [breeds, setBreeds] = useState<Breed[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [loadingReferences, setLoadingReferences] = useState(false)
+
+  // Mode édition ou création
+  const isEditMode = Boolean(breedCountry)
 
   // Initialisation du formulaire
   const {
@@ -105,9 +116,9 @@ export function BreedCountryFormDialog({
   } = useForm<BreedCountryFormData>({
     resolver: zodResolver(breedCountrySchema),
     defaultValues: {
-      breedId: preSelectedBreedId || '',
-      countryCode: preSelectedCountryCode || '',
-      isActive: true,
+      breedId: breedCountry?.breedId || preSelectedBreedId || '',
+      countryCode: breedCountry?.countryCode || preSelectedCountryCode || '',
+      isActive: breedCountry?.isActive ?? true,
     },
   })
 
@@ -147,12 +158,12 @@ export function BreedCountryFormDialog({
   useEffect(() => {
     if (open) {
       reset({
-        breedId: preSelectedBreedId || '',
-        countryCode: preSelectedCountryCode || '',
-        isActive: true,
+        breedId: breedCountry?.breedId || preSelectedBreedId || '',
+        countryCode: breedCountry?.countryCode || preSelectedCountryCode || '',
+        isActive: breedCountry?.isActive ?? true,
       })
     }
-  }, [open, preSelectedBreedId, preSelectedCountryCode, reset])
+  }, [open, breedCountry, preSelectedBreedId, preSelectedCountryCode, reset])
 
   /**
    * Soumission du formulaire
@@ -165,7 +176,7 @@ export function BreedCountryFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>{t('form.createTitle')}</DialogTitle>
+          <DialogTitle>{isEditMode ? t('form.editTitle') : t('form.createTitle')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleFormSubmit} className="space-y-6">
@@ -177,7 +188,7 @@ export function BreedCountryFormDialog({
             <Select
               value={watch('breedId')}
               onValueChange={(value) => setValue('breedId', value, { shouldValidate: true })}
-              disabled={loadingReferences || loading}
+              disabled={isEditMode || loadingReferences || loading}
             >
               <SelectTrigger id="breedId">
                 <SelectValue placeholder={t('form.selectBreed')} />
@@ -203,7 +214,7 @@ export function BreedCountryFormDialog({
             <Select
               value={watch('countryCode')}
               onValueChange={(value) => setValue('countryCode', value, { shouldValidate: true })}
-              disabled={loadingReferences || loading}
+              disabled={isEditMode || loadingReferences || loading}
             >
               <SelectTrigger id="countryCode">
                 <SelectValue placeholder={t('form.selectCountry')} />

@@ -24,6 +24,7 @@ import {
   campaignCountrySchema,
   type CampaignCountryFormData,
 } from '@/lib/validation/schemas/admin/campaign-country.schema'
+import type { CampaignCountry } from '@/lib/types/admin/campaign-country'
 import type { NationalCampaign } from '@/lib/types/admin/national-campaign'
 import type { Country } from '@/lib/types/admin/country'
 import { nationalCampaignsService } from '@/lib/services/admin/national-campaigns.service'
@@ -57,6 +58,12 @@ interface CampaignCountryFormDialogProps {
   loading?: boolean
 
   /**
+   * CampaignCountry à éditer (mode édition)
+   * Si null/undefined, c'est le mode création
+   */
+  campaignCountry?: CampaignCountry | null
+
+  /**
    * ID de campagne pré-sélectionné (pour création depuis filtre)
    */
   preSelectedCampaignId?: string
@@ -68,7 +75,7 @@ interface CampaignCountryFormDialogProps {
 }
 
 /**
- * Dialog de formulaire pour créer un lien Campagne-Pays
+ * Dialog de formulaire pour créer/éditer un lien Campagne-Pays
  *
  * ✅ RÈGLE #6 : i18n complet via useTranslations
  * ✅ RÈGLE #9 : react-hook-form + zodResolver
@@ -76,13 +83,14 @@ interface CampaignCountryFormDialogProps {
  * ✅ RÈGLE Section 7.6 : Pattern checkbox pour isActive
  *
  * Pattern: Junction Table (Many-to-Many)
- * Mode création uniquement (pas d'édition)
+ * Mode création et édition (édition = modifier isActive uniquement)
  */
 export function CampaignCountryFormDialog({
   open,
   onOpenChange,
   onSubmit,
   loading = false,
+  campaignCountry,
   preSelectedCampaignId,
   preSelectedCountryCode,
 }: CampaignCountryFormDialogProps) {
@@ -93,6 +101,9 @@ export function CampaignCountryFormDialog({
   const [campaigns, setCampaigns] = useState<NationalCampaign[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [loadingReferences, setLoadingReferences] = useState(false)
+
+  // Mode édition ou création
+  const isEditMode = Boolean(campaignCountry)
 
   // Initialisation du formulaire
   const {
@@ -105,9 +116,9 @@ export function CampaignCountryFormDialog({
   } = useForm<CampaignCountryFormData>({
     resolver: zodResolver(campaignCountrySchema),
     defaultValues: {
-      campaignId: preSelectedCampaignId || '',
-      countryCode: preSelectedCountryCode || '',
-      isActive: true,
+      campaignId: campaignCountry?.campaignId || preSelectedCampaignId || '',
+      countryCode: campaignCountry?.countryCode || preSelectedCountryCode || '',
+      isActive: campaignCountry?.isActive ?? true,
     },
   })
 
@@ -147,12 +158,12 @@ export function CampaignCountryFormDialog({
   useEffect(() => {
     if (open) {
       reset({
-        campaignId: preSelectedCampaignId || '',
-        countryCode: preSelectedCountryCode || '',
-        isActive: true,
+        campaignId: campaignCountry?.campaignId || preSelectedCampaignId || '',
+        countryCode: campaignCountry?.countryCode || preSelectedCountryCode || '',
+        isActive: campaignCountry?.isActive ?? true,
       })
     }
-  }, [open, preSelectedCampaignId, preSelectedCountryCode, reset])
+  }, [open, campaignCountry, preSelectedCampaignId, preSelectedCountryCode, reset])
 
   /**
    * Soumission du formulaire
@@ -165,7 +176,7 @@ export function CampaignCountryFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>{t('form.createTitle')}</DialogTitle>
+          <DialogTitle>{isEditMode ? t('form.editTitle') : t('form.createTitle')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleFormSubmit} className="space-y-6">
@@ -177,7 +188,7 @@ export function CampaignCountryFormDialog({
             <Select
               value={watch('campaignId')}
               onValueChange={(value) => setValue('campaignId', value, { shouldValidate: true })}
-              disabled={loadingReferences || loading}
+              disabled={isEditMode || loadingReferences || loading}
             >
               <SelectTrigger id="campaignId">
                 <SelectValue placeholder={t('form.selectCampaign')} />
@@ -203,7 +214,7 @@ export function CampaignCountryFormDialog({
             <Select
               value={watch('countryCode')}
               onValueChange={(value) => setValue('countryCode', value, { shouldValidate: true })}
-              disabled={loadingReferences || loading}
+              disabled={isEditMode || loadingReferences || loading}
             >
               <SelectTrigger id="countryCode">
                 <SelectValue placeholder={t('form.selectCountry')} />

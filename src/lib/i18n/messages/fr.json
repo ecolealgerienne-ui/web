@@ -982,6 +982,7 @@
     },
     "form": {
       "createTitle": "Lier une race à un pays",
+      "editTitle": "Modifier l'association race-pays",
       "selectBreed": "Sélectionner une race",
       "selectCountry": "Sélectionner un pays"
     },
@@ -1041,6 +1042,7 @@
     },
     "form": {
       "createTitle": "Lier une campagne à un pays",
+      "editTitle": "Modifier l'association campagne-pays",
       "selectCampaign": "Sélectionner une campagne",
       "selectCountry": "Sélectionner un pays"
     },

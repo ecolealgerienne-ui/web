@@ -74,6 +74,9 @@ export default function CampaignCountriesPage() {
   const [selectedCampaignCountry, setSelectedCampaignCountry] = useState<CampaignCountry | null>(
     null
   )
+  const [editingCampaignCountry, setEditingCampaignCountry] = useState<CampaignCountry | null>(
+    null
+  )
   const [campaignCountryToDelete, setCampaignCountryToDelete] = useState<CampaignCountry | null>(
     null
   )
@@ -196,6 +199,15 @@ export default function CampaignCountriesPage() {
    * Ouvrir le formulaire de création (link)
    */
   const handleCreate = () => {
+    setEditingCampaignCountry(null)
+    setFormOpen(true)
+  }
+
+  /**
+   * Ouvrir le formulaire d'édition
+   */
+  const handleEdit = (campaignCountry: CampaignCountry) => {
+    setEditingCampaignCountry(campaignCountry)
     setFormOpen(true)
   }
 
@@ -229,13 +241,20 @@ export default function CampaignCountriesPage() {
   }
 
   /**
-   * Soumission du formulaire (création/link)
+   * Soumission du formulaire (création/link ou édition)
    */
   const handleFormSubmit = async (data: CampaignCountryFormData) => {
     setSubmitting(true)
     try {
-      await link(data)
+      if (editingCampaignCountry) {
+        // Mode édition : update isActive uniquement
+        await toggleActive(editingCampaignCountry.id, data.isActive ?? true)
+      } else {
+        // Mode création : link
+        await link(data)
+      }
       setFormOpen(false)
+      setEditingCampaignCountry(null)
     } catch (error) {
       console.error('Form submission error:', error)
     } finally {
@@ -342,6 +361,7 @@ export default function CampaignCountriesPage() {
             page={params.page || 1}
             limit={params.limit || 50}
             onPageChange={handlePageChange}
+            onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onView={handleView}
             onRowClick={handleView}
@@ -363,6 +383,7 @@ export default function CampaignCountriesPage() {
         onOpenChange={setFormOpen}
         onSubmit={handleFormSubmit}
         loading={submitting}
+        campaignCountry={editingCampaignCountry}
         preSelectedCampaignId={selectedCampaignId === ALL_CAMPAIGNS ? undefined : selectedCampaignId}
         preSelectedCountryCode={
           selectedCountryCode === ALL_COUNTRIES ? undefined : selectedCountryCode
