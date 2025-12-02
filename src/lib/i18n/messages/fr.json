@@ -46,7 +46,8 @@
       "deletedAt": "Supprimé le",
       "metadata": "Métadonnées",
       "required": "Requis",
-      "none": "Aucun"
+      "none": "Aucun",
+      "version": "Version"
     },
     "error": {
       "title": "Erreur",
@@ -1081,34 +1082,23 @@
     "title": "Indications Thérapeutiques",
     "description": "Gestion des indications thérapeutiques pour les produits vétérinaires par espèce et pays",
     "fields": {
-      "code": "Code",
-      "pathology": "Pathologie",
       "product": "Produit",
       "species": "Espèce",
+      "ageCategory": "Catégorie d'âge",
       "country": "Pays",
       "route": "Voie d'administration",
-      "isVerified": "Vérifiée",
-      "dosage": "Dosage",
-      "frequency": "Fréquence",
-      "duration": "Durée",
+      "doseUnit": "Unité de dosage",
+      "doseMin": "Dose minimale",
+      "doseMax": "Dose maximale",
+      "doseOriginalText": "Texte original de la posologie",
+      "protocolDurationDays": "Durée du protocole (jours)",
       "withdrawalMeat": "Délai viande (jours)",
       "withdrawalMilk": "Délai lait (jours)",
-      "withdrawalEggs": "Délai œufs (jours)",
-      "instructions": "Instructions d'utilisation",
-      "contraindications": "Contre-indications",
-      "warnings": "Avertissements et précautions",
+      "isVerified": "Vérifiée",
+      "validationNotes": "Notes de validation",
       "isActive": "Active"
     },
     "validation": {
-      "code": {
-        "required": "Le code est requis",
-        "maxLength": "Le code ne doit pas dépasser 100 caractères",
-        "pattern": "Le code doit contenir uniquement des lettres, chiffres, tirets et underscores"
-      },
-      "pathology": {
-        "required": "La pathologie est requise",
-        "maxLength": "La pathologie ne doit pas dépasser 200 caractères"
-      },
       "productId": {
         "required": "Le produit est requis",
         "invalid": "L'identifiant du produit est invalide"
@@ -1117,8 +1107,10 @@
         "required": "L'espèce est requise",
         "invalid": "L'identifiant de l'espèce est invalide"
       },
+      "ageCategoryId": {
+        "invalid": "L'identifiant de la catégorie d'âge est invalide"
+      },
       "countryCode": {
-        "required": "Le code pays est requis",
         "length": "Le code pays doit contenir exactement 2 caractères",
         "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
       },
@@ -1126,35 +1118,33 @@
         "required": "La voie d'administration est requise",
         "invalid": "L'identifiant de la voie d'administration est invalide"
       },
-      "dosage": {
-        "maxLength": "Le dosage ne doit pas dépasser 200 caractères"
+      "doseUnitId": {
+        "required": "L'unité de dosage est requise",
+        "invalid": "L'identifiant de l'unité de dosage est invalide"
       },
-      "frequency": {
-        "maxLength": "La fréquence ne doit pas dépasser 200 caractères"
+      "doseMin": {
+        "min": "La dose minimale doit être supérieure ou égale à 0"
       },
-      "duration": {
-        "maxLength": "La durée ne doit pas dépasser 200 caractères"
+      "doseMax": {
+        "min": "La dose maximale doit être supérieure ou égale à 0"
       },
-      "withdrawalMeat": {
+      "doseOriginalText": {
+        "maxLength": "Le texte original ne doit pas dépasser 500 caractères"
+      },
+      "protocolDurationDays": {
+        "integer": "La durée du protocole doit être un nombre entier",
+        "min": "La durée du protocole doit être supérieure ou égale à 1"
+      },
+      "withdrawalMeatDays": {
         "integer": "Le délai viande doit être un nombre entier",
         "min": "Le délai viande doit être supérieur ou égal à 0"
       },
-      "withdrawalMilk": {
+      "withdrawalMilkDays": {
         "integer": "Le délai lait doit être un nombre entier",
         "min": "Le délai lait doit être supérieur ou égal à 0"
       },
-      "withdrawalEggs": {
-        "integer": "Le délai œufs doit être un nombre entier",
-        "min": "Le délai œufs doit être supérieur ou égal à 0"
-      },
-      "instructions": {
-        "maxLength": "Les instructions ne doivent pas dépasser 2000 caractères"
-      },
-      "contraindications": {
-        "maxLength": "Les contre-indications ne doivent pas dépasser 2000 caractères"
-      },
-      "warnings": {
-        "maxLength": "Les avertissements ne doivent pas dépasser 2000 caractères"
+      "validationNotes": {
+        "maxLength": "Les notes de validation ne doivent pas dépasser 1000 caractères"
       },
       "version": {
         "integer": "La version doit être un nombre entier",
@@ -1166,23 +1156,22 @@
       "editTitle": "Modifier l'indication thérapeutique",
       "sectionGeneral": "Informations Générales",
       "sectionTargeting": "Ciblage",
-      "sectionPosology": "Posologie",
+      "sectionDosage": "Posologie",
       "sectionWithdrawal": "Délais d'Attente",
-      "sectionAdditional": "Informations Supplémentaires",
+      "sectionValidation": "Validation",
       "sectionStatus": "Statut",
       "selectProduct": "Sélectionner un produit",
       "selectSpecies": "Sélectionner une espèce",
+      "selectAgeCategory": "Sélectionner une catégorie d'âge",
       "selectCountry": "Sélectionner un pays",
       "selectRoute": "Sélectionner une voie",
-      "codePlaceholder": "Ex: AMOX-CAT-FR-ORAL",
-      "pathologyPlaceholder": "Ex: Infection respiratoire",
-      "dosagePlaceholder": "Ex: 10 mg/kg",
-      "frequencyPlaceholder": "Ex: 2 fois par jour",
-      "durationPlaceholder": "Ex: 5 jours",
+      "selectDoseUnit": "Sélectionner une unité",
+      "doseMinPlaceholder": "Dose minimale",
+      "doseMaxPlaceholder": "Dose maximale",
+      "doseOriginalTextPlaceholder": "Texte original de la posologie...",
+      "protocolDurationPlaceholder": "Nombre de jours",
       "withdrawalPlaceholder": "Nombre de jours",
-      "instructionsPlaceholder": "Décrire les instructions d'utilisation...",
-      "contraindicationsPlaceholder": "Décrire les contre-indications...",
-      "warningsPlaceholder": "Décrire les avertissements et précautions..."
+      "validationNotesPlaceholder": "Notes de validation..."
     },
     "actions": {
       "create": "Créer une indication",
@@ -1205,7 +1194,7 @@
       "notVerifiedOnly": "Non vérifiées uniquement"
     },
     "search": {
-      "placeholder": "Rechercher par code ou pathologie..."
+      "placeholder": "Rechercher une indication thérapeutique..."
     },
     "messages": {
       "createSuccess": "Indication thérapeutique créée avec succès",
