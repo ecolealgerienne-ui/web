@@ -111,8 +111,6 @@ class TherapeuticIndicationsService implements CrudService<
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        orderBy: sortBy,
-        order: sortOrder.toUpperCase(), // ASC ou DESC
       })
 
       // Ajouter les filtres optionnels
