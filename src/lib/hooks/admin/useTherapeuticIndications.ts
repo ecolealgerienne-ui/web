@@ -51,7 +51,7 @@ export function useTherapeuticIndications(initialParams: TherapeuticIndicationFi
   const [params, setParams] = useState<TherapeuticIndicationFilterParams>({
     page: 1,
     limit: 50,
-    sortBy: 'createdAt',
+    sortBy: 'code',
     sortOrder: 'asc',
     ...initialParams,
   })

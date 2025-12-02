@@ -99,7 +99,7 @@ export default function TherapeuticIndicationsPage() {
   } = useTherapeuticIndications({
     page: 1,
     limit: 50,
-    sortBy: 'createdAt',
+    sortBy: 'code',
     sortOrder: 'asc',
   })
 
