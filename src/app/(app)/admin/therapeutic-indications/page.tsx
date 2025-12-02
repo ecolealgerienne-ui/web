@@ -146,50 +146,56 @@ export default function TherapeuticIndicationsPage() {
   /**
    * Définition des colonnes du tableau
    * ✅ RÈGLE Section 8.3.2 : ColumnDef[] pour DataTable
+   * Note: Affiche les IDs pour le moment (le backend ne retourne pas les relations)
    */
   const columns: ColumnDef<TherapeuticIndication>[] = useMemo(
     () => [
       {
-        key: 'code',
-        header: t('fields.code'),
-        sortable: true,
-        render: (indication) => <span className="font-medium">{indication.code}</span>,
-      },
-      {
-        key: 'pathology',
-        header: t('fields.pathology'),
-        sortable: true,
-        render: (indication) => <span className="font-medium">{indication.pathology}</span>,
-      },
-      {
-        key: 'product',
+        key: 'productId',
         header: t('fields.product'),
         render: (indication) => (
-          <div>
-            <div className="text-sm">{indication.product?.commercialName || '—'}</div>
-            {indication.product?.code && (
-              <div className="text-xs text-muted-foreground">{indication.product.code}</div>
-            )}
-          </div>
+          <span className="text-xs font-mono text-muted-foreground">
+            {indication.productId}
+          </span>
         ),
       },
       {
-        key: 'species',
+        key: 'speciesId',
         header: t('fields.species'),
         render: (indication) => (
-          <div>
-            <div className="text-sm">{indication.species?.name || '—'}</div>
-            {indication.species?.code && (
-              <div className="text-xs text-muted-foreground">{indication.species.code}</div>
-            )}
-          </div>
+          <span className="text-xs font-mono text-muted-foreground">
+            {indication.speciesId}
+          </span>
         ),
       },
       {
-        key: 'country',
+        key: 'countryCode',
         header: t('fields.country'),
         render: (indication) => (
-          <Badge variant="default">{indication.countryCode}</Badge>
+          <Badge variant="default">{indication.countryCode || '—'}</Badge>
+        ),
+      },
+      {
+        key: 'routeId',
+        header: t('fields.route'),
+        render: (indication) => (
+          <span className="text-xs font-mono text-muted-foreground">
+            {indication.routeId}
+          </span>
+        ),
+      },
+      {
+        key: 'withdrawalMeatDays',
+        header: t('fields.withdrawalMeat'),
+        render: (indication) => (
+          indication.withdrawalMeatDays ? `${indication.withdrawalMeatDays}j` : '—'
+        ),
+      },
+      {
+        key: 'withdrawalMilkDays',
+        header: t('fields.withdrawalMilk'),
+        render: (indication) => (
+          indication.withdrawalMilkDays ? `${indication.withdrawalMilkDays}j` : '—'
         ),
       },
       {
@@ -493,37 +499,19 @@ export default function TherapeuticIndicationsPage() {
         item={selectedIndication}
         title={t('detail.title')}
         fields={[
-          { key: 'code', label: t('fields.code') },
-          { key: 'pathology', label: t('fields.pathology') },
-          {
-            key: 'product',
-            label: t('fields.product'),
-            render: (value) => (value ? `${value.commercialName} (${value.code})` : '—'),
-          },
-          {
-            key: 'species',
-            label: t('fields.species'),
-            render: (value) => (value ? `${value.name} (${value.code})` : '—'),
-          },
-          {
-            key: 'country',
-            label: t('fields.country'),
-            render: (value) => (value ? `${value.nameFr} (${value.isoCode2})` : '—'),
-          },
-          {
-            key: 'route',
-            label: t('fields.route'),
-            render: (value) => (value ? `${value.name} (${value.code})` : '—'),
-          },
-          { key: 'dosage', label: t('fields.dosage') },
-          { key: 'frequency', label: t('fields.frequency') },
-          { key: 'duration', label: t('fields.duration') },
-          { key: 'withdrawalMeat', label: t('fields.withdrawalMeat'), render: (value) => value ? `${value} jours` : '—' },
-          { key: 'withdrawalMilk', label: t('fields.withdrawalMilk'), render: (value) => value ? `${value} jours` : '—' },
-          { key: 'withdrawalEggs', label: t('fields.withdrawalEggs'), render: (value) => value ? `${value} jours` : '—' },
-          { key: 'instructions', label: t('fields.instructions') },
-          { key: 'contraindications', label: t('fields.contraindications') },
-          { key: 'warnings', label: t('fields.warnings') },
+          { key: 'productId', label: t('fields.product') },
+          { key: 'speciesId', label: t('fields.species') },
+          { key: 'ageCategoryId', label: t('fields.ageCategory') },
+          { key: 'countryCode', label: t('fields.country') },
+          { key: 'routeId', label: t('fields.route') },
+          { key: 'doseMin', label: t('fields.doseMin') },
+          { key: 'doseMax', label: t('fields.doseMax') },
+          { key: 'doseUnitId', label: t('fields.doseUnit') },
+          { key: 'doseOriginalText', label: t('fields.doseOriginalText') },
+          { key: 'protocolDurationDays', label: t('fields.protocolDurationDays'), render: (value) => value ? `${value} jours` : '—' },
+          { key: 'withdrawalMeatDays', label: t('fields.withdrawalMeat'), render: (value) => value ? `${value} jours` : '—' },
+          { key: 'withdrawalMilkDays', label: t('fields.withdrawalMilk'), render: (value) => value ? `${value} jours` : '—' },
+          { key: 'validationNotes', label: t('fields.validationNotes') },
           {
             key: 'isVerified',
             label: t('fields.isVerified'),
@@ -534,6 +522,7 @@ export default function TherapeuticIndicationsPage() {
             label: t('fields.isActive'),
             type: 'badge',
           },
+          { key: 'version', label: tc('fields.version') },
           { key: 'createdAt', label: tc('fields.createdAt'), type: 'date' },
           { key: 'updatedAt', label: tc('fields.updatedAt'), type: 'date' },
         ]}
@@ -543,7 +532,7 @@ export default function TherapeuticIndicationsPage() {
       <DeleteConfirmModal
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
-        itemName={indicationToDelete ? `${indicationToDelete.code} - ${indicationToDelete.pathology}` : ''}
+        itemName={indicationToDelete ? indicationToDelete.id : ''}
         onConfirm={handleDeleteConfirm}
       />
     </div>
