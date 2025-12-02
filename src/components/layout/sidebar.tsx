@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell, Building2, CalendarClock, Dog, Boxes } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell, Building2, CalendarClock, Dog, Boxes, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -33,6 +33,8 @@ const adminMenuItems = [
   { icon: Bell, key: "alertTemplates", href: "/admin/alert-templates" },
   { icon: PackageOpen, key: "products", href: "/admin/products" },
   { icon: Boxes, key: "productPackagings", href: "/admin/product-packagings" },
+  { icon: Link2, key: "breedCountries", href: "/admin/breed-countries" },
+  { icon: Link2, key: "campaignCountries", href: "/admin/campaign-countries" },
 ];
 
 // Menu Données de référence (super admin uniquement)
