@@ -270,15 +270,15 @@ export function TherapeuticIndicationFormDialog({
                 control={control}
                 render={({ field }) => (
                   <Select
-                    onValueChange={(value) => field.onChange(value === '' ? null : value)}
-                    value={field.value || ''}
+                    onValueChange={(value) => field.onChange(value === '__none__' ? null : value)}
+                    value={field.value || '__none__'}
                     disabled={loading || loadingLists}
                   >
                     <SelectTrigger className={errors.ageCategoryId ? 'border-destructive' : ''}>
                       <SelectValue placeholder={t('form.selectAgeCategory')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{tc('placeholders.optional')}</SelectItem>
+                      <SelectItem key="none" value="__none__">{tc('placeholders.optional')}</SelectItem>
                       {ageCategories.map((ac) => (
                         <SelectItem key={ac.id} value={ac.id}>
                           {ac.nameFr}
@@ -301,15 +301,15 @@ export function TherapeuticIndicationFormDialog({
                 control={control}
                 render={({ field }) => (
                   <Select
-                    onValueChange={(value) => field.onChange(value === '' ? null : value)}
-                    value={field.value || ''}
+                    onValueChange={(value) => field.onChange(value === '__none__' ? null : value)}
+                    value={field.value || '__none__'}
                     disabled={loading || loadingLists}
                   >
                     <SelectTrigger className={errors.countryCode ? 'border-destructive' : ''}>
                       <SelectValue placeholder={t('form.selectCountry')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{tc('placeholders.optional')}</SelectItem>
+                      <SelectItem key="none" value="__none__">{tc('placeholders.optional')}</SelectItem>
                       {countries.map((country) => (
                         <SelectItem key={country.isoCode2} value={country.isoCode2}>
                           {country.nameFr} ({country.isoCode2})
