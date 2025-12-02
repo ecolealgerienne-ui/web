@@ -147,7 +147,8 @@
       "nationalCampaigns": "Campagnes Nationales",
       "alertTemplates": "Modèles d'Alertes",
       "products": "Produits Vétérinaires",
-      "productPackagings": "Conditionnements"
+      "productPackagings": "Conditionnements",
+      "breedCountries": "Races par Pays"
     }
   },
   "breeds": {
@@ -952,6 +953,65 @@
     "delete": {
       "title": "Supprimer le conditionnement",
       "description": "Êtes-vous sûr de vouloir supprimer le conditionnement \"{name}\" ? Cette action peut être annulée ultérieurement."
+    }
+  },
+  "breedCountry": {
+    "title": "Races par Pays",
+    "description": "Gestion des associations entre races et pays autorisés",
+    "fields": {
+      "breed": "Race",
+      "country": "Pays",
+      "countryCode": "Code pays",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "breedId": {
+        "required": "La race est requise",
+        "invalid": "L'identifiant de la race est invalide"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "isActive": {
+        "required": "Le statut actif/inactif est requis",
+        "invalid": "Le statut doit être un booléen"
+      }
+    },
+    "form": {
+      "createTitle": "Lier une race à un pays",
+      "selectBreed": "Sélectionner une race",
+      "selectCountry": "Sélectionner un pays"
+    },
+    "actions": {
+      "link": "Lier une race",
+      "unlink": "Délier",
+      "activate": "Activer",
+      "deactivate": "Désactiver"
+    },
+    "filters": {
+      "breed": "Race",
+      "allBreeds": "Toutes les races",
+      "country": "Pays",
+      "allCountries": "Tous les pays"
+    },
+    "search": {
+      "placeholder": "Rechercher une association race-pays..."
+    },
+    "messages": {
+      "linkSuccess": "Association race-pays créée avec succès",
+      "unlinkSuccess": "Association supprimée avec succès",
+      "deleteSuccess": "Association supprimée avec succès",
+      "activateSuccess": "Association activée avec succès",
+      "deactivateSuccess": "Association désactivée avec succès",
+      "noResults": "Aucune association trouvée",
+      "linkError": "Erreur lors de la création de l'association",
+      "unlinkError": "Erreur lors de la suppression de l'association",
+      "toggleError": "Erreur lors du changement de statut"
+    },
+    "detail": {
+      "title": "Détails de l'association race-pays"
     }
   },
   "administrationRoute": {
