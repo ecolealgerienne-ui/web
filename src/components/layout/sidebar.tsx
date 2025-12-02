@@ -18,7 +18,7 @@ const menuItems = [
   { icon: Scale, key: "weighings", href: "/weighings" },
 ];
 
-// Menu Administration (référentiels globaux - super admin uniquement)
+// Menu Données de référence (référentiels globaux - super admin uniquement)
 const adminMenuItems = [
   { icon: TestTube2, key: "activeSubstances", href: "/admin/active-substances" },
   { icon: Layers, key: "productCategories", href: "/admin/product-categories" },
@@ -93,7 +93,7 @@ export function Sidebar() {
           <>
             <div className="my-4 border-t border-border" />
 
-            {/* Menu Administration (référentiels globaux) */}
+            {/* Menu Données de référence (référentiels globaux) */}
             <div className="mb-1">
               <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
                 <Shield className="h-4 w-4" />
