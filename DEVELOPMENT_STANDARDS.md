@@ -1189,10 +1189,10 @@ variant: "default" | "destructive" | "warning" | "success"
 ```
 
 **Mapping Recommandé** :
-- **Active** : `variant="success"` (vert)
-- **Inactive** : `variant="warning"` (jaune)
-- **Error/Deleted** : `variant="destructive"` (rouge)
-- **Neutre** : `variant="default"` ou omis (gris)
+- **Active / Verified** : `variant="success"` (vert)
+- **Inactive / Pending / Unverified** : `variant="warning"` (jaune)
+- **Error / Deleted / Rejected** : `variant="destructive"` (rouge)
+- **Neutre / Default** : `variant="default"` ou omis (gris)
 
 **Erreurs Courantes** :
 ```typescript
@@ -1223,6 +1223,28 @@ variant: "default" | "destructive" | "warning" | "success"
     ),
 }
 ```
+
+**Exemple Vérification (Pattern Therapeutic-Indications)** :
+```typescript
+{
+  key: 'isVerified',
+  header: t('fields.isVerified'),
+  render: (indication) =>
+    indication.isVerified ? (
+      <Badge variant="success" className="flex items-center gap-1">
+        <CheckCircle className="h-3 w-3" />
+        {t('status.verified')}
+      </Badge>
+    ) : (
+      <Badge variant="warning" className="flex items-center gap-1">
+        <XCircle className="h-3 w-3" />
+        {t('status.notVerified')}
+      </Badge>
+    ),
+}
+```
+
+**⚠️ NOTE IMPORTANTE** : Ne jamais utiliser `variant="secondary"` pour les états "pending" ou "unverified". Utiliser `variant="warning"` à la place.
 
 ---
 
@@ -1377,6 +1399,91 @@ const [dependencies, setDependencies] = useState<Record<string, number>>()
 - ✅ i18n complet
 
 **⚠️ RÈGLE ABSOLUE :** Ces composants DOIVENT être utilisés pour toutes les pages admin. Ne jamais créer de variantes ou de doublons.
+
+#### 7.2.4 Inline Table Actions - Actions de Statut Intégrées
+
+**✅ RECOMMANDATION :** Pour les opérations de changement de statut fréquentes (verify/unverify, activate/deactivate), intégrer les actions directement dans les colonnes du tableau plutôt que d'ouvrir le formulaire d'édition.
+
+**Problème** : Ouvrir le formulaire d'édition complet juste pour changer un statut booléen est lourd et ralentit le workflow.
+
+**Solution** : Actions inline avec boutons dans la colonne du statut
+
+```typescript
+// ❌ MOINS OPTIMAL - Forcer l'utilisateur à ouvrir le formulaire pour changer le statut
+{
+  key: 'isVerified',
+  header: t('fields.isVerified'),
+  render: (item) => item.isVerified ? (
+    <Badge variant="success">{t('status.verified')}</Badge>
+  ) : (
+    <Badge variant="warning">{t('status.notVerified')}</Badge>
+  )
+}
+// L'utilisateur doit cliquer sur "Edit" → ouvrir le formulaire → changer le statut → sauvegarder
+
+// ✅ OPTIMAL - Actions inline pour changement rapide de statut
+{
+  key: 'isVerified',
+  header: t('fields.isVerified'),
+  render: (indication) => (
+    <div className="flex items-center gap-2">
+      {indication.isVerified ? (
+        <>
+          <Badge variant="success" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            {t('status.verified')}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()  // ⚠️ Empêcher l'ouverture du DetailSheet
+              unverify(indication.id)
+            }}
+          >
+            {t('actions.unverify')}
+          </Button>
+        </>
+      ) : (
+        <>
+          <Badge variant="warning" className="flex items-center gap-1">
+            <XCircle className="h-3 w-3" />
+            {t('status.notVerified')}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()  // ⚠️ Empêcher l'ouverture du DetailSheet
+              verify(indication.id)
+            }}
+          >
+            {t('actions.verify')}
+          </Button>
+        </>
+      )}
+    </div>
+  )
+}
+```
+
+**Cas d'Usage Recommandés** :
+- ✅ **Verify/Unverify** : Validation de données (Therapeutic-Indications)
+- ✅ **Activate/Deactivate** : Activation temporaire d'entités
+- ✅ **Approve/Reject** : Workflow d'approbation
+- ✅ **Lock/Unlock** : Verrouillage de ressources
+- ❌ **Update Complex Fields** : Utiliser le formulaire d'édition complet
+
+**Avantages** :
+1. **UX Améliorée** : Changement de statut en 1 clic au lieu de 3+ clics
+2. **Performance** : Pas besoin de charger le formulaire complet et ses dépendances
+3. **Visibilité** : Actions clairement visibles à côté du statut actuel
+4. **Workflow Optimisé** : Idéal pour traitement en masse (valider 10+ items rapidement)
+
+**⚠️ IMPORTANT** : Toujours utiliser `e.stopPropagation()` dans le `onClick` du bouton pour empêcher le déclenchement du `onRowClick` du DataTable (ouverture du DetailSheet).
+
+**Pattern appliqué dans** :
+- `src/app/(app)/admin/therapeutic-indications/page.tsx` ✅
 
 ---
 
@@ -2043,6 +2150,102 @@ export function useProductPackagings(initialParams: FilterParams = {}) {
 
 ---
 
+### 7.8 Entity Field Naming - Convention des Champs Relations ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS supposer le nom des champs sans vérifier le type**
+
+**Problème** : Les entités ont des conventions de nommage différentes pour leurs champs. Utiliser `nameFr` au lieu de `name` (ou inversement) cause des erreurs TypeScript silencieuses ou des rendus vides.
+
+**✅ SOLUTION : Vérifier le type TypeScript de chaque entité avant utilisation**
+
+```typescript
+// ❌ MAUVAIS - Supposer que tous les champs utilisent nameFr
+<SelectItem key={species.id} value={species.id}>
+  {species.nameFr} ({species.code})  // ❌ TypeScript error: Property 'nameFr' does not exist
+</SelectItem>
+
+// ✅ BON - Vérifier le type Species d'abord
+// Dans types/admin/species.ts : interface Species { name: string; code: string; ... }
+<SelectItem key={species.id} value={species.id}>
+  {species.name} ({species.code})  // ✅ Correct field name
+</SelectItem>
+```
+
+**Convention par Entité** :
+
+| Entité | Champ Nom | Remarque |
+|--------|-----------|----------|
+| **Species** | `name` | ⚠️ Un seul champ `name` (pas de localisation) |
+| **AdministrationRoute** | `name` | ⚠️ Un seul champ `name` (pas de localisation) |
+| **Country** | `nameFr`, `nameEn`, `nameAr` | ✅ Trois champs séparés (localisés) |
+| **Breed** | `name` | ⚠️ Un seul champ `name` |
+| **Product** | `commercialName`, `laboratoryName` | ⚠️ Champs spécifiques |
+| **AgeCategory** | `name` | ⚠️ Un seul champ `name` |
+
+**Exemple Complet (Therapeutic-Indications)** :
+
+```typescript
+// ❌ ERREUR - Mélanger les conventions
+const columns: ColumnDef<TherapeuticIndication>[] = [
+  {
+    key: 'species',
+    header: t('fields.species'),
+    render: (indication) => indication.species?.nameFr || '—',  // ❌ Species n'a pas nameFr
+  },
+  {
+    key: 'route',
+    header: t('fields.route'),
+    render: (indication) => indication.route?.nameFr || '—',    // ❌ Route n'a pas nameFr
+  },
+  {
+    key: 'country',
+    header: t('fields.country'),
+    render: (indication) => indication.country?.name || '—',     // ❌ Country n'a pas name (a nameFr)
+  },
+]
+
+// ✅ CORRECT - Utiliser les bons noms de champs
+const columns: ColumnDef<TherapeuticIndication>[] = [
+  {
+    key: 'species',
+    header: t('fields.species'),
+    render: (indication) => indication.species?.name || '—',     // ✅ Species.name
+  },
+  {
+    key: 'route',
+    header: t('fields.route'),
+    render: (indication) => indication.route?.name || '—',       // ✅ Route.name
+  },
+  {
+    key: 'country',
+    header: t('fields.country'),
+    render: (indication) => indication.country?.nameFr || '—',   // ✅ Country.nameFr
+  },
+]
+```
+
+**Workflow Recommandé** :
+
+1. **TOUJOURS** ouvrir le fichier type de l'entité référencée (ex: `types/admin/species.ts`)
+2. **VÉRIFIER** les noms de champs exacts dans l'interface TypeScript
+3. **UTILISER** les noms corrects dans le code (render, SelectItem, etc.)
+4. **COMPILER** avec `npx tsc --noEmit` pour vérifier les erreurs TypeScript
+
+**Erreurs TypeScript Typiques** :
+
+```
+error TS2551: Property 'nameFr' does not exist on type 'Species'. Did you mean 'name'?
+error TS2551: Property 'name' does not exist on type 'Country'. Did you mean 'nameFr'?
+```
+
+**Impact** : Évite les erreurs TypeScript lors du build et garantit l'affichage correct des données dans les formulaires et tableaux.
+
+**Pattern appliqué dans** :
+- `src/app/(app)/admin/therapeutic-indications/page.tsx` ✅
+- `src/components/admin/therapeutic-indications/TherapeuticIndicationFormDialog.tsx` ✅
+
+---
+
 ## 8. Services API
 
 ### 8.1 Structure d'un Service
@@ -2314,6 +2517,17 @@ Le backend incrémente automatiquement la version à chaque mise à jour et reto
 
 ✅ **SOLUTION :** Organiser en sections logiques avec titres séparés par bordure
 
+**Recommandations** :
+- **Seuil** : Organiser en sections dès 10+ champs
+- **Nombre de sections** : Idéalement 5-7 sections (pas plus de 8)
+- **Ordre recommandé** :
+  1. Informations Générales / Principales (code, identifiants)
+  2. Ciblage / Relations (foreign keys, associations)
+  3. Données Métier / Core Data (champs principaux spécifiques)
+  4. Données Complémentaires / Supplementary (informations secondaires)
+  5. Statut / Status (isActive, isVerified, etc.)
+- **Champs par section** : 2-5 champs maximum par section
+
 ```tsx
 // ❌ MAUVAIS : Tous les champs mélangés
 <form>
@@ -2368,7 +2582,75 @@ Le backend incrémente automatiquement la version à chaque mise à jour et reto
 }
 ```
 
-**Impact** : Améliore significativement l'UX pour formulaires avec 10+ champs (ex: Products avec 13 champs).
+**Exemple Complexe (Therapeutic-Indications - 16 champs / 6 sections)** :
+
+```tsx
+<form className="space-y-6">
+  {/* Section 1 : Informations Générales */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.generalInfo')}
+    </h3>
+    <Input label={t('fields.code')} {...register('code')} />
+    <Input label={t('fields.pathology')} {...register('pathology')} />
+  </div>
+
+  {/* Section 2 : Ciblage */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.targeting')}
+    </h3>
+    <Select {...register('productId')} />
+    <Select {...register('speciesId')} />
+    <Select {...register('countryCode')} />
+    <Select {...register('routeId')} />
+  </div>
+
+  {/* Section 3 : Posologie */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.dosage')}
+    </h3>
+    <Input label={t('fields.dosage')} {...register('dosage')} />
+    <Input label={t('fields.frequency')} {...register('frequency')} />
+    <Input label={t('fields.duration')} {...register('duration')} />
+  </div>
+
+  {/* Section 4 : Délais d'Attente */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.withdrawalPeriods')}
+    </h3>
+    <Input type="number" label={t('fields.withdrawalMeat')} {...register('withdrawalMeat')} />
+    <Input type="number" label={t('fields.withdrawalMilk')} {...register('withdrawalMilk')} />
+    <Input type="number" label={t('fields.withdrawalEggs')} {...register('withdrawalEggs')} />
+  </div>
+
+  {/* Section 5 : Informations Supplémentaires */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.additionalInfo')}
+    </h3>
+    <Textarea label={t('fields.instructions')} {...register('instructions')} />
+    <Textarea label={t('fields.contraindications')} {...register('contraindications')} />
+    <Textarea label={t('fields.warnings')} {...register('warnings')} />
+  </div>
+
+  {/* Section 6 : Statut */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.status')}
+    </h3>
+    <Checkbox label={t('fields.isVerified')} {...register('isVerified')} />
+    <Checkbox label={t('fields.isActive')} {...register('isActive')} />
+  </div>
+</form>
+```
+
+**Impact** : Améliore significativement l'UX pour formulaires avec 10+ champs (ex: Products avec 13 champs, Therapeutic-Indications avec 16 champs).
+
+**Pattern appliqué dans** :
+- `src/components/admin/therapeutic-indications/TherapeuticIndicationFormDialog.tsx` ✅ (16 champs / 6 sections)
 
 #### 8.3.6 react-hook-form - Controller pour Select
 
