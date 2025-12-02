@@ -46,7 +46,8 @@
       "deletedAt": "Supprimé le",
       "metadata": "Métadonnées",
       "required": "Requis",
-      "none": "Aucun"
+      "none": "Aucun",
+      "version": "Version"
     },
     "error": {
       "title": "Erreur",
@@ -148,6 +149,7 @@
       "alertTemplates": "Modèles d'Alertes",
       "products": "Produits Vétérinaires",
       "productPackagings": "Conditionnements",
+      "therapeuticIndications": "Indications Thérapeutiques",
       "breedCountries": "Races par Pays",
       "campaignCountries": "Campagnes par Pays"
     }
@@ -1074,6 +1076,145 @@
     },
     "detail": {
       "title": "Détails de l'association campagne-pays"
+    }
+  },
+  "therapeuticIndication": {
+    "title": "Indications Thérapeutiques",
+    "description": "Gestion des indications thérapeutiques pour les produits vétérinaires par espèce et pays",
+    "fields": {
+      "product": "Produit",
+      "species": "Espèce",
+      "ageCategory": "Catégorie d'âge",
+      "country": "Pays",
+      "route": "Voie d'administration",
+      "doseUnit": "Unité de dosage",
+      "doseMin": "Dose minimale",
+      "doseMax": "Dose maximale",
+      "doseOriginalText": "Texte original de la posologie",
+      "protocolDurationDays": "Durée du protocole (jours)",
+      "withdrawalMeat": "Délai viande (jours)",
+      "withdrawalMilk": "Délai lait (jours)",
+      "isVerified": "Vérifiée",
+      "validationNotes": "Notes de validation",
+      "isActive": "Active"
+    },
+    "validation": {
+      "productId": {
+        "required": "Le produit est requis",
+        "invalid": "L'identifiant du produit est invalide"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "ageCategoryId": {
+        "invalid": "L'identifiant de la catégorie d'âge est invalide"
+      },
+      "countryCode": {
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "routeId": {
+        "required": "La voie d'administration est requise",
+        "invalid": "L'identifiant de la voie d'administration est invalide"
+      },
+      "doseUnitId": {
+        "required": "L'unité de dosage est requise",
+        "invalid": "L'identifiant de l'unité de dosage est invalide"
+      },
+      "doseMin": {
+        "min": "La dose minimale doit être supérieure ou égale à 0"
+      },
+      "doseMax": {
+        "min": "La dose maximale doit être supérieure ou égale à 0"
+      },
+      "doseOriginalText": {
+        "maxLength": "Le texte original ne doit pas dépasser 500 caractères"
+      },
+      "protocolDurationDays": {
+        "integer": "La durée du protocole doit être un nombre entier",
+        "min": "La durée du protocole doit être supérieure ou égale à 1"
+      },
+      "withdrawalMeatDays": {
+        "integer": "Le délai viande doit être un nombre entier",
+        "min": "Le délai viande doit être supérieur ou égal à 0"
+      },
+      "withdrawalMilkDays": {
+        "integer": "Le délai lait doit être un nombre entier",
+        "min": "Le délai lait doit être supérieur ou égal à 0"
+      },
+      "validationNotes": {
+        "maxLength": "Les notes de validation ne doivent pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer une indication thérapeutique",
+      "editTitle": "Modifier l'indication thérapeutique",
+      "sectionGeneral": "Informations Générales",
+      "sectionTargeting": "Ciblage",
+      "sectionDosage": "Posologie",
+      "sectionWithdrawal": "Délais d'Attente",
+      "sectionValidation": "Validation",
+      "sectionStatus": "Statut",
+      "selectProduct": "Sélectionner un produit",
+      "selectSpecies": "Sélectionner une espèce",
+      "selectAgeCategory": "Sélectionner une catégorie d'âge",
+      "selectCountry": "Sélectionner un pays",
+      "selectRoute": "Sélectionner une voie",
+      "selectDoseUnit": "Sélectionner une unité",
+      "doseMinPlaceholder": "Dose minimale",
+      "doseMaxPlaceholder": "Dose maximale",
+      "doseOriginalTextPlaceholder": "Texte original de la posologie...",
+      "protocolDurationPlaceholder": "Nombre de jours",
+      "withdrawalPlaceholder": "Nombre de jours",
+      "validationNotesPlaceholder": "Notes de validation..."
+    },
+    "actions": {
+      "create": "Créer une indication",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "restore": "Restaurer",
+      "verify": "Vérifier",
+      "unverify": "Révoquer la vérification"
+    },
+    "filters": {
+      "product": "Produit",
+      "allProducts": "Tous les produits",
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces",
+      "country": "Pays",
+      "allCountries": "Tous les pays",
+      "verified": "Statut de vérification",
+      "allStatus": "Tous les statuts",
+      "verifiedOnly": "Vérifiées uniquement",
+      "notVerifiedOnly": "Non vérifiées uniquement"
+    },
+    "search": {
+      "placeholder": "Rechercher une indication thérapeutique..."
+    },
+    "messages": {
+      "createSuccess": "Indication thérapeutique créée avec succès",
+      "updateSuccess": "Indication thérapeutique mise à jour avec succès",
+      "deleteSuccess": "Indication thérapeutique supprimée avec succès",
+      "restoreSuccess": "Indication thérapeutique restaurée avec succès",
+      "verifySuccess": "Indication thérapeutique vérifiée avec succès",
+      "unverifySuccess": "Vérification révoquée avec succès",
+      "noResults": "Aucune indication thérapeutique trouvée",
+      "createError": "Erreur lors de la création",
+      "updateError": "Erreur lors de la mise à jour",
+      "deleteError": "Erreur lors de la suppression",
+      "verifyError": "Erreur lors de la vérification"
+    },
+    "status": {
+      "verified": "Vérifiée",
+      "notVerified": "Non vérifiée"
+    },
+    "detail": {
+      "title": "Détails de l'indication thérapeutique"
     }
   },
   "administrationRoute": {
