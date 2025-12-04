@@ -8,8 +8,9 @@ import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
 import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
+import { useVeterinarians } from '@/lib/hooks/useVeterinarians'
 import { useAuth } from '@/contexts/auth-context'
-import { Veterinarian } from '@/lib/types/veterinarian'
+import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 
 // Régions disponibles (Algérie)
@@ -77,13 +78,23 @@ export function MyVeterinarians() {
     savePreferences,
   } = useVeterinarianPreferences(user?.farmId)
 
-  const loading = loadingPrefs
-  const error = errorPrefs
+  // Charger les vétérinaires disponibles pour cette ferme
+  const {
+    veterinarians,
+    loading: loadingVets,
+    error: errorVets,
+    createVeterinarian,
+  } = useVeterinarians(user?.farmId, {
+    isActive: true,
+  })
 
-  // NOTE: On ne charge pas les vétérinaires disponibles car l'endpoint
-  // /farms/{farmId}/veterinarians n'existe pas dans l'API.
-  // Les utilisateurs peuvent ajouter des vétérinaires locaux manuellement.
-  const availableItems: TransferListItem[] = []
+  const loading = loadingPrefs || loadingVets
+  const error = errorPrefs || errorVets
+
+  // Convertir les vétérinaires en items de liste
+  const availableItems = useMemo(() => {
+    return veterinarians.map(vetToTransferItem)
+  }, [veterinarians])
 
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
@@ -104,7 +115,7 @@ export function MyVeterinarians() {
 
       setSelectedItems(initialSelected)
     }
-  }, [preferences]) // Ne dépend que des préférences, pas de veterinarians
+  }, [preferences])
 
   // Filtrer les items disponibles
   const filteredAvailableItems = useMemo(() => {
@@ -158,24 +169,39 @@ export function MyVeterinarians() {
   }, [selectedItems, markForDeletion, undoOperation, toast, t])
 
   const handleCreateLocal = useCallback(async (name: string, region?: string, phone?: string) => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
     try {
-      // Créer un vétérinaire local directement
-      const regionName = region ? REGIONS.find(r => r.code === region)?.name : undefined
-      const newItem: TransferListItem = {
-        id: `local-vet-${Date.now()}`,
-        name: name,
-        description: regionName || '',
-        region: region,
-        phone: phone,
-        isLocal: true,
+      // Extraire prénom et nom depuis le nom complet
+      const nameParts = name.replace(/^Dr\.\s*/i, '').trim().split(' ')
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
+
+      // Créer le vétérinaire via l'API
+      const newVetData: CreateVeterinarianDto = {
+        scope: 'local',
+        firstName,
+        lastName,
+        licenseNumber: `LOCAL-${Date.now()}`, // Numéro temporaire pour les vétérinaires locaux
+        specialties: 'general',
+        phone: phone || '',
+        city: region ? REGIONS.find(r => r.code === region)?.name : undefined,
+        isActive: true,
       }
+
+      const newVet = await createVeterinarian(newVetData)
+      const newItem = vetToTransferItem(newVet)
+
       setSelectedItems((prev) => [...prev, newItem])
       setHasChanges(true)
       toast.success(t('added'), `${name} ${t('addedTo')}`)
     } catch (error) {
-      toast.error(tc('error.title'), tc('messages.error'))
+      handleApiError(error, 'create veterinarian', toast)
     }
-  }, [toast, t, tc])
+  }, [user?.farmId, createVeterinarian, toast, t, tc])
 
   const handleSave = async () => {
     if (!user?.farmId) {
