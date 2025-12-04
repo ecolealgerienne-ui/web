@@ -43,6 +43,13 @@ import { UpdateFarmPreferenceDto } from '@/lib/types/farm-preference'
 import { farmPreferencesService } from '@/lib/services/farm-preferences.service'
 import { useToast } from '@/lib/hooks/useToast'
 
+// Import pour la gestion de la ferme
+import { useAuth } from '@/contexts/auth-context'
+import { useFarm } from '@/lib/hooks/useFarm'
+import { CountryCode, UpdateFarmDto } from '@/lib/types/farm'
+import { farmsService } from '@/lib/services/farms.service'
+import { handleApiError } from '@/lib/utils/api-error-handler'
+
 type SectionId =
   | 'profile'
   | 'farm'
@@ -284,9 +291,94 @@ function ProfileSection() {
 function FarmSection() {
   const t = useTranslations('settings.farm')
   const ta = useTranslations('settings.actions')
-  const [selectedCountry, setSelectedCountry] = useState('DZ')
+  const tc = useTranslations('common')
+  const { user } = useAuth()
+  const toast = useToast()
 
-  const availableRegions = selectedCountry ? REGIONS[selectedCountry] || [] : []
+  const { farm, loading, error, refetch } = useFarm(user?.farmId)
+  const [saving, setSaving] = useState(false)
+
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    postalCode: '',
+    city: '',
+    country: 'DZ' as CountryCode | '',
+    department: '',
+    commune: '',
+    latitude: 0,
+    longitude: 0,
+    cheptelNumber: '',
+    groupName: '',
+    isActive: true,
+  })
+
+  // Load farm data into form
+  useEffect(() => {
+    if (farm) {
+      setFormData({
+        name: farm.name || '',
+        address: farm.address || '',
+        postalCode: farm.postalCode || '',
+        city: farm.city || '',
+        country: farm.country || 'DZ',
+        department: farm.department || '',
+        commune: farm.commune || '',
+        latitude: farm.latitude || 0,
+        longitude: farm.longitude || 0,
+        cheptelNumber: farm.cheptelNumber || '',
+        groupName: farm.groupName || '',
+        isActive: farm.isActive ?? true,
+      })
+    }
+  }, [farm])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!farm || !user?.farmId) return
+
+    setSaving(true)
+    try {
+      const updateData: UpdateFarmDto = {
+        ...formData,
+        country: formData.country || undefined,
+        version: farm.version,
+      }
+      await farmsService.update(user.farmId, updateData)
+      toast.success(tc('messages.success'), t('updateSuccess'))
+      refetch()
+    } catch (error) {
+      handleApiError(error, 'update farm', toast)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="text-center py-12">{t('loading')}</div>
+      </div>
+    )
+  }
+
+  if (error || !farm) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="text-center py-12 text-destructive">{t('loadError')}</div>
+      </div>
+    )
+  }
+
+  const availableRegions = formData.country ? REGIONS[formData.country] || [] : []
 
   return (
     <div className="space-y-6">
@@ -295,32 +387,73 @@ function FarmSection() {
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
-      <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="farmName">{t('farmName')}</Label>
-          <Input id="farmName" placeholder="Ferme El Baraka" />
+          <Input
+            id="farmName"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="Ferme El Baraka"
+            required
+          />
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="farmId">{t('farmId')}</Label>
-            <Input id="farmId" placeholder="EL-2023-001" />
+            <Label htmlFor="cheptelNumber">{t('cheptelNumber')}</Label>
+            <Input
+              id="cheptelNumber"
+              value={formData.cheptelNumber}
+              onChange={(e) => setFormData({ ...formData, cheptelNumber: e.target.value })}
+              placeholder="EL-2023-001"
+            />
           </div>
           <div>
-            <Label htmlFor="surface">{t('surface')}</Label>
-            <Input id="surface" type="number" placeholder="50" dir="ltr" />
+            <Label htmlFor="groupName">{t('groupName')}</Label>
+            <Input
+              id="groupName"
+              value={formData.groupName}
+              onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
+              placeholder=""
+            />
           </div>
         </div>
         <div>
           <Label htmlFor="address">{t('address')}</Label>
-          <Input id="address" placeholder="Route de Blida, Boufarik" />
+          <Input
+            id="address"
+            value={formData.address}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            placeholder="Route de Blida, Boufarik"
+          />
         </div>
         <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <Label htmlFor="postalCode">{t('postalCode')}</Label>
+            <Input
+              id="postalCode"
+              value={formData.postalCode}
+              onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+              placeholder="16000"
+            />
+          </div>
+          <div>
+            <Label htmlFor="city">{t('city')}</Label>
+            <Input
+              id="city"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              placeholder="Boufarik"
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
           <div>
             <Label htmlFor="country">{t('country')}</Label>
             <select
               id="country"
-              value={selectedCountry}
-              onChange={(e) => setSelectedCountry(e.target.value)}
+              value={formData.country}
+              onChange={(e) => setFormData({ ...formData, country: e.target.value as CountryCode })}
               className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">{t('selectCountry')}</option>
@@ -332,40 +465,67 @@ function FarmSection() {
             </select>
           </div>
           <div>
-            <Label htmlFor="region">{t('region')}</Label>
-            <select
-              id="region"
-              disabled={!selectedCountry}
-              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-            >
-              <option value="">{t('selectRegion')}</option>
-              {availableRegions.map((region) => (
-                <option key={region.code} value={region.code}>
-                  {region.name}
-                </option>
-              ))}
-            </select>
+            <Label htmlFor="department">{t('department')}</Label>
+            <Input
+              id="department"
+              value={formData.department}
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              placeholder="16"
+            />
+          </div>
+          <div>
+            <Label htmlFor="commune">{t('commune')}</Label>
+            <Input
+              id="commune"
+              value={formData.commune}
+              onChange={(e) => setFormData({ ...formData, commune: e.target.value })}
+              placeholder="16004"
+            />
           </div>
         </div>
-        <div>
-          <Label htmlFor="commune">{t('commune')}</Label>
-          <Input id="commune" placeholder="Boufarik" />
-        </div>
-        <div>
-          <Label>{t('species')}</Label>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Badge>Ovins</Badge>
-            <Badge>Caprins</Badge>
-            <Badge className="border border-dashed border-primary text-primary bg-transparent cursor-pointer hover:bg-primary/10">
-              {t('addSpecies')}
-            </Badge>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <Label htmlFor="latitude">{t('latitude')}</Label>
+            <Input
+              id="latitude"
+              type="number"
+              step="any"
+              value={formData.latitude}
+              onChange={(e) => setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })}
+              placeholder="36.4754"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <Label htmlFor="longitude">{t('longitude')}</Label>
+            <Input
+              id="longitude"
+              type="number"
+              step="any"
+              value={formData.longitude}
+              onChange={(e) => setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })}
+              placeholder="2.8329"
+              dir="ltr"
+            />
           </div>
         </div>
-        <Button>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isActive"
+            checked={formData.isActive}
+            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+            className="h-4 w-4 rounded border-input"
+          />
+          <Label htmlFor="isActive" className="cursor-pointer">
+            {t('isActive')}
+          </Label>
+        </div>
+        <Button type="submit" disabled={saving}>
           <Save className="me-2 h-4 w-4" />
-          {ta('save')}
+          {saving ? ta('saving') : ta('save')}
         </Button>
-      </div>
+      </form>
     </div>
   )
 }
