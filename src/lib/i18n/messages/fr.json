@@ -96,6 +96,7 @@
       "name": "Saisir un nom",
       "description": "Saisir une description"
     },
+    "optional": "optionnel",
     "loading": "Chargement...",
     "admin": {
       "products": {
@@ -120,7 +121,8 @@
       "weighings": "Pesées",
       "data": "Données",
       "reports": "Rapports",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "farms": "Fermes"
     },
     "data": {
       "title": "Données",
