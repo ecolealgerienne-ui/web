@@ -78,20 +78,18 @@ export function MyVeterinarians() {
     savePreferences,
   } = useVeterinarianPreferences(user?.farmId)
 
-  // Charger tous les vétérinaires globaux disponibles (liste de gauche)
+  // Charger tous les vétérinaires disponibles (liste de gauche)
+  // Sans aucun filtre par défaut
   const {
     veterinarians,
     loading: loadingVets,
     error: errorVets,
-  } = useGlobalVeterinarians({
-    scope: 'global',
-    isActive: true,
-  })
+  } = useGlobalVeterinarians()
 
   const loading = loadingPrefs || loadingVets
   const error = errorPrefs || errorVets
 
-  // Convertir les vétérinaires globaux en items de liste (pour la liste de gauche)
+  // Convertir les vétérinaires en items de liste pour la liste de gauche (disponibles)
   const availableItems = useMemo(() => {
     return veterinarians.map(vetToTransferItem)
   }, [veterinarians])
