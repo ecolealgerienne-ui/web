@@ -16,6 +16,7 @@ import { Veterinarian, CreateVeterinarianDto, UpdateVeterinarianDto } from '@/li
 import { veterinariansService } from '@/lib/services/veterinarians.service';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { useAuth } from '@/contexts/auth-context';
 
 interface VeterinarianFormDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ export function VeterinarianFormDialog({
   const t = useTranslations('veterinarians');
   const tc = useCommonTranslations();
   const toast = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -118,16 +120,22 @@ export function VeterinarianFormDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user?.farmId) {
+      toast.error(tc('messages.error'), 'Farm ID not found');
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isEditMode) {
         const updateData: UpdateVeterinarianDto = { ...formData };
-        await veterinariansService.update(veterinarian!.id, updateData);
+        await veterinariansService.update(user.farmId, veterinarian!.id, updateData);
         toast.success(tc('messages.success'), t('messages.updated'));
       } else {
         const createData: CreateVeterinarianDto = { ...formData };
-        await veterinariansService.create(createData);
+        await veterinariansService.create(user.farmId, createData);
         toast.success(tc('messages.success'), t('messages.created'));
       }
 
