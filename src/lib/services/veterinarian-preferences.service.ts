@@ -13,13 +13,16 @@ import { logger } from '@/lib/utils/logger'
 
 class VeterinarianPreferencesService {
   private getBasePath(farmId: string) {
-    return `/farms/${farmId}/veterinarian-preferences`
+    return `/api/v1/farms/${farmId}/veterinarian-preferences`
   }
 
-  async getAll(farmId: string): Promise<VeterinarianPreference[]> {
+  async getAll(farmId: string, includeInactive = false): Promise<VeterinarianPreference[]> {
     try {
-      const url = this.getBasePath(farmId)
-      logger.info('Fetching veterinarian preferences', { farmId, url })
+      const params = new URLSearchParams()
+      params.append('includeInactive', String(includeInactive))
+
+      const url = `${this.getBasePath(farmId)}?${params}`
+      logger.info('Fetching veterinarian preferences', { farmId, url, includeInactive })
 
       const response = await apiClient.get<VeterinarianPreferenceResponse>(url)
 

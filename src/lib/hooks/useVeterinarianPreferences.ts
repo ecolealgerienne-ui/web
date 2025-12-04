@@ -30,7 +30,7 @@ export function useVeterinarianPreferences(farmId: string | undefined): UseVeter
     setError(null)
 
     try {
-      const data = await veterinarianPreferencesService.getAll(farmId)
+      const data = await veterinarianPreferencesService.getAll(farmId, false)
       setPreferences(data)
     } catch (err) {
       const error = err as Error
