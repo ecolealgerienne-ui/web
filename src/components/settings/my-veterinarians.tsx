@@ -8,7 +8,10 @@ import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
 import { useVeterinarians } from '@/lib/hooks/useVeterinarians'
+import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
+import { useAuth } from '@/contexts/auth-context'
 import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
+import { handleApiError } from '@/lib/utils/api-error-handler'
 
 // Régions disponibles (Algérie)
 const REGIONS = [
@@ -36,8 +39,7 @@ const SPECIALTIES = [
 ]
 
 interface MyVeterinariansProps {
-  initialSelectedIds?: string[]
-  onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
+  // Props removed - now uses auth context and preferences hook
 }
 
 // Convertir un Veterinarian API en TransferListItem
@@ -56,40 +58,58 @@ function vetToTransferItem(vet: Veterinarian): TransferListItem {
   }
 }
 
-export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinariansProps) {
+export function MyVeterinarians() {
   const t = useTranslations('settings.veterinarians')
   const ta = useTranslations('settings.actions')
+  const tc = useTranslations('common')
   const toast = useToast()
+  const { user } = useAuth()
   const { markForDeletion, undoOperation, isPendingDeletion } = useUndo<TransferListItem>()
 
   // Filtres
   const [filterRegion, setFilterRegion] = useState<string>('')
   const [filterSpecialty, setFilterSpecialty] = useState<string>('')
 
-  // Charger les vétérinaires depuis l'API
-  const { veterinarians, loading, error, createVeterinarian } = useVeterinarians({
+  // Charger les vétérinaires disponibles depuis l'API
+  const { veterinarians, loading: loadingVets, error: errorVets, createVeterinarian } = useVeterinarians({
     isActive: true,
   })
+
+  // Charger les préférences de vétérinaires pour cette ferme
+  const {
+    preferences,
+    loading: loadingPrefs,
+    error: errorPrefs,
+    savePreferences,
+  } = useVeterinarianPreferences(user?.farmId)
+
+  const loading = loadingVets || loadingPrefs
+  const error = errorVets || errorPrefs
 
   // Convertir les vétérinaires API en items de transfert
   const availableItems = useMemo(() => {
     return veterinarians.map(vetToTransferItem)
   }, [veterinarians])
 
-  // Items sélectionnés (initialisés depuis les props)
+  // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Initialiser les sélections depuis initialSelectedIds
+  // Initialiser les sélections depuis les préférences
   useEffect(() => {
-    if (initialSelectedIds.length > 0 && veterinarians.length > 0) {
-      const initialSelected = veterinarians
-        .filter(v => initialSelectedIds.includes(v.id))
+    if (preferences.length > 0 && veterinarians.length > 0) {
+      // Trier par displayOrder
+      const sortedPrefs = [...preferences].sort((a, b) => a.displayOrder - b.displayOrder)
+
+      const initialSelected = sortedPrefs
+        .map(pref => pref.veterinarian)
+        .filter(Boolean)
         .map(vetToTransferItem)
+
       setSelectedItems(initialSelected)
     }
-  }, [initialSelectedIds, veterinarians])
+  }, [preferences, veterinarians])
 
   // Filtrer les items disponibles
   const filteredAvailableItems = useMemo(() => {
@@ -185,29 +205,20 @@ export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinar
   }, [createVeterinarian, toast, t])
 
   const handleSave = async () => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
     setIsSaving(true)
     try {
-      const localItems = selectedItems.filter((item) => item.isLocal)
       const selectedIds = selectedItems.map((item) => item.id)
-
-      if (onSave) {
-        await onSave(selectedIds, localItems)
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        console.log('Saved veterinarians:', selectedIds)
-      }
+      await savePreferences(selectedIds)
 
       setHasChanges(false)
       toast.success(t('saved'), t('savedMessage'))
-    } catch {
-      toast.error(
-        t('saveFailed'),
-        t('saveFailedMessage'),
-        {
-          label: t('retry'),
-          onClick: handleSave,
-        }
-      )
+    } catch (error) {
+      handleApiError(error, 'save veterinarian preferences', toast)
     } finally {
       setIsSaving(false)
     }
