@@ -1,0 +1,81 @@
+/**
+ * Hook React pour récupérer les vétérinaires disponibles pour une ferme
+ * Utilise l'endpoint /api/v1/farms/{farmId}/available-veterinarians
+ * Retourne automatiquement : vétérinaires globaux + vétérinaires locaux de la ferme
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Veterinarian } from '@/lib/types/veterinarian'
+import { veterinariansService, VeterinarianFilters } from '@/lib/services/veterinarians.service'
+import { logger } from '@/lib/utils/logger'
+
+interface UseAvailableVeterinariansResult {
+  veterinarians: Veterinarian[]
+  loading: boolean
+  error: Error | null
+  refetch: () => Promise<void>
+}
+
+export function useAvailableVeterinarians(
+  farmId: string | undefined,
+  filters?: VeterinarianFilters
+): UseAvailableVeterinariansResult {
+  const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterSearch = filters?.search
+  const filterDepartment = filters?.department
+  const filterIsActive = filters?.isActive
+  const filterIsAvailable = filters?.isAvailable
+  const filterEmergencyService = filters?.emergencyService
+  const filterPage = filters?.page
+  const filterLimit = filters?.limit
+  const filterSort = filters?.sort
+  const filterOrder = filters?.order
+
+  const memoizedFilters = useMemo(() => ({
+    search: filterSearch,
+    department: filterDepartment,
+    isActive: filterIsActive,
+    isAvailable: filterIsAvailable,
+    emergencyService: filterEmergencyService,
+    page: filterPage,
+    limit: filterLimit,
+    sort: filterSort,
+    order: filterOrder,
+  }), [filterSearch, filterDepartment, filterIsActive, filterIsAvailable, filterEmergencyService, filterPage, filterLimit, filterSort, filterOrder])
+
+  const fetchVeterinarians = useCallback(async () => {
+    if (!farmId) {
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const data = await veterinariansService.getAvailableForFarm(farmId, memoizedFilters)
+      setVeterinarians(data)
+    } catch (err) {
+      const error = err as Error
+      setError(error)
+      logger.error('Failed to fetch available veterinarians in hook', { error, farmId })
+    } finally {
+      setLoading(false)
+    }
+  }, [farmId, memoizedFilters])
+
+  useEffect(() => {
+    fetchVeterinarians()
+  }, [fetchVeterinarians])
+
+  return {
+    veterinarians,
+    loading,
+    error,
+    refetch: fetchVeterinarians,
+  }
+}

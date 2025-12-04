@@ -8,7 +8,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
 import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
-import { useGlobalVeterinarians } from '@/lib/hooks/useGlobalVeterinarians'
+import { useAvailableVeterinarians } from '@/lib/hooks/useAvailableVeterinarians'
 import { useAuth } from '@/contexts/auth-context'
 import { Veterinarian } from '@/lib/types/veterinarian'
 import { handleApiError } from '@/lib/utils/api-error-handler'
@@ -78,18 +78,19 @@ export function MyVeterinarians() {
     savePreferences,
   } = useVeterinarianPreferences(user?.farmId)
 
-  // Charger tous les vétérinaires disponibles (liste de gauche)
-  // Sans aucun filtre par défaut
+  // Charger tous les vétérinaires disponibles pour cette ferme (liste de gauche)
+  // Endpoint retourne automatiquement : globaux + locaux de la ferme
   const {
     veterinarians,
     loading: loadingVets,
     error: errorVets,
-  } = useGlobalVeterinarians()
+  } = useAvailableVeterinarians(user?.farmId)
 
   const loading = loadingPrefs || loadingVets
   const error = errorPrefs || errorVets
 
-  // Convertir les vétérinaires en items de liste pour la liste de gauche (disponibles)
+  // Convertir les vétérinaires disponibles en items de liste
+  // (globaux de la plateforme + locaux créés par le fermier)
   const availableItems = useMemo(() => {
     return veterinarians.map(vetToTransferItem)
   }, [veterinarians])

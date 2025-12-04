@@ -30,6 +30,50 @@ class VeterinariansService {
     return `/api/v1/veterinarians`
   }
 
+  private getAvailableBasePath(farmId: string) {
+    return `/api/v1/farms/${farmId}/available-veterinarians`
+  }
+
+  /**
+   * Récupérer tous les vétérinaires disponibles pour une ferme
+   * (endpoint /api/v1/farms/{farmId}/available-veterinarians)
+   * Retourne automatiquement : globaux + locaux de la ferme
+   */
+  async getAvailableForFarm(farmId: string, filters?: VeterinarianFilters): Promise<Veterinarian[]> {
+    try {
+      const params = new URLSearchParams()
+      if (filters?.search) params.append('search', filters.search)
+      if (filters?.department) params.append('department', filters.department)
+      if (filters?.isActive !== undefined) params.append('isActive', String(filters.isActive))
+      if (filters?.isAvailable !== undefined) params.append('isAvailable', String(filters.isAvailable))
+      if (filters?.emergencyService !== undefined) params.append('emergencyService', String(filters.emergencyService))
+      if (filters?.page !== undefined) params.append('page', String(filters.page))
+      if (filters?.limit !== undefined) params.append('limit', String(filters.limit))
+      if (filters?.sort) params.append('sort', filters.sort)
+      if (filters?.order) params.append('order', filters.order)
+
+      const url = params.toString() ? `${this.getAvailableBasePath(farmId)}?${params}` : this.getAvailableBasePath(farmId)
+      logger.info('Fetching available veterinarians for farm', { url, farmId, filters })
+
+      const response = await apiClient.get<{ data: Veterinarian[] }>(url)
+
+      logger.info('Available veterinarians fetched', {
+        farmId,
+        count: response.data?.length || 0,
+        hasData: !!response.data,
+        url
+      })
+      return response.data || []
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('No available veterinarians found (404)', { farmId, basePath: this.getAvailableBasePath(farmId) })
+        return []
+      }
+      logger.error('Failed to fetch available veterinarians', { error, farmId, basePath: this.getAvailableBasePath(farmId) })
+      throw error
+    }
+  }
+
   /**
    * Récupérer tous les vétérinaires globaux (endpoint /api/v1/veterinarians)
    * Utilisé pour afficher la liste des vétérinaires disponibles
