@@ -26,6 +26,52 @@ class VeterinariansService {
     return `/api/v1/farms/${farmId}/veterinarians`
   }
 
+  private getGlobalBasePath() {
+    return `/api/v1/veterinarians`
+  }
+
+  /**
+   * Récupérer tous les vétérinaires globaux (endpoint /api/v1/veterinarians)
+   * Utilisé pour afficher la liste des vétérinaires disponibles
+   */
+  async getAllGlobal(filters?: VeterinarianFilters): Promise<Veterinarian[]> {
+    try {
+      const params = new URLSearchParams()
+      if (filters?.search) params.append('search', filters.search)
+      if (filters?.scope) params.append('scope', filters.scope)
+      if (filters?.department) params.append('department', filters.department)
+      if (filters?.isActive !== undefined) params.append('isActive', String(filters.isActive))
+      if (filters?.isAvailable !== undefined) params.append('isAvailable', String(filters.isAvailable))
+      if (filters?.emergencyService !== undefined) params.append('emergencyService', String(filters.emergencyService))
+      if (filters?.page !== undefined) params.append('page', String(filters.page))
+      if (filters?.limit !== undefined) params.append('limit', String(filters.limit))
+      if (filters?.sort) params.append('sort', filters.sort)
+      if (filters?.order) params.append('order', filters.order)
+
+      const url = params.toString() ? `${this.getGlobalBasePath()}?${params}` : this.getGlobalBasePath()
+      logger.info('Fetching global veterinarians', { url, filters })
+
+      const response = await apiClient.get<{ data: Veterinarian[] }>(url)
+
+      logger.info('Global veterinarians fetched', {
+        count: response.data?.length || 0,
+        hasData: !!response.data,
+        url
+      })
+      return response.data || []
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('No global veterinarians found (404)', { basePath: this.getGlobalBasePath() })
+        return []
+      }
+      logger.error('Failed to fetch global veterinarians', { error, basePath: this.getGlobalBasePath() })
+      throw error
+    }
+  }
+
+  /**
+   * Récupérer les vétérinaires d'une ferme spécifique (endpoint /api/v1/farms/{farmId}/veterinarians)
+   */
   async getAll(farmId: string, filters?: VeterinarianFilters): Promise<Veterinarian[]> {
     try {
       const params = new URLSearchParams()

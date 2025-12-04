@@ -8,9 +8,9 @@ import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
 import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
-import { useVeterinarians } from '@/lib/hooks/useVeterinarians'
+import { useGlobalVeterinarians } from '@/lib/hooks/useGlobalVeterinarians'
 import { useAuth } from '@/contexts/auth-context'
-import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
+import { Veterinarian } from '@/lib/types/veterinarian'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 
 // Régions disponibles (Algérie)
@@ -70,7 +70,7 @@ export function MyVeterinarians() {
   const [filterRegion, setFilterRegion] = useState<string>('')
   const [filterSpecialty, setFilterSpecialty] = useState<string>('')
 
-  // Charger les préférences de vétérinaires pour cette ferme
+  // Charger les préférences de vétérinaires pour cette ferme (liste de droite)
   const {
     preferences,
     loading: loadingPrefs,
@@ -78,20 +78,20 @@ export function MyVeterinarians() {
     savePreferences,
   } = useVeterinarianPreferences(user?.farmId)
 
-  // Charger les vétérinaires disponibles pour cette ferme
+  // Charger tous les vétérinaires globaux disponibles (liste de gauche)
   const {
     veterinarians,
     loading: loadingVets,
     error: errorVets,
-    createVeterinarian,
-  } = useVeterinarians(user?.farmId, {
+  } = useGlobalVeterinarians({
+    scope: 'global',
     isActive: true,
   })
 
   const loading = loadingPrefs || loadingVets
   const error = errorPrefs || errorVets
 
-  // Convertir les vétérinaires en items de liste
+  // Convertir les vétérinaires globaux en items de liste (pour la liste de gauche)
   const availableItems = useMemo(() => {
     return veterinarians.map(vetToTransferItem)
   }, [veterinarians])
@@ -168,40 +168,6 @@ export function MyVeterinarians() {
     )
   }, [selectedItems, markForDeletion, undoOperation, toast, t])
 
-  const handleCreateLocal = useCallback(async (name: string, region?: string, phone?: string) => {
-    if (!user?.farmId) {
-      toast.error(tc('error.title'), tc('messages.error'))
-      return
-    }
-
-    try {
-      // Extraire prénom et nom depuis le nom complet
-      const nameParts = name.replace(/^Dr\.\s*/i, '').trim().split(' ')
-      const firstName = nameParts[0] || ''
-      const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
-
-      // Créer le vétérinaire via l'API
-      const newVetData: CreateVeterinarianDto = {
-        scope: 'local',
-        firstName,
-        lastName,
-        licenseNumber: `LOCAL-${Date.now()}`, // Numéro temporaire pour les vétérinaires locaux
-        specialties: 'general',
-        phone: phone || '',
-        city: region ? REGIONS.find(r => r.code === region)?.name : undefined,
-        isActive: true,
-      }
-
-      const newVet = await createVeterinarian(newVetData)
-      const newItem = vetToTransferItem(newVet)
-
-      setSelectedItems((prev) => [...prev, newItem])
-      setHasChanges(true)
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
-    } catch (error) {
-      handleApiError(error, 'create veterinarian', toast)
-    }
-  }, [user?.farmId, createVeterinarian, toast, t, tc])
 
   const handleSave = async () => {
     if (!user?.farmId) {
@@ -285,24 +251,13 @@ export function MyVeterinarians() {
         selectedItems={visibleSelectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
-        onCreateLocalWithDetails={handleCreateLocal}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
-        createLocalLabel={t('addLocal')}
         emptySelectedMessage={t('emptySelected')}
         emptyAvailableMessage={t('noVeterinarians')}
-        regions={REGIONS}
-        showLocalFormWithDetails={true}
         isLoading={loading}
         filters={FiltersComponent}
-        localFormLabels={{
-          name: t('name'),
-          region: t('region'),
-          phone: t('phone'),
-          optional: t('optional'),
-          note: t('localNote'),
-        }}
       />
 
       <div className="flex justify-end">
