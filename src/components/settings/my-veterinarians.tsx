@@ -7,10 +7,9 @@ import { Save, AlertCircle } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
-import { useVeterinarians } from '@/lib/hooks/useVeterinarians'
 import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
 import { useAuth } from '@/contexts/auth-context'
-import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
+import { Veterinarian } from '@/lib/types/veterinarian'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 
 // Régions disponibles (Algérie)
@@ -70,11 +69,6 @@ export function MyVeterinarians() {
   const [filterRegion, setFilterRegion] = useState<string>('')
   const [filterSpecialty, setFilterSpecialty] = useState<string>('')
 
-  // Charger les vétérinaires disponibles depuis l'API
-  const { veterinarians, loading: loadingVets, error: errorVets, createVeterinarian } = useVeterinarians({
-    isActive: true,
-  })
-
   // Charger les préférences de vétérinaires pour cette ferme
   const {
     preferences,
@@ -83,13 +77,13 @@ export function MyVeterinarians() {
     savePreferences,
   } = useVeterinarianPreferences(user?.farmId)
 
-  const loading = loadingVets || loadingPrefs
-  const error = errorVets || errorPrefs
+  const loading = loadingPrefs
+  const error = errorPrefs
 
-  // Convertir les vétérinaires API en items de transfert
-  const availableItems = useMemo(() => {
-    return veterinarians.map(vetToTransferItem)
-  }, [veterinarians])
+  // NOTE: On ne charge pas les vétérinaires disponibles car l'endpoint
+  // /farms/{farmId}/veterinarians n'existe pas dans l'API.
+  // Les utilisateurs peuvent ajouter des vétérinaires locaux manuellement.
+  const availableItems: TransferListItem[] = []
 
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
@@ -165,31 +159,7 @@ export function MyVeterinarians() {
 
   const handleCreateLocal = useCallback(async (name: string, region?: string, phone?: string) => {
     try {
-      // Créer le vétérinaire via l'API
-      const nameParts = name.split(' ')
-      const firstName = nameParts[0] || name
-      const lastName = nameParts.slice(1).join(' ') || ''
-
-      const createDto: CreateVeterinarianDto = {
-        firstName,
-        lastName,
-        phone: phone || '',
-        licenseNumber: `LOCAL-${Date.now()}`,
-        specialties: 'general',
-        city: region ? REGIONS.find(r => r.code === region)?.name : undefined,
-        isActive: true,
-      }
-
-      const newVet = await createVeterinarian(createDto)
-      const newItem = vetToTransferItem(newVet)
-      newItem.isLocal = true
-
-      setSelectedItems((prev) => [...prev, newItem])
-      setHasChanges(true)
-
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
-    } catch {
-      // Fallback: créer localement si l'API échoue
+      // Créer un vétérinaire local directement
       const regionName = region ? REGIONS.find(r => r.code === region)?.name : undefined
       const newItem: TransferListItem = {
         id: `local-vet-${Date.now()}`,
@@ -202,8 +172,10 @@ export function MyVeterinarians() {
       setSelectedItems((prev) => [...prev, newItem])
       setHasChanges(true)
       toast.success(t('added'), `${name} ${t('addedTo')}`)
+    } catch (error) {
+      toast.error(tc('error.title'), tc('messages.error'))
     }
-  }, [createVeterinarian, toast, t])
+  }, [toast, t, tc])
 
   const handleSave = async () => {
     if (!user?.farmId) {
