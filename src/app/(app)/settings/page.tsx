@@ -354,6 +354,21 @@ function FarmSection() {
     }
   }
 
+  // Si l'utilisateur n'a pas de farmId
+  if (!user?.farmId) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="text-center py-12 text-muted-foreground">
+          {tc('messages.noData')}
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
