@@ -18,12 +18,21 @@ class VeterinarianPreferencesService {
 
   async getAll(farmId: string): Promise<VeterinarianPreference[]> {
     try {
-      const response = await apiClient.get<VeterinarianPreferenceResponse>(this.getBasePath(farmId))
-      logger.info('Veterinarian preferences fetched', { farmId, count: response.data?.length || 0 })
+      const url = this.getBasePath(farmId)
+      logger.info('Fetching veterinarian preferences', { farmId, url })
+
+      const response = await apiClient.get<VeterinarianPreferenceResponse>(url)
+
+      logger.info('Veterinarian preferences fetched', {
+        farmId,
+        count: response.data?.length || 0,
+        hasData: !!response.data,
+        success: response.success
+      })
       return response.data || []
     } catch (error: any) {
       if (error.status === 404) {
-        logger.info('No veterinarian preferences found (404)', { farmId })
+        logger.info('No veterinarian preferences found (404)', { farmId, url: this.getBasePath(farmId) })
         return []
       }
       logger.error('Failed to fetch veterinarian preferences', { error, farmId })

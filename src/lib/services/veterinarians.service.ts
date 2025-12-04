@@ -29,16 +29,22 @@ class VeterinariansService {
       if (filters?.specialties) params.append('specialties', filters.specialties)
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath()
+      logger.info('Fetching veterinarians', { url, filters })
+
       const response = await apiClient.get<{ data: Veterinarian[] }>(url)
 
-      logger.info('Veterinarians fetched', { count: response.data?.length || 0 })
+      logger.info('Veterinarians fetched', {
+        count: response.data?.length || 0,
+        hasData: !!response.data,
+        url
+      })
       return response.data || []
     } catch (error: any) {
       if (error.status === 404) {
-        logger.info('No veterinarians found (404)')
+        logger.info('No veterinarians found (404)', { basePath: this.getBasePath() })
         return []
       }
-      logger.error('Failed to fetch veterinarians', { error })
+      logger.error('Failed to fetch veterinarians', { error, basePath: this.getBasePath() })
       throw error
     }
   }
