@@ -2408,7 +2408,12 @@
         "other": "Autre"
       },
       "noVeterinarians": "Aucun vétérinaire disponible",
-      "loadError": "Erreur lors du chargement des vétérinaires"
+      "loadError": "Erreur lors du chargement des vétérinaires",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Êtes-vous sûr de vouloir supprimer définitivement {name} ? Ce vétérinaire local sera supprimé et ne sera plus disponible.",
+      "confirmDeleteGlobal": "Êtes-vous sûr de vouloir retirer {name} de vos vétérinaires ? Il restera disponible dans la liste et pourra être ajouté de nouveau.",
+      "deleteSuccess": "Vétérinaire supprimé avec succès",
+      "removedFromPreferences": "Vétérinaire retiré de votre liste"
     },
     "breeds": {
       "title": "Mes Races",
