@@ -24,15 +24,15 @@ class VeterinarianPreferencesService {
       const url = `${this.getBasePath(farmId)}?${params}`
       logger.info('Fetching veterinarian preferences', { farmId, url, includeInactive })
 
-      const response = await apiClient.get<VeterinarianPreferenceResponse>(url)
+      // apiClient déballe automatiquement { success, data } et retourne data directement
+      const response = await apiClient.get<VeterinarianPreference[]>(url)
 
       logger.info('Veterinarian preferences fetched', {
         farmId,
-        count: response.data?.length || 0,
-        hasData: !!response.data,
-        success: response.success
+        count: response?.length || 0,
+        hasData: !!response
       })
-      return response.data || []
+      return response || []
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No veterinarian preferences found (404)', { farmId, url: this.getBasePath(farmId) })
