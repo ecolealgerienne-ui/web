@@ -7,8 +7,21 @@ import { Save, AlertCircle } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
-import { useVeterinarians } from '@/lib/hooks/useVeterinarians'
-import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
+import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
+import { useAvailableVeterinarians } from '@/lib/hooks/useAvailableVeterinarians'
+import { useAuth } from '@/contexts/auth-context'
+import { Veterinarian } from '@/lib/types/veterinarian'
+import { handleApiError } from '@/lib/utils/api-error-handler'
+import { veterinarianPreferencesService } from '@/lib/services/veterinarian-preferences.service'
+import { veterinariansService } from '@/lib/services/veterinarians.service'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 // Régions disponibles (Algérie)
 const REGIONS = [
@@ -36,8 +49,7 @@ const SPECIALTIES = [
 ]
 
 interface MyVeterinariansProps {
-  initialSelectedIds?: string[]
-  onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
+  // Props removed - now uses auth context and preferences hook
 }
 
 // Convertir un Veterinarian API en TransferListItem
@@ -52,44 +64,75 @@ function vetToTransferItem(vet: Veterinarian): TransferListItem {
       specialties: vet.specialties,
       licenseNumber: vet.licenseNumber,
       email: vet.email,
+      scope: vet.scope, // Ajouter le scope pour savoir si local ou global
     },
   }
 }
 
-export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinariansProps) {
+export function MyVeterinarians() {
   const t = useTranslations('settings.veterinarians')
   const ta = useTranslations('settings.actions')
+  const tc = useTranslations('common')
   const toast = useToast()
+  const { user } = useAuth()
   const { markForDeletion, undoOperation, isPendingDeletion } = useUndo<TransferListItem>()
 
   // Filtres
   const [filterRegion, setFilterRegion] = useState<string>('')
   const [filterSpecialty, setFilterSpecialty] = useState<string>('')
 
-  // Charger les vétérinaires depuis l'API
-  const { veterinarians, loading, error, createVeterinarian } = useVeterinarians({
-    isActive: true,
-  })
+  // Charger les préférences de vétérinaires pour cette ferme (liste de droite)
+  const {
+    preferences,
+    loading: loadingPrefs,
+    error: errorPrefs,
+    savePreferences,
+    refetch: refetchPreferences,
+  } = useVeterinarianPreferences(user?.farmId)
 
-  // Convertir les vétérinaires API en items de transfert
+  // Charger tous les vétérinaires disponibles pour cette ferme (liste de gauche)
+  // Endpoint retourne automatiquement : globaux + locaux de la ferme
+  const {
+    veterinarians,
+    loading: loadingVets,
+    error: errorVets,
+    refetch: refetchVeterinarians,
+  } = useAvailableVeterinarians(user?.farmId)
+
+  const loading = loadingPrefs || loadingVets
+  const error = errorPrefs || errorVets
+
+  // Convertir les vétérinaires disponibles en items de liste
+  // (globaux de la plateforme + locaux créés par le fermier)
   const availableItems = useMemo(() => {
     return veterinarians.map(vetToTransferItem)
   }, [veterinarians])
 
-  // Items sélectionnés (initialisés depuis les props)
+  // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Initialiser les sélections depuis initialSelectedIds
+  // Modal de confirmation de suppression
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Initialiser les sélections depuis les préférences
   useEffect(() => {
-    if (initialSelectedIds.length > 0 && veterinarians.length > 0) {
-      const initialSelected = veterinarians
-        .filter(v => initialSelectedIds.includes(v.id))
+    if (preferences.length > 0) {
+      // Trier par displayOrder
+      const sortedPrefs = [...preferences].sort((a, b) => a.displayOrder - b.displayOrder)
+
+      // Les vétérinaires sont déjà inclus dans les préférences (nested)
+      const initialSelected = sortedPrefs
+        .map(pref => pref.veterinarian)
+        .filter(Boolean) // Filtrer les vétérinaires null/undefined
         .map(vetToTransferItem)
+
       setSelectedItems(initialSelected)
     }
-  }, [initialSelectedIds, veterinarians])
+  }, [preferences])
 
   // Filtrer les items disponibles
   const filteredAvailableItems = useMemo(() => {
@@ -118,96 +161,68 @@ export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinar
     const itemToRemove = selectedItems.find((item) => item.id === itemId)
     if (!itemToRemove) return
 
-    setSelectedItems((prev) => prev.filter((item) => item.id !== itemId))
-    setHasChanges(true)
+    // Ouvrir la modal de confirmation
+    setDeletingItem(itemToRemove)
+    setDeleteDialogOpen(true)
+  }, [selectedItems])
 
-    const operationId = markForDeletion(
-      itemId,
-      itemToRemove,
-      () => {
-        setSelectedItems((prev) => [...prev, itemToRemove])
-      },
-      () => {
-        console.log('Hard delete confirmed:', itemId)
-      }
-    )
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deletingItem || !user?.farmId) return
 
-    toast.undo(
-      `${itemToRemove.name} ${t('removed')}`,
-      () => {
-        undoOperation(operationId)
-        toast.success(t('added'), `${itemToRemove.name} ${t('restored')}`)
-      },
-      t('clickToUndo')
-    )
-  }, [selectedItems, markForDeletion, undoOperation, toast, t])
-
-  const handleCreateLocal = useCallback(async (name: string, region?: string, phone?: string) => {
+    setIsDeleting(true)
     try {
-      // Créer le vétérinaire via l'API
-      const nameParts = name.split(' ')
-      const firstName = nameParts[0] || name
-      const lastName = nameParts.slice(1).join(' ') || ''
+      const scope = deletingItem.metadata?.scope as string | undefined
+      const isLocal = scope === 'local'
 
-      const createDto: CreateVeterinarianDto = {
-        firstName,
-        lastName,
-        phone: phone || '',
-        licenseNumber: `LOCAL-${Date.now()}`,
-        specialties: 'general',
-        city: region ? REGIONS.find(r => r.code === region)?.name : undefined,
-        isActive: true,
+      // Trouver la préférence correspondante
+      const preference = preferences.find(p => p.veterinarianId === deletingItem.id)
+
+      if (isLocal) {
+        // Vétérinaire local : soft delete du vétérinaire
+        await veterinariansService.delete(user.farmId, deletingItem.id)
+        toast.success(tc('messages.success'), t('deleteSuccess'))
+      } else {
+        // Vétérinaire global : supprimer uniquement la préférence
+        if (preference) {
+          await veterinarianPreferencesService.delete(user.farmId, preference.id)
+          toast.success(tc('messages.success'), t('removedFromPreferences'))
+        }
       }
 
-      const newVet = await createVeterinarian(createDto)
-      const newItem = vetToTransferItem(newVet)
-      newItem.isLocal = true
+      // Retirer l'item de la liste
+      setSelectedItems((prev) => prev.filter((item) => item.id !== deletingItem.id))
 
-      setSelectedItems((prev) => [...prev, newItem])
-      setHasChanges(true)
+      // Rafraîchir les données
+      await Promise.all([
+        refetchVeterinarians(),
+        refetchPreferences(),
+      ])
 
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
-    } catch {
-      // Fallback: créer localement si l'API échoue
-      const regionName = region ? REGIONS.find(r => r.code === region)?.name : undefined
-      const newItem: TransferListItem = {
-        id: `local-vet-${Date.now()}`,
-        name: name,
-        description: regionName || '',
-        region: region,
-        phone: phone,
-        isLocal: true,
-      }
-      setSelectedItems((prev) => [...prev, newItem])
-      setHasChanges(true)
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (error) {
+      handleApiError(error, 'delete veterinarian', toast)
+    } finally {
+      setIsDeleting(false)
     }
-  }, [createVeterinarian, toast, t])
+  }, [deletingItem, user?.farmId, preferences, toast, t, tc, refetchVeterinarians, refetchPreferences])
+
 
   const handleSave = async () => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
     setIsSaving(true)
     try {
-      const localItems = selectedItems.filter((item) => item.isLocal)
       const selectedIds = selectedItems.map((item) => item.id)
-
-      if (onSave) {
-        await onSave(selectedIds, localItems)
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        console.log('Saved veterinarians:', selectedIds)
-      }
+      await savePreferences(selectedIds)
 
       setHasChanges(false)
       toast.success(t('saved'), t('savedMessage'))
-    } catch {
-      toast.error(
-        t('saveFailed'),
-        t('saveFailedMessage'),
-        {
-          label: t('retry'),
-          onClick: handleSave,
-        }
-      )
+    } catch (error) {
+      handleApiError(error, 'save veterinarian preferences', toast)
     } finally {
       setIsSaving(false)
     }
@@ -275,24 +290,13 @@ export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinar
         selectedItems={visibleSelectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
-        onCreateLocalWithDetails={handleCreateLocal}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
-        createLocalLabel={t('addLocal')}
         emptySelectedMessage={t('emptySelected')}
         emptyAvailableMessage={t('noVeterinarians')}
-        regions={REGIONS}
-        showLocalFormWithDetails={true}
         isLoading={loading}
         filters={FiltersComponent}
-        localFormLabels={{
-          name: t('name'),
-          region: t('region'),
-          phone: t('phone'),
-          optional: t('optional'),
-          note: t('localNote'),
-        }}
       />
 
       <div className="flex justify-end">
@@ -310,6 +314,41 @@ export function MyVeterinarians({ initialSelectedIds = [], onSave }: MyVeterinar
           )}
         </Button>
       </div>
+
+      {/* Dialog de confirmation de suppression */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('confirmDelete')}</DialogTitle>
+            <DialogDescription>
+              {deletingItem && (
+                <>
+                  {deletingItem.metadata?.scope === 'local'
+                    ? t('confirmDeleteLocal', { name: deletingItem.name })
+                    : t('confirmDeleteGlobal', { name: deletingItem.name })
+                  }
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              {tc('actions.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? tc('actions.deleting') : tc('actions.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

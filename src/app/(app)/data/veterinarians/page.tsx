@@ -11,6 +11,7 @@ import { Veterinarian } from '@/lib/types/veterinarian';
 import { veterinariansService } from '@/lib/services/veterinarians.service';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { useAuth } from '@/contexts/auth-context';
 import {
   Dialog,
   DialogContent,
@@ -24,8 +25,9 @@ export default function VeterinariansPage() {
   const t = useTranslations('veterinarians');
   const tc = useCommonTranslations();
   const toast = useToast();
+  const { user } = useAuth();
   const [showInactive, setShowInactive] = useState(true);
-  const { veterinarians: allVeterinarians, loading, error, refetch } = useVeterinarians();
+  const { veterinarians: allVeterinarians, loading, error, refetch } = useVeterinarians(user?.farmId);
 
   // Filtrer selon l'état actif/inactif
   const veterinarians = showInactive
@@ -57,11 +59,11 @@ export default function VeterinariansPage() {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deletingVeterinarian) return;
+    if (!deletingVeterinarian || !user?.farmId) return;
 
     setDeleting(true);
     try {
-      await veterinariansService.delete(deletingVeterinarian.id);
+      await veterinariansService.delete(user.farmId, deletingVeterinarian.id);
       toast.success(tc('messages.success'), t('messages.deleted'));
       refetch();
       setDeleteDialogOpen(false);

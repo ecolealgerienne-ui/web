@@ -2345,13 +2345,29 @@
       "farmId": "N° d'identification",
       "surface": "Surface (hectares)",
       "address": "Adresse",
+      "postalCode": "Code postal",
+      "city": "Ville",
       "country": "Pays",
+      "department": "Département",
       "region": "Région",
+      "commune": "Commune",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "location": "Localisation",
+      "cheptelNumber": "Numéro de cheptel",
+      "groupId": "Identifiant du groupe",
+      "groupName": "Nom du groupe",
+      "isDefault": "Ferme par défaut",
+      "isActive": "Actif",
       "selectCountry": "Sélectionner un pays",
       "selectRegion": "Sélectionner une région",
-      "commune": "Commune",
+      "selectDepartment": "Sélectionner un département",
       "species": "Espèces élevées",
-      "addSpecies": "+ Ajouter"
+      "addSpecies": "+ Ajouter",
+      "loading": "Chargement des informations de la ferme...",
+      "loadError": "Erreur lors du chargement des informations de la ferme",
+      "updateSuccess": "Informations de la ferme mises à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour des informations de la ferme"
     },
     "veterinarians": {
       "title": "Mes Vétérinaires",
@@ -2392,7 +2408,12 @@
         "other": "Autre"
       },
       "noVeterinarians": "Aucun vétérinaire disponible",
-      "loadError": "Erreur lors du chargement des vétérinaires"
+      "loadError": "Erreur lors du chargement des vétérinaires",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Êtes-vous sûr de vouloir supprimer définitivement {name} ? Ce vétérinaire local sera supprimé et ne sera plus disponible.",
+      "confirmDeleteGlobal": "Êtes-vous sûr de vouloir retirer {name} de vos vétérinaires ? Il restera disponible dans la liste et pourra être ajouté de nouveau.",
+      "deleteSuccess": "Vétérinaire supprimé avec succès",
+      "removedFromPreferences": "Vétérinaire retiré de votre liste"
     },
     "breeds": {
       "title": "Mes Races",

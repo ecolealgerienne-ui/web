@@ -1,22 +1,21 @@
 /**
- * Hook React pour la gestion des vétérinaires
+ * Hook React pour la gestion des vétérinaires globaux
+ * Utilise l'endpoint /api/v1/veterinarians pour afficher tous les vétérinaires disponibles
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Veterinarian, CreateVeterinarianDto } from '@/lib/types/veterinarian'
+import { Veterinarian } from '@/lib/types/veterinarian'
 import { veterinariansService, VeterinarianFilters } from '@/lib/services/veterinarians.service'
 import { logger } from '@/lib/utils/logger'
 
-interface UseVeterinariansResult {
+interface UseGlobalVeterinariansResult {
   veterinarians: Veterinarian[]
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
-  createVeterinarian: (data: CreateVeterinarianDto) => Promise<Veterinarian>
-  deleteVeterinarian: (id: string) => Promise<void>
 }
 
-export function useVeterinarians(farmId: string | undefined, filters?: VeterinarianFilters): UseVeterinariansResult {
+export function useGlobalVeterinarians(filters?: VeterinarianFilters): UseGlobalVeterinariansResult {
   const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -47,49 +46,29 @@ export function useVeterinarians(farmId: string | undefined, filters?: Veterinar
   }), [filterSearch, filterScope, filterDepartment, filterIsActive, filterIsAvailable, filterEmergencyService, filterPage, filterLimit, filterSort, filterOrder])
 
   const fetchVeterinarians = useCallback(async () => {
-    if (!farmId) {
-      setLoading(false)
-      return
-    }
-
     setLoading(true)
     setError(null)
 
     try {
-      const data = await veterinariansService.getAll(farmId, memoizedFilters)
+      const data = await veterinariansService.getAllGlobal(memoizedFilters)
       setVeterinarians(data)
     } catch (err) {
       const error = err as Error
       setError(error)
-      logger.error('Failed to fetch veterinarians in hook', { error, farmId })
+      logger.error('Failed to fetch global veterinarians in hook', { error })
     } finally {
       setLoading(false)
     }
-  }, [farmId, memoizedFilters])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchVeterinarians()
   }, [fetchVeterinarians])
-
-  const createVeterinarian = useCallback(async (data: CreateVeterinarianDto): Promise<Veterinarian> => {
-    if (!farmId) throw new Error('farmId is required')
-    const newVet = await veterinariansService.create(farmId, data)
-    setVeterinarians(prev => [...prev, newVet])
-    return newVet
-  }, [farmId])
-
-  const deleteVeterinarian = useCallback(async (id: string): Promise<void> => {
-    if (!farmId) throw new Error('farmId is required')
-    await veterinariansService.delete(farmId, id)
-    setVeterinarians(prev => prev.filter(v => v.id !== id))
-  }, [farmId])
 
   return {
     veterinarians,
     loading,
     error,
     refetch: fetchVeterinarians,
-    createVeterinarian,
-    deleteVeterinarian,
   }
 }
