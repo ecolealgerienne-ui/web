@@ -98,18 +98,19 @@ export function MyVeterinarians() {
 
   // Initialiser les sélections depuis les préférences
   useEffect(() => {
-    if (preferences.length > 0 && veterinarians.length > 0) {
+    if (preferences.length > 0) {
       // Trier par displayOrder
       const sortedPrefs = [...preferences].sort((a, b) => a.displayOrder - b.displayOrder)
 
+      // Les vétérinaires sont déjà inclus dans les préférences (nested)
       const initialSelected = sortedPrefs
         .map(pref => pref.veterinarian)
-        .filter(Boolean)
+        .filter(Boolean) // Filtrer les vétérinaires null/undefined
         .map(vetToTransferItem)
 
       setSelectedItems(initialSelected)
     }
-  }, [preferences, veterinarians])
+  }, [preferences]) // Ne dépend que des préférences, pas de veterinarians
 
   // Filtrer les items disponibles
   const filteredAvailableItems = useMemo(() => {
