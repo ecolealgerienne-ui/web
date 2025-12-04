@@ -77,24 +77,49 @@ class VeterinarianPreferencesService {
 
   /**
    * Sauvegarde en batch les préférences
-   * Crée de nouvelles préférences pour les IDs qui n'existaient pas
+   * - Supprime les préférences qui ne sont plus dans la liste
+   * - Crée les nouvelles préférences
+   * - Met à jour l'ordre de toutes les préférences
    */
   async saveBatch(farmId: string, veterinarianIds: string[]): Promise<VeterinarianPreference[]> {
     try {
-      // Pour l'instant, on crée une par une
-      // TODO: Implémenter un endpoint batch côté backend
-      const preferences: VeterinarianPreference[] = []
+      // 1. Récupérer les préférences existantes
+      const existingPreferences = await this.getAll(farmId, true)
+      const existingVetIds = new Set(existingPreferences.map(p => p.veterinarianId))
+      const newVetIds = new Set(veterinarianIds)
 
-      for (let i = 0; i < veterinarianIds.length; i++) {
-        const pref = await this.create(farmId, {
-          veterinarianId: veterinarianIds[i],
-          displayOrder: i + 1,
-          isActive: true,
-        })
-        preferences.push(pref)
+      // 2. Supprimer les préférences qui ne sont plus dans la liste
+      const preferencesToDelete = existingPreferences.filter(p => !newVetIds.has(p.veterinarianId))
+      for (const pref of preferencesToDelete) {
+        await this.delete(farmId, pref.id)
       }
 
-      return preferences
+      // 3. Créer les nouvelles préférences et collecter toutes les préférences
+      const allPreferences: VeterinarianPreference[] = []
+
+      for (let i = 0; i < veterinarianIds.length; i++) {
+        const vetId = veterinarianIds[i]
+
+        if (existingVetIds.has(vetId)) {
+          // Préférence existe déjà, la mettre à jour avec le nouveau displayOrder
+          const existingPref = existingPreferences.find(p => p.veterinarianId === vetId)!
+          const updatedPref = await this.update(farmId, existingPref.id, {
+            displayOrder: i + 1,
+            isActive: true,
+          })
+          allPreferences.push(updatedPref)
+        } else {
+          // Nouvelle préférence, la créer
+          const newPref = await this.create(farmId, {
+            veterinarianId: vetId,
+            displayOrder: i + 1,
+            isActive: true,
+          })
+          allPreferences.push(newPref)
+        }
+      }
+
+      return allPreferences
     } catch (error) {
       logger.error('Failed to save veterinarian preferences batch', { error, farmId })
       throw error
