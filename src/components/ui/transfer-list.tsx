@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Trash2, Home, GripVertical, Phone, MapPin } from 'lucide-react'
+import { Search, Plus, Trash2, Home, GripVertical, Phone, MapPin, Pencil } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -37,6 +37,7 @@ interface TransferListProps {
   // Callbacks
   onSelect: (item: TransferListItem) => void
   onDeselect: (itemId: string) => void
+  onEdit?: (item: TransferListItem) => void
   onCreateLocal?: (name: string) => void
   onCreateLocalWithDetails?: (name: string, region?: string, phone?: string) => void
 
@@ -78,6 +79,7 @@ export function TransferList({
   selectedItems,
   onSelect,
   onDeselect,
+  onEdit,
   onCreateLocal,
   onCreateLocalWithDetails,
   availableTitle = 'Catalogue disponible',
@@ -320,49 +322,64 @@ export function TransferList({
             </div>
           ) : (
             <div className="space-y-1">
-              {selectedItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-3 rounded-md bg-muted/50 group"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-50 cursor-grab" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-sm truncate">{item.name}</p>
-                        {item.isLocal && (
-                          <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
-                            <Home className="w-3 h-3" />
-                            Local
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {item.description && (
-                          <span className="flex items-center gap-1 truncate">
-                            <MapPin className="w-3 h-3 flex-shrink-0" />
-                            {item.description}
-                          </span>
-                        )}
-                        {item.phone && (
-                          <span className="flex items-center gap-1">
-                            <Phone className="w-3 h-3 flex-shrink-0" />
-                            <span dir="ltr">{item.phone}</span>
-                          </span>
-                        )}
+              {selectedItems.map((item) => {
+                const isLocal = item.metadata?.scope === 'local'
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-3 rounded-md bg-muted/50 group"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-50 cursor-grab" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm truncate">{item.name}</p>
+                          {isLocal && (
+                            <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                              <Home className="w-3 h-3" />
+                              Local
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {item.description && (
+                            <span className="flex items-center gap-1 truncate">
+                              <MapPin className="w-3 h-3 flex-shrink-0" />
+                              {item.description}
+                            </span>
+                          )}
+                          {item.phone && (
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-3 h-3 flex-shrink-0" />
+                              <span dir="ltr">{item.phone}</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {isLocal && onEdit && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEdit(item)}
+                          className="text-primary hover:text-primary hover:bg-primary/10"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDeselect(item.id)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDeselect(item.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
