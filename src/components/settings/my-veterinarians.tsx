@@ -273,13 +273,14 @@ export function MyVeterinarians() {
       let createdOrUpdatedVet: Veterinarian
 
       if (editingVeterinarian) {
-        // Mode édition - convertir en UpdateVeterinarianDto (exclure scope, department)
+        // Mode édition - convertir en UpdateVeterinarianDto
         const updateData: UpdateVeterinarianDto = {
           firstName: data.firstName,
           lastName: data.lastName,
           phone: data.phone,
           mobile: data.mobile,
           email: data.email,
+          department: data.department,
           city: data.city,
           clinic: data.clinic,
           specialties: data.specialties,

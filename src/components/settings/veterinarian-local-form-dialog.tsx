@@ -66,6 +66,7 @@ export function VeterinarianLocalFormDialog({
     phone: '',
     mobile: '',
     email: '',
+    department: '',
     city: '',
     clinic: '',
     specialties: 'general',
@@ -81,6 +82,7 @@ export function VeterinarianLocalFormDialog({
         phone: veterinarian.phone || '',
         mobile: veterinarian.mobile || '',
         email: veterinarian.email || '',
+        department: veterinarian.department || '',
         city: veterinarian.city || '',
         clinic: veterinarian.clinic || '',
         specialties: veterinarian.specialties || 'general',
@@ -94,6 +96,7 @@ export function VeterinarianLocalFormDialog({
         phone: '',
         mobile: '',
         email: '',
+        department: '',
         city: '',
         clinic: '',
         specialties: 'general',
@@ -111,6 +114,7 @@ export function VeterinarianLocalFormDialog({
       phone: formData.phone.trim() || '',
       mobile: formData.mobile.trim() || undefined,
       email: formData.email.trim() || undefined,
+      department: formData.department || undefined,
       city: formData.city.trim() || undefined,
       clinic: formData.clinic.trim() || undefined,
       specialties: formData.specialties,
@@ -225,17 +229,38 @@ export function VeterinarianLocalFormDialog({
             </select>
           </div>
 
-          {/* Ville */}
-          <div className="space-y-2">
-            <Label htmlFor="city">
-              {t('city')} <span className="text-muted-foreground text-xs">({tc('optional')})</span>
-            </Label>
-            <Input
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              placeholder={t('cityPlaceholder')}
-            />
+          {/* Département et Ville */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="department">
+                {t('department')} <span className="text-muted-foreground text-xs">({tc('optional')})</span>
+              </Label>
+              <select
+                id="department"
+                value={formData.department}
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="">{t('departmentPlaceholder')}</option>
+                {REGIONS.map((region) => (
+                  <option key={region.code} value={region.code}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="city">
+                {t('city')} <span className="text-muted-foreground text-xs">({tc('optional')})</span>
+              </Label>
+              <Input
+                id="city"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                placeholder={t('cityPlaceholder')}
+              />
+            </div>
           </div>
 
           {/* Clinique et Numéro de licence */}
