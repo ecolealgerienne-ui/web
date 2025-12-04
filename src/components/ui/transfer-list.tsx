@@ -38,6 +38,7 @@ interface TransferListProps {
   onSelect: (item: TransferListItem) => void
   onDeselect: (itemId: string) => void
   onEdit?: (item: TransferListItem) => void
+  onItemClick?: (item: TransferListItem) => void
   onCreateLocal?: (name: string) => void
   onCreateLocalWithDetails?: (name: string, region?: string, phone?: string) => void
 
@@ -80,6 +81,7 @@ export function TransferList({
   onSelect,
   onDeselect,
   onEdit,
+  onItemClick,
   onCreateLocal,
   onCreateLocalWithDetails,
   availableTitle = 'Catalogue disponible',
@@ -190,12 +192,14 @@ export function TransferList({
           ) : (
             <div className="space-y-1">
               {filteredAvailableItems.map((item) => (
-                <button
+                <div
                   key={item.id}
-                  onClick={() => onSelect(item)}
-                  className="w-full flex items-center justify-between p-3 rounded-md hover:bg-muted transition-colors text-left group"
+                  className="flex items-center justify-between p-3 rounded-md hover:bg-muted transition-colors group"
                 >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <button
+                    onClick={() => onItemClick?.(item)}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                  >
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -213,11 +217,16 @@ export function TransferList({
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Plus className="w-4 h-4 text-primary" />
-                  </div>
-                </button>
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onSelect(item)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary hover:bg-primary/10"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
               ))}
             </div>
           )}
@@ -329,7 +338,10 @@ export function TransferList({
                     key={item.id}
                     className="flex items-center justify-between p-3 rounded-md bg-muted/50 group"
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <button
+                      onClick={() => onItemClick?.(item)}
+                      className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    >
                       <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-50 cursor-grab" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -356,13 +368,16 @@ export function TransferList({
                           )}
                         </div>
                       </div>
-                    </div>
+                    </button>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {isLocal && onEdit && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onEdit(item)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit(item)
+                          }}
                           className="text-primary hover:text-primary hover:bg-primary/10"
                         >
                           <Pencil className="w-4 h-4" />
@@ -371,7 +386,10 @@ export function TransferList({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onDeselect(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onDeselect(item.id)
+                        }}
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="w-4 h-4" />

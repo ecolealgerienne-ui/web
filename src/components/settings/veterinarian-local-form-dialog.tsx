@@ -112,7 +112,7 @@ export function VeterinarianLocalFormDialog({
       scope: 'local',
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
-      phone: formData.phone.trim(),
+      phone: formData.phone.trim() || undefined,
       mobile: formData.mobile.trim() || undefined,
       email: formData.email.trim() || undefined,
       department: formData.department || undefined,
@@ -126,7 +126,7 @@ export function VeterinarianLocalFormDialog({
     await onSubmit(submitData)
   }
 
-  const isValid = formData.firstName.trim() && formData.lastName.trim() && formData.phone.trim()
+  const isValid = formData.firstName.trim() && formData.lastName.trim()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -174,7 +174,7 @@ export function VeterinarianLocalFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="phone">
-                {t('phone')} <span className="text-destructive">*</span>
+                {t('phone')} <span className="text-muted-foreground text-xs">({tc('optional')})</span>
               </Label>
               <Input
                 id="phone"
@@ -182,7 +182,6 @@ export function VeterinarianLocalFormDialog({
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder={t('phonePlaceholder')}
-                required
               />
             </div>
 

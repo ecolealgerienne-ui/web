@@ -15,6 +15,7 @@ import { handleApiError } from '@/lib/utils/api-error-handler'
 import { veterinarianPreferencesService } from '@/lib/services/veterinarian-preferences.service'
 import { veterinariansService } from '@/lib/services/veterinarians.service'
 import { VeterinarianLocalFormDialog } from './veterinarian-local-form-dialog'
+import { VeterinarianDetailsDialog } from './veterinarian-details-dialog'
 import {
   Dialog,
   DialogContent,
@@ -124,6 +125,10 @@ export function MyVeterinarians() {
   const [editingVeterinarian, setEditingVeterinarian] = useState<Veterinarian | null>(null)
   const [isSavingLocalVet, setIsSavingLocalVet] = useState(false)
 
+  // Modal d'affichage des détails
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
+  const [viewingVeterinarian, setViewingVeterinarian] = useState<Veterinarian | null>(null)
+
   // Initialiser les sélections depuis les préférences
   useEffect(() => {
     if (preferences.length > 0) {
@@ -171,6 +176,15 @@ export function MyVeterinarians() {
     setDeletingItem(itemToRemove)
     setDeleteDialogOpen(true)
   }, [selectedItems])
+
+  const handleItemClick = useCallback((item: TransferListItem) => {
+    // Trouver le vétérinaire complet depuis la liste
+    const vet = veterinarians.find(v => v.id === item.id)
+    if (vet) {
+      setViewingVeterinarian(vet)
+      setDetailsDialogOpen(true)
+    }
+  }, [veterinarians])
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingItem || !user?.farmId) return
@@ -373,6 +387,7 @@ export function MyVeterinarians() {
         onSelect={handleSelect}
         onDeselect={handleDeselect}
         onEdit={handleEditLocalVet}
+        onItemClick={handleItemClick}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
@@ -441,6 +456,13 @@ export function MyVeterinarians() {
         veterinarian={editingVeterinarian}
         onSubmit={handleSubmitLocalVet}
         loading={isSavingLocalVet}
+      />
+
+      {/* Dialog d'affichage des détails */}
+      <VeterinarianDetailsDialog
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+        veterinarian={viewingVeterinarian}
       />
     </div>
   )
