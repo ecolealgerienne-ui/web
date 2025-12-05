@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "ghost" | "outline";
+  variant?: "default" | "ghost" | "outline" | "destructive";
   size?: "default" | "sm" | "lg" | "icon";
 }
 
@@ -16,6 +16,7 @@ export const buttonVariants = (variant: string = "default", size: string = "defa
       "bg-primary text-primary-foreground hover:bg-primary/90": variant === "default",
       "hover:bg-accent hover:text-accent-foreground": variant === "ghost",
       "border border-input bg-background hover:bg-accent hover:text-accent-foreground": variant === "outline",
+      "bg-destructive text-destructive-foreground hover:bg-destructive/90": variant === "destructive",
     },
     {
       "h-10 px-4 py-2": size === "default",
