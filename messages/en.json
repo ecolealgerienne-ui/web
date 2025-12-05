@@ -342,5 +342,69 @@
       "addDescription": "Add the information for the new farm",
       "editDescription": "Edit the farm information"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile",
+      "description": "Manage your personal information"
+    },
+    "farm": {
+      "title": "Farm",
+      "description": "Information about your farm"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Notification preferences"
+    },
+    "language": {
+      "title": "Language & Region",
+      "description": "Choose your language"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Password and security"
+    },
+    "data": {
+      "title": "Data",
+      "description": "Import/Export data"
+    },
+    "veterinarians": {
+      "title": "My veterinarians",
+      "subtitle": "Select the veterinarians you want to associate with your farm",
+      "available": "Available veterinarians",
+      "selected": "My veterinarians",
+      "searchPlaceholder": "Search for a veterinarian...",
+      "emptySelected": "No veterinarian selected",
+      "noVeterinarians": "No veterinarian available",
+      "loadError": "Error loading veterinarians",
+      "saved": "Saved",
+      "savedMessage": "Your preferences have been saved",
+      "alreadyInList": "Veterinarian already added",
+      "alreadyInListMessage": "{name} is already in your veterinarian list",
+      "confirmDelete": "Confirm deletion",
+      "confirmDeleteLocal": "Do you really want to delete {name}? This local veterinarian will be permanently deleted.",
+      "confirmDeleteGlobal": "Do you want to remove {name} from your list? You can add them again later.",
+      "deleteSuccess": "Veterinarian deleted successfully",
+      "removedFromPreferences": "Veterinarian removed from your preferences",
+      "filters": {
+        "allRegions": "All regions",
+        "allSpecialties": "All specialties"
+      },
+      "specialties": {
+        "bovine": "Bovine",
+        "ovine": "Ovine",
+        "caprine": "Caprine",
+        "poultry": "Poultry",
+        "equine": "Equine",
+        "camelid": "Camelid",
+        "general": "General",
+        "other": "Other"
+      }
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving..."
+    }
   }
 }
