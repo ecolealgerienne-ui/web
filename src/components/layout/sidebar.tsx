@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Database, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell, Building2, CalendarClock, Dog, Boxes, Link2 } from "lucide-react";
+import { Home, Beef, Package, Syringe, Pill, BarChart3, Settings, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell, Building2, CalendarClock, Dog, Boxes, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -18,7 +18,7 @@ const menuItems = [
   { icon: Scale, key: "weighings", href: "/weighings" },
 ];
 
-// Menu Administration (référentiels globaux - super admin uniquement)
+// Menu Données de référence (référentiels globaux - super admin uniquement)
 const adminMenuItems = [
   { icon: TestTube2, key: "activeSubstances", href: "/admin/active-substances" },
   { icon: Layers, key: "productCategories", href: "/admin/product-categories" },
@@ -36,17 +36,6 @@ const adminMenuItems = [
   { icon: Pill, key: "therapeuticIndications", href: "/admin/therapeutic-indications" },
   { icon: Link2, key: "breedCountries", href: "/admin/breed-countries" },
   { icon: Link2, key: "campaignCountries", href: "/admin/campaign-countries" },
-];
-
-// Menu Données de référence (super admin uniquement)
-const dataMenuItems = [
-  { key: "breeds", href: "/data/breeds" },
-  { key: "vaccines", href: "/data/vaccines" },
-  { key: "diseases", href: "/data/diseases" },
-  { key: "medications", href: "/data/medications" },
-  { key: "veterinarians", href: "/data/veterinarians" },
-  { key: "campaigns", href: "/data/campaigns" },
-  { key: "alerts", href: "/data/alert-configurations" },
 ];
 
 const bottomMenuItems = [
@@ -104,7 +93,7 @@ export function Sidebar() {
           <>
             <div className="my-4 border-t border-border" />
 
-            {/* Menu Administration (référentiels globaux) */}
+            {/* Menu Données de référence (référentiels globaux) */}
             <div className="mb-1">
               <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
                 <Shield className="h-4 w-4" />
@@ -127,33 +116,6 @@ export function Sidebar() {
                     >
                       <Icon className="h-4 w-4" />
                       {t(`admin.${item.key}`)}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Menu Données de référence (super admin uniquement) */}
-            <div className="mb-1 mt-4">
-              <div className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-foreground">
-                <Database className="h-4 w-4" />
-                {t('data.title')}
-              </div>
-              <div className="ml-7 space-y-1">
-                {dataMenuItems.map((item) => {
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "block rounded-lg px-3 py-1.5 text-sm transition-colors",
-                        active
-                          ? "bg-primary text-primary-foreground font-medium"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                      )}
-                    >
-                      {t(`data.${item.key}`)}
                     </Link>
                   );
                 })}
