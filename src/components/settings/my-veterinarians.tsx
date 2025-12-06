@@ -3,17 +3,19 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save, AlertCircle } from 'lucide-react'
+import { Save, AlertCircle, Plus, Pencil } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
 import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
 import { useGlobalVeterinarians } from '@/lib/hooks/useGlobalVeterinarians'
 import { useAuth } from '@/contexts/auth-context'
-import { Veterinarian } from '@/lib/types/veterinarian'
+import { Veterinarian, CreateVeterinarianDto, UpdateVeterinarianDto } from '@/lib/types/veterinarian'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 import { veterinarianPreferencesService } from '@/lib/services/veterinarian-preferences.service'
 import { veterinariansService } from '@/lib/services/veterinarians.service'
+import { VeterinarianLocalFormDialog } from './veterinarian-local-form-dialog'
+import { VeterinarianDetailsDialog } from './veterinarian-details-dialog'
 import {
   Dialog,
   DialogContent,
@@ -106,6 +108,22 @@ export function MyVeterinarians() {
     return globalVeterinarians.map(vetToTransferItem)
   }, [globalVeterinarians])
 
+  // Liste combinée de tous les vétérinaires (globaux + locaux depuis préférences)
+  const allVeterinarians = useMemo(() => {
+    const vetsFromPrefs = preferences
+      .map(p => p.veterinarian)
+      .filter((v): v is Veterinarian => v !== null && v !== undefined)
+
+    // Combiner avec les globaux, en évitant les doublons
+    const allVets = [...globalVeterinarians]
+    vetsFromPrefs.forEach(vet => {
+      if (!allVets.some(v => v.id === vet.id)) {
+        allVets.push(vet)
+      }
+    })
+    return allVets
+  }, [globalVeterinarians, preferences])
+
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
@@ -115,6 +133,15 @@ export function MyVeterinarians() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // Modal d'ajout/modification de vétérinaire local
+  const [localVetDialogOpen, setLocalVetDialogOpen] = useState(false)
+  const [editingVeterinarian, setEditingVeterinarian] = useState<Veterinarian | null>(null)
+  const [isSavingLocalVet, setIsSavingLocalVet] = useState(false)
+
+  // Modal d'affichage des détails
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
+  const [viewingVeterinarian, setViewingVeterinarian] = useState<Veterinarian | null>(null)
 
   // Initialiser les sélections depuis les préférences
   useEffect(() => {
@@ -169,6 +196,15 @@ export function MyVeterinarians() {
     setDeletingItem(itemToRemove)
     setDeleteDialogOpen(true)
   }, [selectedItems])
+
+  const handleItemClick = useCallback((item: TransferListItem) => {
+    // Trouver le vétérinaire complet depuis la liste
+    const vet = allVeterinarians.find(v => v.id === item.id)
+    if (vet) {
+      setViewingVeterinarian(vet)
+      setDetailsDialogOpen(true)
+    }
+  }, [allVeterinarians])
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingItem || !user?.farmId) return
@@ -232,6 +268,77 @@ export function MyVeterinarians() {
     }
   }
 
+  const handleAddLocalVet = () => {
+    setEditingVeterinarian(null)
+    setLocalVetDialogOpen(true)
+  }
+
+  const handleEditLocalVet = (item: TransferListItem) => {
+    // Trouver le vétérinaire complet depuis la liste
+    const vet = allVeterinarians.find(v => v.id === item.id)
+    if (vet && vet.scope === 'local') {
+      setEditingVeterinarian(vet)
+      setLocalVetDialogOpen(true)
+    }
+  }
+
+  const handleSubmitLocalVet = async (data: CreateVeterinarianDto) => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
+    setIsSavingLocalVet(true)
+    try {
+      let createdOrUpdatedVet: Veterinarian
+
+      if (editingVeterinarian) {
+        // Mode édition - convertir en UpdateVeterinarianDto
+        const updateData: UpdateVeterinarianDto = {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phone,
+          mobile: data.mobile,
+          email: data.email,
+          department: data.department,
+          city: data.city,
+          clinic: data.clinic,
+          specialties: data.specialties,
+          licenseNumber: data.licenseNumber,
+        }
+        createdOrUpdatedVet = await veterinariansService.update(
+          user.farmId,
+          editingVeterinarian.id,
+          updateData
+        )
+        toast.success(tc('messages.success'), t('form.updateSuccess'))
+      } else {
+        // Mode création
+        createdOrUpdatedVet = await veterinariansService.create(user.farmId, data)
+
+        // Ajouter automatiquement le nouveau vétérinaire aux sélections
+        const newItem = vetToTransferItem(createdOrUpdatedVet)
+        setSelectedItems(prev => [...prev, newItem])
+        setHasChanges(true)
+
+        toast.success(tc('messages.success'), t('form.createSuccess'))
+      }
+
+      // Rafraîchir les listes
+      await Promise.all([
+        refetchVeterinarians(),
+        refetchPreferences(),
+      ])
+
+      setLocalVetDialogOpen(false)
+      setEditingVeterinarian(null)
+    } catch (error) {
+      handleApiError(error, 'save local veterinarian', toast)
+    } finally {
+      setIsSavingLocalVet(false)
+    }
+  }
+
   const visibleSelectedItems = selectedItems.filter(
     (item) => !isPendingDeletion(item.id)
   )
@@ -284,9 +391,15 @@ export function MyVeterinarians() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <Button onClick={handleAddLocalVet} variant="outline" size="sm">
+          <Plus className="w-4 h-4 me-2" />
+          {t('addLocal')}
+        </Button>
       </div>
 
       <TransferList
@@ -294,6 +407,8 @@ export function MyVeterinarians() {
         selectedItems={visibleSelectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
+        onEdit={handleEditLocalVet}
+        onItemClick={handleItemClick}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
@@ -301,9 +416,10 @@ export function MyVeterinarians() {
         emptyAvailableMessage={t('noVeterinarians')}
         isLoading={loading}
         filters={FiltersComponent}
+        showCreateLocal={false}
       />
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
         <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
           {isSaving ? (
             <>
@@ -353,6 +469,22 @@ export function MyVeterinarians() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog d'ajout/modification de vétérinaire local */}
+      <VeterinarianLocalFormDialog
+        open={localVetDialogOpen}
+        onOpenChange={setLocalVetDialogOpen}
+        veterinarian={editingVeterinarian}
+        onSubmit={handleSubmitLocalVet}
+        loading={isSavingLocalVet}
+      />
+
+      {/* Dialog d'affichage des détails */}
+      <VeterinarianDetailsDialog
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+        veterinarian={viewingVeterinarian}
+      />
     </div>
   )
 }

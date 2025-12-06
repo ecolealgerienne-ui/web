@@ -43,6 +43,7 @@ export interface Veterinarian {
 }
 
 export interface CreateVeterinarianDto {
+  id?: string
   firstName: string
   lastName: string
   title?: string
@@ -56,12 +57,15 @@ export interface CreateVeterinarianDto {
   city?: string
   postalCode?: string
   country?: string
+  department?: string
+  commune?: string
   isAvailable?: boolean
   emergencyService?: boolean
   workingHours?: string
   consultationFee?: number
   emergencyFee?: number
   currency?: string
+  notes?: string
   isPreferred?: boolean
   isDefault?: boolean
   isActive?: boolean
@@ -81,12 +85,15 @@ export interface UpdateVeterinarianDto {
   city?: string
   postalCode?: string
   country?: string
+  department?: string
+  commune?: string
   isAvailable?: boolean
   emergencyService?: boolean
   workingHours?: string
   consultationFee?: number
   emergencyFee?: number
   currency?: string
+  notes?: string
   isPreferred?: boolean
   isDefault?: boolean
   isActive?: boolean
