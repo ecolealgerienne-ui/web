@@ -70,8 +70,13 @@ export function AnimalFormDialog({
 
   useEffect(() => {
     if (animal) {
+      // Convertir la date ISO en format YYYY-MM-DD pour l'input date
+      const birthDateForInput = animal.birthDate
+        ? animal.birthDate.split('T')[0]
+        : '';
+
       setFormData({
-        birthDate: animal.birthDate || '',
+        birthDate: birthDateForInput,
         sex: animal.sex,
         currentEid: animal.currentEid || '',
         officialNumber: animal.officialNumber || '',
@@ -252,6 +257,7 @@ export function AnimalFormDialog({
                       <SelectContent>
                         <SelectItem value="alive">{t('status.alive')}</SelectItem>
                         <SelectItem value="sold">{t('status.sold')}</SelectItem>
+                        <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
                         <SelectItem value="dead">{t('status.dead')}</SelectItem>
                       </SelectContent>
                     </Select>
@@ -317,18 +323,15 @@ export function AnimalFormDialog({
 
               {/* Section: Notes */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium border-b pb-2">Notes</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="notes">{t('fields.notes')}</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder={t('placeholders.notes')}
-                    rows={3}
-                    maxLength={1000}
-                  />
-                </div>
+                <h3 className="text-sm font-medium border-b pb-2">{t('fields.notes')}</h3>
+                <Textarea
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder={t('placeholders.notes')}
+                  rows={3}
+                  maxLength={1000}
+                />
               </div>
 
               <DialogFooter>
