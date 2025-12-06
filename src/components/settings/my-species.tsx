@@ -3,17 +3,16 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save, AlertCircle, Plus } from 'lucide-react'
+import { Save, AlertCircle } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTranslations } from 'next-intl'
 import { useSpeciesPreferences } from '@/lib/hooks/useSpeciesPreferences'
 import { useGlobalSpecies } from '@/lib/hooks/useGlobalSpecies'
 import { useAuth } from '@/contexts/auth-context'
-import { Species, CreateSpeciesDto } from '@/lib/types/admin/species'
+import { Species } from '@/lib/types/admin/species'
 import { ApiSpeciesInPreference } from '@/lib/types/species-preference'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 import { speciesPreferencesService } from '@/lib/services/species-preferences.service'
-import { SpeciesLocalFormDialog } from './species-local-form-dialog'
 import {
   Dialog,
   DialogContent,
@@ -81,18 +80,6 @@ export function MySpecies() {
     return globalSpecies.map(speciesToTransferItem)
   }, [globalSpecies])
 
-  // Liste combinée de toutes les espèces (globales + locales depuis préférences)
-  // Note: les espèces globales sont déjà mappées dans useGlobalSpecies
-  const allSpeciesIds = useMemo(() => {
-    const ids = new Set(globalSpecies.map(s => s.id))
-    preferences.forEach(p => {
-      if (p.species) {
-        ids.add(p.species.id)
-      }
-    })
-    return ids
-  }, [globalSpecies, preferences])
-
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
@@ -102,10 +89,6 @@ export function MySpecies() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  // Modal d'ajout d'espèce locale
-  const [localSpeciesDialogOpen, setLocalSpeciesDialogOpen] = useState(false)
-  const [isSavingLocalSpecies, setIsSavingLocalSpecies] = useState(false)
 
   // Initialiser les sélections depuis les préférences
   useEffect(() => {
@@ -142,21 +125,11 @@ export function MySpecies() {
 
     setIsDeleting(true)
     try {
-      const scope = deletingItem.metadata?.scope as string | undefined
-      const isLocal = scope === 'local'
-
       const preference = preferences.find(p => p.speciesId === deletingItem.id)
 
-      if (isLocal) {
-        // Espèce locale : soft delete
-        // TODO: Implémenter le delete d'espèce locale quand l'API sera disponible
-        toast.success(tc('messages.success'), t('deleteSuccess'))
-      } else {
-        // Espèce globale : supprimer uniquement la préférence
-        if (preference) {
-          await speciesPreferencesService.delete(user.farmId, preference.id)
-          toast.success(tc('messages.success'), t('removedFromPreferences'))
-        }
+      if (preference) {
+        await speciesPreferencesService.delete(user.farmId, preference.id)
+        toast.success(tc('messages.success'), t('removedFromPreferences'))
       }
 
       setSelectedItems((prev) => prev.filter((item) => item.id !== deletingItem.id))
@@ -195,35 +168,6 @@ export function MySpecies() {
     }
   }
 
-  const handleAddLocalSpecies = () => {
-    setLocalSpeciesDialogOpen(true)
-  }
-
-  const handleSubmitLocalSpecies = async (data: CreateSpeciesDto) => {
-    if (!user?.farmId) {
-      toast.error(tc('error.title'), tc('messages.error'))
-      return
-    }
-
-    setIsSavingLocalSpecies(true)
-    try {
-      // TODO: Implémenter la création d'espèce locale quand l'API sera disponible
-      // Pour l'instant on simule l'ajout
-      toast.success(tc('messages.success'), t('form.createSuccess'))
-
-      await Promise.all([
-        refetchSpecies(),
-        refetchPreferences(),
-      ])
-
-      setLocalSpeciesDialogOpen(false)
-    } catch (error) {
-      handleApiError(error, 'save local species', toast)
-    } finally {
-      setIsSavingLocalSpecies(false)
-    }
-  }
-
   // Afficher l'erreur si le chargement a échoué
   if (error) {
     return (
@@ -242,15 +186,9 @@ export function MySpecies() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
-          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
-        </div>
-        <Button onClick={handleAddLocalSpecies} variant="outline" size="sm">
-          <Plus className="w-4 h-4 me-2" />
-          {t('addLocal')}
-        </Button>
+      <div>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <TransferList
@@ -289,14 +227,7 @@ export function MySpecies() {
           <DialogHeader>
             <DialogTitle>{t('confirmDelete')}</DialogTitle>
             <DialogDescription>
-              {deletingItem && (
-                <>
-                  {deletingItem.metadata?.scope === 'local'
-                    ? t('confirmDeleteLocal', { name: deletingItem.name })
-                    : t('confirmDeleteGlobal', { name: deletingItem.name })
-                  }
-                </>
-              )}
+              {deletingItem && t('confirmDeleteGlobal', { name: deletingItem.name })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -317,14 +248,6 @@ export function MySpecies() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Dialog d'ajout d'espèce locale */}
-      <SpeciesLocalFormDialog
-        open={localSpeciesDialogOpen}
-        onOpenChange={setLocalSpeciesDialogOpen}
-        onSubmit={handleSubmitLocalSpecies}
-        loading={isSavingLocalSpecies}
-      />
     </div>
   )
 }

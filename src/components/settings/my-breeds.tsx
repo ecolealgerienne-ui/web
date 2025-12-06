@@ -282,7 +282,7 @@ export function MyBreeds() {
           <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
           <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
-        {activeSpeciesId && (
+        {speciesPreferences.length > 0 && (
           <Button onClick={handleAddLocalBreed} variant="outline" size="sm">
             <Plus className="w-4 h-4 me-2" />
             {t('addLocal')}
@@ -381,13 +381,12 @@ export function MyBreeds() {
       </Dialog>
 
       {/* Dialog d'ajout de race locale */}
-      {activeSpeciesId && (
+      {speciesPreferences.length > 0 && (
         <BreedLocalFormDialog
           open={localBreedDialogOpen}
           onOpenChange={setLocalBreedDialogOpen}
           onSubmit={handleSubmitLocalBreed}
-          speciesId={activeSpeciesId}
-          speciesName={activeSpeciesName}
+          speciesPreferences={speciesPreferences}
           loading={isSavingLocalBreed}
         />
       )}

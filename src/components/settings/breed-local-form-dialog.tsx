@@ -13,15 +13,22 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useTranslations } from 'next-intl'
 import { CreateBreedDto } from '@/lib/types/admin/breed'
+import { SpeciesPreference } from '@/lib/types/species-preference'
 
 interface BreedLocalFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (data: CreateBreedDto) => Promise<void>
-  speciesId: string
-  speciesName: string
+  speciesPreferences: SpeciesPreference[]
   loading?: boolean
 }
 
@@ -29,48 +36,57 @@ export function BreedLocalFormDialog({
   open,
   onOpenChange,
   onSubmit,
-  speciesId,
-  speciesName,
+  speciesPreferences,
   loading = false,
 }: BreedLocalFormDialogProps) {
   const t = useTranslations('settings.breeds.form')
   const tc = useTranslations('common')
 
   const [formData, setFormData] = useState({
-    code: '',
-    nameFr: '',
-    nameEn: '',
+    speciesId: '',
+    name: '',
     description: '',
   })
 
   // Réinitialiser le formulaire quand le dialog s'ouvre
   useEffect(() => {
     if (open) {
+      // Sélectionner la première espèce par défaut
+      const sortedPrefs = [...speciesPreferences].sort((a, b) => a.displayOrder - b.displayOrder)
       setFormData({
-        code: '',
-        nameFr: '',
-        nameEn: '',
+        speciesId: sortedPrefs[0]?.speciesId || '',
+        name: '',
         description: '',
       })
     }
-  }, [open])
+  }, [open, speciesPreferences])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Générer un code à partir du nom
+    const generatedCode = formData.name
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .substring(0, 10)
+
     const submitData: CreateBreedDto = {
-      code: formData.code.trim().toUpperCase(),
-      nameFr: formData.nameFr.trim(),
-      nameEn: formData.nameEn.trim() || formData.nameFr.trim(),
+      code: generatedCode || `LOCAL-${Date.now()}`,
+      nameFr: formData.name.trim(),
+      nameEn: formData.name.trim(),
       description: formData.description.trim() || undefined,
-      speciesId,
+      speciesId: formData.speciesId,
       isActive: true,
     }
 
     await onSubmit(submitData)
   }
 
-  const isValid = formData.code.trim() && formData.nameFr.trim()
+  const isValid = formData.speciesId && formData.name.trim()
+
+  // Trier les espèces par displayOrder
+  const sortedSpecies = [...speciesPreferences].sort((a, b) => a.displayOrder - b.displayOrder)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -78,50 +94,44 @@ export function BreedLocalFormDialog({
         <DialogHeader>
           <DialogTitle>{t('addTitle')}</DialogTitle>
           <DialogDescription>
-            {t('addDescription', { species: speciesName })}
+            {t('addDescriptionSimple')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Code */}
+          {/* Espèce */}
           <div className="space-y-2">
-            <Label htmlFor="code">
-              {t('code')} <span className="text-destructive">*</span>
+            <Label htmlFor="speciesId">
+              {t('species')} <span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="code"
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-              placeholder={t('codePlaceholder')}
-              maxLength={20}
-              required
-            />
+            <Select
+              value={formData.speciesId}
+              onValueChange={(value) => setFormData({ ...formData, speciesId: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('selectSpecies')} />
+              </SelectTrigger>
+              <SelectContent>
+                {sortedSpecies.map((pref) => (
+                  <SelectItem key={pref.speciesId} value={pref.speciesId}>
+                    {pref.species?.nameFr || pref.speciesId}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Nom FR */}
+          {/* Nom */}
           <div className="space-y-2">
-            <Label htmlFor="nameFr">
-              {t('nameFr')} <span className="text-destructive">*</span>
+            <Label htmlFor="name">
+              {t('name')} <span className="text-destructive">*</span>
             </Label>
             <Input
-              id="nameFr"
-              value={formData.nameFr}
-              onChange={(e) => setFormData({ ...formData, nameFr: e.target.value })}
-              placeholder={t('nameFrPlaceholder')}
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder={t('namePlaceholder')}
               required
-            />
-          </div>
-
-          {/* Nom EN */}
-          <div className="space-y-2">
-            <Label htmlFor="nameEn">
-              {t('nameEn')} <span className="text-muted-foreground text-xs">({tc('optional')})</span>
-            </Label>
-            <Input
-              id="nameEn"
-              value={formData.nameEn}
-              onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-              placeholder={t('nameEnPlaceholder')}
             />
           </div>
 
