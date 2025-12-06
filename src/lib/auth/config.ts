@@ -41,7 +41,7 @@ export const authConfig = {
  * En production, cet ID sera récupéré depuis le contexte utilisateur
  * après authentification.
  */
-export const TEMP_FARM_ID = '550e8400-e29b-41d4-a716-446655440000';
+export const TEMP_FARM_ID = '4ccd57de-a0ba-493c-b7dd-206aa50dabf4';
 
 // Utilisateur mock pour le mode développement
 export const mockUser = {
