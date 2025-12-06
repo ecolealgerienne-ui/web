@@ -101,6 +101,7 @@ export function MyMedications() {
   const {
     categories,
     loading: loadingCategories,
+    error: errorCategories,
   } = useProductCategories()
 
   // Charger les produits globaux depuis l'API
@@ -121,7 +122,17 @@ export function MyMedications() {
   } = useProductPreferences(user?.farmId)
 
   const loading = loadingCategories || loadingProducts || loadingPrefs
-  const error = errorProducts || errorPrefs
+  const error = errorProducts || errorPrefs || errorCategories
+
+  // Debug: Afficher dans la console ce qui est chargé
+  console.log('MyMedications - Debug:', {
+    categoriesCount: categories.length,
+    productsCount: globalProducts.length,
+    preferencesCount: preferences.length,
+    therapeuticFormsFound: globalProducts.map(p => p.therapeuticForm).filter(Boolean),
+    categoryIdsFound: globalProducts.map(p => p.categoryId).filter(Boolean),
+    errors: { errorProducts, errorPrefs, errorCategories },
+  })
 
   // Extraire les formes thérapeutiques uniques des produits
   const therapeuticForms = useMemo(() => {
