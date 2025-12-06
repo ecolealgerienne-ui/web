@@ -8,7 +8,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import { useUndo } from '@/lib/hooks/useUndo'
 import { useTranslations } from 'next-intl'
 import { useVeterinarianPreferences } from '@/lib/hooks/useVeterinarianPreferences'
-import { useAvailableVeterinarians } from '@/lib/hooks/useAvailableVeterinarians'
+import { useGlobalVeterinarians } from '@/lib/hooks/useGlobalVeterinarians'
 import { useAuth } from '@/contexts/auth-context'
 import { Veterinarian } from '@/lib/types/veterinarian'
 import { handleApiError } from '@/lib/utils/api-error-handler'
@@ -90,23 +90,21 @@ export function MyVeterinarians() {
     refetch: refetchPreferences,
   } = useVeterinarianPreferences(user?.farmId)
 
-  // Charger tous les vétérinaires disponibles pour cette ferme (liste de gauche)
-  // Endpoint retourne automatiquement : globaux + locaux de la ferme
+  // Charger tous les vétérinaires globaux (liste de gauche)
   const {
-    veterinarians,
+    veterinarians: globalVeterinarians,
     loading: loadingVets,
     error: errorVets,
     refetch: refetchVeterinarians,
-  } = useAvailableVeterinarians(user?.farmId)
+  } = useGlobalVeterinarians()
 
   const loading = loadingPrefs || loadingVets
   const error = errorPrefs || errorVets
 
-  // Convertir les vétérinaires disponibles en items de liste
-  // (globaux de la plateforme + locaux créés par le fermier)
+  // Convertir les vétérinaires globaux en items de liste (liste gauche)
   const availableItems = useMemo(() => {
-    return veterinarians.map(vetToTransferItem)
-  }, [veterinarians])
+    return globalVeterinarians.map(vetToTransferItem)
+  }, [globalVeterinarians])
 
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
@@ -153,9 +151,15 @@ export function MyVeterinarians() {
   }, [availableItems, filterRegion, filterSpecialty])
 
   const handleSelect = useCallback((item: TransferListItem) => {
+    // Vérifier si le vétérinaire existe déjà dans les préférences
+    const alreadyExists = selectedItems.some((selected) => selected.id === item.id)
+    if (alreadyExists) {
+      toast.warning(t('alreadyInList'), t('alreadyInListMessage', { name: item.name }))
+      return
+    }
     setSelectedItems((prev) => [...prev, item])
     setHasChanges(true)
-  }, [])
+  }, [selectedItems, toast, t])
 
   const handleDeselect = useCallback((itemId: string) => {
     const itemToRemove = selectedItems.find((item) => item.id === itemId)

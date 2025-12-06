@@ -525,6 +525,43 @@
     "data": {
       "title": "Données",
       "description": "Import/Export de données"
+    },
+    "veterinarians": {
+      "title": "Mes vétérinaires",
+      "subtitle": "Sélectionnez les vétérinaires que vous souhaitez associer à votre ferme",
+      "available": "Vétérinaires disponibles",
+      "selected": "Mes vétérinaires",
+      "searchPlaceholder": "Rechercher un vétérinaire...",
+      "emptySelected": "Aucun vétérinaire sélectionné",
+      "noVeterinarians": "Aucun vétérinaire disponible",
+      "loadError": "Erreur lors du chargement des vétérinaires",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences ont été enregistrées",
+      "alreadyInList": "Vétérinaire déjà ajouté",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de vétérinaires",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Voulez-vous vraiment supprimer {name} ? Ce vétérinaire local sera définitivement supprimé.",
+      "confirmDeleteGlobal": "Voulez-vous retirer {name} de votre liste ? Vous pourrez le réajouter plus tard.",
+      "deleteSuccess": "Vétérinaire supprimé avec succès",
+      "removedFromPreferences": "Vétérinaire retiré de vos préférences",
+      "filters": {
+        "allRegions": "Toutes les régions",
+        "allSpecialties": "Toutes les spécialités"
+      },
+      "specialties": {
+        "bovine": "Bovins",
+        "ovine": "Ovins",
+        "caprine": "Caprins",
+        "poultry": "Volailles",
+        "equine": "Équins",
+        "camelid": "Camélidés",
+        "general": "Généraliste",
+        "other": "Autre"
+      }
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
     }
   },
   "footer": {
