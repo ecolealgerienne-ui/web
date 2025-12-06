@@ -4,151 +4,208 @@ import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
 import { Save, AlertCircle } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTranslations } from 'next-intl'
-import { useMedicalProducts } from '@/lib/hooks/useMedicalProducts'
-import { MedicalProduct, CreateMedicalProductDto, MedicalProductCategory } from '@/lib/types/medical-product'
+import { useGlobalProducts } from '@/lib/hooks/useGlobalProducts'
+import { useProductCategories } from '@/lib/hooks/useProductCategories'
+import { useProductPreferences } from '@/lib/hooks/useProductPreferences'
+import { useAuth } from '@/contexts/auth-context'
+import { Product } from '@/lib/types/admin/product'
+import { ApiProductInPreference } from '@/lib/types/product-preference'
+import { handleApiError } from '@/lib/utils/api-error-handler'
+import { productPreferencesService } from '@/lib/services/product-preferences.service'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
-// Catégories de produits médicaux
-const CATEGORIES: { code: MedicalProductCategory | 'all'; key: string }[] = [
-  { code: 'all', key: 'all' },
-  { code: 'antiparasitic', key: 'antiparasitic' },
-  { code: 'antibiotic', key: 'antibiotic' },
-  { code: 'anti_inflammatory', key: 'anti_inflammatory' },
-  { code: 'vitamin_mineral', key: 'vitamin_mineral' },
-  { code: 'hormone', key: 'hormone' },
-  { code: 'antiseptic', key: 'antiseptic' },
-  { code: 'other', key: 'other' },
-]
+// Convertir un Product global en TransferListItem
+function productToTransferItem(product: Product): TransferListItem {
+  const parts = [
+    product.laboratoryName,
+    product.dosage,
+    product.therapeuticForm,
+  ].filter(Boolean)
 
-interface MyMedicationsProps {
-  initialSelectedIds?: string[]
-  onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
-}
-
-// Convertir un MedicalProduct API en TransferListItem
-function productToTransferItem(product: MedicalProduct): TransferListItem {
   return {
     id: product.id,
-    name: product.nameFr,
-    description: product.description || product.commercialName || '',
+    name: product.commercialName,
+    description: parts.join(' | '),
     metadata: {
-      category: product.category,
-      activeIngredient: product.activeIngredient,
-      manufacturer: product.manufacturer,
-      scope: product.scope,
+      code: product.code,
+      laboratoryName: product.laboratoryName,
+      therapeuticForm: product.therapeuticForm,
+      dosage: product.dosage,
+      scope: 'global',
     },
   }
 }
 
-export function MyMedications({ initialSelectedIds = [], onSave }: MyMedicationsProps) {
+// Convertir un ApiProductInPreference en TransferListItem
+function apiProductToTransferItem(product: ApiProductInPreference): TransferListItem {
+  const parts = [
+    product.laboratoryName,
+    product.dosage,
+    product.therapeuticForm,
+  ].filter(Boolean)
+
+  return {
+    id: product.id,
+    name: product.commercialName,
+    description: parts.join(' | '),
+    metadata: {
+      code: product.code,
+      laboratoryName: product.laboratoryName,
+      therapeuticForm: product.therapeuticForm,
+      dosage: product.dosage,
+      categoryId: product.categoryId,
+      scope: 'global',
+    },
+  }
+}
+
+export function MyMedications() {
   const t = useTranslations('settings.medications')
   const ta = useTranslations('settings.actions')
+  const tc = useTranslations('common')
   const toast = useToast()
+  const { user } = useAuth()
 
   // Filtre par catégorie
-  const [activeCategory, setActiveCategory] = useState<MedicalProductCategory | 'all'>('all')
+  const [activeCategoryId, setActiveCategoryId] = useState<string>('all')
 
-  // Charger les produits médicaux depuis l'API
-  const { medicalProducts, loading, error, createMedicalProduct } = useMedicalProducts({
-    isActive: true,
-  })
+  // Charger les catégories depuis l'API
+  const {
+    categories,
+    loading: loadingCategories,
+  } = useProductCategories()
 
-  // Convertir les produits API en items de transfert
+  // Charger les produits globaux depuis l'API
+  const {
+    products: globalProducts,
+    loading: loadingProducts,
+    error: errorProducts,
+    refetch: refetchProducts,
+  } = useGlobalProducts()
+
+  // Charger les préférences de produits pour cette ferme
+  const {
+    preferences,
+    loading: loadingPrefs,
+    error: errorPrefs,
+    savePreferences,
+    refetch: refetchPreferences,
+  } = useProductPreferences(user?.farmId)
+
+  const loading = loadingCategories || loadingProducts || loadingPrefs
+  const error = errorProducts || errorPrefs
+
+  // Convertir les produits globaux en items de liste
   const availableItems = useMemo(() => {
-    return medicalProducts.map(productToTransferItem)
-  }, [medicalProducts])
+    return globalProducts.map(productToTransferItem)
+  }, [globalProducts])
 
-  // Items sélectionnés
+  // Filtrer par catégorie (côté client)
+  const filteredAvailableItems = useMemo(() => {
+    if (activeCategoryId === 'all') return availableItems
+    // Note: Le filtrage par categoryId sera implémenté quand les produits auront ce champ
+    return availableItems
+  }, [availableItems, activeCategoryId])
+
+  // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Initialiser les sélections depuis initialSelectedIds
+  // Modal de confirmation de suppression
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Initialiser les sélections depuis les préférences
   useEffect(() => {
-    if (initialSelectedIds.length > 0 && medicalProducts.length > 0) {
-      const initialSelected = medicalProducts
-        .filter(p => initialSelectedIds.includes(p.id))
-        .map(productToTransferItem)
+    if (preferences.length > 0) {
+      const sortedPrefs = [...preferences].sort((a, b) => a.displayOrder - b.displayOrder)
+      const initialSelected = sortedPrefs
+        .map(pref => pref.product)
+        .filter(Boolean)
+        .map(apiProductToTransferItem)
       setSelectedItems(initialSelected)
     }
-  }, [initialSelectedIds, medicalProducts])
-
-  // Filtrer les items disponibles par catégorie
-  const filteredAvailableItems = useMemo(() => {
-    if (activeCategory === 'all') return availableItems
-    return availableItems.filter(item => {
-      const category = item.metadata?.category as string | undefined
-      return category === activeCategory
-    })
-  }, [availableItems, activeCategory])
+  }, [preferences])
 
   const handleSelect = useCallback((item: TransferListItem) => {
+    const alreadyExists = selectedItems.some((selected) => selected.id === item.id)
+    if (alreadyExists) {
+      toast.warning(t('alreadyInList'), t('alreadyInListMessage', { name: item.name }))
+      return
+    }
     setSelectedItems((prev) => [...prev, item])
     setHasChanges(true)
-  }, [])
+  }, [selectedItems, toast, t])
 
   const handleDeselect = useCallback((itemId: string) => {
-    setSelectedItems((prev) => prev.filter((item) => item.id !== itemId))
-    setHasChanges(true)
-  }, [])
+    const itemToRemove = selectedItems.find((item) => item.id === itemId)
+    if (!itemToRemove) return
 
-  const handleCreateLocal = useCallback(async (name: string) => {
+    setDeletingItem(itemToRemove)
+    setDeleteDialogOpen(true)
+  }, [selectedItems])
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deletingItem || !user?.farmId) return
+
+    setIsDeleting(true)
     try {
-      // Créer le produit via l'API
-      const createDto: CreateMedicalProductDto = {
-        nameFr: name,
-        nameEn: name,
-        nameAr: name,
-        description: t('localNote'),
-        isActive: true,
+      const preference = preferences.find(p => p.productId === deletingItem.id)
+
+      if (preference) {
+        await productPreferencesService.delete(user.farmId, preference.id)
+        toast.success(tc('messages.success'), t('removedFromPreferences'))
       }
 
-      const newProduct = await createMedicalProduct(createDto)
-      const newItem = productToTransferItem(newProduct)
-      newItem.isLocal = true
+      setSelectedItems((prev) => prev.filter((item) => item.id !== deletingItem.id))
 
-      setSelectedItems((prev) => [...prev, newItem])
-      setHasChanges(true)
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
-    } catch {
-      // Fallback: créer localement si l'API échoue
-      const newItem: TransferListItem = {
-        id: `local-med-${Date.now()}`,
-        name: name,
-        description: t('localNote'),
-        isLocal: true,
-      }
-      setSelectedItems((prev) => [...prev, newItem])
-      setHasChanges(true)
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
+      await Promise.all([
+        refetchProducts(),
+        refetchPreferences(),
+      ])
+
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (error) {
+      handleApiError(error, 'delete product preference', toast)
+    } finally {
+      setIsDeleting(false)
     }
-  }, [createMedicalProduct, toast, t])
+  }, [deletingItem, user?.farmId, preferences, toast, t, tc, refetchProducts, refetchPreferences])
 
   const handleSave = async () => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
     setIsSaving(true)
     try {
-      const localItems = selectedItems.filter((item) => item.isLocal)
       const selectedIds = selectedItems.map((item) => item.id)
-
-      if (onSave) {
-        await onSave(selectedIds, localItems)
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        console.log('Saved medications:', selectedIds)
-      }
+      await savePreferences(selectedIds)
 
       setHasChanges(false)
       toast.success(t('saved'), t('savedMessage'))
-    } catch {
-      toast.error(
-        t('saveFailed'),
-        t('saveFailedMessage'),
-        {
-          label: t('retry'),
-          onClick: handleSave,
-        }
-      )
+    } catch (error) {
+      handleApiError(error, 'save product preferences', toast)
     } finally {
       setIsSaving(false)
     }
@@ -170,20 +227,22 @@ export function MyMedications({ initialSelectedIds = [], onSave }: MyMedications
     )
   }
 
-  // Composant de filtres par catégorie
+  // Composant de filtres
   const categoryFilters = (
-    <div className="flex flex-wrap gap-1">
-      {CATEGORIES.map((cat) => (
-        <Button
-          key={cat.code}
-          variant={activeCategory === cat.code ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setActiveCategory(cat.code)}
-          className="h-7 text-xs"
-        >
-          {t(`categories.${cat.key}`)}
-        </Button>
-      ))}
+    <div className="flex items-center gap-2">
+      <Select value={activeCategoryId} onValueChange={setActiveCategoryId}>
+        <SelectTrigger className="w-[200px] h-8">
+          <SelectValue placeholder={t('filters.allCategories')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allCategories')}</SelectItem>
+          {categories.map((cat) => (
+            <SelectItem key={cat.id} value={cat.id}>
+              {cat.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 
@@ -199,18 +258,17 @@ export function MyMedications({ initialSelectedIds = [], onSave }: MyMedications
         selectedItems={selectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
-        onCreateLocal={handleCreateLocal}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
-        createLocalLabel={t('addLocal')}
         emptySelectedMessage={t('emptySelected')}
         emptyAvailableMessage={t('emptyAvailable')}
         isLoading={loading}
         filters={categoryFilters}
+        showCreateLocal={false}
       />
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
         <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
           {isSaving ? (
             <>
@@ -225,6 +283,34 @@ export function MyMedications({ initialSelectedIds = [], onSave }: MyMedications
           )}
         </Button>
       </div>
+
+      {/* Dialog de confirmation de suppression */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('confirmDelete')}</DialogTitle>
+            <DialogDescription>
+              {deletingItem && t('confirmDeleteMessage', { name: deletingItem.name })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              {tc('actions.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? tc('actions.deleting') : tc('actions.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
