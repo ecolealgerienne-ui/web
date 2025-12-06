@@ -3,18 +3,17 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save, AlertCircle, Plus } from 'lucide-react'
+import { Save, AlertCircle } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTranslations } from 'next-intl'
 import { useBreedPreferences } from '@/lib/hooks/useBreedPreferences'
 import { useGlobalBreeds } from '@/lib/hooks/useGlobalBreeds'
 import { useSpeciesPreferences } from '@/lib/hooks/useSpeciesPreferences'
 import { useAuth } from '@/contexts/auth-context'
-import { Breed, CreateBreedDto } from '@/lib/types/admin/breed'
+import { Breed } from '@/lib/types/admin/breed'
 import { ApiBreedInPreference } from '@/lib/types/breed-preference'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 import { breedPreferencesService } from '@/lib/services/breed-preferences.service'
-import { BreedLocalFormDialog } from './breed-local-form-dialog'
 import {
   Dialog,
   DialogContent,
@@ -112,10 +111,6 @@ export function MyBreeds() {
   const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Modal d'ajout de race locale
-  const [localBreedDialogOpen, setLocalBreedDialogOpen] = useState(false)
-  const [isSavingLocalBreed, setIsSavingLocalBreed] = useState(false)
-
   // Initialiser les sélections depuis les préférences quand l'espèce change
   useEffect(() => {
     if (activeSpeciesId && breedPreferences.length > 0) {
@@ -212,34 +207,6 @@ export function MyBreeds() {
     }
   }
 
-  const handleAddLocalBreed = () => {
-    setLocalBreedDialogOpen(true)
-  }
-
-  const handleSubmitLocalBreed = async (data: CreateBreedDto) => {
-    if (!user?.farmId) {
-      toast.error(tc('error.title'), tc('messages.error'))
-      return
-    }
-
-    setIsSavingLocalBreed(true)
-    try {
-      // TODO: Implémenter la création de race locale quand l'API sera disponible
-      toast.success(tc('messages.success'), t('form.createSuccess'))
-
-      await Promise.all([
-        refetchBreeds(),
-        refetchBreedPreferences(),
-      ])
-
-      setLocalBreedDialogOpen(false)
-    } catch (error) {
-      handleApiError(error, 'save local breed', toast)
-    } finally {
-      setIsSavingLocalBreed(false)
-    }
-  }
-
   // Si aucune espèce n'est sélectionnée
   if (!loadingSpeciesPrefs && speciesPreferences.length === 0) {
     return (
@@ -277,17 +244,9 @@ export function MyBreeds() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
-          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
-        </div>
-        {speciesPreferences.length > 0 && (
-          <Button onClick={handleAddLocalBreed} variant="outline" size="sm">
-            <Plus className="w-4 h-4 me-2" />
-            {t('addLocal')}
-          </Button>
-        )}
+      <div>
+        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       {/* Onglets par espèce */}
@@ -379,17 +338,6 @@ export function MyBreeds() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Dialog d'ajout de race locale */}
-      {speciesPreferences.length > 0 && (
-        <BreedLocalFormDialog
-          open={localBreedDialogOpen}
-          onOpenChange={setLocalBreedDialogOpen}
-          onSubmit={handleSubmitLocalBreed}
-          speciesPreferences={speciesPreferences}
-          loading={isSavingLocalBreed}
-        />
-      )}
     </div>
   )
 }
