@@ -95,17 +95,13 @@ class SpeciesPreferencesService {
         const speciesId = speciesIds[i]
 
         if (existingSpeciesIds.has(speciesId)) {
+          // L'espèce existe déjà, on la garde telle quelle
           const existingPref = existingPreferences.find(p => p.speciesId === speciesId)!
-          const updatedPref = await this.update(farmId, existingPref.id, {
-            displayOrder: i + 1,
-            isActive: true,
-          })
-          allPreferences.push(updatedPref)
+          allPreferences.push(existingPref)
         } else {
+          // Nouvelle espèce - l'API n'accepte que speciesId
           const newPref = await this.create(farmId, {
             speciesId: speciesId,
-            displayOrder: i + 1,
-            isActive: true,
           })
           allPreferences.push(newPref)
         }

@@ -2,7 +2,17 @@
  * Types pour les préférences d'espèces par ferme
  */
 
-import { Species } from './admin/species'
+/**
+ * Structure de l'espèce retournée par l'API dans les préférences
+ * (différente du type Species admin)
+ */
+export interface ApiSpeciesInPreference {
+  id: string
+  nameFr: string
+  nameEn?: string
+  nameAr?: string
+  icon?: string
+}
 
 export interface SpeciesPreference {
   id: string
@@ -12,13 +22,12 @@ export interface SpeciesPreference {
   isActive: boolean
   createdAt: string
   updatedAt: string
-  species: Species
+  species: ApiSpeciesInPreference
 }
 
 export interface CreateSpeciesPreferenceDto {
   speciesId: string
-  displayOrder?: number
-  isActive?: boolean
+  // Note: displayOrder et isActive sont gérés automatiquement par le backend
 }
 
 export interface UpdateSpeciesPreferenceDto {

@@ -10,6 +10,7 @@ import { useSpeciesPreferences } from '@/lib/hooks/useSpeciesPreferences'
 import { useGlobalSpecies } from '@/lib/hooks/useGlobalSpecies'
 import { useAuth } from '@/contexts/auth-context'
 import { Species, CreateSpeciesDto } from '@/lib/types/admin/species'
+import { ApiSpeciesInPreference } from '@/lib/types/species-preference'
 import { handleApiError } from '@/lib/utils/api-error-handler'
 import { speciesPreferencesService } from '@/lib/services/species-preferences.service'
 import { SpeciesLocalFormDialog } from './species-local-form-dialog'
@@ -22,7 +23,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 
-// Convertir une Species API en TransferListItem
+// Convertir une Species globale (mappée depuis l'API) en TransferListItem
 function speciesToTransferItem(species: Species): TransferListItem {
   return {
     id: species.id,
@@ -30,7 +31,20 @@ function speciesToTransferItem(species: Species): TransferListItem {
     description: species.description || species.code,
     metadata: {
       code: species.code,
-      scope: (species as any).scope || 'global',
+      scope: 'global',
+    },
+  }
+}
+
+// Convertir une ApiSpeciesInPreference (depuis les préférences) en TransferListItem
+function apiSpeciesToTransferItem(species: ApiSpeciesInPreference): TransferListItem {
+  return {
+    id: species.id,
+    name: species.nameFr, // Utiliser nameFr pour l'affichage
+    description: species.icon || species.id,
+    metadata: {
+      code: species.id.toUpperCase(),
+      scope: 'global',
     },
   }
 }
@@ -68,19 +82,15 @@ export function MySpecies() {
   }, [globalSpecies])
 
   // Liste combinée de toutes les espèces (globales + locales depuis préférences)
-  const allSpecies = useMemo(() => {
-    const speciesFromPrefs = preferences
-      .map(p => p.species)
-      .filter((s): s is Species => s !== null && s !== undefined)
-
-    // Combiner avec les globales, en évitant les doublons
-    const allSpecs = [...globalSpecies]
-    speciesFromPrefs.forEach(spec => {
-      if (!allSpecs.some(s => s.id === spec.id)) {
-        allSpecs.push(spec)
+  // Note: les espèces globales sont déjà mappées dans useGlobalSpecies
+  const allSpeciesIds = useMemo(() => {
+    const ids = new Set(globalSpecies.map(s => s.id))
+    preferences.forEach(p => {
+      if (p.species) {
+        ids.add(p.species.id)
       }
     })
-    return allSpecs
+    return ids
   }, [globalSpecies, preferences])
 
   // Items sélectionnés (initialisés depuis les préférences)
@@ -104,7 +114,7 @@ export function MySpecies() {
       const initialSelected = sortedPrefs
         .map(pref => pref.species)
         .filter(Boolean)
-        .map(speciesToTransferItem)
+        .map(apiSpeciesToTransferItem)
       setSelectedItems(initialSelected)
     }
   }, [preferences])
