@@ -1888,10 +1888,12 @@
     "status": {
       "alive": "Vivant",
       "sold": "Vendu",
+      "slaughtered": "Abattu",
       "dead": "Décédé",
       "missing": "Disparu"
     },
     "fields": {
+      "identification": "Identification",
       "identificationNumber": "N° d'identification",
       "name": "Nom",
       "speciesId": "Espèce",

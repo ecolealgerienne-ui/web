@@ -102,12 +102,14 @@ export default function AnimalsPage() {
     }
   };
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'success' | 'warning' => {
+  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'success' | 'warning' | 'secondary' => {
     switch (status) {
       case 'alive':
         return 'success';
       case 'sold':
         return 'warning';
+      case 'slaughtered':
+        return 'secondary';
       case 'dead':
         return 'destructive';
       case 'missing':
@@ -124,7 +126,7 @@ export default function AnimalsPage() {
       header: t('fields.identification'),
       sortable: true,
       render: (animal) => {
-        const displayId = animal.currentEid || animal.officialNumber || animal.visualId || animal.id.substring(0, 8);
+        const displayId = animal.officialNumber || animal.visualId || animal.currentEid || animal.id.substring(0, 8);
         return (
           <div>
             <div className="font-medium">{displayId}</div>
@@ -172,6 +174,7 @@ export default function AnimalsPage() {
         <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
         <SelectItem value="alive">{t('status.alive')}</SelectItem>
         <SelectItem value="sold">{t('status.sold')}</SelectItem>
+        <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
         <SelectItem value="dead">{t('status.dead')}</SelectItem>
       </SelectContent>
     </Select>
