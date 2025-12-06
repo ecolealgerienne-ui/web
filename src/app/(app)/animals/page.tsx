@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Search, Pill, Syringe, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useAnimals } from '@/lib/hooks/useAnimals';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
@@ -14,6 +12,7 @@ import { AnimalFormDialog } from '@/components/animals/animal-form-dialog';
 import { AnimalDetailDialog } from '@/components/animals/animal-detail-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,14 +59,12 @@ export default function AnimalsPage() {
     }
   };
 
-  const handleEdit = (animal: Animal, e?: React.MouseEvent) => {
-    e?.stopPropagation();
+  const handleEdit = (animal: Animal) => {
     setSelectedAnimal(animal);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (animal: Animal, e?: React.MouseEvent) => {
-    e?.stopPropagation();
+  const handleDelete = (animal: Animal) => {
     setAnimalToDelete(animal);
     setIsDeleteDialogOpen(true);
   };
@@ -120,191 +117,96 @@ export default function AnimalsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-        </div>
-        <div className="text-center py-12">{tc('messages.loading')}</div>
-      </div>
-    );
-  }
+  // Définition des colonnes du tableau
+  const columns: ColumnDef<Animal>[] = [
+    {
+      key: 'identification',
+      header: t('fields.identification'),
+      sortable: true,
+      render: (animal) => {
+        const displayId = animal.currentEid || animal.officialNumber || animal.visualId || animal.id.substring(0, 8);
+        return (
+          <div>
+            <div className="font-medium">{displayId}</div>
+            {animal.breed && (
+              <div className="text-sm text-muted-foreground">{animal.breed.name}</div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'sex',
+      header: t('fields.sex'),
+      sortable: true,
+      render: (animal) => t(`sex.${animal.sex}`),
+    },
+    {
+      key: 'birthDate',
+      header: t('fields.birthDate'),
+      sortable: true,
+      render: (animal) => animal.birthDate ? new Date(animal.birthDate).toLocaleDateString() : '-',
+    },
+    {
+      key: 'status',
+      header: t('fields.status'),
+      sortable: true,
+      render: (animal) => (
+        <Badge variant={getStatusBadgeVariant(animal.status)}>
+          {t(`status.${animal.status}`)}
+        </Badge>
+      ),
+    },
+  ];
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-        </div>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-destructive">
-              {tc('messages.loadError')}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Filtre personnalisé pour le statut
+  const statusFilterComponent = (
+    <Select
+      value={statusFilter}
+      onValueChange={(value) => setStatusFilter(value)}
+    >
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder={t('filters.allStatus')} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
+        <SelectItem value="alive">{t('status.alive')}</SelectItem>
+        <SelectItem value="sold">{t('status.sold')}</SelectItem>
+        <SelectItem value="dead">{t('status.dead')}</SelectItem>
+      </SelectContent>
+    </Select>
+  );
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-      </div>
-
-      {/* Filtres et actions */}
-      <div className="flex gap-4 items-center flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t('filters.search')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+      {/* Header avec bouton d'ajout */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
-
-        <Select
-          value={statusFilter}
-          onValueChange={(value) => setStatusFilter(value)}
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder={t('filters.allStatus')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
-            <SelectItem value="alive">{t('status.alive')}</SelectItem>
-            <SelectItem value="sold">{t('status.sold')}</SelectItem>
-            <SelectItem value="dead">{t('status.dead')}</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button onClick={handleAdd} className="ml-auto">
+        <Button onClick={handleAdd}>
           <Plus className="mr-2 h-4 w-4" />
           {t('newAnimal')}
         </Button>
       </div>
 
-      {/* Liste des animaux */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {t('title')} ({animals.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {animals.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              {t('noAnimals')}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {animals.map((animal) => {
-                const displayId = animal.currentEid || animal.officialNumber || animal.visualId || animal.id.substring(0, 8);
-                return (
-                  <div
-                    key={animal.id}
-                    className="p-4 border rounded-lg hover:bg-accent transition-colors cursor-pointer"
-                    onClick={() => handleViewDetail(animal)}
-                  >
-                    <div className="space-y-3">
-                      {/* Header */}
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-lg truncate">
-                            {displayId}
-                          </div>
-                          {animal.breed && (
-                            <div className="text-sm text-muted-foreground truncate">
-                              {animal.breed.name}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <Badge variant={getStatusBadgeVariant(animal.status)}>
-                            {t(`status.${animal.status}`)}
-                          </Badge>
-                        </div>
-                      </div>
-
-                    {/* Informations */}
-                    <div className="text-sm text-muted-foreground space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{t('fields.sex')}:</span>
-                        <span>{t(`sex.${animal.sex}`)}</span>
-                      </div>
-                      {animal.birthDate && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.birthDate')}:</span>
-                          <span>{new Date(animal.birthDate).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                      {animal.currentWeight && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.currentWeight')}:</span>
-                          <span>{animal.currentWeight} kg</span>
-                        </div>
-                      )}
-                      {animal.currentEid && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.currentEid')}:</span>
-                          <span>{animal.currentEid}</span>
-                        </div>
-                      )}
-                      {animal.officialNumber && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.officialNumber')}:</span>
-                          <span>{animal.officialNumber}</span>
-                        </div>
-                      )}
-                      {animal.visualId && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.visualId')}:</span>
-                          <span>{animal.visualId}</span>
-                        </div>
-                      )}
-                      {animal.notes && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{t('fields.notes')}:</span>
-                          <span className="text-xs italic line-clamp-2">{animal.notes}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-2 pt-2 border-t">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => handleEdit(animal, e)}
-                        className="flex-1"
-                      >
-                        <Edit2 className="mr-1 h-3 w-3" />
-                        {tc('actions.edit')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => handleDelete(animal, e)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* DataTable avec filtres intégrés */}
+      <DataTable<Animal>
+        data={animals}
+        columns={columns}
+        totalItems={animals.length}
+        loading={loading}
+        error={error}
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t('filters.search')}
+        onRowClick={handleViewDetail}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        emptyMessage={t('noAnimals')}
+        filters={statusFilterComponent}
+      />
 
       {/* Dialog de détail */}
       <AnimalDetailDialog

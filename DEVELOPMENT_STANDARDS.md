@@ -49,6 +49,12 @@
   - Ces composants sont dans `/src/components/admin/common/`
   - Voir section 7.2 pour documentation complète
 
+- ❌ **Ne jamais recréer les composants génériques transactionnels**
+  - **TOUJOURS** utiliser `DataTable<T>` de `/src/components/data/common/` pour les tableaux transactionnels
+  - **TOUJOURS** utiliser `Pagination` de `/src/components/data/common/` pour la pagination
+  - ⚠️ **NE PAS** mélanger composants admin et transactionnels (i18n différent)
+  - Voir section 7.3 pour documentation complète
+
 - ❌ **Ne jamais ignorer les types et patterns communs (Phase 1)**
   - **TOUJOURS** étendre `BaseEntity` pour toutes les entités admin
   - **TOUJOURS** utiliser `PaginatedResponse<T>` pour les listes paginées
@@ -2243,6 +2249,114 @@ error TS2551: Property 'name' does not exist on type 'Country'. Did you mean 'na
 **Pattern appliqué dans** :
 - `src/app/(app)/admin/therapeutic-indications/page.tsx` ✅
 - `src/components/admin/therapeutic-indications/TherapeuticIndicationFormDialog.tsx` ✅
+
+### 7.3 Composants Génériques Transactionnels (farm-scoped)
+
+⚠️ **IMPORTANT** : Ces composants sont DIFFÉRENTS des composants admin (section 7.2).
+
+**Différences clés :**
+| Aspect | Admin (`/components/admin/common/`) | Transactionnel (`/components/data/common/`) |
+|--------|-------------------------------------|---------------------------------------------|
+| i18n | `next-intl` (`useTranslations`) | `@/lib/i18n` (`useCommonTranslations`) |
+| Type base | `BaseEntity` | `{ id: string }` |
+| Soft delete | Supporté (badge, opacity) | Non supporté |
+| Scope | Référentiels globaux | Données farm-scoped |
+
+**Pour TOUTES les pages transactionnelles (animals, veterinarians, treatments, etc.)**, utiliser les composants de `/src/components/data/common/` :
+
+#### 7.3.1 DataTable<T> - Tableau Transactionnel
+
+```typescript
+import { DataTable, ColumnDef } from '@/components/data/common/DataTable'
+
+// Définir les colonnes
+const columns: ColumnDef<Animal>[] = [
+  {
+    key: 'identification',
+    header: t('fields.identification'),
+    sortable: true,
+    render: (animal) => (
+      <div>
+        <div className="font-medium">{animal.currentEid || animal.id}</div>
+        {animal.breed && (
+          <div className="text-sm text-muted-foreground">{animal.breed.name}</div>
+        )}
+      </div>
+    ),
+  },
+  {
+    key: 'status',
+    header: t('fields.status'),
+    sortable: true,
+    render: (animal) => (
+      <Badge variant={getStatusBadgeVariant(animal.status)}>
+        {t(`status.${animal.status}`)}
+      </Badge>
+    ),
+  },
+]
+
+// Utiliser le DataTable
+<DataTable<Animal>
+  data={animals}
+  columns={columns}
+  totalItems={animals.length}
+  loading={loading}
+  error={error}
+  searchValue={search}
+  onSearchChange={setSearch}
+  searchPlaceholder={t('filters.search')}
+  onRowClick={handleViewDetail}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+  emptyMessage={t('noAnimals')}
+  filters={statusFilterComponent}
+/>
+```
+
+**Features incluses :**
+- ✅ Pagination client ou serveur
+- ✅ Tri par colonne (asc/desc)
+- ✅ Recherche avec debounce
+- ✅ Actions (Edit/Delete/View/Custom)
+- ✅ Loading/error/empty states
+- ✅ Clic sur ligne pour détail
+- ✅ Filtres personnalisés (via prop `filters`)
+- ✅ Type-safe avec génériques
+
+**Props principales :**
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `data` | `T[]` | Données à afficher |
+| `columns` | `ColumnDef<T>[]` | Définition des colonnes |
+| `totalItems` | `number` | Total pour pagination |
+| `loading` | `boolean` | État de chargement |
+| `error` | `Error \| string \| null` | Erreur éventuelle |
+| `onRowClick` | `(item: T) => void` | Clic sur ligne (détail) |
+| `onEdit` | `(item: T) => void` | Action édition |
+| `onDelete` | `(item: T) => void` | Action suppression |
+| `onSearchChange` | `(value: string) => void` | Recherche |
+| `filters` | `React.ReactNode` | Filtres personnalisés |
+
+#### 7.3.2 Pagination - Contrôles Transactionnels
+
+```typescript
+import { Pagination } from '@/components/data/common/Pagination'
+
+<Pagination
+  currentPage={page}
+  totalPages={totalPages}
+  totalItems={total}
+  itemsPerPage={limit}
+  onPageChange={setPage}
+  onItemsPerPageChange={setLimit}
+/>
+```
+
+**Features identiques à l'admin** mais utilise `@/lib/i18n` pour les traductions.
+
+**⚠️ RÈGLE :** Pour les pages transactionnelles (`/app/(app)/animals`, `/app/(app)/veterinarians`, etc.), TOUJOURS utiliser les composants de `/components/data/common/`. Ne JAMAIS utiliser les composants admin.
 
 ---
 
