@@ -68,9 +68,13 @@ class TreatmentsService {
       if (filters?.search) params.append('search', filters.search);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<{ data: Treatment[] }>(url);
-      logger.info('Treatments fetched', { count: response.data?.length || 0 });
-      return response.data || [];
+      // apiClient dépasse automatiquement { success, data } -> data
+      const response = await apiClient.get<Treatment[] | { data: Treatment[] }>(url);
+
+      // Gérer les deux formats possibles de réponse
+      const treatments = Array.isArray(response) ? response : (response?.data || []);
+      logger.info('Treatments fetched', { count: treatments.length, filters });
+      return treatments;
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No treatments found (404)');

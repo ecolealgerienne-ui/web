@@ -20,6 +20,7 @@ import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { Treatment } from '@/lib/types/treatment';
 import { useTranslations } from '@/lib/i18n';
 import { useBreeds } from '@/lib/hooks/useBreeds';
+import { useSpecies } from '@/lib/hooks/useSpecies';
 import { treatmentsService } from '@/lib/services/treatments.service';
 import { Pill, Syringe } from 'lucide-react';
 
@@ -56,7 +57,8 @@ export function AnimalFormDialog({
   });
 
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('');
-  const { breeds } = useBreeds(selectedSpeciesId);
+  const { species, loading: loadingSpecies } = useSpecies();
+  const { breeds, loading: loadingBreeds } = useBreeds(selectedSpeciesId);
 
   // Care data (only for editing existing animals)
   const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
@@ -266,43 +268,53 @@ export function AnimalFormDialog({
                 <h3 className="text-sm font-medium border-b pb-2">Espèce et Race</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="speciesId">{t('fields.speciesId')}</Label>
-                    <Input
-                      id="speciesId"
+                    <Label htmlFor="speciesId">{t('fields.speciesId')} *</Label>
+                    <Select
                       value={formData.speciesId}
-                      onChange={(e) => {
-                        setFormData({ ...formData, speciesId: e.target.value, breedId: '' });
-                        setSelectedSpeciesId(e.target.value);
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, speciesId: value, breedId: '' });
+                        setSelectedSpeciesId(value);
                       }}
-                      placeholder="Ex: UUID de l'espèce"
-                    />
+                      disabled={loadingSpecies}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={loadingSpecies ? "Chargement..." : "Sélectionner une espèce"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {species.map((sp) => (
+                          <SelectItem key={sp.id} value={sp.id}>
+                            {sp.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="breedId">{t('fields.breedId')}</Label>
-                    {breeds.length > 0 ? (
-                      <Select
-                        value={formData.breedId}
-                        onValueChange={(value) => setFormData({ ...formData, breedId: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une race" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {breeds.map((breed) => (
-                            <SelectItem key={breed.id} value={breed.id}>
-                              {breed.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Input
-                        id="breedId"
-                        value={formData.breedId}
-                        onChange={(e) => setFormData({ ...formData, breedId: e.target.value })}
-                        placeholder="Ex: UUID de la race"
-                      />
-                    )}
+                    <Select
+                      value={formData.breedId}
+                      onValueChange={(value) => setFormData({ ...formData, breedId: value })}
+                      disabled={!selectedSpeciesId || loadingBreeds}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={
+                          !selectedSpeciesId
+                            ? "Sélectionner d'abord une espèce"
+                            : loadingBreeds
+                              ? "Chargement..."
+                              : breeds.length === 0
+                                ? "Aucune race disponible"
+                                : "Sélectionner une race"
+                        } />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {breeds.map((breed) => (
+                          <SelectItem key={breed.id} value={breed.id}>
+                            {breed.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
