@@ -102,7 +102,7 @@ export function AnimalDetailDialog({
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <DialogTitle className="text-2xl">
-                {animal.currentEid || animal.officialNumber || animal.visualId || animal.id}
+                {animal.officialNumber || animal.visualId || animal.currentEid || animal.id}
               </DialogTitle>
               <DialogDescription>
                 {animal.breed?.name && (
