@@ -2316,6 +2316,7 @@
       "farm": "Ferme",
       "generalSettings": "Paramètres généraux",
       "myVeterinarians": "Mes Vétérinaires",
+      "mySpecies": "Mes Espèces",
       "myBreeds": "Mes Races",
       "myVaccines": "Mes Vaccins",
       "myMedications": "Ma Pharmacie",
@@ -2370,6 +2371,39 @@
       "loadError": "Erreur lors du chargement des informations de la ferme",
       "updateSuccess": "Informations de la ferme mises à jour avec succès",
       "updateError": "Erreur lors de la mise à jour des informations de la ferme"
+    },
+    "species": {
+      "title": "Mes Espèces",
+      "subtitle": "Sélectionnez les espèces que vous élevez. Elles apparaîtront en priorité dans vos formulaires de saisie.",
+      "available": "Espèces disponibles",
+      "selected": "Mes espèces",
+      "searchPlaceholder": "Rechercher une espèce...",
+      "addLocal": "Ajouter une espèce locale",
+      "emptySelected": "Sélectionnez vos espèces",
+      "noSpecies": "Aucune espèce disponible",
+      "loadError": "Erreur lors du chargement des espèces",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos espèces ont été enregistrées",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Êtes-vous sûr de vouloir supprimer définitivement {name} ? Cette espèce locale sera supprimée et ne sera plus disponible.",
+      "confirmDeleteGlobal": "Êtes-vous sûr de vouloir retirer {name} de vos espèces ? Elle restera disponible dans la liste et pourra être ajoutée de nouveau.",
+      "deleteSuccess": "Espèce supprimée avec succès",
+      "removedFromPreferences": "Espèce retirée de votre liste",
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste d'espèces",
+      "form": {
+        "addTitle": "Ajouter une espèce locale",
+        "addDescription": "Ajoutez une espèce qui n'est pas dans la liste. Elle sera privée et visible uniquement par vous.",
+        "code": "Code",
+        "codePlaceholder": "Ex: BOV, OVI, CAP",
+        "name": "Nom",
+        "namePlaceholder": "Ex: Bovin, Ovin, Caprin",
+        "description": "Description",
+        "descriptionPlaceholder": "Description de l'espèce",
+        "addButton": "Ajouter l'espèce",
+        "localNote": "Cette espèce sera privée et visible uniquement par vous.",
+        "createSuccess": "Espèce locale créée avec succès"
+      }
     },
     "veterinarians": {
       "title": "Mes Vétérinaires",
@@ -2466,6 +2500,7 @@
       "addLocal": "Ajouter une race locale",
       "emptySelected": "Sélectionnez vos races",
       "emptyAvailable": "Aucune race disponible pour cette espèce",
+      "noSpeciesSelected": "Veuillez d'abord sélectionner vos espèces dans la section \"Mes Espèces\"",
       "localNote": "Cette race sera privée et visible uniquement par vous.",
       "removed": "retirée",
       "restored": "a été restaurée",
@@ -2481,6 +2516,11 @@
       "loadError": "Erreur lors du chargement des races",
       "totalSelected": "{count} race sélectionnée",
       "totalSelected_plural": "{count} races sélectionnées",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Êtes-vous sûr de vouloir retirer {name} de vos races ?",
+      "removedFromPreferences": "Race retirée de votre liste",
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de races",
       "species": {
         "bovine": "Bovins",
         "ovine": "Ovins",
@@ -2498,6 +2538,19 @@
         "work": "Travail",
         "sport": "Sport",
         "local": "Race locale"
+      },
+      "form": {
+        "addTitle": "Ajouter une race locale",
+        "addDescriptionSimple": "Ajoutez une race qui n'est pas dans la liste.",
+        "species": "Espèce",
+        "selectSpecies": "Sélectionner une espèce",
+        "name": "Nom",
+        "namePlaceholder": "Ex: Ouled Djellal, Hamra, Taadmit",
+        "description": "Description",
+        "descriptionPlaceholder": "Description de la race",
+        "addButton": "Ajouter la race",
+        "localNote": "Cette race sera privée et visible uniquement par vous.",
+        "createSuccess": "Race locale créée avec succès"
       }
     },
     "vaccines": {
