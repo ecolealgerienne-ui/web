@@ -70,7 +70,7 @@ class AlertPreferencesService {
     try {
       logger.info('Updating alert preference', { farmId, preferenceId, data })
 
-      const response = await apiClient.patch<AlertPreference>(
+      const response = await apiClient.put<AlertPreference>(
         `${this.getBasePath(farmId)}/${preferenceId}`,
         data
       )
