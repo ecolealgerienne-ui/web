@@ -52,7 +52,7 @@ interface UpdateVaccinationDto {
 
 class VaccinationsService {
   private getBasePath(): string {
-    return `/farms/${TEMP_FARM_ID}/vaccinations`;
+    return `/api/v1/farms/${TEMP_FARM_ID}/vaccinations`;
   }
 
   /**

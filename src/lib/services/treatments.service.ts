@@ -51,7 +51,7 @@ interface UpdateTreatmentDto {
 
 class TreatmentsService {
   private getBasePath(): string {
-    return `/farms/${TEMP_FARM_ID}/treatments`;
+    return `/api/v1/farms/${TEMP_FARM_ID}/treatments`;
   }
 
   /**

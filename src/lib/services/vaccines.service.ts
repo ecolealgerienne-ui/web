@@ -16,7 +16,7 @@ const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e';
 
 class VaccinesService {
   private getBasePath(): string {
-    return `/farms/${TEMP_FARM_ID}/vaccines`;
+    return `/api/v1/farms/${TEMP_FARM_ID}/vaccines`;
   }
 
   /**

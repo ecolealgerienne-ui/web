@@ -27,8 +27,8 @@ class MovementsService {
       if (toDate) params.append('toDate', toDate);
 
       const url = params.toString()
-        ? `/farms/${TEMP_FARM_ID}/movements/statistics?${params}`
-        : `/farms/${TEMP_FARM_ID}/movements/statistics`;
+        ? `/api/v1/farms/${TEMP_FARM_ID}/movements/statistics?${params}`
+        : `/api/v1/farms/${TEMP_FARM_ID}/movements/statistics`;
 
       const response = await apiClient.get<MovementStatistics>(url);
       logger.info('Movement statistics fetched', { fromDate, toDate, total: response.totalMovements });

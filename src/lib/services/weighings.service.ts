@@ -5,6 +5,10 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 
 class WeighingsService {
+  private getBasePath(): string {
+    return `/api/v1/farms/${TEMP_FARM_ID}/weights`;
+  }
+
   async getAll(filters?: Partial<WeighingFilters>): Promise<Weighing[]> {
     try {
       const params = new URLSearchParams();
@@ -15,7 +19,7 @@ class WeighingsService {
       if (filters?.dateFrom) params.append('fromDate', filters.dateFrom);
       if (filters?.dateTo) params.append('toDate', filters.dateTo);
 
-      const url = `/farms/${TEMP_FARM_ID}/weights${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = params.toString() ? `${this.getBasePath()}?${params.toString()}` : this.getBasePath();
       const response = await apiClient.get<{ data: Weighing[] }>(url);
       return response.data || [];
     } catch (error: any) {
@@ -29,7 +33,7 @@ class WeighingsService {
   }
 
   async getById(id: string): Promise<Weighing> {
-    const response = await apiClient.get<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weights/${id}`);
+    const response = await apiClient.get<{ data: Weighing }>(`${this.getBasePath()}/${id}`);
     return response.data;
   }
 
@@ -39,18 +43,18 @@ class WeighingsService {
   }
 
   async create(data: CreateWeighingDto): Promise<Weighing> {
-    const response = await apiClient.post<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weights`, data);
+    const response = await apiClient.post<{ data: Weighing }>(this.getBasePath(), data);
     return response.data;
   }
 
   async update(id: string, data: UpdateWeighingDto): Promise<Weighing> {
     // Use PUT as per API specs (not PATCH)
-    const response = await apiClient.put<{ data: Weighing }>(`/farms/${TEMP_FARM_ID}/weights/${id}`, data);
+    const response = await apiClient.put<{ data: Weighing }>(`${this.getBasePath()}/${id}`, data);
     return response.data;
   }
 
   async delete(id: string): Promise<void> {
-    await apiClient.delete(`/farms/${TEMP_FARM_ID}/weights/${id}`);
+    await apiClient.delete(`${this.getBasePath()}/${id}`);
   }
 }
 

@@ -10,7 +10,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 class FarmPreferencesService {
   private getBasePath() {
-    return `/farms/${TEMP_FARM_ID}/preferences`
+    return `/api/v1/farms/${TEMP_FARM_ID}/preferences`
   }
 
   async get(): Promise<FarmPreference | null> {

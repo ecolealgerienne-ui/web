@@ -10,7 +10,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 class AlertConfigurationsService {
   private getBasePath() {
-    return `/farms/${TEMP_FARM_ID}/alert-configurations`
+    return `/api/v1/farms/${TEMP_FARM_ID}/alert-configurations`
   }
 
   async getAll(filters?: { type?: AlertType; category?: string; enabled?: boolean }): Promise<AlertConfiguration[]> {

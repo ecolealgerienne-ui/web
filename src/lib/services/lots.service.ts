@@ -31,7 +31,7 @@ export interface UpdateLotDto extends Partial<CreateLotDto> {}
 
 class LotsService {
   private getBasePath(): string {
-    return `/farms/${TEMP_FARM_ID}/lots`;
+    return `/api/v1/farms/${TEMP_FARM_ID}/lots`;
   }
 
   async getAll(filters?: Partial<LotFilters>): Promise<Lot[]> {
