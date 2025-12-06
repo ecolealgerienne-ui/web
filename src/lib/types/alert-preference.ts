@@ -53,4 +53,6 @@ export interface CreateAlertPreferenceDto {
 export interface UpdateAlertPreferenceDto {
   displayOrder?: number
   isActive?: boolean
+  reminderDays?: number
+  version?: number
 }

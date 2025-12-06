@@ -3,7 +3,9 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save, AlertCircle, Bell } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Save, AlertCircle, Bell, Settings } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -146,6 +148,12 @@ export function MyAlerts() {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
   const [selectedAlert, setSelectedAlert] = useState<TransferListItem | null>(null)
 
+  // Modal de configuration
+  const [configureDialogOpen, setConfigureDialogOpen] = useState(false)
+  const [configuringItem, setConfiguringItem] = useState<TransferListItem | null>(null)
+  const [reminderDays, setReminderDays] = useState<number>(7)
+  const [isConfiguring, setIsConfiguring] = useState(false)
+
   // Initialiser les sélections depuis les préférences
   useEffect(() => {
     if (preferences.length > 0) {
@@ -180,6 +188,39 @@ export function MyAlerts() {
     setSelectedAlert(item)
     setDetailDialogOpen(true)
   }, [])
+
+  const handleConfigure = useCallback((item: TransferListItem) => {
+    // Trouver la préférence existante pour récupérer reminderDays
+    const preference = preferences.find(p => p.alertTemplateId === item.id)
+    setReminderDays(preference?.reminderDays ?? 7)
+    setConfiguringItem(item)
+    setConfigureDialogOpen(true)
+  }, [preferences])
+
+  const handleConfigureConfirm = useCallback(async () => {
+    if (!configuringItem || !user?.farmId) return
+
+    setIsConfiguring(true)
+    try {
+      const preference = preferences.find(p => p.alertTemplateId === configuringItem.id)
+
+      if (preference) {
+        await alertPreferencesService.update(user.farmId, preference.id, {
+          reminderDays,
+          version: preference.version,
+        })
+        toast.success(t('configure.saved'), t('configure.savedMessage'))
+        await refetchPreferences()
+      }
+
+      setConfigureDialogOpen(false)
+      setConfiguringItem(null)
+    } catch (error) {
+      handleApiError(error, 'configure alert preference', toast)
+    } finally {
+      setIsConfiguring(false)
+    }
+  }, [configuringItem, user?.farmId, preferences, reminderDays, toast, t, refetchPreferences])
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingItem || !user?.farmId) return
@@ -277,6 +318,8 @@ export function MyAlerts() {
         onSelect={handleSelect}
         onDeselect={handleDeselect}
         onItemClick={handleItemClick}
+        onConfigure={handleConfigure}
+        isConfigurable={(item) => preferences.some(p => p.alertTemplateId === item.id)}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
@@ -386,6 +429,51 @@ export function MyAlerts() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
               {tc('actions.close')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de configuration */}
+      <Dialog open={configureDialogOpen} onOpenChange={setConfigureDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5 text-primary" />
+              {t('configure.title')}
+            </DialogTitle>
+            <DialogDescription>
+              {configuringItem?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reminderDays">{t('configure.reminderDays')}</Label>
+              <Input
+                id="reminderDays"
+                type="number"
+                min={1}
+                max={365}
+                value={reminderDays}
+                onChange={(e) => setReminderDays(parseInt(e.target.value) || 7)}
+              />
+              <p className="text-sm text-muted-foreground">
+                {t('configure.reminderDaysDescription')}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfigureDialogOpen(false)}
+              disabled={isConfiguring}
+            >
+              {tc('actions.cancel')}
+            </Button>
+            <Button onClick={handleConfigureConfirm} disabled={isConfiguring}>
+              {isConfiguring ? tc('actions.saving') : tc('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -668,6 +668,13 @@
         "category": "Catégorie",
         "priority": "Priorité",
         "description": "Description"
+      },
+      "configure": {
+        "title": "Configurer l'alerte",
+        "reminderDays": "Jours de rappel",
+        "reminderDaysDescription": "Nombre de jours avant l'échéance pour recevoir le rappel",
+        "saved": "Configuration enregistrée",
+        "savedMessage": "La configuration de l'alerte a été enregistrée"
       }
     },
     "actions": {

@@ -8,6 +8,7 @@ import { logger } from '@/lib/utils/logger'
 import type {
   AlertPreference,
   CreateAlertPreferenceDto,
+  UpdateAlertPreferenceDto,
 } from '@/lib/types/alert-preference'
 
 class AlertPreferencesService {
@@ -58,6 +59,26 @@ class AlertPreferencesService {
       return response
     } catch (error) {
       logger.error('Failed to create alert preference', { error, farmId, data })
+      throw error
+    }
+  }
+
+  /**
+   * Met à jour une préférence d'alerte
+   */
+  async update(farmId: string, preferenceId: string, data: UpdateAlertPreferenceDto): Promise<AlertPreference> {
+    try {
+      logger.info('Updating alert preference', { farmId, preferenceId, data })
+
+      const response = await apiClient.patch<AlertPreference>(
+        `${this.getBasePath(farmId)}/${preferenceId}`,
+        data
+      )
+
+      logger.info('Alert preference updated', { farmId, id: response.id })
+      return response
+    } catch (error) {
+      logger.error('Failed to update alert preference', { error, farmId, preferenceId, data })
       throw error
     }
   }
