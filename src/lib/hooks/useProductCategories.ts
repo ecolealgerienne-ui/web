@@ -29,7 +29,7 @@ export function useProductCategories(): UseProductCategoriesResult {
       const response = await productCategoriesService.getAll({
         page: 1,
         limit: 100,
-        sortOrder: 'ASC',
+        sortOrder: 'asc',
       })
 
       // Filtrer pour ne garder que les catégories actives

@@ -53,7 +53,7 @@ export function useGlobalProducts(params?: UseGlobalProductsParams): UseGlobalPr
     } finally {
       setLoading(false)
     }
-  }, [params?.search, params?.therapeuticForm])
+  }, [params?.search])
 
   useEffect(() => {
     fetchProducts()
