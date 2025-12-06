@@ -54,14 +54,40 @@ class TreatmentsService {
     return `/api/v1/farms/${TEMP_FARM_ID}/treatments`;
   }
 
+  private getAnimalTreatmentsPath(animalId: string): string {
+    return `/api/v1/farms/${TEMP_FARM_ID}/animals/${animalId}/treatments`;
+  }
+
+  /**
+   * Récupère les traitements d'un animal spécifique
+   * @param animalId - ID de l'animal
+   */
+  async getByAnimalId(animalId: string): Promise<Treatment[]> {
+    try {
+      const url = this.getAnimalTreatmentsPath(animalId);
+      const response = await apiClient.get<Treatment[] | { data: Treatment[] }>(url);
+
+      // Gérer les deux formats possibles de réponse
+      const treatments = Array.isArray(response) ? response : (response?.data || []);
+      logger.info('Animal treatments fetched', { animalId, count: treatments.length });
+      return treatments;
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('No treatments found for animal (404)', { animalId });
+        return [];
+      }
+      logger.error('Failed to fetch animal treatments', { error, animalId });
+      throw error;
+    }
+  }
+
   /**
    * Récupère tous les traitements avec filtres
-   * @param filters - Filtres optionnels (animalId, status, dateFrom, dateTo)
+   * @param filters - Filtres optionnels (status, dateFrom, dateTo)
    */
-  async getAll(filters?: Partial<TreatmentFilters> & { animalId?: string }): Promise<Treatment[]> {
+  async getAll(filters?: Partial<TreatmentFilters>): Promise<Treatment[]> {
     try {
       const params = new URLSearchParams();
-      if (filters?.animalId) params.append('animalId', filters.animalId);
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.dateFrom) params.append('fromDate', filters.dateFrom);
       if (filters?.dateTo) params.append('toDate', filters.dateTo);

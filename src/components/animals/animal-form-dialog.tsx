@@ -102,17 +102,13 @@ export function AnimalFormDialog({
   const loadCareData = React.useCallback(async () => {
     if (!animal) return;
     setLoadingCare(true);
-    console.log('[Animal Form] Loading care data for animal:', animal.id);
     try {
       // Charger tous les treatments (inclus vaccinations avec type='vaccination')
-      const treatmentsData = await treatmentsService.getAll({ animalId: animal.id });
-      console.log('[Animal Form] All treatments loaded:', treatmentsData.length, treatmentsData);
+      const treatmentsData = await treatmentsService.getByAnimalId(animal.id);
 
       // Séparer les résultats
       const regularTreatments = treatmentsData.filter(t => t.type !== 'vaccination');
       const vaccinationTreatments = treatmentsData.filter(t => t.type === 'vaccination');
-      console.log('[Animal Form] Regular treatments:', regularTreatments.length);
-      console.log('[Animal Form] Vaccinations:', vaccinationTreatments.length);
 
       setAllTreatments(treatmentsData);
     } catch (error) {

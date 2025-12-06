@@ -48,18 +48,9 @@ export function AnimalDetailDialog({
   const loadCareData = React.useCallback(async () => {
     if (!animal) return;
     setLoadingCare(true);
-    console.log('[Animal Detail] Loading care data for animal:', animal.id);
     try {
       // Charger tous les treatments (inclus vaccinations avec type='vaccination')
-      const treatmentsData = await treatmentsService.getAll({ animalId: animal.id });
-      console.log('[Animal Detail] All treatments loaded:', treatmentsData.length, treatmentsData);
-
-      // Séparer les résultats
-      const regularTreatments = treatmentsData.filter(t => t.type !== 'vaccination');
-      const vaccinationTreatments = treatmentsData.filter(t => t.type === 'vaccination');
-      console.log('[Animal Detail] Regular treatments:', regularTreatments.length);
-      console.log('[Animal Detail] Vaccinations:', vaccinationTreatments.length);
-
+      const treatmentsData = await treatmentsService.getByAnimalId(animal.id);
       setAllTreatments(treatmentsData);
     } catch (error) {
       console.error('[Animal Detail] Failed to load care data:', error);
