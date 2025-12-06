@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useBreeds } from '@/lib/hooks/useBreeds';
 import { BreedFormDialog } from '@/components/data/breed-form-dialog';
 import { Breed } from '@/lib/types/breed';
 import { breedsService } from '@/lib/services/breeds.service';
@@ -27,7 +26,33 @@ export default function BreedsPage() {
   const toast = useToast();
   const [selectedSpecies, setSelectedSpecies] = useState('all');
   const [showInactive, setShowInactive] = useState(true);
-  const { breeds: allBreeds, loading, error, refetch } = useBreeds(selectedSpecies === 'all' ? undefined : selectedSpecies);
+
+  // État local pour les races (utilise breedsService directement)
+  const [allBreeds, setAllBreeds] = useState<Breed[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchBreeds = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const speciesId = selectedSpecies === 'all' ? undefined : selectedSpecies;
+      const breeds = await breedsService.getAll(speciesId);
+      setAllBreeds(breeds);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedSpecies]);
+
+  useEffect(() => {
+    fetchBreeds();
+  }, [fetchBreeds]);
+
+  const refetch = useCallback(() => {
+    fetchBreeds();
+  }, [fetchBreeds]);
 
   const speciesOptions = [
     { value: 'all', label: t('filters.allSpecies') },
