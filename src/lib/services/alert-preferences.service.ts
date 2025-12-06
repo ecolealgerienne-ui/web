@@ -1,6 +1,6 @@
 /**
  * Service API pour la gestion des préférences d'alertes d'une ferme
- * Endpoint: /api/v1/farms/{farmId}/alert-preferences
+ * Endpoint: /api/v1/farms/{farmId}/alert-template-preferences
  */
 
 import { apiClient } from '@/lib/api/client'
@@ -13,7 +13,7 @@ import type { PaginatedResponse } from '@/lib/types/common/api'
 
 class AlertPreferencesService {
   private getBasePath(farmId: string) {
-    return `/api/v1/farms/${farmId}/alert-preferences`
+    return `/api/v1/farms/${farmId}/alert-template-preferences`
   }
 
   /**

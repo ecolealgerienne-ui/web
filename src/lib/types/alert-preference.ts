@@ -1,6 +1,6 @@
 /**
  * Types pour les préférences d'alertes d'une ferme
- * Endpoint: /api/v1/farms/{farmId}/alert-preferences
+ * Endpoint: /api/v1/farms/{farmId}/alert-template-preferences
  */
 
 import type { AlertTemplate } from './admin/alert-template'
@@ -37,10 +37,10 @@ export interface AlertPreference {
 
 /**
  * DTO pour créer une préférence d'alerte
- * Note: Envoyer uniquement alertTemplateId
  */
 export interface CreateAlertPreferenceDto {
   alertTemplateId: string
+  reminderDays?: number
 }
 
 /**
