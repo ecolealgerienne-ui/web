@@ -20,7 +20,8 @@
       "active": "Actif",
       "inactive": "Inactif",
       "disabled": "Désactivé",
-      "enabled": "Activé"
+      "enabled": "Activé",
+      "deleted": "Supprimé"
     },
     "messages": {
       "success": "Succès",
@@ -31,7 +32,8 @@
       "loading": "Chargement en cours...",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
       "actionIrreversible": "Cette action est irréversible.",
-      "loadError": "Erreur lors du chargement des données"
+      "loadError": "Erreur lors du chargement des données",
+      "selectedCount": "{count} sélectionné(s)"
     },
     "fields": {
       "name": "Nom",
@@ -40,7 +42,62 @@
       "isActive": "Actif",
       "createdAt": "Créé le",
       "updatedAt": "Modifié le",
+      "deletedAt": "Supprimé le",
+      "metadata": "Métadonnées",
       "required": "Requis"
+    },
+    "error": {
+      "title": "Erreur",
+      "validation": "Erreur de validation",
+      "unauthorized": "Non authentifié",
+      "forbidden": "Accès refusé",
+      "notFound": "Ressource non trouvée",
+      "timeout": "Délai d'attente dépassé",
+      "conflict": "Conflit détecté",
+      "versionConflict": "Conflit de version",
+      "hasDependencies": "Suppression impossible",
+      "tooManyRequests": "Trop de requêtes",
+      "serverError": "Erreur serveur",
+      "network": "Erreur réseau",
+      "unknown": "Erreur inconnue"
+    },
+    "pagination": {
+      "of": "sur",
+      "items": "éléments",
+      "itemsPerPage": "Par page",
+      "page": "Page",
+      "firstPage": "Première page",
+      "previousPage": "Page précédente",
+      "nextPage": "Page suivante",
+      "lastPage": "Dernière page",
+      "totalItems": "{count, plural, =0 {Aucun élément} one {# élément} other {# éléments}}"
+    },
+    "table": {
+      "actions": "Actions",
+      "noResults": "Aucun résultat trouvé",
+      "loading": "Chargement...",
+      "cannotDelete": "Impossible de supprimer",
+      "isUsedBy": "car il est utilisé par",
+      "mustDeleteDependencies": "Vous devez d'abord supprimer ces dépendances.",
+      "confirmDeleteItem": "Voulez-vous vraiment supprimer"
+    },
+    "sections": {
+      "mainInfo": "Informations principales",
+      "basicInfo": "Informations de base",
+      "additionalInfo": "Informations complémentaires",
+      "options": "Options"
+    },
+    "placeholders": {
+      "select": "Sélectionner",
+      "optional": "Optionnel",
+      "name": "Saisir un nom",
+      "description": "Saisir une description"
+    },
+    "loading": "Chargement...",
+    "admin": {
+      "products": {
+        "subtitle": "Gestion du catalogue des produits vétérinaires"
+      }
     }
   },
   "header": {
@@ -73,6 +130,21 @@
       "preferences": "Préférences",
       "alerts": "Alertes",
       "farms": "Fermes"
+    },
+    "admin": {
+      "title": "Administration",
+      "activeSubstances": "Substances Actives",
+      "productCategories": "Catégories de Produits",
+      "units": "Unités de Mesure",
+      "administrationRoutes": "Voies d'Administration",
+      "species": "Espèces",
+      "breeds": "Races",
+      "ageCategories": "Catégories d'Âge",
+      "countries": "Pays",
+      "veterinarians": "Vétérinaires",
+      "nationalCampaigns": "Campagnes Nationales",
+      "alertTemplates": "Modèles d'Alertes",
+      "products": "Produits Vétérinaires"
     }
   },
   "breeds": {
@@ -211,6 +283,955 @@
       "updateError": "Erreur lors de la mise à jour du médicament",
       "deleteError": "Erreur lors de la suppression du médicament",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer le médicament {name} ?"
+    }
+  },
+  "activeSubstance": {
+    "title": {
+      "singular": "Substance Active",
+      "plural": "Substances Actives"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Nom International (DCI)",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "actions": {
+      "create": "Créer une substance active",
+      "edit": "Modifier la substance active",
+      "delete": "Supprimer la substance active",
+      "restore": "Restaurer la substance active"
+    },
+    "messages": {
+      "created": "Substance active créée avec succès",
+      "updated": "Substance active mise à jour avec succès",
+      "deleted": "Substance active supprimée avec succès",
+      "restored": "Substance active restaurée avec succès",
+      "createError": "Erreur lors de la création de la substance active",
+      "updateError": "Erreur lors de la mise à jour de la substance active",
+      "deleteError": "Erreur lors de la suppression de la substance active",
+      "confirmDelete": "Voulez-vous vraiment supprimer la substance active «{name}» ?",
+      "noResults": "Aucune substance active trouvée"
+    }
+  },
+  "product": {
+    "title": {
+      "singular": "Produit Vétérinaire",
+      "plural": "Produits Vétérinaires"
+    },
+    "fields": {
+      "code": "Code Produit",
+      "commercialName": "Nom Commercial",
+      "laboratoryName": "Laboratoire",
+      "therapeuticForm": "Forme Thérapeutique",
+      "dosage": "Dosage",
+      "packaging": "Conditionnement",
+      "activeSubstances": "Substances Actives",
+      "description": "Description",
+      "usageInstructions": "Instructions d'Utilisation",
+      "contraindications": "Contre-indications",
+      "storageConditions": "Conditions de Stockage",
+      "withdrawalPeriodMeat": "Délai d'attente Viande",
+      "withdrawalPeriodMilk": "Délai d'attente Lait",
+      "days": "jours",
+      "isVeterinaryPrescriptionRequired": "Prescription Vétérinaire Obligatoire",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code produit est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "commercialName": {
+        "required": "Le nom commercial est requis",
+        "maxLength": "Le nom commercial ne doit pas dépasser 200 caractères"
+      },
+      "laboratoryName": {
+        "required": "Le nom du laboratoire est requis",
+        "maxLength": "Le nom du laboratoire ne doit pas dépasser 200 caractères"
+      },
+      "therapeuticForm": {
+        "required": "La forme thérapeutique est requise",
+        "maxLength": "La forme thérapeutique ne doit pas dépasser 100 caractères"
+      },
+      "dosage": {
+        "required": "Le dosage est requis",
+        "maxLength": "Le dosage ne doit pas dépasser 100 caractères"
+      },
+      "packaging": {
+        "required": "Le conditionnement est requis",
+        "maxLength": "Le conditionnement ne doit pas dépasser 200 caractères"
+      },
+      "activeSubstanceIds": {
+        "required": "Au moins une substance active est requise",
+        "maxLength": "Maximum 10 substances actives",
+        "invalidUuid": "ID de substance active invalide"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 2000 caractères"
+      },
+      "usageInstructions": {
+        "maxLength": "Les instructions ne doivent pas dépasser 2000 caractères"
+      },
+      "contraindications": {
+        "maxLength": "Les contre-indications ne doivent pas dépasser 1000 caractères"
+      },
+      "storageConditions": {
+        "maxLength": "Les conditions de stockage ne doivent pas dépasser 500 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      },
+      "noChanges": "Aucune modification détectée"
+    },
+    "actions": {
+      "create": "Créer un produit",
+      "edit": "Modifier le produit",
+      "delete": "Supprimer le produit",
+      "restore": "Restaurer le produit",
+      "selectSubstances": "Sélectionner les substances actives"
+    },
+    "messages": {
+      "created": "Produit créé avec succès",
+      "updated": "Produit mis à jour avec succès",
+      "deleted": "Produit supprimé avec succès",
+      "restored": "Produit restauré avec succès",
+      "createError": "Erreur lors de la création du produit",
+      "updateError": "Erreur lors de la mise à jour du produit",
+      "deleteError": "Erreur lors de la suppression du produit",
+      "confirmDelete": "Voulez-vous vraiment supprimer le produit «{name}» ?",
+      "noResults": "Aucun produit trouvé"
+    },
+    "therapeuticForms": {
+      "injectable": "Injectable",
+      "oral": "Oral",
+      "topical": "Topique",
+      "intramammary": "Intramammaire",
+      "pour-on": "Pour-On",
+      "bolus": "Bolus",
+      "powder": "Poudre",
+      "suspension": "Suspension",
+      "tablet": "Comprimé"
+    }
+  },
+  "productCategory": {
+    "title": {
+      "singular": "Catégorie de Produit",
+      "plural": "Catégories de Produits"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "actions": {
+      "create": "Créer une catégorie",
+      "edit": "Modifier la catégorie",
+      "delete": "Supprimer la catégorie",
+      "restore": "Restaurer la catégorie"
+    },
+    "messages": {
+      "created": "Catégorie créée avec succès",
+      "updated": "Catégorie mise à jour avec succès",
+      "deleted": "Catégorie supprimée avec succès",
+      "restored": "Catégorie restaurée avec succès",
+      "createError": "Erreur lors de la création de la catégorie",
+      "updateError": "Erreur lors de la mise à jour de la catégorie",
+      "deleteError": "Erreur lors de la suppression de la catégorie",
+      "confirmDelete": "Voulez-vous vraiment supprimer la catégorie «{name}» ?",
+      "noResults": "Aucune catégorie trouvée"
+    }
+  },
+  "unit": {
+    "title": {
+      "singular": "Unité de Mesure",
+      "plural": "Unités de Mesure"
+    },
+    "subtitle": "Gestion des unités de mesure (poids, volume, concentration)",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "symbol": "Symbole",
+      "type": "Type",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "types": {
+      "WEIGHT": "Poids",
+      "VOLUME": "Volume",
+      "CONCENTRATION": "Concentration"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "symbol": {
+        "required": "Le symbole est requis",
+        "maxLength": "Le symbole ne doit pas dépasser 20 caractères"
+      },
+      "type": {
+        "invalid": "Type invalide"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "MG, ML, KG...",
+      "name": "Milligramme, Millilitre...",
+      "symbol": "mg, ml, kg..."
+    },
+    "actions": {
+      "create": "Créer une unité",
+      "edit": "Modifier l'unité",
+      "delete": "Supprimer l'unité",
+      "restore": "Restaurer l'unité"
+    },
+    "search": {
+      "placeholder": "Rechercher une unité..."
+    },
+    "messages": {
+      "created": "Unité créée avec succès",
+      "updated": "Unité mise à jour avec succès",
+      "deleted": "Unité supprimée avec succès",
+      "restored": "Unité restaurée avec succès",
+      "noResults": "Aucune unité trouvée"
+    }
+  },
+  "species": {
+    "title": {
+      "singular": "Espèce",
+      "plural": "Espèces"
+    },
+    "subtitle": "Gestion des espèces animales (bovins, ovins, caprins, etc.)",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "BOV, OVI, CAP...",
+      "name": "Bovin, Ovin, Caprin...",
+      "description": "Description de l'espèce..."
+    },
+    "actions": {
+      "create": "Créer une espèce",
+      "edit": "Modifier l'espèce",
+      "delete": "Supprimer l'espèce",
+      "restore": "Restaurer l'espèce"
+    },
+    "search": {
+      "placeholder": "Rechercher une espèce..."
+    },
+    "messages": {
+      "created": "Espèce créée avec succès",
+      "updated": "Espèce mise à jour avec succès",
+      "deleted": "Espèce supprimée avec succès",
+      "restored": "Espèce restaurée avec succès",
+      "noResults": "Aucune espèce trouvée"
+    }
+  },
+  "country": {
+    "title": {
+      "singular": "Pays",
+      "plural": "Pays"
+    },
+    "subtitle": "Gestion du référentiel géographique des pays",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "isoCode2": "Code ISO 2",
+      "isoCode3": "Code ISO 3",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom en anglais est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom en arabe est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "isoCode2": {
+        "required": "Le code ISO 2 est requis",
+        "length": "Le code ISO 2 doit contenir exactement 2 caractères",
+        "pattern": "Le code ISO 2 doit contenir uniquement des lettres majuscules"
+      },
+      "isoCode3": {
+        "required": "Le code ISO 3 est requis",
+        "length": "Le code ISO 3 doit contenir exactement 3 caractères",
+        "pattern": "Le code ISO 3 doit contenir uniquement des lettres majuscules"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "DZA, FRA, MAR...",
+      "nameFr": "Algérie, France, Maroc...",
+      "nameEn": "Algeria, France, Morocco...",
+      "nameAr": "الجزائر، فرنسا، المغرب...",
+      "isoCode2": "DZ, FR, MA...",
+      "isoCode3": "DZA, FRA, MAR..."
+    },
+    "actions": {
+      "create": "Créer un pays",
+      "edit": "Modifier le pays",
+      "delete": "Supprimer le pays",
+      "restore": "Restaurer le pays"
+    },
+    "search": {
+      "placeholder": "Rechercher un pays..."
+    },
+    "messages": {
+      "created": "Pays créé avec succès",
+      "updated": "Pays mis à jour avec succès",
+      "deleted": "Pays supprimé avec succès",
+      "restored": "Pays restauré avec succès",
+      "noResults": "Aucun pays trouvé"
+    }
+  },
+  "ageCategory": {
+    "title": {
+      "singular": "Catégorie d'Âge",
+      "plural": "Catégories d'Âge"
+    },
+    "subtitle": "Gestion des catégories d'âge par espèce animale",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "speciesId": "Espèce",
+      "ageMinDays": "Âge minimum (jours)",
+      "ageMaxDays": "Âge maximum (jours)",
+      "ageRange": "Tranche d'âge",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif",
+      "days": "jours",
+      "noLimit": "Sans limite"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom en anglais est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "maxLength": "Le nom en arabe ne doit pas dépasser 200 caractères"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "ageMinDays": {
+        "required": "L'âge minimum est requis",
+        "integer": "L'âge minimum doit être un nombre entier",
+        "min": "L'âge minimum doit être supérieur ou égal à 0"
+      },
+      "ageMaxDays": {
+        "integer": "L'âge maximum doit être un nombre entier",
+        "min": "L'âge maximum doit être supérieur ou égal à 0",
+        "greaterThanMin": "L'âge maximum doit être supérieur à l'âge minimum"
+      },
+      "displayOrder": {
+        "integer": "L'ordre d'affichage doit être un nombre entier",
+        "min": "L'ordre d'affichage doit être supérieur ou égal à 0"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "VEAU, ADULTE, SENIOR...",
+      "nameFr": "Veau, Adulte, Senior...",
+      "nameEn": "Calf, Adult, Senior...",
+      "nameAr": "عجل، بالغ، كبير السن...",
+      "selectSpecies": "Sélectionner une espèce",
+      "ageMaxDays": "Laisser vide pour sans limite"
+    },
+    "actions": {
+      "create": "Créer une catégorie d'âge",
+      "edit": "Modifier la catégorie d'âge",
+      "delete": "Supprimer la catégorie d'âge",
+      "restore": "Restaurer la catégorie d'âge"
+    },
+    "filters": {
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces"
+    },
+    "search": {
+      "placeholder": "Rechercher une catégorie d'âge..."
+    },
+    "messages": {
+      "created": "Catégorie d'âge créée avec succès",
+      "updated": "Catégorie d'âge mise à jour avec succès",
+      "deleted": "Catégorie d'âge supprimée avec succès",
+      "restored": "Catégorie d'âge restaurée avec succès",
+      "noResults": "Aucune catégorie d'âge trouvée",
+      "createError": "Le code existe déjà ou une erreur s'est produite",
+      "updateError": "Conflit de version ou erreur lors de la mise à jour",
+      "deleteError": "Impossible de supprimer : la catégorie est utilisée"
+    }
+  },
+  "breed": {
+    "title": "Races",
+    "description": "Gestion des races par espèce animale",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "nameAr": "Nom (Arabe)",
+      "species": "Espèce",
+      "description": "Description",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom en anglais est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "maxLength": "Le nom en arabe ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "displayOrder": {
+        "integer": "L'ordre d'affichage doit être un nombre entier",
+        "min": "L'ordre d'affichage doit être supérieur ou égal à 0"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer une race",
+      "editTitle": "Modifier la race",
+      "codePlaceholder": "PER, SIA, HOL...",
+      "nameFrPlaceholder": "Persan, Siamois, Holstein...",
+      "nameEnPlaceholder": "Persian, Siamese, Holstein...",
+      "nameArPlaceholder": "فارسي، سيامي، هولشتاين...",
+      "descriptionPlaceholder": "Caractéristiques, origines...",
+      "displayOrderPlaceholder": "Ex: 1, 2, 3...",
+      "selectSpecies": "Sélectionner une espèce"
+    },
+    "actions": {
+      "create": "Créer une race",
+      "edit": "Modifier la race",
+      "delete": "Supprimer la race",
+      "restore": "Restaurer la race"
+    },
+    "filters": {
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces"
+    },
+    "search": {
+      "placeholder": "Rechercher une race..."
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "messages": {
+      "createSuccess": "Race créée avec succès",
+      "updateSuccess": "Race mise à jour avec succès",
+      "deleteSuccess": "Race supprimée avec succès",
+      "restoreSuccess": "Race restaurée avec succès",
+      "noResults": "Aucune race trouvée",
+      "createError": "Le code existe déjà ou une erreur s'est produite",
+      "updateError": "Conflit de version ou erreur lors de la mise à jour",
+      "deleteError": "Impossible de supprimer : la race est utilisée"
+    },
+    "detail": {
+      "title": "Détails de la race"
+    }
+  },
+  "administrationRoute": {
+    "title": {
+      "singular": "Voie d'Administration",
+      "plural": "Voies d'Administration"
+    },
+    "subtitle": "Gestion des voies d'administration des produits vétérinaires",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "name": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "ORAL, SC, IM, IV...",
+      "name": "Voie orale, Injection sous-cutanée...",
+      "description": "Description de la voie d'administration..."
+    },
+    "actions": {
+      "create": "Créer une voie d'administration",
+      "edit": "Modifier la voie d'administration",
+      "delete": "Supprimer la voie d'administration",
+      "restore": "Restaurer la voie d'administration"
+    },
+    "search": {
+      "placeholder": "Rechercher une voie d'administration..."
+    },
+    "messages": {
+      "created": "Voie d'administration créée avec succès",
+      "updated": "Voie d'administration mise à jour avec succès",
+      "deleted": "Voie d'administration supprimée avec succès",
+      "restored": "Voie d'administration restaurée avec succès",
+      "noResults": "Aucune voie d'administration trouvée"
+    }
+  },
+  "veterinarian": {
+    "title": {
+      "singular": "Vétérinaire",
+      "plural": "Vétérinaires"
+    },
+    "subtitle": "Gestion du catalogue des vétérinaires professionnels",
+    "fields": {
+      "code": "Code",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "fullName": "Nom complet",
+      "licenseNumber": "Numéro de licence",
+      "specialties": "Spécialités",
+      "clinic": "Clinique",
+      "scope": "Portée",
+      "department": "Département",
+      "isAvailable": "Disponible",
+      "emergencyService": "Service d'urgence",
+      "contactInfo": "Coordonnées",
+      "phone": "Téléphone",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Adresse",
+      "city": "Ville",
+      "postalCode": "Code postal",
+      "country": "Pays",
+      "isActive": "Actif"
+    },
+    "scope": {
+      "global": "Global",
+      "local": "Local"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "firstName": {
+        "required": "Le prénom est requis",
+        "maxLength": "Le prénom ne doit pas dépasser 100 caractères"
+      },
+      "lastName": {
+        "required": "Le nom est requis",
+        "maxLength": "Le nom ne doit pas dépasser 100 caractères"
+      },
+      "licenseNumber": {
+        "required": "Le numéro de licence est requis",
+        "maxLength": "Le numéro de licence ne doit pas dépasser 50 caractères",
+        "pattern": "Le numéro de licence doit contenir uniquement des lettres majuscules, chiffres et tirets"
+      },
+      "specialties": {
+        "required": "Au moins une spécialité est requise",
+        "maxItems": "Vous ne pouvez pas ajouter plus de 10 spécialités",
+        "item": {
+          "required": "La spécialité ne peut pas être vide",
+          "maxLength": "La spécialité ne doit pas dépasser 100 caractères"
+        }
+      },
+      "clinic": {
+        "maxLength": "Le nom de la clinique ne doit pas dépasser 200 caractères"
+      },
+      "scope": {
+        "invalid": "La portée doit être 'global' ou 'local'"
+      },
+      "department": {
+        "maxLength": "Le département ne doit pas dépasser 10 caractères"
+      },
+      "contactInfo": {
+        "phone": {
+          "required": "Le numéro de téléphone est requis",
+          "maxLength": "Le numéro de téléphone ne doit pas dépasser 20 caractères",
+          "pattern": "Le numéro de téléphone contient des caractères invalides"
+        },
+        "mobile": {
+          "maxLength": "Le numéro mobile ne doit pas dépasser 20 caractères",
+          "pattern": "Le numéro mobile contient des caractères invalides"
+        },
+        "email": {
+          "invalid": "L'adresse email est invalide",
+          "maxLength": "L'adresse email ne doit pas dépasser 100 caractères"
+        },
+        "address": {
+          "maxLength": "L'adresse ne doit pas dépasser 200 caractères"
+        },
+        "city": {
+          "maxLength": "La ville ne doit pas dépasser 100 caractères"
+        },
+        "postalCode": {
+          "maxLength": "Le code postal ne doit pas dépasser 20 caractères"
+        },
+        "country": {
+          "maxLength": "Le pays ne doit pas dépasser 100 caractères"
+        }
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "VET001, VET-DZ-123...",
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "licenseNumber": "VET-FR-12345",
+      "specialties": "Chirurgie, Dermatologie...",
+      "clinic": "Clinique Vétérinaire Centrale",
+      "scope": "Sélectionnez la portée",
+      "department": "75, 16, DZ-16...",
+      "phone": "+33 1 23 45 67 89",
+      "mobile": "+33 6 12 34 56 78",
+      "email": "jean.dupont@vet-clinic.fr",
+      "address": "123 Rue de la République",
+      "city": "Paris",
+      "postalCode": "75001",
+      "country": "France"
+    },
+    "actions": {
+      "create": "Créer un vétérinaire",
+      "edit": "Modifier le vétérinaire",
+      "delete": "Supprimer le vétérinaire",
+      "restore": "Restaurer le vétérinaire",
+      "addSpecialty": "Ajouter une spécialité"
+    },
+    "search": {
+      "placeholder": "Rechercher un vétérinaire..."
+    },
+    "messages": {
+      "created": "Vétérinaire créé avec succès",
+      "updated": "Vétérinaire mis à jour avec succès",
+      "deleted": "Vétérinaire supprimé avec succès",
+      "restored": "Vétérinaire restauré avec succès",
+      "createError": "Erreur lors de la création du vétérinaire",
+      "updateError": "Erreur lors de la mise à jour du vétérinaire",
+      "deleteError": "Erreur lors de la suppression du vétérinaire",
+      "noResults": "Aucun vétérinaire trouvé"
+    }
+  },
+  "nationalCampaign": {
+    "title": {
+      "singular": "Campagne Nationale",
+      "plural": "Campagnes Nationales"
+    },
+    "subtitle": "Gestion du catalogue des campagnes de santé animale nationales",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "nameAr": "Nom (AR)",
+      "type": "Type",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "description": "Description",
+      "isActive": "Actif"
+    },
+    "types": {
+      "vaccination": "Vaccination",
+      "deworming": "Déparasitage",
+      "screening": "Dépistage",
+      "treatment": "Traitement",
+      "census": "Recensement",
+      "other": "Autre"
+    },
+    "sections": {
+      "names": "Noms multilingues",
+      "dates": "Période",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom français est requis",
+        "maxLength": "Le nom français ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom anglais est requis",
+        "maxLength": "Le nom anglais ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom arabe est requis",
+        "maxLength": "Le nom arabe ne doit pas dépasser 200 caractères"
+      },
+      "type": {
+        "invalid": "Le type doit être vaccination, déparasitage, dépistage, traitement, recensement ou autre"
+      },
+      "startDate": {
+        "required": "La date de début est requise",
+        "invalid": "La date de début est invalide"
+      },
+      "endDate": {
+        "required": "La date de fin est requise",
+        "invalid": "La date de fin est invalide",
+        "afterStart": "La date de fin doit être postérieure ou égale à la date de début"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      }
+    },
+    "placeholders": {
+      "code": "VACC2024, DEWORM-2024-Q1...",
+      "nameFr": "Campagne de Vaccination 2024",
+      "nameEn": "Vaccination Campaign 2024",
+      "nameAr": "حملة التطعيم 2024",
+      "type": "Sélectionnez le type",
+      "description": "Description de la campagne..."
+    },
+    "actions": {
+      "create": "Créer une campagne",
+      "edit": "Modifier la campagne",
+      "delete": "Supprimer la campagne",
+      "restore": "Restaurer la campagne"
+    },
+    "search": {
+      "placeholder": "Rechercher une campagne..."
+    },
+    "messages": {
+      "created": "Campagne créée avec succès",
+      "updated": "Campagne mise à jour avec succès",
+      "deleted": "Campagne supprimée avec succès",
+      "restored": "Campagne restaurée avec succès",
+      "createError": "Erreur lors de la création de la campagne",
+      "updateError": "Erreur lors de la mise à jour de la campagne",
+      "deleteError": "Erreur lors de la suppression de la campagne",
+      "noResults": "Aucune campagne trouvée"
+    }
+  },
+  "alertTemplate": {
+    "title": {
+      "singular": "Modèle d'Alerte",
+      "plural": "Modèles d'Alertes"
+    },
+    "subtitle": "Gestion des modèles de notifications et rappels du système",
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "nameAr": "Nom (AR)",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "description": "Description",
+      "messageTemplateFr": "Modèle de message (FR)",
+      "messageTemplateEn": "Modèle de message (EN)",
+      "messageTemplateAr": "Modèle de message (AR)",
+      "isActive": "Actif"
+    },
+    "categories": {
+      "health": "Santé",
+      "vaccination": "Vaccination",
+      "treatment": "Traitement",
+      "reproduction": "Reproduction",
+      "nutrition": "Nutrition",
+      "administrative": "Administratif",
+      "other": "Autre"
+    },
+    "priorities": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée",
+      "urgent": "Urgente"
+    },
+    "sections": {
+      "names": "Noms multilingues",
+      "description": "Description"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères",
+        "pattern": "Le code doit contenir uniquement des lettres majuscules, chiffres, tirets et underscores"
+      },
+      "nameFr": {
+        "required": "Le nom français est requis",
+        "maxLength": "Le nom français ne doit pas dépasser 200 caractères"
+      },
+      "nameEn": {
+        "required": "Le nom anglais est requis",
+        "maxLength": "Le nom anglais ne doit pas dépasser 200 caractères"
+      },
+      "nameAr": {
+        "required": "Le nom arabe est requis",
+        "maxLength": "Le nom arabe ne doit pas dépasser 200 caractères"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "messageTemplateFr": {
+        "maxLength": "Le modèle de message français ne doit pas dépasser 500 caractères"
+      },
+      "messageTemplateEn": {
+        "maxLength": "Le modèle de message anglais ne doit pas dépasser 500 caractères"
+      },
+      "messageTemplateAr": {
+        "maxLength": "Le modèle de message arabe ne doit pas dépasser 500 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "placeholders": {
+      "code": "ALERT_VACC_REMINDER, ALERT_TREATMENT...",
+      "nameFr": "Rappel de vaccination",
+      "nameEn": "Vaccination reminder",
+      "nameAr": "تذكير التطعيم",
+      "description": "Description du modèle d'alerte...",
+      "messageTemplateFr": "Votre animal nécessite une vaccination...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "يحتاج حيوانك إلى التطعيم..."
+    },
+    "actions": {
+      "create": "Créer un modèle",
+      "edit": "Modifier le modèle",
+      "delete": "Supprimer le modèle",
+      "restore": "Restaurer le modèle"
+    },
+    "search": {
+      "placeholder": "Rechercher un modèle..."
+    },
+    "messages": {
+      "created": "Modèle d'alerte créé avec succès",
+      "updated": "Modèle d'alerte mis à jour avec succès",
+      "deleted": "Modèle d'alerte supprimé avec succès",
+      "restored": "Modèle d'alerte restauré avec succès",
+      "createError": "Erreur lors de la création du modèle",
+      "updateError": "Erreur lors de la mise à jour du modèle",
+      "deleteError": "Erreur lors de la suppression du modèle",
+      "noResults": "Aucun modèle d'alerte trouvé"
     }
   },
   "campaigns": {
@@ -923,6 +1944,7 @@
     "sections": {
       "profile": "Profil",
       "farm": "Ferme",
+      "generalSettings": "Paramètres généraux",
       "myVeterinarians": "Mes Vétérinaires",
       "myBreeds": "Mes Races",
       "myVaccines": "Mes Vaccins",

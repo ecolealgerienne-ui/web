@@ -20,7 +20,8 @@
       "active": "نشط",
       "inactive": "غير نشط",
       "disabled": "معطل",
-      "enabled": "مفعل"
+      "enabled": "مفعل",
+      "deleted": "محذوف"
     },
     "messages": {
       "success": "نجح",
@@ -31,7 +32,8 @@
       "loading": "جاري التحميل...",
       "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
       "actionIrreversible": "هذا الإجراء لا رجعة فيه.",
-      "loadError": "خطأ في تحميل البيانات"
+      "loadError": "خطأ في تحميل البيانات",
+      "selectedCount": "{count} محدد"
     },
     "fields": {
       "name": "الاسم",
@@ -40,7 +42,62 @@
       "isActive": "نشط",
       "createdAt": "تاريخ الإنشاء",
       "updatedAt": "تاريخ التحديث",
+      "deletedAt": "تاريخ الحذف",
+      "metadata": "البيانات الوصفية",
       "required": "مطلوب"
+    },
+    "error": {
+      "title": "خطأ",
+      "validation": "خطأ في التحقق",
+      "unauthorized": "غير مصرح",
+      "forbidden": "الوصول مرفوض",
+      "notFound": "المورد غير موجود",
+      "timeout": "انتهت المهلة",
+      "conflict": "تم اكتشاف تعارض",
+      "versionConflict": "تعارض الإصدار",
+      "hasDependencies": "لا يمكن الحذف",
+      "tooManyRequests": "طلبات كثيرة جدًا",
+      "serverError": "خطأ في الخادم",
+      "network": "خطأ في الشبكة",
+      "unknown": "خطأ غير معروف"
+    },
+    "pagination": {
+      "of": "من",
+      "items": "عناصر",
+      "itemsPerPage": "لكل صفحة",
+      "page": "صفحة",
+      "firstPage": "الصفحة الأولى",
+      "previousPage": "الصفحة السابقة",
+      "nextPage": "الصفحة التالية",
+      "lastPage": "الصفحة الأخيرة",
+      "totalItems": "{count, plural, =0 {لا توجد عناصر} one {عنصر واحد} other {# عناصر}}"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "noResults": "لم يتم العثور على نتائج",
+      "loading": "جاري التحميل...",
+      "cannotDelete": "لا يمكن الحذف",
+      "isUsedBy": "لأنه مستخدم من قبل",
+      "mustDeleteDependencies": "يجب عليك حذف هذه التبعيات أولاً.",
+      "confirmDeleteItem": "هل أنت متأكد من حذف"
+    },
+    "sections": {
+      "mainInfo": "المعلومات الأساسية",
+      "basicInfo": "المعلومات الأولية",
+      "additionalInfo": "معلومات إضافية",
+      "options": "الخيارات"
+    },
+    "placeholders": {
+      "select": "اختر",
+      "optional": "اختياري",
+      "name": "أدخل اسمًا",
+      "description": "أدخل وصفًا"
+    },
+    "loading": "جاري التحميل...",
+    "admin": {
+      "products": {
+        "subtitle": "إدارة كتالوج المنتجات البيطرية"
+      }
     }
   },
   "header": {
@@ -73,6 +130,19 @@
       "preferences": "التفضيلات",
       "alerts": "التنبيهات",
       "farms": "المزارع"
+    },
+    "admin": {
+      "title": "الإدارة",
+      "activeSubstances": "المواد الفعالة",
+      "productCategories": "فئات المنتجات",
+      "units": "وحدات القياس",
+      "administrationRoutes": "طرق الإعطاء",
+      "species": "أنواع الحيوانات",
+      "countries": "البلدان",
+      "veterinarians": "الأطباء البيطريون",
+      "nationalCampaigns": "الحملات الوطنية",
+      "alertTemplates": "نماذج التنبيهات",
+      "products": "المنتجات البيطرية"
     }
   },
   "breeds": {
@@ -211,6 +281,770 @@
       "updateError": "خطأ في تحديث الدواء",
       "deleteError": "خطأ في حذف الدواء",
       "confirmDelete": "هل أنت متأكد من حذف الدواء {name}؟"
+    }
+  },
+  "activeSubstance": {
+    "title": {
+      "singular": "مادة فعالة",
+      "plural": "المواد الفعالة"
+    },
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم الدولي",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفاً",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقماً صحيحاً",
+        "positive": "يجب أن يكون الإصدار موجباً"
+      }
+    },
+    "actions": {
+      "create": "إنشاء مادة فعالة",
+      "edit": "تعديل المادة الفعالة",
+      "delete": "حذف المادة الفعالة",
+      "restore": "استعادة المادة الفعالة"
+    },
+    "messages": {
+      "created": "تم إنشاء المادة الفعالة بنجاح",
+      "updated": "تم تحديث المادة الفعالة بنجاح",
+      "deleted": "تم حذف المادة الفعالة بنجاح",
+      "restored": "تمت استعادة المادة الفعالة بنجاح",
+      "createError": "خطأ في إنشاء المادة الفعالة",
+      "updateError": "خطأ في تحديث المادة الفعالة",
+      "deleteError": "خطأ في حذف المادة الفعالة",
+      "confirmDelete": "هل تريد حقاً حذف المادة الفعالة \"{name}\"؟",
+      "noResults": "لم يتم العثور على مواد فعالة"
+    }
+  },
+  "product": {
+    "title": {
+      "singular": "منتج بيطري",
+      "plural": "المنتجات البيطرية"
+    },
+    "fields": {
+      "code": "رمز المنتج",
+      "commercialName": "الاسم التجاري",
+      "laboratoryName": "المختبر",
+      "therapeuticForm": "الشكل العلاجي",
+      "dosage": "الجرعة",
+      "packaging": "التغليف",
+      "activeSubstances": "المواد الفعالة",
+      "description": "الوصف",
+      "usageInstructions": "تعليمات الاستخدام",
+      "contraindications": "موانع الاستعمال",
+      "storageConditions": "ظروف التخزين",
+      "withdrawalPeriodMeat": "فترة السحب اللحوم",
+      "withdrawalPeriodMilk": "فترة السحب الحليب",
+      "days": "أيام",
+      "isVeterinaryPrescriptionRequired": "وصفة بيطرية مطلوبة",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "رمز المنتج مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفاً",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات فقط"
+      },
+      "commercialName": {
+        "required": "الاسم التجاري مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم التجاري 200 حرف"
+      },
+      "laboratoryName": {
+        "required": "اسم المختبر مطلوب",
+        "maxLength": "يجب ألا يتجاوز اسم المختبر 200 حرف"
+      },
+      "therapeuticForm": {
+        "required": "الشكل العلاجي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الشكل العلاجي 100 حرف"
+      },
+      "dosage": {
+        "required": "الجرعة مطلوبة",
+        "maxLength": "يجب ألا تتجاوز الجرعة 100 حرف"
+      },
+      "packaging": {
+        "required": "التغليف مطلوب",
+        "maxLength": "يجب ألا يتجاوز التغليف 200 حرف"
+      },
+      "activeSubstanceIds": {
+        "required": "مادة فعالة واحدة على الأقل مطلوبة",
+        "maxLength": "10 مواد فعالة كحد أقصى",
+        "invalidUuid": "معرف مادة فعالة غير صالح"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 2000 حرف"
+      },
+      "usageInstructions": {
+        "maxLength": "يجب ألا تتجاوز التعليمات 2000 حرف"
+      },
+      "contraindications": {
+        "maxLength": "يجب ألا تتجاوز موانع الاستعمال 1000 حرف"
+      },
+      "storageConditions": {
+        "maxLength": "يجب ألا تتجاوز ظروف التخزين 500 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقماً صحيحاً",
+        "positive": "يجب أن يكون الإصدار موجباً"
+      },
+      "noChanges": "لم يتم اكتشاف أي تغييرات"
+    },
+    "actions": {
+      "create": "إنشاء منتج",
+      "edit": "تعديل المنتج",
+      "delete": "حذف المنتج",
+      "restore": "استعادة المنتج",
+      "selectSubstances": "اختيار المواد الفعالة"
+    },
+    "messages": {
+      "created": "تم إنشاء المنتج بنجاح",
+      "updated": "تم تحديث المنتج بنجاح",
+      "deleted": "تم حذف المنتج بنجاح",
+      "restored": "تمت استعادة المنتج بنجاح",
+      "createError": "خطأ في إنشاء المنتج",
+      "updateError": "خطأ في تحديث المنتج",
+      "deleteError": "خطأ في حذف المنتج",
+      "confirmDelete": "هل تريد حقاً حذف المنتج \"{name}\"؟",
+      "noResults": "لم يتم العثور على منتجات"
+    },
+    "therapeuticForms": {
+      "injectable": "حقن",
+      "oral": "فموي",
+      "topical": "موضعي",
+      "intramammary": "داخل الضرع",
+      "pour-on": "صب على الظهر",
+      "bolus": "بلعة",
+      "powder": "مسحوق",
+      "suspension": "معلق",
+      "tablet": "قرص"
+    }
+  },
+  "productCategory": {
+    "title": {
+      "singular": "فئة المنتج",
+      "plural": "فئات المنتجات"
+    },
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "actions": {
+      "create": "إنشاء فئة",
+      "edit": "تعديل الفئة",
+      "delete": "حذف الفئة",
+      "restore": "استعادة الفئة"
+    },
+    "messages": {
+      "created": "تم إنشاء الفئة بنجاح",
+      "updated": "تم تحديث الفئة بنجاح",
+      "deleted": "تم حذف الفئة بنجاح",
+      "noResults": "لم يتم العثور على فئات"
+    }
+  },
+  "unit": {
+    "title": {
+      "singular": "وحدة القياس",
+      "plural": "وحدات القياس"
+    },
+    "subtitle": "إدارة وحدات القياس (الوزن، الحجم، التركيز)",
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "symbol": "الرمز المختصر",
+      "type": "النوع",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "types": {
+      "WEIGHT": "الوزن",
+      "VOLUME": "الحجم",
+      "CONCENTRATION": "التركيز"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "symbol": {
+        "required": "الرمز المختصر مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز المختصر 20 حرفًا"
+      },
+      "type": {
+        "invalid": "نوع غير صالح"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "MG, ML, KG...",
+      "name": "ملليجرام، ملليلتر...",
+      "symbol": "mg, ml, kg..."
+    },
+    "actions": {
+      "create": "إنشاء وحدة",
+      "edit": "تعديل الوحدة",
+      "delete": "حذف الوحدة",
+      "restore": "استعادة الوحدة"
+    },
+    "search": {
+      "placeholder": "البحث عن وحدة..."
+    },
+    "messages": {
+      "created": "تم إنشاء الوحدة بنجاح",
+      "updated": "تم تحديث الوحدة بنجاح",
+      "deleted": "تم حذف الوحدة بنجاح",
+      "restored": "تم استعادة الوحدة بنجاح",
+      "noResults": "لم يتم العثور على وحدات"
+    }
+  },
+  "species": {
+    "title": {
+      "singular": "نوع الحيوان",
+      "plural": "أنواع الحيوانات"
+    },
+    "subtitle": "إدارة أنواع الحيوانات (البقريات، الأغنام، الماعز، إلخ)",
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "BOV, OVI, CAP...",
+      "name": "بقري، غنم، ماعز...",
+      "description": "وصف النوع..."
+    },
+    "actions": {
+      "create": "إنشاء نوع",
+      "edit": "تعديل النوع",
+      "delete": "حذف النوع",
+      "restore": "استعادة النوع"
+    },
+    "search": {
+      "placeholder": "البحث عن نوع..."
+    },
+    "messages": {
+      "created": "تم إنشاء النوع بنجاح",
+      "updated": "تم تحديث النوع بنجاح",
+      "deleted": "تم حذف النوع بنجاح",
+      "restored": "تم استعادة النوع بنجاح",
+      "noResults": "لم يتم العثور على أنواع"
+    }
+  },
+  "country": {
+    "title": {
+      "singular": "بلد",
+      "plural": "بلدان"
+    },
+    "subtitle": "إدارة البيانات المرجعية الجغرافية للبلدان",
+    "fields": {
+      "code": "الرمز",
+      "nameFr": "الاسم (فرنسي)",
+      "nameEn": "الاسم (إنجليزي)",
+      "nameAr": "الاسم (عربي)",
+      "isoCode2": "رمز ISO 2",
+      "isoCode3": "رمز ISO 3",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "nameFr": {
+        "required": "الاسم بالفرنسية مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "nameEn": {
+        "required": "الاسم بالإنجليزية مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "nameAr": {
+        "required": "الاسم بالعربية مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "isoCode2": {
+        "required": "رمز ISO 2 مطلوب",
+        "length": "يجب أن يحتوي رمز ISO 2 على حرفين بالضبط",
+        "pattern": "يجب أن يحتوي رمز ISO 2 على أحرف كبيرة فقط"
+      },
+      "isoCode3": {
+        "required": "رمز ISO 3 مطلوب",
+        "length": "يجب أن يحتوي رمز ISO 3 على 3 أحرف بالضبط",
+        "pattern": "يجب أن يحتوي رمز ISO 3 على أحرف كبيرة فقط"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "DZA, FRA, MAR...",
+      "nameFr": "الجزائر، فرنسا، المغرب...",
+      "nameEn": "Algeria, France, Morocco...",
+      "nameAr": "الجزائر، فرنسا، المغرب...",
+      "isoCode2": "DZ, FR, MA...",
+      "isoCode3": "DZA, FRA, MAR..."
+    },
+    "actions": {
+      "create": "إنشاء بلد",
+      "edit": "تعديل البلد",
+      "delete": "حذف البلد",
+      "restore": "استعادة البلد"
+    },
+    "search": {
+      "placeholder": "البحث عن بلد..."
+    },
+    "messages": {
+      "created": "تم إنشاء البلد بنجاح",
+      "updated": "تم تحديث البلد بنجاح",
+      "deleted": "تم حذف البلد بنجاح",
+      "restored": "تم استعادة البلد بنجاح",
+      "noResults": "لم يتم العثور على بلدان"
+    }
+  },
+  "administrationRoute": {
+    "title": {
+      "singular": "طريقة الإعطاء",
+      "plural": "طرق الإعطاء"
+    },
+    "subtitle": "إدارة طرق إعطاء المنتجات البيطرية",
+    "fields": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "name": {
+        "required": "الاسم مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار رقمًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "ORAL, SC, IM, IV...",
+      "name": "الطريق الفموي، الحقن تحت الجلد...",
+      "description": "وصف طريقة الإعطاء..."
+    },
+    "actions": {
+      "create": "إنشاء طريقة إعطاء",
+      "edit": "تعديل طريقة الإعطاء",
+      "delete": "حذف طريقة الإعطاء",
+      "restore": "استعادة طريقة الإعطاء"
+    },
+    "search": {
+      "placeholder": "البحث عن طريقة إعطاء..."
+    },
+    "messages": {
+      "created": "تم إنشاء طريقة الإعطاء بنجاح",
+      "updated": "تم تحديث طريقة الإعطاء بنجاح",
+      "deleted": "تم حذف طريقة الإعطاء بنجاح",
+      "restored": "تم استعادة طريقة الإعطاء بنجاح",
+      "noResults": "لم يتم العثور على طرق إعطاء"
+    }
+  },
+  "veterinarian": {
+    "title": {
+      "singular": "طبيب بيطري",
+      "plural": "الأطباء البيطريون"
+    },
+    "subtitle": "إدارة كتالوج الأطباء البيطريين المحترفين",
+    "fields": {
+      "code": "الرمز",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "fullName": "الاسم الكامل",
+      "licenseNumber": "رقم الترخيص",
+      "specialties": "التخصصات",
+      "clinic": "العيادة",
+      "scope": "النطاق",
+      "department": "الولاية",
+      "isAvailable": "متاح",
+      "emergencyService": "خدمة الطوارئ",
+      "contactInfo": "معلومات الاتصال",
+      "phone": "الهاتف",
+      "mobile": "الجوال",
+      "email": "البريد الإلكتروني",
+      "address": "العنوان",
+      "city": "المدينة",
+      "postalCode": "الرمز البريدي",
+      "country": "البلد",
+      "isActive": "نشط"
+    },
+    "scope": {
+      "global": "عالمي",
+      "local": "محلي"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "firstName": {
+        "required": "الاسم الأول مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الأول 100 حرف"
+      },
+      "lastName": {
+        "required": "اسم العائلة مطلوب",
+        "maxLength": "يجب ألا يتجاوز اسم العائلة 100 حرف"
+      },
+      "licenseNumber": {
+        "required": "رقم الترخيص مطلوب",
+        "maxLength": "يجب ألا يتجاوز رقم الترخيص 50 حرفًا",
+        "pattern": "يجب أن يحتوي رقم الترخيص على أحرف كبيرة وأرقام وشرطات فقط"
+      },
+      "specialties": {
+        "required": "مطلوب تخصص واحد على الأقل",
+        "maxItems": "لا يمكنك إضافة أكثر من 10 تخصصات",
+        "item": {
+          "required": "لا يمكن أن يكون التخصص فارغًا",
+          "maxLength": "يجب ألا يتجاوز التخصص 100 حرف"
+        }
+      },
+      "clinic": {
+        "maxLength": "يجب ألا يتجاوز اسم العيادة 200 حرف"
+      },
+      "scope": {
+        "invalid": "يجب أن يكون النطاق 'عالمي' أو 'محلي'"
+      },
+      "department": {
+        "maxLength": "يجب ألا تتجاوز الولاية 10 أحرف"
+      },
+      "contactInfo": {
+        "phone": {
+          "required": "رقم الهاتف مطلوب",
+          "maxLength": "يجب ألا يتجاوز رقم الهاتف 20 حرفًا",
+          "pattern": "رقم الهاتف يحتوي على أحرف غير صالحة"
+        },
+        "mobile": {
+          "maxLength": "يجب ألا يتجاوز رقم الجوال 20 حرفًا",
+          "pattern": "رقم الجوال يحتوي على أحرف غير صالحة"
+        },
+        "email": {
+          "invalid": "عنوان البريد الإلكتروني غير صالح",
+          "maxLength": "يجب ألا يتجاوز عنوان البريد الإلكتروني 100 حرف"
+        },
+        "address": {
+          "maxLength": "يجب ألا يتجاوز العنوان 200 حرف"
+        },
+        "city": {
+          "maxLength": "يجب ألا تتجاوز المدينة 100 حرف"
+        },
+        "postalCode": {
+          "maxLength": "يجب ألا يتجاوز الرمز البريدي 20 حرفًا"
+        },
+        "country": {
+          "maxLength": "يجب ألا يتجاوز البلد 100 حرف"
+        }
+      },
+      "version": {
+        "integer": "يجب أن تكون النسخة عددًا صحيحًا",
+        "positive": "يجب أن تكون النسخة موجبة"
+      }
+    },
+    "placeholders": {
+      "code": "VET001, VET-DZ-123...",
+      "firstName": "أحمد",
+      "lastName": "بن علي",
+      "licenseNumber": "VET-DZ-12345",
+      "specialties": "الجراحة، الأمراض الجلدية...",
+      "clinic": "العيادة البيطرية المركزية",
+      "scope": "اختر النطاق",
+      "department": "16، 01، 31...",
+      "phone": "+213 21 12 34 56",
+      "mobile": "+213 6 12 34 56 78",
+      "email": "ahmed.benali@vet-clinic.dz",
+      "address": "123 شارع الجمهورية",
+      "city": "الجزائر",
+      "postalCode": "16000",
+      "country": "الجزائر"
+    },
+    "actions": {
+      "create": "إنشاء طبيب بيطري",
+      "edit": "تعديل الطبيب البيطري",
+      "delete": "حذف الطبيب البيطري",
+      "restore": "استعادة الطبيب البيطري",
+      "addSpecialty": "إضافة تخصص"
+    },
+    "search": {
+      "placeholder": "البحث عن طبيب بيطري..."
+    },
+    "messages": {
+      "created": "تم إنشاء الطبيب البيطري بنجاح",
+      "updated": "تم تحديث الطبيب البيطري بنجاح",
+      "deleted": "تم حذف الطبيب البيطري بنجاح",
+      "restored": "تم استعادة الطبيب البيطري بنجاح",
+      "createError": "خطأ في إنشاء الطبيب البيطري",
+      "updateError": "خطأ في تحديث الطبيب البيطري",
+      "deleteError": "خطأ في حذف الطبيب البيطري",
+      "noResults": "لم يتم العثور على طبيب بيطري"
+    }
+  },
+  "nationalCampaign": {
+    "title": {
+      "singular": "حملة وطنية",
+      "plural": "الحملات الوطنية"
+    },
+    "subtitle": "إدارة كتالوج الحملات الوطنية للصحة الحيوانية",
+    "fields": {
+      "code": "الرمز",
+      "nameFr": "الاسم (FR)",
+      "nameEn": "الاسم (EN)",
+      "nameAr": "الاسم (AR)",
+      "type": "النوع",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "description": "الوصف",
+      "isActive": "نشط"
+    },
+    "types": {
+      "vaccination": "التطعيم",
+      "deworming": "إزالة الديدان",
+      "screening": "الفحص",
+      "treatment": "العلاج",
+      "census": "الإحصاء",
+      "other": "أخرى"
+    },
+    "sections": {
+      "names": "الأسماء متعددة اللغات",
+      "dates": "الفترة",
+      "description": "الوصف"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "nameFr": {
+        "required": "الاسم الفرنسي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الفرنسي 200 حرف"
+      },
+      "nameEn": {
+        "required": "الاسم الإنجليزي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الإنجليزي 200 حرف"
+      },
+      "nameAr": {
+        "required": "الاسم العربي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم العربي 200 حرف"
+      },
+      "type": {
+        "invalid": "يجب أن يكون النوع تطعيم، إزالة الديدان، فحص، علاج، إحصاء أو أخرى"
+      },
+      "startDate": {
+        "required": "تاريخ البدء مطلوب",
+        "invalid": "تاريخ البدء غير صالح"
+      },
+      "endDate": {
+        "required": "تاريخ الانتهاء مطلوب",
+        "invalid": "تاريخ الانتهاء غير صالح",
+        "afterStart": "يجب أن يكون تاريخ الانتهاء مساويًا أو بعد تاريخ البدء"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      }
+    },
+    "placeholders": {
+      "code": "VACC2024, DEWORM-2024-Q1...",
+      "nameFr": "Campagne de Vaccination 2024",
+      "nameEn": "Vaccination Campaign 2024",
+      "nameAr": "حملة التطعيم 2024",
+      "type": "اختر النوع",
+      "description": "وصف الحملة..."
+    },
+    "actions": {
+      "create": "إنشاء حملة",
+      "edit": "تعديل الحملة",
+      "delete": "حذف الحملة",
+      "restore": "استعادة الحملة"
+    },
+    "search": {
+      "placeholder": "البحث عن حملة..."
+    },
+    "messages": {
+      "created": "تم إنشاء الحملة بنجاح",
+      "updated": "تم تحديث الحملة بنجاح",
+      "deleted": "تم حذف الحملة بنجاح",
+      "restored": "تم استعادة الحملة بنجاح",
+      "createError": "خطأ في إنشاء الحملة",
+      "updateError": "خطأ في تحديث الحملة",
+      "deleteError": "خطأ في حذف الحملة",
+      "noResults": "لم يتم العثور على حملة"
+    }
+  },
+  "alertTemplate": {
+    "title": {
+      "singular": "نموذج التنبيه",
+      "plural": "نماذج التنبيهات"
+    },
+    "subtitle": "إدارة نماذج الإشعارات والتذكيرات في النظام",
+    "fields": {
+      "code": "الرمز",
+      "nameFr": "الاسم (FR)",
+      "nameEn": "الاسم (EN)",
+      "nameAr": "الاسم (AR)",
+      "category": "الفئة",
+      "priority": "الأولوية",
+      "description": "الوصف",
+      "messageTemplateFr": "نموذج الرسالة (FR)",
+      "messageTemplateEn": "نموذج الرسالة (EN)",
+      "messageTemplateAr": "نموذج الرسالة (AR)",
+      "isActive": "نشط"
+    },
+    "categories": {
+      "health": "الصحة",
+      "vaccination": "التطعيم",
+      "treatment": "العلاج",
+      "reproduction": "التكاثر",
+      "nutrition": "التغذية",
+      "administrative": "إداري",
+      "other": "أخرى"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "urgent": "عاجلة"
+    },
+    "sections": {
+      "names": "الأسماء متعددة اللغات",
+      "description": "الوصف"
+    },
+    "validation": {
+      "code": {
+        "required": "الرمز مطلوب",
+        "maxLength": "يجب ألا يتجاوز الرمز 50 حرفًا",
+        "pattern": "يجب أن يحتوي الرمز على أحرف كبيرة وأرقام وشرطات وشرطات سفلية فقط"
+      },
+      "nameFr": {
+        "required": "الاسم الفرنسي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الفرنسي 200 حرف"
+      },
+      "nameEn": {
+        "required": "الاسم الإنجليزي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم الإنجليزي 200 حرف"
+      },
+      "nameAr": {
+        "required": "الاسم العربي مطلوب",
+        "maxLength": "يجب ألا يتجاوز الاسم العربي 200 حرف"
+      },
+      "description": {
+        "maxLength": "يجب ألا يتجاوز الوصف 1000 حرف"
+      },
+      "messageTemplateFr": {
+        "maxLength": "يجب ألا يتجاوز نموذج الرسالة الفرنسية 500 حرف"
+      },
+      "messageTemplateEn": {
+        "maxLength": "يجب ألا يتجاوز نموذج الرسالة الإنجليزية 500 حرف"
+      },
+      "messageTemplateAr": {
+        "maxLength": "يجب ألا يتجاوز نموذج الرسالة العربية 500 حرف"
+      },
+      "version": {
+        "integer": "يجب أن يكون الإصدار عددًا صحيحًا",
+        "positive": "يجب أن يكون الإصدار موجبًا"
+      }
+    },
+    "placeholders": {
+      "code": "ALERT_VACC_REMINDER, ALERT_TREATMENT...",
+      "nameFr": "تذكير بالتطعيم",
+      "nameEn": "Vaccination reminder",
+      "nameAr": "تذكير بالتطعيم",
+      "description": "وصف نموذج التنبيه...",
+      "messageTemplateFr": "يحتاج حيوانك إلى التطعيم...",
+      "messageTemplateEn": "Your animal requires vaccination...",
+      "messageTemplateAr": "يحتاج حيوانك إلى التطعيم..."
+    },
+    "actions": {
+      "create": "إنشاء نموذج",
+      "edit": "تعديل النموذج",
+      "delete": "حذف النموذج",
+      "restore": "استعادة النموذج"
+    },
+    "search": {
+      "placeholder": "البحث عن نموذج..."
+    },
+    "messages": {
+      "created": "تم إنشاء نموذج التنبيه بنجاح",
+      "updated": "تم تحديث نموذج التنبيه بنجاح",
+      "deleted": "تم حذف نموذج التنبيه بنجاح",
+      "restored": "تمت استعادة نموذج التنبيه بنجاح",
+      "createError": "خطأ في إنشاء النموذج",
+      "updateError": "خطأ في تحديث النموذج",
+      "deleteError": "خطأ في حذف النموذج",
+      "noResults": "لم يتم العثور على نموذج تنبيه"
     }
   },
   "errors": {
@@ -923,6 +1757,7 @@
     "sections": {
       "profile": "الملف الشخصي",
       "farm": "المزرعة",
+      "generalSettings": "الإعدادات العامة",
       "myVeterinarians": "أطبائي البيطريون",
       "myBreeds": "سلالاتي",
       "myVaccines": "لقاحاتي",
