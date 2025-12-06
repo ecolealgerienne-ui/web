@@ -25,6 +25,7 @@ export function VeterinarianDetailsDialog({
   const t = useTranslations('settings.veterinarians')
   const tf = useTranslations('settings.veterinarians.form')
   const ts = useTranslations('settings.veterinarians.specialties')
+  const td = useTranslations('settings.veterinarians.details')
 
   if (!veterinarian) return null
 
@@ -39,9 +40,9 @@ export function VeterinarianDetailsDialog({
               Dr. {veterinarian.firstName} {veterinarian.lastName}
             </DialogTitle>
             {isLocal && (
-              <Badge className="bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700">
+              <Badge variant="warning">
                 <Home className="w-3 h-3 me-1" />
-                Local
+                {td('localBadge')}
               </Badge>
             )}
           </div>
@@ -51,7 +52,7 @@ export function VeterinarianDetailsDialog({
           {/* Informations de contact */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Contact
+              {td('sections.contact')}
             </h3>
             <div className="space-y-2">
               {veterinarian.phone && (
@@ -82,7 +83,7 @@ export function VeterinarianDetailsDialog({
           {veterinarian.specialties && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                Spécialité
+                {td('sections.specialty')}
               </h3>
               <div className="flex items-center gap-2 text-sm">
                 <Stethoscope className="w-4 h-4 text-muted-foreground" />
@@ -95,7 +96,7 @@ export function VeterinarianDetailsDialog({
           {(veterinarian.city || veterinarian.department || veterinarian.clinic) && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                Localisation
+                {td('sections.location')}
               </h3>
               <div className="space-y-2">
                 {veterinarian.clinic && (
@@ -127,7 +128,7 @@ export function VeterinarianDetailsDialog({
           {veterinarian.licenseNumber && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                Licence
+                {td('sections.license')}
               </h3>
               <div className="flex items-center gap-2 text-sm">
                 <FileText className="w-4 h-4 text-muted-foreground" />

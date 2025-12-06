@@ -2444,7 +2444,18 @@
         "localNote": "Ce vétérinaire sera privé et visible uniquement par vous.",
         "createSuccess": "Vétérinaire local créé avec succès",
         "updateSuccess": "Vétérinaire local mis à jour avec succès"
-      }
+      },
+      "details": {
+        "localBadge": "Local",
+        "sections": {
+          "contact": "Contact",
+          "specialty": "Spécialité",
+          "location": "Localisation",
+          "license": "Licence"
+        }
+      },
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de vétérinaires"
     },
     "breeds": {
       "title": "Mes Races",
