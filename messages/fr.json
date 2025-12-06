@@ -629,9 +629,71 @@
         "other": "Autre"
       }
     },
+    "alerts": {
+      "title": "Mes Alertes",
+      "subtitle": "Sélectionnez les types d'alertes que vous souhaitez recevoir",
+      "available": "Alertes disponibles",
+      "selected": "Mes alertes",
+      "searchPlaceholder": "Rechercher une alerte...",
+      "emptySelected": "Aucune alerte sélectionnée",
+      "emptyAvailable": "Aucune alerte disponible",
+      "loadError": "Erreur lors du chargement des alertes",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences d'alertes ont été enregistrées",
+      "alreadyInList": "Alerte déjà ajoutée",
+      "alreadyInListMessage": "{name} est déjà dans votre liste d'alertes",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Voulez-vous retirer {name} de votre liste ? Vous pourrez la réajouter plus tard.",
+      "removedFromPreferences": "Alerte retirée de vos préférences",
+      "filters": {
+        "allCategories": "Toutes les catégories"
+      },
+      "categories": {
+        "health": "Santé",
+        "vaccination": "Vaccination",
+        "treatment": "Traitement",
+        "reproduction": "Reproduction",
+        "nutrition": "Nutrition",
+        "administrative": "Administratif",
+        "other": "Autre"
+      },
+      "priorities": {
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Haute",
+        "urgent": "Urgente"
+      },
+      "details": {
+        "code": "Code",
+        "category": "Catégorie",
+        "priority": "Priorité",
+        "description": "Description"
+      }
+    },
     "actions": {
       "save": "Enregistrer",
       "saving": "Enregistrement..."
+    },
+    "subtitle": "Gérez vos préférences et paramètres",
+    "groups": {
+      "general": "Général",
+      "myData": "Mes Données",
+      "preferences": "Préférences",
+      "system": "Système"
+    },
+    "sections": {
+      "profile": "Profil",
+      "farm": "Exploitation",
+      "generalSettings": "Paramètres généraux",
+      "myVeterinarians": "Mes vétérinaires",
+      "mySpecies": "Mes espèces",
+      "myBreeds": "Mes races",
+      "myVaccines": "Mes vaccins",
+      "myMedications": "Ma pharmacie",
+      "myAlerts": "Mes alertes",
+      "language": "Langue & Région",
+      "security": "Sécurité",
+      "data": "Données"
     }
   },
   "footer": {

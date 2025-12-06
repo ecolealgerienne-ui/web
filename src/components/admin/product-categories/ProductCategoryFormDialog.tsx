@@ -93,7 +93,7 @@ export function ProductCategoryFormDialog({
     if (category && open) {
       reset({
         code: category.code,
-        name: category.name,
+        name: category.nameFr,
         description: category.description || '',
         isActive: category.isActive ?? true,
         ...(isEditMode && { version: category.version || 1 }),

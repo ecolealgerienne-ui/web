@@ -33,10 +33,9 @@ export interface AlertTemplate extends BaseEntity {
   nameAr: string
   category: AlertCategory
   priority: AlertPriority
-  description?: string
-  messageTemplateFr?: string
-  messageTemplateEn?: string
-  messageTemplateAr?: string
+  descriptionFr?: string | null
+  descriptionEn?: string | null
+  descriptionAr?: string | null
 }
 
 /**

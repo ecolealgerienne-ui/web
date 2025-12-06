@@ -100,10 +100,10 @@ export function AlertTemplateFormDialog({
         nameAr: template.nameAr,
         category: template.category,
         priority: template.priority,
-        description: template.description || '',
-        messageTemplateFr: template.messageTemplateFr || '',
-        messageTemplateEn: template.messageTemplateEn || '',
-        messageTemplateAr: template.messageTemplateAr || '',
+        description: template.descriptionFr || '',
+        messageTemplateFr: '',
+        messageTemplateEn: '',
+        messageTemplateAr: '',
         isActive: template.isActive,
       })
     } else if (!open) {
