@@ -2250,6 +2250,126 @@ error TS2551: Property 'name' does not exist on type 'Country'. Did you mean 'na
 - `src/app/(app)/admin/therapeutic-indications/page.tsx` ✅
 - `src/components/admin/therapeutic-indications/TherapeuticIndicationFormDialog.tsx` ✅
 
+### 7.9 Dialogs Unifiés - Pattern Consultation/Modification ⚠️ RÈGLE OBLIGATOIRE
+
+**❌ NE JAMAIS créer des composants séparés pour consultation et modification**
+
+**Problème** : Créer deux composants distincts (`EntityDetailDialog` pour la consultation et `EntityFormDialog` pour la modification) entraîne :
+- Duplication de code et de structure
+- Incohérence visuelle entre les deux modes
+- Double maintenance à chaque modification
+- Risque de divergence dans l'affichage des données
+
+**✅ SOLUTION : Un seul composant Dialog avec une prop `mode`**
+
+```typescript
+type DialogMode = 'view' | 'edit' | 'create';
+
+interface EntityDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: DialogMode;
+  entity?: Entity | null;
+  onSubmit?: (data: CreateEntityDto | UpdateEntityDto) => Promise<void>;
+  isLoading?: boolean;
+}
+
+export function EntityDialog({ open, onOpenChange, mode, entity, onSubmit, isLoading }: EntityDialogProps) {
+  const isEditable = mode === 'edit' || mode === 'create';
+
+  // Composant Field qui s'adapte au mode
+  const Field = ({ label, value, onChange, type = 'text' }: FieldProps) => {
+    if (!isEditable) {
+      // Mode lecture : afficher comme texte
+      return (
+        <div className="space-y-1">
+          <span className="text-sm text-muted-foreground">{label}</span>
+          <p className="font-medium">{value || '-'}</p>
+        </div>
+      );
+    }
+
+    // Mode édition : afficher comme input
+    return (
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <Input value={value} onChange={(e) => onChange?.(e.target.value)} type={type} />
+      </div>
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        {isEditable ? (
+          <form onSubmit={handleSubmit}>
+            {/* Même structure pour les deux modes */}
+            <Field label="Nom" value={formData.name} onChange={(v) => setFormData({...formData, name: v})} />
+            <DialogFooter>
+              <Button type="submit">{mode === 'create' ? 'Créer' : 'Enregistrer'}</Button>
+            </DialogFooter>
+          </form>
+        ) : (
+          // Consultation : même structure, sans form wrapper
+          <Field label="Nom" value={entity?.name || ''} />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Utilisation dans la page :**
+
+```typescript
+// ❌ MAUVAIS - Deux composants séparés
+const [isDetailOpen, setIsDetailOpen] = useState(false);
+const [isFormOpen, setIsFormOpen] = useState(false);
+
+<EntityDetailDialog open={isDetailOpen} entity={selected} />
+<EntityFormDialog open={isFormOpen} entity={selected} onSubmit={handleSubmit} />
+
+// ✅ BON - Un seul composant avec mode
+const [dialogOpen, setDialogOpen] = useState(false);
+const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
+
+const handleViewDetail = (entity: Entity) => {
+  setSelectedEntity(entity);
+  setDialogMode('view');
+  setDialogOpen(true);
+};
+
+const handleEdit = (entity: Entity) => {
+  setSelectedEntity(entity);
+  setDialogMode('edit');
+  setDialogOpen(true);
+};
+
+const handleAdd = () => {
+  setSelectedEntity(null);
+  setDialogMode('create');
+  setDialogOpen(true);
+};
+
+<EntityDialog
+  open={dialogOpen}
+  onOpenChange={setDialogOpen}
+  mode={dialogMode}
+  entity={selectedEntity}
+  onSubmit={handleSubmit}
+  isLoading={isSubmitting}
+/>
+```
+
+**Avantages** :
+- **Cohérence visuelle** : Même structure et mise en page
+- **Maintenance unique** : Un seul composant à modifier
+- **Moins de code** : Réutilisation maximale
+- **UX améliorée** : Transition fluide entre consultation et modification
+
+**Pattern appliqué dans** :
+- `src/components/animals/animal-dialog.tsx` ✅
+
 ### 7.3 Composants Génériques Transactionnels (farm-scoped)
 
 ⚠️ **IMPORTANT** : Ces composants sont DIFFÉRENTS des composants admin (section 7.2).

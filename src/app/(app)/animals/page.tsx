@@ -8,8 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { useAnimals } from '@/lib/hooks/useAnimals';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { animalsService } from '@/lib/services/animals.service';
-import { AnimalFormDialog } from '@/components/animals/animal-form-dialog';
-import { AnimalDetailDialog } from '@/components/animals/animal-detail-dialog';
+import { AnimalDialog } from '@/components/animals/animal-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
@@ -31,8 +30,8 @@ export default function AnimalsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [animalToDelete, setAnimalToDelete] = useState<Animal | null>(null);
@@ -40,12 +39,14 @@ export default function AnimalsPage() {
 
   const handleAdd = () => {
     setSelectedAnimal(null);
-    setIsDialogOpen(true);
+    setDialogMode('create');
+    setDialogOpen(true);
   };
 
   const handleViewDetail = (animal: Animal) => {
     setSelectedAnimal(animal);
-    setIsDetailDialogOpen(true);
+    setDialogMode('view');
+    setDialogOpen(true);
   };
 
   const handleNavigate = (direction: 'prev' | 'next') => {
@@ -61,7 +62,8 @@ export default function AnimalsPage() {
 
   const handleEdit = (animal: Animal) => {
     setSelectedAnimal(animal);
-    setIsDialogOpen(true);
+    setDialogMode('edit');
+    setDialogOpen(true);
   };
 
   const handleDelete = (animal: Animal) => {
@@ -79,7 +81,7 @@ export default function AnimalsPage() {
         await animalsService.create(data as CreateAnimalDto);
         toast.success(tc('messages.success'), t('messages.created'));
       }
-      setIsDialogOpen(false);
+      setDialogOpen(false);
       refetch();
     } catch (error) {
       toast.error(tc('messages.error'), t('messages.createError'));
@@ -211,22 +213,16 @@ export default function AnimalsPage() {
         filters={statusFilterComponent}
       />
 
-      {/* Dialog de détail */}
-      <AnimalDetailDialog
+      {/* Dialog unifié (consultation/modification/création) */}
+      <AnimalDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
         animal={selectedAnimal}
-        open={isDetailDialogOpen}
-        onOpenChange={setIsDetailDialogOpen}
+        onSubmit={handleSubmit}
+        isLoading={isSubmitting}
         animals={animals}
         onNavigate={handleNavigate}
-      />
-
-      {/* Dialog formulaire */}
-      <AnimalFormDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleSubmit}
-        animal={selectedAnimal}
-        isLoading={isSubmitting}
       />
 
       {/* Dialog confirmation suppression */}
