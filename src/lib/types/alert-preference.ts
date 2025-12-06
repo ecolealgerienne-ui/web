@@ -12,13 +12,14 @@ export interface ApiAlertInPreference {
   id: string
   code: string
   nameFr: string
-  nameEn?: string
-  nameAr?: string
+  nameEn?: string | null
+  nameAr?: string | null
   category: string
   priority: string
   descriptionFr?: string | null
   descriptionEn?: string | null
   descriptionAr?: string | null
+  isActive?: boolean
 }
 
 /**
@@ -30,8 +31,11 @@ export interface AlertPreference {
   alertTemplateId: string
   displayOrder: number
   isActive: boolean
+  reminderDays?: number
+  version?: number
   createdAt?: string
   updatedAt?: string
+  deletedAt?: string | null
   alertTemplate: ApiAlertInPreference
 }
 

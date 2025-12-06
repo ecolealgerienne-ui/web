@@ -9,7 +9,6 @@ import type {
   AlertPreference,
   CreateAlertPreferenceDto,
 } from '@/lib/types/alert-preference'
-import type { PaginatedResponse } from '@/lib/types/common/api'
 
 class AlertPreferencesService {
   private getBasePath(farmId: string) {
@@ -18,17 +17,20 @@ class AlertPreferencesService {
 
   /**
    * Récupère toutes les préférences d'alertes d'une ferme
+   * @param farmId - ID de la ferme
+   * @param includeInactive - Inclure les préférences inactives (défaut: false)
    */
-  async getAll(farmId: string): Promise<AlertPreference[]> {
+  async getAll(farmId: string, includeInactive = false): Promise<AlertPreference[]> {
     try {
-      logger.info('Fetching alert preferences', { farmId })
+      logger.info('Fetching alert preferences', { farmId, includeInactive })
 
-      const response = await apiClient.get<PaginatedResponse<AlertPreference>>(
-        `${this.getBasePath(farmId)}?page=1&limit=100&order=asc`
+      // L'API retourne un tableau directement, pas de pagination
+      const response = await apiClient.get<AlertPreference[]>(
+        `${this.getBasePath(farmId)}?includeInactive=${includeInactive}`
       )
 
-      logger.info('Alert preferences fetched', { farmId, count: response.data.length })
-      return response.data
+      logger.info('Alert preferences fetched', { farmId, count: response.length })
+      return response
     } catch (error: unknown) {
       const apiError = error as { status?: number }
       if (apiError.status === 404) {
