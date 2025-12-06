@@ -35,9 +35,7 @@ export function useGlobalProducts(params?: UseGlobalProductsParams): UseGlobalPr
       const response = await productsService.getAll({
         page: 1,
         limit: 200, // Récupérer plus de produits pour le TransferList
-        sortOrder: 'ASC',
         search: params?.search,
-        therapeuticForm: params?.therapeuticForm,
       })
 
       // Filtrer par catégorie si spécifié (côté client car l'API ne supporte pas categoryId directement)
