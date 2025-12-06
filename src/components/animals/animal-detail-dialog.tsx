@@ -67,12 +67,14 @@ export function AnimalDetailDialog({
 
   if (!animal) return null;
 
-  const getStatusBadgeVariant = (status: string): "default" | "destructive" | "success" | "warning" => {
+  const getStatusBadgeVariant = (status: string): "default" | "destructive" | "success" | "warning" | "secondary" => {
     switch (status) {
       case 'alive':
         return 'success';
       case 'sold':
         return 'warning';
+      case 'slaughtered':
+        return 'secondary';
       case 'dead':
         return 'destructive';
       default:
@@ -158,105 +160,88 @@ export function AnimalDetailDialog({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="info" className="space-y-6 mt-4">
+          <TabsContent value="info" className="space-y-6 py-4">
             {/* Section: Identification */}
-            <div>
-              <h3 className="text-sm font-semibold mb-3 border-b pb-2">{t('sections.general')}</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {animal.currentEid && (
-                  <div>
-                    <span className="text-muted-foreground">{t('fields.currentEid')}:</span>
-                    <p className="font-medium">{animal.currentEid}</p>
-                  </div>
-                )}
-                {animal.officialNumber && (
-                  <div>
-                    <span className="text-muted-foreground">{t('fields.officialNumber')}:</span>
-                    <p className="font-medium">{animal.officialNumber}</p>
-                  </div>
-                )}
-                {animal.visualId && (
-                  <div>
-                    <span className="text-muted-foreground">{t('fields.visualId')}:</span>
-                    <p className="font-medium">{animal.visualId}</p>
-                  </div>
-                )}
-                <div>
-                  <span className="text-muted-foreground">{t('fields.sex')}:</span>
-                  <p className="font-medium">{t(`sex.${animal.sex}`)}</p>
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.currentEid')}</span>
+                  <p className="font-medium">{animal.currentEid || '-'}</p>
                 </div>
-                {animal.birthDate && (
-                  <div>
-                    <span className="text-muted-foreground">{t('fields.birthDate')}:</span>
-                    <p className="font-medium">{new Date(animal.birthDate).toLocaleDateString()}</p>
-                  </div>
-                )}
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.officialNumber')}</span>
+                  <p className="font-medium">{animal.officialNumber || '-'}</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.visualId')}</span>
+                  <p className="font-medium">{animal.visualId || '-'}</p>
+                </div>
               </div>
             </div>
 
-            {/* Section: Species & Breed */}
-            {(animal.species || animal.breed) && (
-              <div>
-                <h3 className="text-sm font-semibold mb-3 border-b pb-2">Espèce et Race</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  {animal.species && (
-                    <div>
-                      <span className="text-muted-foreground">{t('fields.speciesId')}:</span>
-                      <p className="font-medium">{animal.species.name}</p>
-                    </div>
-                  )}
-                  {animal.breed && (
-                    <div>
-                      <span className="text-muted-foreground">{t('fields.breedId')}:</span>
-                      <p className="font-medium">{animal.breed.name}</p>
-                    </div>
-                  )}
+            {/* Section: Informations de base */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">Informations de base</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.sex')}</span>
+                  <p className="font-medium">{t(`sex.${animal.sex}`)}</p>
                 </div>
-              </div>
-            )}
-
-            {/* Section: Genealogy */}
-            {animal.mother && (
-              <div>
-                <h3 className="text-sm font-semibold mb-3 border-b pb-2">{t('sections.genealogy')}</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.birthDate')}</span>
+                  <p className="font-medium">
+                    {animal.birthDate ? new Date(animal.birthDate).toLocaleDateString() : '-'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.status')}</span>
                   <div>
-                    <span className="text-muted-foreground">Mère:</span>
-                    <p className="font-medium">
-                      {animal.mother.currentEid || animal.mother.officialNumber || animal.mother.visualId}
-                    </p>
+                    <Badge variant={getStatusBadgeVariant(animal.status)}>
+                      {t(`status.${animal.status}`)}
+                    </Badge>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Section: Additional Info */}
-            {animal.notes && (
-              <div>
-                <h3 className="text-sm font-semibold mb-3 border-b pb-2">Informations supplémentaires</h3>
-                <div className="text-sm">
-                  <span className="text-muted-foreground">{t('fields.notes')}:</span>
-                  <p className="mt-2 text-sm whitespace-pre-wrap">{animal.notes}</p>
+            {/* Section: Espèce et Race */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">Espèce et Race</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.speciesId')}</span>
+                  <p className="font-medium">{animal.species?.name || '-'}</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.breedId')}</span>
+                  <p className="font-medium">{animal.breed?.name || '-'}</p>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Section: Metadata */}
-            <div>
-              <h3 className="text-sm font-semibold mb-3 border-b pb-2">Métadonnées</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
-                {animal.createdAt && (
-                  <div>
-                    <span>{t('fields.createdAt')}:</span>
-                    <p>{new Date(animal.createdAt).toLocaleString()}</p>
-                  </div>
-                )}
-                {animal.updatedAt && (
-                  <div>
-                    <span>{t('fields.updatedAt')}:</span>
-                    <p>{new Date(animal.updatedAt).toLocaleString()}</p>
-                  </div>
-                )}
+            {/* Section: Notes */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">{t('fields.notes')}</h3>
+              <p className="text-sm whitespace-pre-wrap">{animal.notes || '-'}</p>
+            </div>
+
+            {/* Section: Métadonnées */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">Métadonnées</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.createdAt')}</span>
+                  <p className="text-sm">
+                    {animal.createdAt ? new Date(animal.createdAt).toLocaleString() : '-'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-sm text-muted-foreground">{t('fields.updatedAt')}</span>
+                  <p className="text-sm">
+                    {animal.updatedAt ? new Date(animal.updatedAt).toLocaleString() : '-'}
+                  </p>
+                </div>
               </div>
             </div>
           </TabsContent>
