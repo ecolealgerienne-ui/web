@@ -75,11 +75,11 @@ export default function ProductCategoriesPage() {
       ),
     },
     {
-      key: 'name',
+      key: 'nameFr',
       header: t('fields.name'),
       sortable: true,
       render: (category: ProductCategory) => (
-        <span className="font-medium">{category.name}</span>
+        <span className="font-medium">{category.nameFr}</span>
       ),
     },
     {
@@ -232,10 +232,10 @@ export default function ProductCategoriesPage() {
         onOpenChange={setDetailOpen}
         item={selectedCategory}
         title={t('title.singular')}
-        description={selectedCategory?.name}
+        description={selectedCategory?.nameFr}
         fields={[
           { key: 'code', label: t('fields.code') },
-          { key: 'name', label: t('fields.name') },
+          { key: 'nameFr', label: t('fields.name') },
           {
             key: 'description',
             label: t('fields.description'),
@@ -273,7 +273,7 @@ export default function ProductCategoriesPage() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        itemName={deletingCategory?.name || ''}
+        itemName={deletingCategory?.nameFr || ''}
       />
     </div>
   )

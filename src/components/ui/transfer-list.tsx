@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Trash2, Home, GripVertical, Phone, MapPin, Pencil } from 'lucide-react'
+import { Search, Plus, Trash2, Home, GripVertical, Phone, MapPin, Pencil, Settings } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -38,6 +38,7 @@ interface TransferListProps {
   onSelect: (item: TransferListItem) => void
   onDeselect: (itemId: string) => void
   onEdit?: (item: TransferListItem) => void
+  onConfigure?: (item: TransferListItem) => void
   onItemClick?: (item: TransferListItem) => void
   onCreateLocal?: (name: string) => void
   onCreateLocalWithDetails?: (name: string, region?: string, phone?: string) => void
@@ -57,6 +58,7 @@ interface TransferListProps {
   isLoading?: boolean
   regions?: Region[]
   localFormLabels?: LocalFormLabels
+  isConfigurable?: (item: TransferListItem) => boolean
 }
 
 // Mapping région code -> nom pour la recherche
@@ -81,6 +83,7 @@ export function TransferList({
   onSelect,
   onDeselect,
   onEdit,
+  onConfigure,
   onItemClick,
   onCreateLocal,
   onCreateLocalWithDetails,
@@ -96,6 +99,7 @@ export function TransferList({
   isLoading = false,
   regions = [],
   localFormLabels,
+  isConfigurable,
 }: TransferListProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -381,6 +385,19 @@ export function TransferList({
                           className="text-primary hover:text-primary hover:bg-primary/10"
                         >
                           <Pencil className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {onConfigure && (!isConfigurable || isConfigurable(item)) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onConfigure(item)
+                          }}
+                          className="text-primary hover:text-primary hover:bg-primary/10"
+                        >
+                          <Settings className="w-4 h-4" />
                         </Button>
                       )}
                       <Button

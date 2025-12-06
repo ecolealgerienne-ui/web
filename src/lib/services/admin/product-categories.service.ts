@@ -109,7 +109,7 @@ class ProductCategoriesService
       logger.info('Product category fetched successfully', {
         id,
         code: category.code,
-        name: category.name,
+        name: category.nameFr,
       })
 
       return category
@@ -141,7 +141,7 @@ class ProductCategoriesService
       logger.info('Product category created successfully', {
         id: category.id,
         code: category.code,
-        name: category.name,
+        name: category.nameFr,
       })
 
       return category
