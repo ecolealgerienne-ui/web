@@ -355,9 +355,9 @@ export function MyAlerts() {
               {!!selectedAlert.metadata?.category && (
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">{t('details.category')}</span>
-                  <p>
+                  <div className="mt-1">
                     <Badge>{t(`categories.${selectedAlert.metadata.category}`)}</Badge>
-                  </p>
+                  </div>
                 </div>
               )}
 
@@ -365,11 +365,11 @@ export function MyAlerts() {
               {!!selectedAlert.metadata?.priority && (
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">{t('details.priority')}</span>
-                  <p>
+                  <div className="mt-1">
                     <Badge variant={getPriorityVariant(String(selectedAlert.metadata.priority))}>
                       {t(`priorities.${selectedAlert.metadata.priority}`)}
                     </Badge>
-                  </p>
+                  </div>
                 </div>
               )}
 
