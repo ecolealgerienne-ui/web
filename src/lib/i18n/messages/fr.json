@@ -40,11 +40,14 @@
       "description": "Description",
       "displayOrder": "Ordre d'affichage",
       "isActive": "Actif",
+      "status": "Statut",
       "createdAt": "Créé le",
       "updatedAt": "Modifié le",
       "deletedAt": "Supprimé le",
       "metadata": "Métadonnées",
-      "required": "Requis"
+      "required": "Requis",
+      "none": "Aucun",
+      "version": "Version"
     },
     "error": {
       "title": "Erreur",
@@ -93,6 +96,7 @@
       "name": "Saisir un nom",
       "description": "Saisir une description"
     },
+    "optional": "optionnel",
     "loading": "Chargement...",
     "admin": {
       "products": {
@@ -117,7 +121,8 @@
       "weighings": "Pesées",
       "data": "Données",
       "reports": "Rapports",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "farms": "Fermes"
     },
     "data": {
       "title": "Données",
@@ -132,7 +137,7 @@
       "farms": "Fermes"
     },
     "admin": {
-      "title": "Administration",
+      "title": "Données de référence",
       "activeSubstances": "Substances Actives",
       "productCategories": "Catégories de Produits",
       "units": "Unités de Mesure",
@@ -144,7 +149,11 @@
       "veterinarians": "Vétérinaires",
       "nationalCampaigns": "Campagnes Nationales",
       "alertTemplates": "Modèles d'Alertes",
-      "products": "Produits Vétérinaires"
+      "products": "Produits Vétérinaires",
+      "productPackagings": "Conditionnements",
+      "therapeuticIndications": "Indications Thérapeutiques",
+      "breedCountries": "Races par Pays",
+      "campaignCountries": "Campagnes par Pays"
     }
   },
   "breeds": {
@@ -847,6 +856,367 @@
     },
     "detail": {
       "title": "Détails de la race"
+    }
+  },
+  "productPackaging": {
+    "title": "Conditionnements de Produits",
+    "description": "Gestion des conditionnements et formats de produits vétérinaires par pays",
+    "fields": {
+      "product": "Produit",
+      "packagingLabel": "Label du conditionnement",
+      "country": "Pays",
+      "countryCode": "Code pays",
+      "gtinEan": "Code GTIN/EAN",
+      "numeroAMM": "Numéro AMM",
+      "concentration": "Concentration",
+      "unit": "Unité",
+      "description": "Description",
+      "displayOrder": "Ordre d'affichage",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "productId": {
+        "required": "Le produit est requis",
+        "invalid": "L'identifiant du produit est invalide"
+      },
+      "packagingLabel": {
+        "required": "Le label du conditionnement est requis",
+        "maxLength": "Le label ne doit pas dépasser 200 caractères"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "gtinEan": {
+        "maxLength": "Le code GTIN/EAN ne doit pas dépasser 50 caractères"
+      },
+      "numeroAMM": {
+        "maxLength": "Le numéro AMM ne doit pas dépasser 100 caractères"
+      },
+      "concentration": {
+        "maxLength": "La concentration ne doit pas dépasser 100 caractères"
+      },
+      "unitId": {
+        "invalid": "L'identifiant de l'unité est invalide"
+      },
+      "description": {
+        "maxLength": "La description ne doit pas dépasser 1000 caractères"
+      },
+      "displayOrder": {
+        "integer": "L'ordre d'affichage doit être un nombre entier",
+        "min": "L'ordre d'affichage doit être supérieur ou égal à 0"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer un conditionnement",
+      "editTitle": "Modifier le conditionnement",
+      "selectProduct": "Sélectionner un produit",
+      "selectCountry": "Sélectionner un pays",
+      "selectUnit": "Sélectionner une unité (optionnel)",
+      "packagingLabelPlaceholder": "Flacon 100ml, Boîte 20 comprimés...",
+      "gtinEanPlaceholder": "3760123456789",
+      "numeroAMMPlaceholder": "DZ/VET/2023/001",
+      "concentrationPlaceholder": "500mg/ml, 10%, 1:1000...",
+      "descriptionPlaceholder": "Informations complémentaires sur le conditionnement...",
+      "displayOrderPlaceholder": "Ex: 1, 2, 3..."
+    },
+    "actions": {
+      "create": "Créer un conditionnement",
+      "edit": "Modifier le conditionnement",
+      "delete": "Supprimer le conditionnement",
+      "restore": "Restaurer le conditionnement"
+    },
+    "filters": {
+      "product": "Produit",
+      "allProducts": "Tous les produits"
+    },
+    "search": {
+      "placeholder": "Rechercher un conditionnement..."
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "messages": {
+      "createSuccess": "Conditionnement créé avec succès",
+      "updateSuccess": "Conditionnement mis à jour avec succès",
+      "deleteSuccess": "Conditionnement supprimé avec succès",
+      "restoreSuccess": "Conditionnement restauré avec succès",
+      "noResults": "Aucun conditionnement trouvé",
+      "createError": "Erreur lors de la création du conditionnement",
+      "updateError": "Conflit de version ou erreur lors de la mise à jour",
+      "deleteError": "Impossible de supprimer : le conditionnement est utilisé"
+    },
+    "detail": {
+      "title": "Détails du conditionnement"
+    },
+    "delete": {
+      "title": "Supprimer le conditionnement",
+      "description": "Êtes-vous sûr de vouloir supprimer le conditionnement \"{name}\" ? Cette action peut être annulée ultérieurement."
+    }
+  },
+  "breedCountry": {
+    "title": "Races par Pays",
+    "description": "Gestion des associations entre races et pays autorisés",
+    "fields": {
+      "breed": "Race",
+      "country": "Pays",
+      "countryCode": "Code pays",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "breedId": {
+        "required": "La race est requise",
+        "invalid": "L'identifiant de la race est invalide"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "isActive": {
+        "required": "Le statut actif/inactif est requis",
+        "invalid": "Le statut doit être un booléen"
+      }
+    },
+    "form": {
+      "createTitle": "Lier une race à un pays",
+      "editTitle": "Modifier l'association race-pays",
+      "selectBreed": "Sélectionner une race",
+      "selectCountry": "Sélectionner un pays"
+    },
+    "actions": {
+      "link": "Lier une race",
+      "unlink": "Délier",
+      "activate": "Activer",
+      "deactivate": "Désactiver"
+    },
+    "filters": {
+      "breed": "Race",
+      "allBreeds": "Toutes les races",
+      "country": "Pays",
+      "allCountries": "Tous les pays"
+    },
+    "search": {
+      "placeholder": "Rechercher une association race-pays..."
+    },
+    "messages": {
+      "linkSuccess": "Association race-pays créée avec succès",
+      "unlinkSuccess": "Association supprimée avec succès",
+      "deleteSuccess": "Association supprimée avec succès",
+      "activateSuccess": "Association activée avec succès",
+      "deactivateSuccess": "Association désactivée avec succès",
+      "noResults": "Aucune association trouvée",
+      "linkError": "Erreur lors de la création de l'association",
+      "unlinkError": "Erreur lors de la suppression de l'association",
+      "toggleError": "Erreur lors du changement de statut"
+    },
+    "detail": {
+      "title": "Détails de l'association race-pays"
+    }
+  },
+  "campaignCountry": {
+    "title": "Campagnes par Pays",
+    "description": "Gestion des associations entre campagnes nationales et pays autorisés",
+    "fields": {
+      "campaign": "Campagne",
+      "country": "Pays",
+      "countryCode": "Code pays",
+      "isActive": "Actif"
+    },
+    "validation": {
+      "campaignId": {
+        "required": "La campagne est requise",
+        "invalid": "L'identifiant de la campagne est invalide"
+      },
+      "countryCode": {
+        "required": "Le code pays est requis",
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "isActive": {
+        "required": "Le statut actif/inactif est requis",
+        "invalid": "Le statut doit être un booléen"
+      }
+    },
+    "form": {
+      "createTitle": "Lier une campagne à un pays",
+      "editTitle": "Modifier l'association campagne-pays",
+      "selectCampaign": "Sélectionner une campagne",
+      "selectCountry": "Sélectionner un pays"
+    },
+    "actions": {
+      "link": "Lier une campagne",
+      "unlink": "Délier",
+      "activate": "Activer",
+      "deactivate": "Désactiver"
+    },
+    "filters": {
+      "campaign": "Campagne",
+      "allCampaigns": "Toutes les campagnes",
+      "country": "Pays",
+      "allCountries": "Tous les pays"
+    },
+    "search": {
+      "placeholder": "Rechercher une association campagne-pays..."
+    },
+    "messages": {
+      "linkSuccess": "Association campagne-pays créée avec succès",
+      "unlinkSuccess": "Association supprimée avec succès",
+      "deleteSuccess": "Association supprimée avec succès",
+      "activateSuccess": "Association activée avec succès",
+      "deactivateSuccess": "Association désactivée avec succès",
+      "noResults": "Aucune association trouvée",
+      "linkError": "Erreur lors de la création de l'association",
+      "unlinkError": "Erreur lors de la suppression de l'association",
+      "toggleError": "Erreur lors du changement de statut"
+    },
+    "detail": {
+      "title": "Détails de l'association campagne-pays"
+    }
+  },
+  "therapeuticIndication": {
+    "title": "Indications Thérapeutiques",
+    "description": "Gestion des indications thérapeutiques pour les produits vétérinaires par espèce et pays",
+    "fields": {
+      "product": "Produit",
+      "species": "Espèce",
+      "ageCategory": "Catégorie d'âge",
+      "country": "Pays",
+      "route": "Voie d'administration",
+      "doseUnit": "Unité de dosage",
+      "doseMin": "Dose minimale",
+      "doseMax": "Dose maximale",
+      "doseOriginalText": "Texte original de la posologie",
+      "protocolDurationDays": "Durée du protocole (jours)",
+      "withdrawalMeat": "Délai viande (jours)",
+      "withdrawalMilk": "Délai lait (jours)",
+      "isVerified": "Vérifiée",
+      "validationNotes": "Notes de validation",
+      "isActive": "Active"
+    },
+    "validation": {
+      "productId": {
+        "required": "Le produit est requis",
+        "invalid": "L'identifiant du produit est invalide"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      },
+      "ageCategoryId": {
+        "invalid": "L'identifiant de la catégorie d'âge est invalide"
+      },
+      "countryCode": {
+        "length": "Le code pays doit contenir exactement 2 caractères",
+        "pattern": "Le code pays doit être composé de 2 lettres majuscules (ex: DZ, FR, MA)"
+      },
+      "routeId": {
+        "required": "La voie d'administration est requise",
+        "invalid": "L'identifiant de la voie d'administration est invalide"
+      },
+      "doseUnitId": {
+        "required": "L'unité de dosage est requise",
+        "invalid": "L'identifiant de l'unité de dosage est invalide"
+      },
+      "doseMin": {
+        "min": "La dose minimale doit être supérieure ou égale à 0"
+      },
+      "doseMax": {
+        "min": "La dose maximale doit être supérieure ou égale à 0"
+      },
+      "doseOriginalText": {
+        "maxLength": "Le texte original ne doit pas dépasser 500 caractères"
+      },
+      "protocolDurationDays": {
+        "integer": "La durée du protocole doit être un nombre entier",
+        "min": "La durée du protocole doit être supérieure ou égale à 1"
+      },
+      "withdrawalMeatDays": {
+        "integer": "Le délai viande doit être un nombre entier",
+        "min": "Le délai viande doit être supérieur ou égal à 0"
+      },
+      "withdrawalMilkDays": {
+        "integer": "Le délai lait doit être un nombre entier",
+        "min": "Le délai lait doit être supérieur ou égal à 0"
+      },
+      "validationNotes": {
+        "maxLength": "Les notes de validation ne doivent pas dépasser 1000 caractères"
+      },
+      "version": {
+        "integer": "La version doit être un nombre entier",
+        "positive": "La version doit être positive"
+      }
+    },
+    "form": {
+      "createTitle": "Créer une indication thérapeutique",
+      "editTitle": "Modifier l'indication thérapeutique",
+      "sectionGeneral": "Informations Générales",
+      "sectionTargeting": "Ciblage",
+      "sectionDosage": "Posologie",
+      "sectionWithdrawal": "Délais d'Attente",
+      "sectionValidation": "Validation",
+      "sectionStatus": "Statut",
+      "selectProduct": "Sélectionner un produit",
+      "selectSpecies": "Sélectionner une espèce",
+      "selectAgeCategory": "Sélectionner une catégorie d'âge",
+      "selectCountry": "Sélectionner un pays",
+      "selectRoute": "Sélectionner une voie",
+      "selectDoseUnit": "Sélectionner une unité",
+      "doseMinPlaceholder": "Dose minimale",
+      "doseMaxPlaceholder": "Dose maximale",
+      "doseOriginalTextPlaceholder": "Texte original de la posologie...",
+      "protocolDurationPlaceholder": "Nombre de jours",
+      "withdrawalPlaceholder": "Nombre de jours",
+      "validationNotesPlaceholder": "Notes de validation..."
+    },
+    "actions": {
+      "create": "Créer une indication",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "restore": "Restaurer",
+      "verify": "Vérifier",
+      "unverify": "Révoquer la vérification"
+    },
+    "filters": {
+      "product": "Produit",
+      "allProducts": "Tous les produits",
+      "species": "Espèce",
+      "allSpecies": "Toutes les espèces",
+      "country": "Pays",
+      "allCountries": "Tous les pays",
+      "verified": "Statut de vérification",
+      "allStatus": "Tous les statuts",
+      "verifiedOnly": "Vérifiées uniquement",
+      "notVerifiedOnly": "Non vérifiées uniquement"
+    },
+    "search": {
+      "placeholder": "Rechercher une indication thérapeutique..."
+    },
+    "messages": {
+      "createSuccess": "Indication thérapeutique créée avec succès",
+      "updateSuccess": "Indication thérapeutique mise à jour avec succès",
+      "deleteSuccess": "Indication thérapeutique supprimée avec succès",
+      "restoreSuccess": "Indication thérapeutique restaurée avec succès",
+      "verifySuccess": "Indication thérapeutique vérifiée avec succès",
+      "unverifySuccess": "Vérification révoquée avec succès",
+      "noResults": "Aucune indication thérapeutique trouvée",
+      "createError": "Erreur lors de la création",
+      "updateError": "Erreur lors de la mise à jour",
+      "deleteError": "Erreur lors de la suppression",
+      "verifyError": "Erreur lors de la vérification"
+    },
+    "status": {
+      "verified": "Vérifiée",
+      "notVerified": "Non vérifiée"
+    },
+    "detail": {
+      "title": "Détails de l'indication thérapeutique"
     }
   },
   "administrationRoute": {
@@ -1946,6 +2316,7 @@
       "farm": "Ferme",
       "generalSettings": "Paramètres généraux",
       "myVeterinarians": "Mes Vétérinaires",
+      "mySpecies": "Mes Espèces",
       "myBreeds": "Mes Races",
       "myVaccines": "Mes Vaccins",
       "myMedications": "Ma Pharmacie",
@@ -1977,13 +2348,62 @@
       "farmId": "N° d'identification",
       "surface": "Surface (hectares)",
       "address": "Adresse",
+      "postalCode": "Code postal",
+      "city": "Ville",
       "country": "Pays",
+      "department": "Département",
       "region": "Région",
+      "commune": "Commune",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "location": "Localisation",
+      "cheptelNumber": "Numéro de cheptel",
+      "groupId": "Identifiant du groupe",
+      "groupName": "Nom du groupe",
+      "isDefault": "Ferme par défaut",
+      "isActive": "Actif",
       "selectCountry": "Sélectionner un pays",
       "selectRegion": "Sélectionner une région",
-      "commune": "Commune",
+      "selectDepartment": "Sélectionner un département",
       "species": "Espèces élevées",
-      "addSpecies": "+ Ajouter"
+      "addSpecies": "+ Ajouter",
+      "loading": "Chargement des informations de la ferme...",
+      "loadError": "Erreur lors du chargement des informations de la ferme",
+      "updateSuccess": "Informations de la ferme mises à jour avec succès",
+      "updateError": "Erreur lors de la mise à jour des informations de la ferme"
+    },
+    "species": {
+      "title": "Mes Espèces",
+      "subtitle": "Sélectionnez les espèces que vous élevez. Elles apparaîtront en priorité dans vos formulaires de saisie.",
+      "available": "Espèces disponibles",
+      "selected": "Mes espèces",
+      "searchPlaceholder": "Rechercher une espèce...",
+      "addLocal": "Ajouter une espèce locale",
+      "emptySelected": "Sélectionnez vos espèces",
+      "noSpecies": "Aucune espèce disponible",
+      "loadError": "Erreur lors du chargement des espèces",
+      "saved": "Configuration sauvegardée",
+      "savedMessage": "Vos espèces ont été enregistrées",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Êtes-vous sûr de vouloir supprimer définitivement {name} ? Cette espèce locale sera supprimée et ne sera plus disponible.",
+      "confirmDeleteGlobal": "Êtes-vous sûr de vouloir retirer {name} de vos espèces ? Elle restera disponible dans la liste et pourra être ajoutée de nouveau.",
+      "deleteSuccess": "Espèce supprimée avec succès",
+      "removedFromPreferences": "Espèce retirée de votre liste",
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste d'espèces",
+      "form": {
+        "addTitle": "Ajouter une espèce locale",
+        "addDescription": "Ajoutez une espèce qui n'est pas dans la liste. Elle sera privée et visible uniquement par vous.",
+        "code": "Code",
+        "codePlaceholder": "Ex: BOV, OVI, CAP",
+        "name": "Nom",
+        "namePlaceholder": "Ex: Bovin, Ovin, Caprin",
+        "description": "Description",
+        "descriptionPlaceholder": "Description de l'espèce",
+        "addButton": "Ajouter l'espèce",
+        "localNote": "Cette espèce sera privée et visible uniquement par vous.",
+        "createSuccess": "Espèce locale créée avec succès"
+      }
     },
     "veterinarians": {
       "title": "Mes Vétérinaires",
@@ -2024,7 +2444,52 @@
         "other": "Autre"
       },
       "noVeterinarians": "Aucun vétérinaire disponible",
-      "loadError": "Erreur lors du chargement des vétérinaires"
+      "loadError": "Erreur lors du chargement des vétérinaires",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Êtes-vous sûr de vouloir supprimer définitivement {name} ? Ce vétérinaire local sera supprimé et ne sera plus disponible.",
+      "confirmDeleteGlobal": "Êtes-vous sûr de vouloir retirer {name} de vos vétérinaires ? Il restera disponible dans la liste et pourra être ajouté de nouveau.",
+      "deleteSuccess": "Vétérinaire supprimé avec succès",
+      "removedFromPreferences": "Vétérinaire retiré de votre liste",
+      "form": {
+        "addTitle": "Ajouter un vétérinaire local",
+        "editTitle": "Modifier le vétérinaire",
+        "addDescription": "Ajoutez un vétérinaire qui n'est pas dans la liste. Il sera privé et visible uniquement par vous.",
+        "editDescription": "Modifiez les informations de ce vétérinaire local.",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "phone": "Téléphone",
+        "mobile": "Mobile",
+        "email": "Email",
+        "specialties": "Spécialité",
+        "department": "Département",
+        "city": "Ville",
+        "clinic": "Clinique",
+        "licenseNumber": "N° de licence",
+        "firstNamePlaceholder": "Saisir le prénom",
+        "lastNamePlaceholder": "Saisir le nom",
+        "phonePlaceholder": "Ex: 0555123456",
+        "mobilePlaceholder": "Ex: 0666123456",
+        "emailPlaceholder": "email@exemple.com",
+        "departmentPlaceholder": "Sélectionner un département",
+        "cityPlaceholder": "Saisir la ville",
+        "clinicPlaceholder": "Nom de la clinique",
+        "licenseNumberPlaceholder": "N° d'ordre vétérinaire",
+        "addButton": "Ajouter le vétérinaire",
+        "localNote": "Ce vétérinaire sera privé et visible uniquement par vous.",
+        "createSuccess": "Vétérinaire local créé avec succès",
+        "updateSuccess": "Vétérinaire local mis à jour avec succès"
+      },
+      "details": {
+        "localBadge": "Local",
+        "sections": {
+          "contact": "Contact",
+          "specialty": "Spécialité",
+          "location": "Localisation",
+          "license": "Licence"
+        }
+      },
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de vétérinaires"
     },
     "breeds": {
       "title": "Mes Races",
@@ -2035,6 +2500,7 @@
       "addLocal": "Ajouter une race locale",
       "emptySelected": "Sélectionnez vos races",
       "emptyAvailable": "Aucune race disponible pour cette espèce",
+      "noSpeciesSelected": "Veuillez d'abord sélectionner vos espèces dans la section \"Mes Espèces\"",
       "localNote": "Cette race sera privée et visible uniquement par vous.",
       "removed": "retirée",
       "restored": "a été restaurée",
@@ -2050,6 +2516,11 @@
       "loadError": "Erreur lors du chargement des races",
       "totalSelected": "{count} race sélectionnée",
       "totalSelected_plural": "{count} races sélectionnées",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Êtes-vous sûr de vouloir retirer {name} de vos races ?",
+      "removedFromPreferences": "Race retirée de votre liste",
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de races",
       "species": {
         "bovine": "Bovins",
         "ovine": "Ovins",
@@ -2067,6 +2538,19 @@
         "work": "Travail",
         "sport": "Sport",
         "local": "Race locale"
+      },
+      "form": {
+        "addTitle": "Ajouter une race locale",
+        "addDescriptionSimple": "Ajoutez une race qui n'est pas dans la liste.",
+        "species": "Espèce",
+        "selectSpecies": "Sélectionner une espèce",
+        "name": "Nom",
+        "namePlaceholder": "Ex: Ouled Djellal, Hamra, Taadmit",
+        "description": "Description",
+        "descriptionPlaceholder": "Description de la race",
+        "addButton": "Ajouter la race",
+        "localNote": "Cette race sera privée et visible uniquement par vous.",
+        "createSuccess": "Race locale créée avec succès"
       }
     },
     "vaccines": {

@@ -2,8 +2,11 @@
  * Types pour les vétérinaires (données de référence avec CRUD)
  */
 
+export type VeterinarianScope = 'global' | 'local'
+
 export interface Veterinarian {
   id: string
+  scope: VeterinarianScope
   farmId: string
   firstName: string
   lastName: string
@@ -11,6 +14,8 @@ export interface Veterinarian {
   licenseNumber: string
   specialties: string
   clinic?: string
+  department?: string
+  commune?: string
   phone: string
   mobile?: string
   email?: string
@@ -24,14 +29,21 @@ export interface Veterinarian {
   consultationFee?: number
   emergencyFee?: number
   currency?: string
+  notes?: string
   isPreferred?: boolean
   isDefault?: boolean
+  rating?: number
+  totalInterventions?: number
+  lastInterventionDate?: string
   isActive: boolean
+  version?: number
+  deletedAt?: string | null
   createdAt?: string
   updatedAt?: string
 }
 
 export interface CreateVeterinarianDto {
+  id?: string
   firstName: string
   lastName: string
   title?: string
@@ -45,12 +57,15 @@ export interface CreateVeterinarianDto {
   city?: string
   postalCode?: string
   country?: string
+  department?: string
+  commune?: string
   isAvailable?: boolean
   emergencyService?: boolean
   workingHours?: string
   consultationFee?: number
   emergencyFee?: number
   currency?: string
+  notes?: string
   isPreferred?: boolean
   isDefault?: boolean
   isActive?: boolean
@@ -70,12 +85,15 @@ export interface UpdateVeterinarianDto {
   city?: string
   postalCode?: string
   country?: string
+  department?: string
+  commune?: string
   isAvailable?: boolean
   emergencyService?: boolean
   workingHours?: string
   consultationFee?: number
   emergencyFee?: number
   currency?: string
+  notes?: string
   isPreferred?: boolean
   isDefault?: boolean
   isActive?: boolean

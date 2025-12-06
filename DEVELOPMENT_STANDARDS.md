@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.6
+**Version:** 1.8
 **Date:** 2025-12-01
-**Dernière mise à jour:** Ajout 3 nouvelles règles suite implémentation National-Campaigns (Règles 8.3.21-23: Gestion dates avec input HTML5, Validation cross-field Zod, Conversion sort order ASC/DESC)
+**Dernière mise à jour:** Ajout règle 5.5 suite implémentation Breeds - Messages d'erreur Zod avec clés relatives (sans préfixe entité) pour éviter duplication avec useTranslations()
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -728,6 +728,121 @@ export const updateAgeCategorySchema = ageCategoryBaseSchema
   )
 ```
 
+### 5.5 Messages d'Erreur Zod : Clés Relatives (Sans Préfixe Entité) ⚠️ RÈGLE CRITIQUE
+
+✅ **RÈGLE OBLIGATOIRE** : Les messages d'erreur Zod doivent être des clés i18n **RELATIVES** (sans préfixe d'entité)
+
+**Problème :**
+Quand on utilise `useTranslations('breed')`, le fonction `t()` ajoute automatiquement le préfixe `breed.` aux clés.
+Si le message Zod contient déjà `'breed.validation.code.required'`, alors `t('breed.validation.code.required')` cherche `breed.breed.validation.code.required` → MISSING_MESSAGE.
+
+**✅ Pattern CORRECT :**
+
+```typescript
+// /src/lib/validation/schemas/admin/breed.schema.ts
+import { z } from 'zod'
+
+export const breedSchema = z.object({
+  code: z.string()
+    .min(1, 'validation.code.required')        // ✅ Clé RELATIVE (sans 'breed.')
+    .max(50, 'validation.code.maxLength'),
+
+  nameFr: z.string()
+    .min(1, 'validation.nameFr.required')      // ✅ RELATIVE
+    .max(200, 'validation.nameFr.maxLength'),
+
+  speciesId: z.string()
+    .min(1, 'validation.speciesId.required')   // ✅ RELATIVE
+    .uuid('validation.speciesId.invalid'),
+})
+
+// Dans le composant
+const t = useTranslations('breed')  // Namespace = 'breed'
+
+{errors.code && (
+  <p>{t(errors.code.message!)}</p>
+  // t('validation.code.required') → cherche 'breed.validation.code.required' ✅
+)}
+```
+
+**❌ Pattern INCORRECT :**
+
+```typescript
+// ❌ ERREUR : Messages avec préfixe complet
+export const breedSchema = z.object({
+  code: z.string()
+    .min(1, 'breed.validation.code.required')    // ❌ Préfixe 'breed.' inclus
+})
+
+// Dans le composant
+const t = useTranslations('breed')
+
+{errors.code && (
+  <p>{t(errors.code.message!)}</p>
+  // t('breed.validation.code.required') → cherche 'breed.breed.validation.code.required' ❌
+  // ERREUR: MISSING_MESSAGE
+)}
+```
+
+**Structure i18n correspondante :**
+
+```json
+{
+  "breed": {
+    "fields": {
+      "code": "Code",
+      "nameFr": "Nom (Français)"
+    },
+    "validation": {
+      "code": {
+        "required": "Le code est requis",
+        "maxLength": "Le code ne doit pas dépasser 50 caractères"
+      },
+      "nameFr": {
+        "required": "Le nom en français est requis"
+      },
+      "speciesId": {
+        "required": "L'espèce est requise",
+        "invalid": "L'identifiant de l'espèce est invalide"
+      }
+    }
+  }
+}
+```
+
+**Raison :**
+- `useTranslations('entity')` ajoute automatiquement le préfixe `'entity.'`
+- Messages Zod doivent être compatibles avec ce mécanisme
+- Évite la duplication du préfixe (entity.entity.validation.*)
+
+**Impact violation :**
+- ❌ Erreur runtime : `MISSING_MESSAGE: Could not resolve 'breed.breed.validation.code.required'`
+- ❌ Messages de validation non traduits affichés aux utilisateurs
+- ❌ Expérience utilisateur dégradée
+
+**Checklist messages Zod :**
+- [ ] Messages Zod utilisent clés **RELATIVES** : `'validation.field.error'` (sans préfixe entité)
+- [ ] Dans composant : `useTranslations('entity')` + `t(error.message!)`
+- [ ] Traductions dans `fr.json` : `entity.validation.field.error`
+- [ ] Tester la validation pour vérifier que les messages s'affichent correctement
+- [ ] Aucune erreur MISSING_MESSAGE dans la console
+
+**Pattern cohérent dans tous les schémas :**
+
+```typescript
+// age-category.schema.ts
+speciesId: z.string()
+  .min(1, 'validation.speciesId.required')   // ✅ Pas 'ageCategory.validation...'
+
+// breed.schema.ts
+code: z.string()
+  .min(1, 'validation.code.required')        // ✅ Pas 'breed.validation...'
+
+// product.schema.ts
+name: z.string()
+  .min(1, 'validation.name.required')        // ✅ Pas 'product.validation...'
+```
+
 ---
 
 ## 6. TypeScript & Types
@@ -960,10 +1075,8 @@ import { apiClient } from '@/lib/api/client'
 // Internationalization
 import { useTranslations } from 'next-intl'
 
-// Types communs
-import type { BaseEntity } from '@/lib/types/common/base-entity'
-import type { PaginatedResponse, PaginationParams } from '@/lib/types/common/api'
-import type { CrudService } from '@/lib/types/common/crud-service'
+// Types communs - TOUS dans api.ts
+import type { BaseEntity, PaginatedResponse, PaginationParams, CrudService } from '@/lib/types/common/api'
 
 // UI Components (shadcn/ui)
 import { Button } from '@/components/ui/button'
@@ -1076,10 +1189,10 @@ variant: "default" | "destructive" | "warning" | "success"
 ```
 
 **Mapping Recommandé** :
-- **Active** : `variant="success"` (vert)
-- **Inactive** : `variant="warning"` (jaune)
-- **Error/Deleted** : `variant="destructive"` (rouge)
-- **Neutre** : `variant="default"` ou omis (gris)
+- **Active / Verified** : `variant="success"` (vert)
+- **Inactive / Pending / Unverified** : `variant="warning"` (jaune)
+- **Error / Deleted / Rejected** : `variant="destructive"` (rouge)
+- **Neutre / Default** : `variant="default"` ou omis (gris)
 
 **Erreurs Courantes** :
 ```typescript
@@ -1110,6 +1223,28 @@ variant: "default" | "destructive" | "warning" | "success"
     ),
 }
 ```
+
+**Exemple Vérification (Pattern Therapeutic-Indications)** :
+```typescript
+{
+  key: 'isVerified',
+  header: t('fields.isVerified'),
+  render: (indication) =>
+    indication.isVerified ? (
+      <Badge variant="success" className="flex items-center gap-1">
+        <CheckCircle className="h-3 w-3" />
+        {t('status.verified')}
+      </Badge>
+    ) : (
+      <Badge variant="warning" className="flex items-center gap-1">
+        <XCircle className="h-3 w-3" />
+        {t('status.notVerified')}
+      </Badge>
+    ),
+}
+```
+
+**⚠️ NOTE IMPORTANTE** : Ne jamais utiliser `variant="secondary"` pour les états "pending" ou "unverified". Utiliser `variant="warning"` à la place.
 
 ---
 
@@ -1264,6 +1399,91 @@ const [dependencies, setDependencies] = useState<Record<string, number>>()
 - ✅ i18n complet
 
 **⚠️ RÈGLE ABSOLUE :** Ces composants DOIVENT être utilisés pour toutes les pages admin. Ne jamais créer de variantes ou de doublons.
+
+#### 7.2.4 Inline Table Actions - Actions de Statut Intégrées
+
+**✅ RECOMMANDATION :** Pour les opérations de changement de statut fréquentes (verify/unverify, activate/deactivate), intégrer les actions directement dans les colonnes du tableau plutôt que d'ouvrir le formulaire d'édition.
+
+**Problème** : Ouvrir le formulaire d'édition complet juste pour changer un statut booléen est lourd et ralentit le workflow.
+
+**Solution** : Actions inline avec boutons dans la colonne du statut
+
+```typescript
+// ❌ MOINS OPTIMAL - Forcer l'utilisateur à ouvrir le formulaire pour changer le statut
+{
+  key: 'isVerified',
+  header: t('fields.isVerified'),
+  render: (item) => item.isVerified ? (
+    <Badge variant="success">{t('status.verified')}</Badge>
+  ) : (
+    <Badge variant="warning">{t('status.notVerified')}</Badge>
+  )
+}
+// L'utilisateur doit cliquer sur "Edit" → ouvrir le formulaire → changer le statut → sauvegarder
+
+// ✅ OPTIMAL - Actions inline pour changement rapide de statut
+{
+  key: 'isVerified',
+  header: t('fields.isVerified'),
+  render: (indication) => (
+    <div className="flex items-center gap-2">
+      {indication.isVerified ? (
+        <>
+          <Badge variant="success" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            {t('status.verified')}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()  // ⚠️ Empêcher l'ouverture du DetailSheet
+              unverify(indication.id)
+            }}
+          >
+            {t('actions.unverify')}
+          </Button>
+        </>
+      ) : (
+        <>
+          <Badge variant="warning" className="flex items-center gap-1">
+            <XCircle className="h-3 w-3" />
+            {t('status.notVerified')}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()  // ⚠️ Empêcher l'ouverture du DetailSheet
+              verify(indication.id)
+            }}
+          >
+            {t('actions.verify')}
+          </Button>
+        </>
+      )}
+    </div>
+  )
+}
+```
+
+**Cas d'Usage Recommandés** :
+- ✅ **Verify/Unverify** : Validation de données (Therapeutic-Indications)
+- ✅ **Activate/Deactivate** : Activation temporaire d'entités
+- ✅ **Approve/Reject** : Workflow d'approbation
+- ✅ **Lock/Unlock** : Verrouillage de ressources
+- ❌ **Update Complex Fields** : Utiliser le formulaire d'édition complet
+
+**Avantages** :
+1. **UX Améliorée** : Changement de statut en 1 clic au lieu de 3+ clics
+2. **Performance** : Pas besoin de charger le formulaire complet et ses dépendances
+3. **Visibilité** : Actions clairement visibles à côté du statut actuel
+4. **Workflow Optimisé** : Idéal pour traitement en masse (valider 10+ items rapidement)
+
+**⚠️ IMPORTANT** : Toujours utiliser `e.stopPropagation()` dans le `onClick` du bouton pour empêcher le déclenchement du `onRowClick` du DataTable (ouverture du DetailSheet).
+
+**Pattern appliqué dans** :
+- `src/app/(app)/admin/therapeutic-indications/page.tsx` ✅
 
 ---
 
@@ -1753,6 +1973,279 @@ export function BreedFormDialog({ breed, ... }: Props) {
 
 ---
 
+### 7.7 Hooks Personnalisés - Gestion des Paramètres ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS gérer un état `params` local en parallèle de l'état du hook**
+
+**Problème** : Quand un hook personnalisé (comme `useProductPackagings`, `useBreeds`, etc.) gère un état `params` en interne, créer un état local séparé dans le composant page empêche la synchronisation et casse la pagination, le tri et les filtres.
+
+**✅ SOLUTION : Utiliser `params` et `setParams` retournés par le hook**
+
+```typescript
+// ❌ MAUVAIS - État params séparé dans la page
+const [params, setParams] = useState<FilterParams>({
+  page: 1,
+  limit: 25,
+  sortBy: 'name',
+  sortOrder: 'asc',
+})
+const { data, total, loading, create, update, delete } = useMyEntities(params)
+
+// Problème : Le hook reçoit les params initiaux mais ne voit pas les changements
+// quand on appelle setParams dans la page. Pagination et filtres ne fonctionnent pas.
+
+// ✅ BON - Utiliser params/setParams du hook
+const {
+  data,
+  total,
+  loading,
+  params,      // ✅ État géré par le hook
+  setParams,   // ✅ Fonction du hook
+  create,
+  update,
+  delete
+} = useMyEntities({
+  page: 1,
+  limit: 25,
+  sortBy: 'name',
+  sortOrder: 'asc',
+})
+
+// Les changements via setParams se propagent correctement dans le hook
+```
+
+**Exemple Complet (Product-Packagings)** :
+
+```typescript
+export default function ProductPackagingsPage() {
+  const t = useTranslations('productPackaging')
+
+  // Constante pour filtre "Tous les produits"
+  const ALL_PRODUCTS = '__all__'
+
+  // État local pour le filtre (seulement l'ID sélectionné)
+  const [selectedProductId, setSelectedProductId] = useState<string>(ALL_PRODUCTS)
+
+  // ✅ Hook gère les params en interne
+  const {
+    data,
+    total,
+    loading,
+    params,      // ✅ Du hook
+    setParams,   // ✅ Du hook
+    create,
+    update,
+    delete: deletePackaging
+  } = useProductPackagings({
+    page: 1,
+    limit: 25,
+    sortBy: 'packagingLabel',
+    sortOrder: 'asc',
+  })
+
+  // ✅ useEffect met à jour les params du hook quand le filtre change
+  useEffect(() => {
+    setParams((prev) => ({
+      ...prev,
+      productId: selectedProductId === ALL_PRODUCTS ? undefined : selectedProductId,
+      page: 1, // Reset à la page 1
+    }))
+  }, [selectedProductId, setParams])
+
+  // ✅ Les handlers utilisent setParams du hook
+  const handlePageChange = (page: number) => {
+    setParams((prev) => ({ ...prev, page }))
+  }
+
+  const handleSearchChange = (search: string) => {
+    setParams((prev) => ({ ...prev, search, page: 1 }))
+  }
+
+  const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
+    setParams((prev) => ({ ...prev, sortBy, sortOrder }))
+  }
+
+  return (
+    <DataTable
+      data={data}
+      totalItems={total}
+      page={params.page || 1}        // ✅ Lecture depuis params du hook
+      limit={params.limit || 25}      // ✅
+      onPageChange={handlePageChange} // ✅ Mise à jour via setParams du hook
+      onSearchChange={handleSearchChange}
+      onSortChange={handleSortChange}
+      // ...
+    />
+  )
+}
+```
+
+**Implémentation du Hook** :
+
+```typescript
+export function useProductPackagings(initialParams: FilterParams = {}) {
+  // ✅ Le hook gère son propre état params
+  const [params, setParams] = useState<FilterParams>({
+    page: 1,
+    limit: 25,
+    sortBy: 'packagingLabel',
+    sortOrder: 'asc',
+    ...initialParams,  // Fusion avec les params initiaux
+  })
+
+  const [data, setData] = useState<ProductPackaging[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  // Effet qui se déclenche quand params change
+  const fetchPackagings = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await productPackagingsService.getAll(params)
+      setData(response.data)
+      setTotal(response.meta.total)
+    } catch (error) {
+      handleApiError(error, 'productPackagings.fetch', toast)
+    } finally {
+      setLoading(false)
+    }
+  }, [params, toast])
+
+  useEffect(() => {
+    fetchPackagings()
+  }, [fetchPackagings])
+
+  // ✅ Retourner params et setParams
+  return {
+    data,
+    total,
+    loading,
+    params,      // ✅ Exposé au composant
+    setParams,   // ✅ Exposé au composant
+    create,
+    update,
+    delete: deletePackaging,
+  }
+}
+```
+
+**Raisons de cette règle** :
+
+1. **Source de vérité unique** : Le hook est la seule source de vérité pour `params`, évite les désynchronisations
+2. **Pagination fonctionnelle** : Les changements de page se propagent correctement
+3. **Filtres fonctionnels** : Les filtres déclenchent un nouveau fetch
+4. **Tri fonctionnel** : Les changements de tri sont reflétés dans les données
+5. **Cohérence** : Pattern identique pour tous les hooks CRUD (useBreeds, useSpecies, etc.)
+
+**Erreurs typiques si cette règle n'est pas suivie** :
+- ❌ Pagination : Cliquer sur "Page suivante" ne change rien
+- ❌ Filtres : Sélectionner un filtre ne rafraîchit pas les données
+- ❌ Tri : Cliquer sur une colonne ne trie pas
+- ❌ Recherche : Taper dans la recherche ne filtre pas
+
+**Pattern appliqué dans** :
+- `src/app/(app)/admin/breeds/page.tsx` ✅
+- `src/app/(app)/admin/product-packagings/page.tsx` ✅
+- `src/app/(app)/admin/species/page.tsx` ✅
+
+---
+
+### 7.8 Entity Field Naming - Convention des Champs Relations ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS supposer le nom des champs sans vérifier le type**
+
+**Problème** : Les entités ont des conventions de nommage différentes pour leurs champs. Utiliser `nameFr` au lieu de `name` (ou inversement) cause des erreurs TypeScript silencieuses ou des rendus vides.
+
+**✅ SOLUTION : Vérifier le type TypeScript de chaque entité avant utilisation**
+
+```typescript
+// ❌ MAUVAIS - Supposer que tous les champs utilisent nameFr
+<SelectItem key={species.id} value={species.id}>
+  {species.nameFr} ({species.code})  // ❌ TypeScript error: Property 'nameFr' does not exist
+</SelectItem>
+
+// ✅ BON - Vérifier le type Species d'abord
+// Dans types/admin/species.ts : interface Species { name: string; code: string; ... }
+<SelectItem key={species.id} value={species.id}>
+  {species.name} ({species.code})  // ✅ Correct field name
+</SelectItem>
+```
+
+**Convention par Entité** :
+
+| Entité | Champ Nom | Remarque |
+|--------|-----------|----------|
+| **Species** | `name` | ⚠️ Un seul champ `name` (pas de localisation) |
+| **AdministrationRoute** | `name` | ⚠️ Un seul champ `name` (pas de localisation) |
+| **Country** | `nameFr`, `nameEn`, `nameAr` | ✅ Trois champs séparés (localisés) |
+| **Breed** | `name` | ⚠️ Un seul champ `name` |
+| **Product** | `commercialName`, `laboratoryName` | ⚠️ Champs spécifiques |
+| **AgeCategory** | `name` | ⚠️ Un seul champ `name` |
+
+**Exemple Complet (Therapeutic-Indications)** :
+
+```typescript
+// ❌ ERREUR - Mélanger les conventions
+const columns: ColumnDef<TherapeuticIndication>[] = [
+  {
+    key: 'species',
+    header: t('fields.species'),
+    render: (indication) => indication.species?.nameFr || '—',  // ❌ Species n'a pas nameFr
+  },
+  {
+    key: 'route',
+    header: t('fields.route'),
+    render: (indication) => indication.route?.nameFr || '—',    // ❌ Route n'a pas nameFr
+  },
+  {
+    key: 'country',
+    header: t('fields.country'),
+    render: (indication) => indication.country?.name || '—',     // ❌ Country n'a pas name (a nameFr)
+  },
+]
+
+// ✅ CORRECT - Utiliser les bons noms de champs
+const columns: ColumnDef<TherapeuticIndication>[] = [
+  {
+    key: 'species',
+    header: t('fields.species'),
+    render: (indication) => indication.species?.name || '—',     // ✅ Species.name
+  },
+  {
+    key: 'route',
+    header: t('fields.route'),
+    render: (indication) => indication.route?.name || '—',       // ✅ Route.name
+  },
+  {
+    key: 'country',
+    header: t('fields.country'),
+    render: (indication) => indication.country?.nameFr || '—',   // ✅ Country.nameFr
+  },
+]
+```
+
+**Workflow Recommandé** :
+
+1. **TOUJOURS** ouvrir le fichier type de l'entité référencée (ex: `types/admin/species.ts`)
+2. **VÉRIFIER** les noms de champs exacts dans l'interface TypeScript
+3. **UTILISER** les noms corrects dans le code (render, SelectItem, etc.)
+4. **COMPILER** avec `npx tsc --noEmit` pour vérifier les erreurs TypeScript
+
+**Erreurs TypeScript Typiques** :
+
+```
+error TS2551: Property 'nameFr' does not exist on type 'Species'. Did you mean 'name'?
+error TS2551: Property 'name' does not exist on type 'Country'. Did you mean 'nameFr'?
+```
+
+**Impact** : Évite les erreurs TypeScript lors du build et garantit l'affichage correct des données dans les formulaires et tableaux.
+
+**Pattern appliqué dans** :
+- `src/app/(app)/admin/therapeutic-indications/page.tsx` ✅
+- `src/components/admin/therapeutic-indications/TherapeuticIndicationFormDialog.tsx` ✅
+
+---
+
 ## 8. Services API
 
 ### 8.1 Structure d'un Service
@@ -2024,6 +2517,17 @@ Le backend incrémente automatiquement la version à chaque mise à jour et reto
 
 ✅ **SOLUTION :** Organiser en sections logiques avec titres séparés par bordure
 
+**Recommandations** :
+- **Seuil** : Organiser en sections dès 10+ champs
+- **Nombre de sections** : Idéalement 5-7 sections (pas plus de 8)
+- **Ordre recommandé** :
+  1. Informations Générales / Principales (code, identifiants)
+  2. Ciblage / Relations (foreign keys, associations)
+  3. Données Métier / Core Data (champs principaux spécifiques)
+  4. Données Complémentaires / Supplementary (informations secondaires)
+  5. Statut / Status (isActive, isVerified, etc.)
+- **Champs par section** : 2-5 champs maximum par section
+
 ```tsx
 // ❌ MAUVAIS : Tous les champs mélangés
 <form>
@@ -2078,7 +2582,75 @@ Le backend incrémente automatiquement la version à chaque mise à jour et reto
 }
 ```
 
-**Impact** : Améliore significativement l'UX pour formulaires avec 10+ champs (ex: Products avec 13 champs).
+**Exemple Complexe (Therapeutic-Indications - 16 champs / 6 sections)** :
+
+```tsx
+<form className="space-y-6">
+  {/* Section 1 : Informations Générales */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.generalInfo')}
+    </h3>
+    <Input label={t('fields.code')} {...register('code')} />
+    <Input label={t('fields.pathology')} {...register('pathology')} />
+  </div>
+
+  {/* Section 2 : Ciblage */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.targeting')}
+    </h3>
+    <Select {...register('productId')} />
+    <Select {...register('speciesId')} />
+    <Select {...register('countryCode')} />
+    <Select {...register('routeId')} />
+  </div>
+
+  {/* Section 3 : Posologie */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.dosage')}
+    </h3>
+    <Input label={t('fields.dosage')} {...register('dosage')} />
+    <Input label={t('fields.frequency')} {...register('frequency')} />
+    <Input label={t('fields.duration')} {...register('duration')} />
+  </div>
+
+  {/* Section 4 : Délais d'Attente */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.withdrawalPeriods')}
+    </h3>
+    <Input type="number" label={t('fields.withdrawalMeat')} {...register('withdrawalMeat')} />
+    <Input type="number" label={t('fields.withdrawalMilk')} {...register('withdrawalMilk')} />
+    <Input type="number" label={t('fields.withdrawalEggs')} {...register('withdrawalEggs')} />
+  </div>
+
+  {/* Section 5 : Informations Supplémentaires */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.additionalInfo')}
+    </h3>
+    <Textarea label={t('fields.instructions')} {...register('instructions')} />
+    <Textarea label={t('fields.contraindications')} {...register('contraindications')} />
+    <Textarea label={t('fields.warnings')} {...register('warnings')} />
+  </div>
+
+  {/* Section 6 : Statut */}
+  <div className="space-y-4">
+    <h3 className="text-sm font-semibold border-b pb-2">
+      {tc('sections.status')}
+    </h3>
+    <Checkbox label={t('fields.isVerified')} {...register('isVerified')} />
+    <Checkbox label={t('fields.isActive')} {...register('isActive')} />
+  </div>
+</form>
+```
+
+**Impact** : Améliore significativement l'UX pour formulaires avec 10+ champs (ex: Products avec 13 champs, Therapeutic-Indications avec 16 champs).
+
+**Pattern appliqué dans** :
+- `src/components/admin/therapeutic-indications/TherapeuticIndicationFormDialog.tsx` ✅ (16 champs / 6 sections)
 
 #### 8.3.6 react-hook-form - Controller pour Select
 
@@ -3780,6 +4352,126 @@ export interface NationalCampaignFilterParams {
 - [ ] Spécifier `path` dans refine pour cibler le bon champ d'erreur
 - [ ] Convertir sort order : `.toLowerCase()` pour DataTable, `.toUpperCase()` pour backend
 - [ ] Afficher dates avec `toLocaleDateString('fr-FR')` dans les tableaux
+
+#### 8.3.24 Structure de PaginatedResponse - Accès via meta.total ⚠️ RÈGLE CRITIQUE
+
+✅ **RÈGLE OBLIGATOIRE** : `PaginatedResponse<T>` utilise `meta.total`, PAS `total` directement
+
+**Problème :**
+L'interface `PaginatedResponse<T>` a changé de structure. Le total n'est plus à la racine mais dans l'objet `meta`.
+
+**Structure correcte de PaginatedResponse :**
+
+```typescript
+// /src/lib/types/common/api.ts
+export interface PaginationMeta {
+  total: number        // ✅ Total d'éléments
+  page: number         // Page actuelle
+  limit: number        // Éléments par page
+  totalPages: number   // Nombre total de pages
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]            // ✅ Array des données
+  meta: PaginationMeta // ✅ Métadonnées dans un objet 'meta'
+}
+```
+
+**Pattern correct dans les services :**
+
+```typescript
+// ✅ CORRECT : Accès via response.meta.total
+async getAll(params: FilterParams = {}): Promise<PaginatedResponse<MyEntity>> {
+  const response = await apiClient.get<PaginatedResponse<MyEntity>>(
+    `${this.basePath}?${queryParams.toString()}`
+  )
+
+  logger.info('Entities fetched', {
+    total: response.meta.total,    // ✅ Accès via .meta
+    page: response.meta.page,      // ✅
+    totalPages: response.meta.totalPages  // ✅
+  })
+
+  return response
+}
+```
+
+**Pattern correct dans les hooks :**
+
+```typescript
+// ✅ CORRECT : Extraction via response.meta.total
+const fetchEntities = useCallback(async () => {
+  setLoading(true)
+  try {
+    const response = await myEntityService.getAll(params)
+    setData(response.data)           // ✅ Array directement
+    setTotal(response.meta.total)    // ✅ Total via .meta
+  } catch (error) {
+    handleApiError(error, 'entities.fetch', toast)
+  } finally {
+    setLoading(false)
+  }
+}, [params, toast])
+```
+
+**❌ Erreurs courantes :**
+
+```typescript
+// ❌ ERREUR 1 : Accès direct à response.total (n'existe pas)
+const response = await myService.getAll(params)
+setTotal(response.total)  // ❌ Property 'total' does not exist on type 'PaginatedResponse<T>'
+
+// ✅ CORRECT 1
+setTotal(response.meta.total)  // ✅
+
+// ❌ ERREUR 2 : Logger response.total
+logger.info('Entities fetched', {
+  total: response.total  // ❌ Undefined
+})
+
+// ✅ CORRECT 2
+logger.info('Entities fetched', {
+  total: response.meta.total  // ✅
+})
+
+// ❌ ERREUR 3 : Déstructuration incorrecte
+const { data, total } = await myService.getAll()  // ❌ total undefined
+
+// ✅ CORRECT 3
+const { data, meta } = await myService.getAll()
+const total = meta.total  // ✅
+
+// Ou directement
+const response = await myService.getAll()
+setData(response.data)
+setTotal(response.meta.total)
+```
+
+**Types d'erreur TypeScript :**
+
+```
+Property 'total' does not exist on type 'PaginatedResponse<Breed>'.
+```
+
+**Raison du changement :**
+- Séparation des données et des métadonnées
+- Structure plus évolutive (ajout de nouvelles métadonnées sans polluer la racine)
+- Cohérence avec les standards REST modernes
+
+**Impact violation :**
+- ❌ Build error TypeScript
+- ❌ `total` sera `undefined` au runtime
+- ❌ Pagination cassée (affichage "0 résultats" même si données présentes)
+- ❌ Logs incorrects
+
+**Checklist PaginatedResponse :**
+- [ ] Import `PaginatedResponse<T>` depuis `@/lib/types/common/api`
+- [ ] Accéder au total via `response.meta.total` (pas `response.total`)
+- [ ] Accéder à la page via `response.meta.page`
+- [ ] Accéder au nombre de pages via `response.meta.totalPages`
+- [ ] Dans les hooks : `setTotal(response.meta.total)`
+- [ ] Dans les logs : `total: response.meta.total`
+- [ ] Vérifier avec `npx tsc --noEmit` avant commit
 
 ---
 

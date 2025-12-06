@@ -8,9 +8,8 @@ import type {
 import type {
   PaginatedResponse,
   PaginationParams,
-  SortOrder,
+  CrudService,
 } from '@/lib/types/common/api'
-import type { CrudService } from '@/lib/types/common/crud-service'
 
 /**
  * Paramètres de filtrage pour les races
@@ -43,7 +42,7 @@ export interface BreedFilterParams extends PaginationParams {
   /**
    * Ordre de tri (ASC ou DESC)
    */
-  sortOrder?: SortOrder
+  sortOrder?: 'asc' | 'desc'
 }
 
 /**
@@ -60,12 +59,12 @@ class BreedsService implements CrudService<Breed, CreateBreedDto, UpdateBreedDto
   private readonly basePath = '/api/v1/breeds'
 
   /**
-   * Liste paginée des races avec filtres
+   * Récupère toutes les races (paginées) avec filtres
    *
    * @param params - Paramètres de pagination et filtrage
    * @returns Promise<PaginatedResponse<Breed>>
    */
-  async list(params: BreedFilterParams = {}): Promise<PaginatedResponse<Breed>> {
+  async getAll(params: BreedFilterParams = {}): Promise<PaginatedResponse<Breed>> {
     try {
       const {
         page = 1,
@@ -95,7 +94,7 @@ class BreedsService implements CrudService<Breed, CreateBreedDto, UpdateBreedDto
       )
 
       logger.info('Breeds list fetched', {
-        total: response.total,
+        total: response.meta.total,
         page,
         limit,
         speciesId,

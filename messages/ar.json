@@ -525,6 +525,43 @@
     "data": {
       "title": "البيانات",
       "description": "استيراد/تصدير البيانات"
+    },
+    "veterinarians": {
+      "title": "أطبائي البيطريون",
+      "subtitle": "اختر الأطباء البيطريين الذين تريد ربطهم بمزرعتك",
+      "available": "الأطباء المتاحون",
+      "selected": "أطبائي البيطريون",
+      "searchPlaceholder": "ابحث عن طبيب بيطري...",
+      "emptySelected": "لم يتم اختيار أي طبيب بيطري",
+      "noVeterinarians": "لا يوجد طبيب بيطري متاح",
+      "loadError": "خطأ في تحميل الأطباء البيطريين",
+      "saved": "تم الحفظ",
+      "savedMessage": "تم حفظ تفضيلاتك",
+      "alreadyInList": "الطبيب موجود مسبقاً",
+      "alreadyInListMessage": "{name} موجود بالفعل في قائمة أطبائك البيطريين",
+      "confirmDelete": "تأكيد الحذف",
+      "confirmDeleteLocal": "هل تريد حقاً حذف {name}؟ سيتم حذف هذا الطبيب المحلي نهائياً.",
+      "confirmDeleteGlobal": "هل تريد إزالة {name} من قائمتك؟ يمكنك إضافته مرة أخرى لاحقاً.",
+      "deleteSuccess": "تم حذف الطبيب البيطري بنجاح",
+      "removedFromPreferences": "تمت إزالة الطبيب من تفضيلاتك",
+      "filters": {
+        "allRegions": "جميع المناطق",
+        "allSpecialties": "جميع التخصصات"
+      },
+      "specialties": {
+        "bovine": "أبقار",
+        "ovine": "أغنام",
+        "caprine": "ماعز",
+        "poultry": "دواجن",
+        "equine": "خيول",
+        "camelid": "إبل",
+        "general": "عام",
+        "other": "أخرى"
+      }
+    },
+    "actions": {
+      "save": "حفظ",
+      "saving": "جاري الحفظ..."
     }
   },
   "footer": {

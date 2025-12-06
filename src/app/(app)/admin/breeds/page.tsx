@@ -332,6 +332,7 @@ export default function BreedsPage() {
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onView={handleView}
+            onRowClick={handleView}
             loading={loading}
             emptyMessage={t('messages.noResults')}
             searchPlaceholder={t('search.placeholder')}
@@ -361,19 +362,21 @@ export default function BreedsPage() {
         item={selectedBreed}
         title={t('detail.title')}
         fields={[
-          { label: t('fields.code'), value: (item) => item.code },
-          { label: t('fields.nameFr'), value: (item) => item.nameFr },
-          { label: t('fields.nameEn'), value: (item) => item.nameEn },
-          { label: t('fields.nameAr'), value: (item) => item.nameAr || '—' },
+          { key: 'code', label: t('fields.code') },
+          { key: 'nameFr', label: t('fields.nameFr') },
+          { key: 'nameEn', label: t('fields.nameEn') },
+          { key: 'nameAr', label: t('fields.nameAr') },
           {
+            key: 'species',
             label: t('fields.species'),
-            value: (item) => `${item.species?.name || '—'} (${item.species?.code || '—'})`,
+            render: (value) => value ? `${value.name || '—'} (${value.code || '—'})` : '—',
           },
-          { label: t('fields.description'), value: (item) => item.description || '—' },
-          { label: t('fields.displayOrder'), value: (item) => item.displayOrder?.toString() || '—' },
+          { key: 'description', label: t('fields.description') },
+          { key: 'displayOrder', label: t('fields.displayOrder') },
           {
+            key: 'isActive',
             label: t('fields.isActive'),
-            value: (item) => (item.isActive ? t('status.active') : t('status.inactive')),
+            type: 'badge',
           },
         ]}
       />

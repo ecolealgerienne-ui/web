@@ -31,15 +31,6 @@ export const authConfig = {
   },
 }
 
-// Utilisateur mock pour le mode développement
-export const mockUser = {
-  id: 'dev-user-1',
-  email: 'dev@ecole-algerienne.dz',
-  name: 'Utilisateur Dev',
-  role: 'super_admin' as const, // Super admin pour accès complet en dev
-  farmName: 'Ferme du Val Fleuri',
-}
-
 /**
  * ID de la ferme pour le mode développement
  *
@@ -50,7 +41,17 @@ export const mockUser = {
  * En production, cet ID sera récupéré depuis le contexte utilisateur
  * après authentification.
  */
-export const TEMP_FARM_ID = '550e8400-e29b-41d4-a716-446655440000';
+export const TEMP_FARM_ID = 'd8f9288a-92a6-4bfa-8201-d7c61b5a4eaf';
+
+// Utilisateur mock pour le mode développement
+export const mockUser = {
+  id: 'dev-user-1',
+  email: 'dev@ecole-algerienne.dz',
+  name: 'Utilisateur Dev',
+  role: 'super_admin' as const, // Super admin pour accès complet en dev
+  farmId: TEMP_FARM_ID,
+  farmName: 'Ferme du Val Fleuri',
+}
 
 // Vérifier si une route est publique
 export function isPublicRoute(pathname: string): boolean {

@@ -31,16 +31,31 @@ export interface ProductCategory extends BaseEntity {
   code: string
 
   /**
-   * Nom de la catégorie
+   * Nom de la catégorie en français
    * @example "Antibiotiques", "Anti-inflammatoires", "Antiparasitaires"
    */
-  name: string
+  nameFr: string
+
+  /**
+   * Nom de la catégorie en anglais
+   */
+  nameEn?: string
+
+  /**
+   * Nom de la catégorie en arabe
+   */
+  nameAr?: string
 
   /**
    * Description optionnelle de la catégorie
    * @example "Médicaments destinés à combattre les infections bactériennes"
    */
-  description?: string
+  description?: string | null
+
+  /**
+   * Ordre d'affichage
+   */
+  displayOrder?: number
 
   // Hérité de BaseEntity :
   // - id: string

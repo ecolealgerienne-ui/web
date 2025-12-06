@@ -525,6 +525,182 @@
     "data": {
       "title": "Données",
       "description": "Import/Export de données"
+    },
+    "species": {
+      "title": "Mes Espèces",
+      "subtitle": "Sélectionnez les espèces que vous élevez dans votre ferme",
+      "available": "Espèces disponibles",
+      "selected": "Mes espèces",
+      "searchPlaceholder": "Rechercher une espèce...",
+      "emptySelected": "Aucune espèce sélectionnée",
+      "noSpecies": "Aucune espèce disponible",
+      "loadError": "Erreur lors du chargement des espèces",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences d'espèces ont été enregistrées",
+      "alreadyInList": "Espèce déjà ajoutée",
+      "alreadyInListMessage": "{name} est déjà dans votre liste d'espèces",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteGlobal": "Voulez-vous retirer {name} de votre liste ? Vous pourrez la réajouter plus tard.",
+      "removedFromPreferences": "Espèce retirée de vos préférences"
+    },
+    "breeds": {
+      "title": "Mes Races",
+      "subtitle": "Sélectionnez les races que vous élevez pour chaque espèce",
+      "available": "Races disponibles",
+      "selected": "Mes races",
+      "searchPlaceholder": "Rechercher une race...",
+      "emptySelected": "Aucune race sélectionnée",
+      "emptyAvailable": "Aucune race disponible pour cette espèce",
+      "noSpeciesSelected": "Veuillez d'abord sélectionner au moins une espèce dans 'Mes Espèces'",
+      "loadError": "Erreur lors du chargement des races",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences de races ont été enregistrées",
+      "alreadyInList": "Race déjà ajoutée",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de races",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Voulez-vous retirer {name} de votre liste ? Vous pourrez la réajouter plus tard.",
+      "removedFromPreferences": "Race retirée de vos préférences"
+    },
+    "medications": {
+      "title": "Ma Pharmacie",
+      "subtitle": "Sélectionnez les produits vétérinaires que vous utilisez régulièrement",
+      "available": "Produits disponibles",
+      "selected": "Mes produits",
+      "searchPlaceholder": "Rechercher un produit...",
+      "emptySelected": "Aucun produit sélectionné",
+      "emptyAvailable": "Aucun produit disponible",
+      "loadError": "Erreur lors du chargement des produits",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences de produits ont été enregistrées",
+      "alreadyInList": "Produit déjà ajouté",
+      "alreadyInListMessage": "{name} est déjà dans votre pharmacie",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Voulez-vous retirer {name} de votre pharmacie ? Vous pourrez le réajouter plus tard.",
+      "removedFromPreferences": "Produit retiré de votre pharmacie",
+      "filters": {
+        "allCategories": "Toutes les catégories",
+        "allForms": "Toutes les formes"
+      },
+      "details": {
+        "code": "Code",
+        "laboratory": "Laboratoire",
+        "category": "Catégorie",
+        "form": "Forme thérapeutique",
+        "dosage": "Dosage",
+        "packaging": "Conditionnement",
+        "prescriptionRequired": "Prescription vétérinaire requise",
+        "description": "Description",
+        "usageInstructions": "Instructions d'utilisation",
+        "contraindications": "Contre-indications",
+        "storageConditions": "Conditions de stockage",
+        "activeSubstances": "Substances actives"
+      }
+    },
+    "veterinarians": {
+      "title": "Mes vétérinaires",
+      "subtitle": "Sélectionnez les vétérinaires que vous souhaitez associer à votre ferme",
+      "available": "Vétérinaires disponibles",
+      "selected": "Mes vétérinaires",
+      "searchPlaceholder": "Rechercher un vétérinaire...",
+      "emptySelected": "Aucun vétérinaire sélectionné",
+      "noVeterinarians": "Aucun vétérinaire disponible",
+      "loadError": "Erreur lors du chargement des vétérinaires",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences ont été enregistrées",
+      "alreadyInList": "Vétérinaire déjà ajouté",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de vétérinaires",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteLocal": "Voulez-vous vraiment supprimer {name} ? Ce vétérinaire local sera définitivement supprimé.",
+      "confirmDeleteGlobal": "Voulez-vous retirer {name} de votre liste ? Vous pourrez le réajouter plus tard.",
+      "deleteSuccess": "Vétérinaire supprimé avec succès",
+      "removedFromPreferences": "Vétérinaire retiré de vos préférences",
+      "filters": {
+        "allRegions": "Toutes les régions",
+        "allSpecialties": "Toutes les spécialités"
+      },
+      "specialties": {
+        "bovine": "Bovins",
+        "ovine": "Ovins",
+        "caprine": "Caprins",
+        "poultry": "Volailles",
+        "equine": "Équins",
+        "camelid": "Camélidés",
+        "general": "Généraliste",
+        "other": "Autre"
+      }
+    },
+    "alerts": {
+      "title": "Mes Alertes",
+      "subtitle": "Sélectionnez les types d'alertes que vous souhaitez recevoir",
+      "available": "Alertes disponibles",
+      "selected": "Mes alertes",
+      "searchPlaceholder": "Rechercher une alerte...",
+      "emptySelected": "Aucune alerte sélectionnée",
+      "emptyAvailable": "Aucune alerte disponible",
+      "loadError": "Erreur lors du chargement des alertes",
+      "saved": "Enregistré",
+      "savedMessage": "Vos préférences d'alertes ont été enregistrées",
+      "alreadyInList": "Alerte déjà ajoutée",
+      "alreadyInListMessage": "{name} est déjà dans votre liste d'alertes",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Voulez-vous retirer {name} de votre liste ? Vous pourrez la réajouter plus tard.",
+      "removedFromPreferences": "Alerte retirée de vos préférences",
+      "filters": {
+        "allCategories": "Toutes les catégories"
+      },
+      "categories": {
+        "health": "Santé",
+        "vaccination": "Vaccination",
+        "treatment": "Traitement",
+        "reproduction": "Reproduction",
+        "nutrition": "Nutrition",
+        "administrative": "Administratif",
+        "other": "Autre"
+      },
+      "priorities": {
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Haute",
+        "urgent": "Urgente"
+      },
+      "details": {
+        "code": "Code",
+        "category": "Catégorie",
+        "priority": "Priorité",
+        "description": "Description"
+      },
+      "configure": {
+        "title": "Configurer l'alerte",
+        "reminderDays": "Jours de rappel",
+        "reminderDaysDescription": "Nombre de jours avant l'échéance pour recevoir le rappel",
+        "saved": "Configuration enregistrée",
+        "savedMessage": "La configuration de l'alerte a été enregistrée"
+      }
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "subtitle": "Gérez vos préférences et paramètres",
+    "groups": {
+      "general": "Général",
+      "myData": "Mes Données",
+      "preferences": "Préférences",
+      "system": "Système"
+    },
+    "sections": {
+      "profile": "Profil",
+      "farm": "Exploitation",
+      "generalSettings": "Paramètres généraux",
+      "myVeterinarians": "Mes vétérinaires",
+      "mySpecies": "Mes espèces",
+      "myBreeds": "Mes races",
+      "myVaccines": "Mes vaccins",
+      "myMedications": "Ma pharmacie",
+      "myAlerts": "Mes alertes",
+      "language": "Langue & Région",
+      "security": "Sécurité",
+      "data": "Données"
     }
   },
   "footer": {
