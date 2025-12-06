@@ -1,22 +1,28 @@
 /**
- * Hook React pour la gestion des races (READ avec création locale)
+ * Hook React pour la gestion des races (via préférences ferme)
+ * Utilise les préférences de la ferme, pas le référentiel admin
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Breed, CreateBreedDto } from '@/lib/types/breed'
-import { breedsService } from '@/lib/services/breeds.service'
+import { breedPreferencesService } from '@/lib/services/breed-preferences.service'
 import { logger } from '@/lib/utils/logger'
+import { TEMP_FARM_ID } from '@/lib/auth/config'
+
+interface Breed {
+  id: string
+  name: string
+  speciesId: string
+}
 
 interface UseBreedsResult {
   breeds: Breed[]
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
-  createBreed: (data: CreateBreedDto) => Promise<Breed>
 }
 
 export function useBreeds(speciesId?: string): UseBreedsResult {
-  const [breeds, setBreeds] = useState<Breed[]>([])
+  const [allBreeds, setAllBreeds] = useState<Breed[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -28,32 +34,39 @@ export function useBreeds(speciesId?: string): UseBreedsResult {
     setError(null)
 
     try {
-      const data = await breedsService.getAll(memoizedSpeciesId)
-      setBreeds(data)
+      const preferences = await breedPreferencesService.getAll(TEMP_FARM_ID)
+      // Mapper les préférences vers un format simple { id, name, speciesId }
+      const breedsList: Breed[] = preferences
+        .filter(p => p.isActive)
+        .map(p => ({
+          id: p.breedId,
+          name: p.breed?.nameFr || p.breed?.nameEn || p.breedId,
+          speciesId: p.breed?.speciesId || '',
+        }))
+      setAllBreeds(breedsList)
     } catch (err) {
       const error = err as Error
       setError(error)
-      logger.error('Failed to fetch breeds in hook', { error, speciesId: memoizedSpeciesId })
+      logger.error('Failed to fetch breed preferences in hook', { error })
     } finally {
       setLoading(false)
     }
-  }, [memoizedSpeciesId])
+  }, [])
 
   useEffect(() => {
     fetchBreeds()
   }, [fetchBreeds])
 
-  const createBreed = useCallback(async (data: CreateBreedDto): Promise<Breed> => {
-    const newBreed = await breedsService.create(data)
-    setBreeds(prev => [...prev, newBreed])
-    return newBreed
-  }, [])
+  // Filtrer les races par espèce si speciesId est fourni
+  const breeds = useMemo(() => {
+    if (!memoizedSpeciesId) return allBreeds
+    return allBreeds.filter(b => b.speciesId === memoizedSpeciesId)
+  }, [allBreeds, memoizedSpeciesId])
 
   return {
     breeds,
     loading,
     error,
     refetch: fetchBreeds,
-    createBreed,
   }
 }
