@@ -291,7 +291,7 @@ export function MyMedications() {
           <SelectItem value="all">{t('filters.allCategories')}</SelectItem>
           {categories.map((cat) => (
             <SelectItem key={cat.id} value={cat.id}>
-              {cat.name}
+              {cat.nameFr}
             </SelectItem>
           ))}
         </SelectContent>
