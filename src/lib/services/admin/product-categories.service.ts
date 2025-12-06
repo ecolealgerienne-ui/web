@@ -62,11 +62,12 @@ class ProductCategoriesService
       logger.info('Fetching product categories', { params })
 
       // Construire l'URL avec les query params
+      // Note: L'API utilise 'order' (pas 'sortOrder')
       const queryParams = new URLSearchParams()
       if (params?.page) queryParams.append('page', String(params.page))
       if (params?.limit) queryParams.append('limit', String(params.limit))
       if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
-      if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder)
+      if (params?.sortOrder) queryParams.append('order', params.sortOrder)
       if (params?.search) queryParams.append('search', params.search)
 
       const url = queryParams.toString()
