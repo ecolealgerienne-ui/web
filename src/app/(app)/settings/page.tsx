@@ -21,10 +21,12 @@ import {
   Pill,
   Bell,
   Settings,
+  PawPrint,
 } from 'lucide-react'
 
 // Import des nouveaux composants de configuration
 import { MyVeterinarians } from '@/components/settings/my-veterinarians'
+import { MySpecies } from '@/components/settings/my-species'
 import { MyBreeds } from '@/components/settings/my-breeds'
 import { MyVaccines } from '@/components/settings/my-vaccines'
 import { MyMedications } from '@/components/settings/my-medications'
@@ -55,6 +57,7 @@ type SectionId =
   | 'farm'
   | 'general-settings'
   | 'my-veterinarians'
+  | 'my-species'
   | 'my-breeds'
   | 'my-vaccines'
   | 'my-medications'
@@ -80,6 +83,7 @@ const sections: Section[] = [
   // Mes Données
   { id: 'general-settings', labelKey: 'generalSettings', icon: Settings, group: 'my-data' },
   { id: 'my-veterinarians', labelKey: 'myVeterinarians', icon: Stethoscope, group: 'my-data' },
+  { id: 'my-species', labelKey: 'mySpecies', icon: PawPrint, group: 'my-data' },
   { id: 'my-breeds', labelKey: 'myBreeds', icon: Dna, group: 'my-data' },
   { id: 'my-vaccines', labelKey: 'myVaccines', icon: Syringe, group: 'my-data' },
   { id: 'my-medications', labelKey: 'myMedications', icon: Pill, group: 'my-data' },
@@ -164,6 +168,8 @@ export default function SettingsPage() {
         return <GeneralSettingsSection />
       case 'my-veterinarians':
         return <MyVeterinarians />
+      case 'my-species':
+        return <MySpecies />
       case 'my-breeds':
         return <MyBreeds farmSpecies={['ovine', 'caprine', 'bovine']} />
       case 'my-vaccines':
