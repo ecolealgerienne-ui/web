@@ -10,7 +10,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 class CampaignsService {
   private getBasePath() {
-    return `/farms/${TEMP_FARM_ID}/campaigns`
+    return `/api/v1/farms/${TEMP_FARM_ID}/campaigns`
   }
 
   async getAll(filters?: { type?: CampaignType | 'all'; status?: CampaignStatus | 'all'; fromDate?: string; toDate?: string }): Promise<Campaign[]> {

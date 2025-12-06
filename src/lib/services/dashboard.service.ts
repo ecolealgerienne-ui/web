@@ -124,7 +124,7 @@ class DashboardService {
 
   async getAlerts(): Promise<Alert[]> {
     try {
-      const response = await apiClient.get<{ data: Alert[] }>(`/farms/${TEMP_FARM_ID}/dashboard/alerts`);
+      const response = await apiClient.get<{ data: Alert[] }>(`/api/v1/farms/${TEMP_FARM_ID}/dashboard/alerts`);
       return response.data || [];
     } catch (error: any) {
       if (error.status === 404) {
@@ -138,7 +138,7 @@ class DashboardService {
 
   async getRecentActivities(): Promise<Activity[]> {
     try {
-      const response = await apiClient.get<{ data: Activity[] }>(`/farms/${TEMP_FARM_ID}/dashboard/activities`);
+      const response = await apiClient.get<{ data: Activity[] }>(`/api/v1/farms/${TEMP_FARM_ID}/dashboard/activities`);
       return response.data || [];
     } catch (error: any) {
       if (error.status === 404) {
@@ -153,7 +153,7 @@ class DashboardService {
   async getHerdEvolution(period?: string): Promise<HerdEvolution> {
     try {
       const queryParams = period ? `?period=${period}` : '';
-      const response = await apiClient.get<HerdEvolution>(`/farms/${TEMP_FARM_ID}/dashboard/herd-evolution${queryParams}`);
+      const response = await apiClient.get<HerdEvolution>(`/api/v1/farms/${TEMP_FARM_ID}/dashboard/herd-evolution${queryParams}`);
       return response;
     } catch (error: any) {
       if (error.status === 404) {

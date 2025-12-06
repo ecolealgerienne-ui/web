@@ -17,7 +17,7 @@ export interface VeterinarianFilters {
 
 class VeterinariansService {
   private getBasePath() {
-    return `/farms/${TEMP_FARM_ID}/veterinarians`
+    return `/api/v1/farms/${TEMP_FARM_ID}/veterinarians`
   }
 
   async getAll(filters?: VeterinarianFilters): Promise<Veterinarian[]> {

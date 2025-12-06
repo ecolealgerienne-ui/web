@@ -10,7 +10,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 class AnimalsService {
   private getBasePath(): string {
-    return `/farms/${TEMP_FARM_ID}/animals`;
+    return `/api/v1/farms/${TEMP_FARM_ID}/animals`;
   }
 
   async getAll(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; page?: number }): Promise<Animal[]> {

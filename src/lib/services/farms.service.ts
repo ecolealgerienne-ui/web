@@ -7,7 +7,7 @@ import { Farm, CreateFarmDto, UpdateFarmDto } from '@/lib/types/farm'
 import { logger } from '@/lib/utils/logger'
 
 class FarmsService {
-  private basePath = '/api/farms'
+  private basePath = '/api/v1/farms'
 
   async getAll(filters?: { ownerId?: string; groupId?: string; isDefault?: boolean; search?: string }): Promise<Farm[]> {
     try {
