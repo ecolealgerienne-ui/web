@@ -108,6 +108,22 @@ export function MyVeterinarians() {
     return globalVeterinarians.map(vetToTransferItem)
   }, [globalVeterinarians])
 
+  // Liste combinée de tous les vétérinaires (globaux + locaux depuis préférences)
+  const allVeterinarians = useMemo(() => {
+    const vetsFromPrefs = preferences
+      .map(p => p.veterinarian)
+      .filter((v): v is Veterinarian => v !== null && v !== undefined)
+
+    // Combiner avec les globaux, en évitant les doublons
+    const allVets = [...globalVeterinarians]
+    vetsFromPrefs.forEach(vet => {
+      if (!allVets.some(v => v.id === vet.id)) {
+        allVets.push(vet)
+      }
+    })
+    return allVets
+  }, [globalVeterinarians, preferences])
+
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
@@ -183,12 +199,12 @@ export function MyVeterinarians() {
 
   const handleItemClick = useCallback((item: TransferListItem) => {
     // Trouver le vétérinaire complet depuis la liste
-    const vet = veterinarians.find(v => v.id === item.id)
+    const vet = allVeterinarians.find(v => v.id === item.id)
     if (vet) {
       setViewingVeterinarian(vet)
       setDetailsDialogOpen(true)
     }
-  }, [veterinarians])
+  }, [allVeterinarians])
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingItem || !user?.farmId) return
@@ -259,7 +275,7 @@ export function MyVeterinarians() {
 
   const handleEditLocalVet = (item: TransferListItem) => {
     // Trouver le vétérinaire complet depuis la liste
-    const vet = veterinarians.find(v => v.id === item.id)
+    const vet = allVeterinarians.find(v => v.id === item.id)
     if (vet && vet.scope === 'local') {
       setEditingVeterinarian(vet)
       setLocalVetDialogOpen(true)
