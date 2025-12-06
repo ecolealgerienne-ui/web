@@ -429,11 +429,15 @@ export function AnimalDialog({
             <>
               <div className="space-y-1">
                 <span className="text-sm text-muted-foreground">{t('fields.speciesId')}</span>
-                <p className="font-medium">{animal?.species?.name || '-'}</p>
+                <p className="font-medium">
+                  {animal?.species?.name || species.find(s => s.id === animal?.speciesId)?.name || '-'}
+                </p>
               </div>
               <div className="space-y-1">
                 <span className="text-sm text-muted-foreground">{t('fields.breedId')}</span>
-                <p className="font-medium">{animal?.breed?.name || '-'}</p>
+                <p className="font-medium">
+                  {animal?.breed?.name || breeds.find(b => b.id === animal?.breedId)?.name || '-'}
+                </p>
               </div>
             </>
           )}
