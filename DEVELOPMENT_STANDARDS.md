@@ -4781,9 +4781,26 @@ describe('ActiveSubstanceForm', () => {
 
 ### 11.1 Workflow Git
 
+⚠️ **RÈGLE CRITIQUE - Création de branche depuis main à jour**
+
 ```bash
-# 1. Créer branche feature
-git checkout -b feature/admin-active-substances
+# TOUJOURS créer une branche depuis le main DISTANT (pas local)
+git fetch origin main
+git checkout -b feature/ma-feature origin/main
+```
+
+❌ **NE JAMAIS FAIRE :**
+```bash
+git checkout main
+git checkout -b feature/ma-feature  # Risque de partir d'un main obsolète !
+```
+
+**Workflow complet :**
+
+```bash
+# 1. Récupérer main à jour et créer branche feature
+git fetch origin main
+git checkout -b feature/admin-active-substances origin/main
 
 # 2. Développer
 # ...
