@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save, AlertCircle } from 'lucide-react'
+import { Save, AlertCircle, Pill, X } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTranslations } from 'next-intl'
 import { useGlobalProducts } from '@/lib/hooks/useGlobalProducts'
@@ -47,6 +48,15 @@ function productToTransferItem(product: Product): TransferListItem {
       laboratoryName: product.laboratoryName,
       therapeuticForm: product.therapeuticForm,
       dosage: product.dosage,
+      packaging: product.packaging,
+      categoryId: product.categoryId,
+      categoryName: product.category?.name,
+      description: product.description,
+      usageInstructions: product.usageInstructions,
+      contraindications: product.contraindications,
+      storageConditions: product.storageConditions,
+      isVeterinaryPrescriptionRequired: product.isVeterinaryPrescriptionRequired,
+      activeSubstances: product.activeSubstances,
       scope: 'global',
     },
   }
@@ -70,6 +80,7 @@ function apiProductToTransferItem(product: ApiProductInPreference): TransferList
       therapeuticForm: product.therapeuticForm,
       dosage: product.dosage,
       categoryId: product.categoryId,
+      categoryName: product.category?.name,
       scope: 'global',
     },
   }
@@ -82,8 +93,9 @@ export function MyMedications() {
   const toast = useToast()
   const { user } = useAuth()
 
-  // Filtre par catégorie
+  // Filtres
   const [activeCategoryId, setActiveCategoryId] = useState<string>('all')
+  const [activeTherapeuticForm, setActiveTherapeuticForm] = useState<string>('all')
 
   // Charger les catégories depuis l'API
   const {
@@ -111,17 +123,38 @@ export function MyMedications() {
   const loading = loadingCategories || loadingProducts || loadingPrefs
   const error = errorProducts || errorPrefs
 
+  // Extraire les formes thérapeutiques uniques des produits
+  const therapeuticForms = useMemo(() => {
+    const forms = new Set<string>()
+    globalProducts.forEach(p => {
+      if (p.therapeuticForm) forms.add(p.therapeuticForm)
+    })
+    return Array.from(forms).sort()
+  }, [globalProducts])
+
   // Convertir les produits globaux en items de liste
   const availableItems = useMemo(() => {
     return globalProducts.map(productToTransferItem)
   }, [globalProducts])
 
-  // Filtrer par catégorie (côté client)
+  // Filtrer par catégorie et forme thérapeutique (côté client)
   const filteredAvailableItems = useMemo(() => {
-    if (activeCategoryId === 'all') return availableItems
-    // Note: Le filtrage par categoryId sera implémenté quand les produits auront ce champ
-    return availableItems
-  }, [availableItems, activeCategoryId])
+    return availableItems.filter(item => {
+      // Filtrer par catégorie
+      if (activeCategoryId !== 'all') {
+        if (item.metadata?.categoryId !== activeCategoryId) {
+          return false
+        }
+      }
+      // Filtrer par forme thérapeutique
+      if (activeTherapeuticForm !== 'all') {
+        if (item.metadata?.therapeuticForm !== activeTherapeuticForm) {
+          return false
+        }
+      }
+      return true
+    })
+  }, [availableItems, activeCategoryId, activeTherapeuticForm])
 
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
@@ -132,6 +165,10 @@ export function MyMedications() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // Modal de détails du produit
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<TransferListItem | null>(null)
 
   // Initialiser les sélections depuis les préférences
   useEffect(() => {
@@ -162,6 +199,11 @@ export function MyMedications() {
     setDeletingItem(itemToRemove)
     setDeleteDialogOpen(true)
   }, [selectedItems])
+
+  const handleItemClick = useCallback((item: TransferListItem) => {
+    setSelectedProduct(item)
+    setDetailDialogOpen(true)
+  }, [])
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingItem || !user?.farmId) return
@@ -229,9 +271,9 @@ export function MyMedications() {
 
   // Composant de filtres
   const categoryFilters = (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <Select value={activeCategoryId} onValueChange={setActiveCategoryId}>
-        <SelectTrigger className="w-[200px] h-8">
+        <SelectTrigger className="w-[180px] h-8">
           <SelectValue placeholder={t('filters.allCategories')} />
         </SelectTrigger>
         <SelectContent>
@@ -239,6 +281,20 @@ export function MyMedications() {
           {categories.map((cat) => (
             <SelectItem key={cat.id} value={cat.id}>
               {cat.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={activeTherapeuticForm} onValueChange={setActiveTherapeuticForm}>
+        <SelectTrigger className="w-[180px] h-8">
+          <SelectValue placeholder={t('filters.allForms')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allForms')}</SelectItem>
+          {therapeuticForms.map((form) => (
+            <SelectItem key={form} value={form}>
+              {form}
             </SelectItem>
           ))}
         </SelectContent>
@@ -258,6 +314,7 @@ export function MyMedications() {
         selectedItems={selectedItems}
         onSelect={handleSelect}
         onDeselect={handleDeselect}
+        onItemClick={handleItemClick}
         availableTitle={t('available')}
         selectedTitle={t('selected')}
         searchPlaceholder={t('searchPlaceholder')}
@@ -307,6 +364,132 @@ export function MyMedications() {
               disabled={isDeleting}
             >
               {isDeleting ? tc('actions.deleting') : tc('actions.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de détails du produit */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pill className="w-5 h-5 text-primary" />
+              {selectedProduct?.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedProduct && (
+            <div className="space-y-4">
+              {/* Code */}
+              {!!selectedProduct.metadata?.code && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.code')}</span>
+                  <p className="font-mono text-sm">{String(selectedProduct.metadata.code)}</p>
+                </div>
+              )}
+
+              {/* Laboratoire */}
+              {!!selectedProduct.metadata?.laboratoryName && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.laboratory')}</span>
+                  <p>{String(selectedProduct.metadata.laboratoryName)}</p>
+                </div>
+              )}
+
+              {/* Catégorie */}
+              {!!selectedProduct.metadata?.categoryName && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.category')}</span>
+                  <p>
+                    <Badge>{String(selectedProduct.metadata.categoryName)}</Badge>
+                  </p>
+                </div>
+              )}
+
+              {/* Forme et dosage */}
+              <div className="grid grid-cols-2 gap-4">
+                {!!selectedProduct.metadata?.therapeuticForm && (
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">{t('details.form')}</span>
+                    <p>{String(selectedProduct.metadata.therapeuticForm)}</p>
+                  </div>
+                )}
+                {!!selectedProduct.metadata?.dosage && (
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">{t('details.dosage')}</span>
+                    <p>{String(selectedProduct.metadata.dosage)}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Conditionnement */}
+              {!!selectedProduct.metadata?.packaging && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.packaging')}</span>
+                  <p>{String(selectedProduct.metadata.packaging)}</p>
+                </div>
+              )}
+
+              {/* Prescription requise */}
+              {!!selectedProduct.metadata?.isVeterinaryPrescriptionRequired && (
+                <div>
+                  <Badge variant="destructive">{t('details.prescriptionRequired')}</Badge>
+                </div>
+              )}
+
+              {/* Description */}
+              {!!selectedProduct.metadata?.description && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.description')}</span>
+                  <p className="text-sm">{String(selectedProduct.metadata.description)}</p>
+                </div>
+              )}
+
+              {/* Instructions d'utilisation */}
+              {!!selectedProduct.metadata?.usageInstructions && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.usageInstructions')}</span>
+                  <p className="text-sm">{String(selectedProduct.metadata.usageInstructions)}</p>
+                </div>
+              )}
+
+              {/* Contre-indications */}
+              {!!selectedProduct.metadata?.contraindications && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.contraindications')}</span>
+                  <p className="text-sm text-destructive">{String(selectedProduct.metadata.contraindications)}</p>
+                </div>
+              )}
+
+              {/* Conditions de stockage */}
+              {!!selectedProduct.metadata?.storageConditions && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.storageConditions')}</span>
+                  <p className="text-sm">{String(selectedProduct.metadata.storageConditions)}</p>
+                </div>
+              )}
+
+              {/* Substances actives */}
+              {Array.isArray(selectedProduct.metadata?.activeSubstances) &&
+               (selectedProduct.metadata.activeSubstances as Array<{name: string}>).length > 0 && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">{t('details.activeSubstances')}</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {(selectedProduct.metadata.activeSubstances as Array<{id: string, name: string}>).map((substance) => (
+                      <span key={substance.id} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+                        {substance.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
+              {tc('actions.cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>

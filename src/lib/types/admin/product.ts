@@ -50,6 +50,16 @@ export interface Product extends BaseEntity {
   /** Liste des substances actives (relation many-to-many) */
   activeSubstances: ActiveSubstance[]
 
+  /** ID de la catégorie (ex: Antibiotiques, Antiparasitaires) */
+  categoryId?: string
+
+  /** Catégorie avec détails */
+  category?: {
+    id: string
+    code: string
+    name: string
+  }
+
   /** Description détaillée du produit */
   description?: string
 

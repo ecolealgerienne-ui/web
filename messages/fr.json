@@ -578,7 +578,22 @@
       "confirmDeleteMessage": "Voulez-vous retirer {name} de votre pharmacie ? Vous pourrez le réajouter plus tard.",
       "removedFromPreferences": "Produit retiré de votre pharmacie",
       "filters": {
-        "allCategories": "Toutes les catégories"
+        "allCategories": "Toutes les catégories",
+        "allForms": "Toutes les formes"
+      },
+      "details": {
+        "code": "Code",
+        "laboratory": "Laboratoire",
+        "category": "Catégorie",
+        "form": "Forme thérapeutique",
+        "dosage": "Dosage",
+        "packaging": "Conditionnement",
+        "prescriptionRequired": "Prescription vétérinaire requise",
+        "description": "Description",
+        "usageInstructions": "Instructions d'utilisation",
+        "contraindications": "Contre-indications",
+        "storageConditions": "Conditions de stockage",
+        "activeSubstances": "Substances actives"
       }
     },
     "veterinarians": {
