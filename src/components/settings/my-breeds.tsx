@@ -3,178 +3,258 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { TransferList, TransferListItem } from '@/components/ui/transfer-list'
 import { Button } from '@/components/ui/button'
-import { Save, AlertCircle } from 'lucide-react'
+import { Save, AlertCircle, Plus } from 'lucide-react'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTranslations } from 'next-intl'
-import { useBreeds } from '@/lib/hooks/useBreeds'
-import { Breed, CreateBreedDto } from '@/lib/types/breed'
-import { Species } from '@/lib/types/farm'
+import { useBreedPreferences } from '@/lib/hooks/useBreedPreferences'
+import { useGlobalBreeds } from '@/lib/hooks/useGlobalBreeds'
+import { useSpeciesPreferences } from '@/lib/hooks/useSpeciesPreferences'
+import { useAuth } from '@/contexts/auth-context'
+import { Breed, CreateBreedDto } from '@/lib/types/admin/breed'
+import { ApiBreedInPreference } from '@/lib/types/breed-preference'
+import { handleApiError } from '@/lib/utils/api-error-handler'
+import { breedPreferencesService } from '@/lib/services/breed-preferences.service'
+import { BreedLocalFormDialog } from './breed-local-form-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
-// Constantes pour les espèces
-const ALL_SPECIES: Species[] = ['bovine', 'ovine', 'caprine', 'poultry', 'equine', 'camelid']
-
-interface MyBreedsProps {
-  farmSpecies?: Species[]
-  initialSelectedIds?: string[]
-  onSave?: (selectedIds: string[], localItems: TransferListItem[]) => Promise<void>
-}
-
-// Convertir une Breed API en TransferListItem
+// Convertir une Breed globale en TransferListItem
 function breedToTransferItem(breed: Breed): TransferListItem {
   return {
     id: breed.id,
-    name: breed.nameFr || breed.name,
-    description: breed.description || '',
+    name: breed.nameFr,
+    description: breed.code,
     metadata: {
+      code: breed.code,
       speciesId: breed.speciesId,
-      nameFr: breed.nameFr,
-      nameEn: breed.nameEn,
-      nameAr: breed.nameAr,
+      scope: 'global',
     },
   }
 }
 
-export function MyBreeds({
-  farmSpecies = ['ovine', 'caprine'],
-  initialSelectedIds = [],
-  onSave
-}: MyBreedsProps) {
+// Convertir une ApiBreedInPreference en TransferListItem
+function apiBreedToTransferItem(breed: ApiBreedInPreference): TransferListItem {
+  return {
+    id: breed.id,
+    name: breed.nameFr,
+    description: breed.code,
+    metadata: {
+      code: breed.code,
+      speciesId: breed.speciesId,
+      scope: 'global',
+    },
+  }
+}
+
+export function MyBreeds() {
   const t = useTranslations('settings.breeds')
   const ta = useTranslations('settings.actions')
+  const tc = useTranslations('common')
   const toast = useToast()
+  const { user } = useAuth()
 
-  // Espèce active (onglet sélectionné)
-  const [activeSpecies, setActiveSpecies] = useState<Species>(farmSpecies[0] || 'bovine')
+  // Charger les espèces sélectionnées par la ferme (pour les onglets)
+  const {
+    preferences: speciesPreferences,
+    loading: loadingSpeciesPrefs,
+  } = useSpeciesPreferences(user?.farmId)
 
-  // Charger les races depuis l'API pour l'espèce active
-  const { breeds, loading, error, createBreed } = useBreeds(activeSpecies)
+  // Espèce active (premier onglet par défaut)
+  const [activeSpeciesId, setActiveSpeciesId] = useState<string | null>(null)
 
-  // Items sélectionnés par espèce
-  const [selectedItemsBySpecies, setSelectedItemsBySpecies] = useState<Record<Species, TransferListItem[]>>(() => {
-    const initial: Record<Species, TransferListItem[]> = {} as Record<Species, TransferListItem[]>
-    ALL_SPECIES.forEach(sp => { initial[sp] = [] })
-    return initial
-  })
+  // Initialiser l'espèce active quand les préférences sont chargées
+  useEffect(() => {
+    if (speciesPreferences.length > 0 && !activeSpeciesId) {
+      const sorted = [...speciesPreferences].sort((a, b) => a.displayOrder - b.displayOrder)
+      setActiveSpeciesId(sorted[0]?.speciesId || null)
+    }
+  }, [speciesPreferences, activeSpeciesId])
 
+  // Charger les races globales pour l'espèce active
+  const {
+    breeds: globalBreeds,
+    loading: loadingBreeds,
+    error: errorBreeds,
+    refetch: refetchBreeds,
+  } = useGlobalBreeds(activeSpeciesId || undefined)
+
+  // Charger les préférences de races pour cette ferme
+  const {
+    preferences: breedPreferences,
+    preferencesBySpecies,
+    loading: loadingBreedPrefs,
+    error: errorBreedPrefs,
+    savePreferences,
+    refetch: refetchBreedPreferences,
+  } = useBreedPreferences(user?.farmId)
+
+  const loading = loadingSpeciesPrefs || loadingBreeds || loadingBreedPrefs
+  const error = errorBreeds || errorBreedPrefs
+
+  // Convertir les races globales en items de liste (liste gauche)
+  const availableItems = useMemo(() => {
+    return globalBreeds.map(breedToTransferItem)
+  }, [globalBreeds])
+
+  // Items sélectionnés pour l'espèce active (initialisés depuis les préférences)
+  const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Convertir les races API en items de transfert
-  const availableBreeds = useMemo(() => {
-    return breeds.map(breed => breedToTransferItem(breed))
-  }, [breeds])
+  // Modal de confirmation de suppression
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingItem, setDeletingItem] = useState<TransferListItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  // Items sélectionnés pour l'espèce active
-  const selectedBreeds = useMemo(() => {
-    return selectedItemsBySpecies[activeSpecies] || []
-  }, [activeSpecies, selectedItemsBySpecies])
+  // Modal d'ajout de race locale
+  const [localBreedDialogOpen, setLocalBreedDialogOpen] = useState(false)
+  const [isSavingLocalBreed, setIsSavingLocalBreed] = useState(false)
 
-  // Initialiser les sélections depuis initialSelectedIds
+  // Initialiser les sélections depuis les préférences quand l'espèce change
   useEffect(() => {
-    if (initialSelectedIds.length > 0 && breeds.length > 0) {
-      const initialSelected = breeds
-        .filter(b => initialSelectedIds.includes(b.id))
-        .map(b => breedToTransferItem(b))
-
-      if (initialSelected.length > 0) {
-        setSelectedItemsBySpecies(prev => ({
-          ...prev,
-          [activeSpecies]: initialSelected,
-        }))
-      }
+    if (activeSpeciesId && breedPreferences.length > 0) {
+      const prefsForSpecies = preferencesBySpecies(activeSpeciesId)
+      const sortedPrefs = [...prefsForSpecies].sort((a, b) => a.displayOrder - b.displayOrder)
+      const initialSelected = sortedPrefs
+        .map(pref => pref.breed)
+        .filter(Boolean)
+        .map(apiBreedToTransferItem)
+      setSelectedItems(initialSelected)
+      setHasChanges(false)
+    } else if (activeSpeciesId) {
+      setSelectedItems([])
+      setHasChanges(false)
     }
-  }, [initialSelectedIds, breeds, activeSpecies])
+  }, [activeSpeciesId, breedPreferences, preferencesBySpecies])
+
+  // Obtenir le nom de l'espèce active
+  const activeSpeciesName = useMemo(() => {
+    const pref = speciesPreferences.find(p => p.speciesId === activeSpeciesId)
+    return pref?.species?.nameFr || ''
+  }, [speciesPreferences, activeSpeciesId])
 
   const handleSelect = useCallback((item: TransferListItem) => {
-    setSelectedItemsBySpecies((prev) => ({
-      ...prev,
-      [activeSpecies]: [...(prev[activeSpecies] || []), item],
-    }))
+    const alreadyExists = selectedItems.some((selected) => selected.id === item.id)
+    if (alreadyExists) {
+      toast.warning(t('alreadyInList'), t('alreadyInListMessage', { name: item.name }))
+      return
+    }
+    setSelectedItems((prev) => [...prev, item])
     setHasChanges(true)
-  }, [activeSpecies])
+  }, [selectedItems, toast, t])
 
   const handleDeselect = useCallback((itemId: string) => {
-    setSelectedItemsBySpecies((prev) => ({
-      ...prev,
-      [activeSpecies]: (prev[activeSpecies] || []).filter((item) => item.id !== itemId),
-    }))
-    setHasChanges(true)
-  }, [activeSpecies])
+    const itemToRemove = selectedItems.find((item) => item.id === itemId)
+    if (!itemToRemove) return
 
-  const handleCreateLocal = useCallback(async (name: string) => {
+    setDeletingItem(itemToRemove)
+    setDeleteDialogOpen(true)
+  }, [selectedItems])
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deletingItem || !user?.farmId) return
+
+    setIsDeleting(true)
     try {
-      // Créer la race via l'API
-      const createDto: CreateBreedDto = {
-        id: `local-${activeSpecies}-${Date.now()}`,
-        speciesId: activeSpecies,
-        nameFr: name,
-        nameEn: name,
-        nameAr: name,
-        description: t('breedTypes.local'),
-        isActive: true,
+      const preference = breedPreferences.find(p => p.breedId === deletingItem.id)
+
+      if (preference) {
+        await breedPreferencesService.delete(user.farmId, preference.id)
+        toast.success(tc('messages.success'), t('removedFromPreferences'))
       }
 
-      const newBreed = await createBreed(createDto)
-      const newItem = breedToTransferItem(newBreed)
-      newItem.isLocal = true
+      setSelectedItems((prev) => prev.filter((item) => item.id !== deletingItem.id))
 
-      setSelectedItemsBySpecies((prev) => ({
-        ...prev,
-        [activeSpecies]: [...(prev[activeSpecies] || []), newItem],
-      }))
-      setHasChanges(true)
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
-    } catch {
-      // Fallback: créer localement si l'API échoue
-      const newItem: TransferListItem = {
-        id: `local-breed-${activeSpecies}-${Date.now()}`,
-        name: name,
-        description: t('breedTypes.local'),
-        isLocal: true,
-      }
-      setSelectedItemsBySpecies((prev) => ({
-        ...prev,
-        [activeSpecies]: [...(prev[activeSpecies] || []), newItem],
-      }))
-      setHasChanges(true)
-      toast.success(t('added'), `${name} ${t('addedTo')}`)
+      await Promise.all([
+        refetchBreeds(),
+        refetchBreedPreferences(),
+      ])
+
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (error) {
+      handleApiError(error, 'delete breed preference', toast)
+    } finally {
+      setIsDeleting(false)
     }
-  }, [activeSpecies, createBreed, toast, t])
+  }, [deletingItem, user?.farmId, breedPreferences, toast, t, tc, refetchBreeds, refetchBreedPreferences])
 
   const handleSave = async () => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
     setIsSaving(true)
     try {
-      const allSelected = Object.values(selectedItemsBySpecies).flat()
-      const localItems = allSelected.filter((item) => item.isLocal)
-      const selectedIds = allSelected.map((item) => item.id)
+      // Récupérer toutes les préférences actuelles des autres espèces
+      const currentPrefs = breedPreferences.filter(p => p.breed?.speciesId !== activeSpeciesId)
+      const currentBreedIds = currentPrefs.map(p => p.breedId)
 
-      if (onSave) {
-        await onSave(selectedIds, localItems)
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        console.log('Saved breeds:', selectedIds)
-      }
+      // Ajouter les nouvelles sélections pour l'espèce active
+      const selectedIds = selectedItems.map((item) => item.id)
+      const allBreedIds = [...currentBreedIds, ...selectedIds]
+
+      await savePreferences(allBreedIds)
 
       setHasChanges(false)
       toast.success(t('saved'), t('savedMessage'))
-    } catch {
-      toast.error(
-        t('saveFailed'),
-        t('saveFailedMessage'),
-        {
-          label: t('retry'),
-          onClick: handleSave,
-        }
-      )
+    } catch (error) {
+      handleApiError(error, 'save breed preferences', toast)
     } finally {
       setIsSaving(false)
     }
   }
 
-  // Compter le total des races sélectionnées
-  const totalSelected = useMemo(() => {
-    return Object.values(selectedItemsBySpecies).reduce((acc, items) => acc + items.length, 0)
-  }, [selectedItemsBySpecies])
+  const handleAddLocalBreed = () => {
+    setLocalBreedDialogOpen(true)
+  }
+
+  const handleSubmitLocalBreed = async (data: CreateBreedDto) => {
+    if (!user?.farmId) {
+      toast.error(tc('error.title'), tc('messages.error'))
+      return
+    }
+
+    setIsSavingLocalBreed(true)
+    try {
+      // TODO: Implémenter la création de race locale quand l'API sera disponible
+      toast.success(tc('messages.success'), t('form.createSuccess'))
+
+      await Promise.all([
+        refetchBreeds(),
+        refetchBreedPreferences(),
+      ])
+
+      setLocalBreedDialogOpen(false)
+    } catch (error) {
+      handleApiError(error, 'save local breed', toast)
+    } finally {
+      setIsSavingLocalBreed(false)
+    }
+  }
+
+  // Si aucune espèce n'est sélectionnée
+  if (!loadingSpeciesPrefs && speciesPreferences.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <div className="flex items-center gap-2 p-4 bg-muted/50 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-muted-foreground" />
+          <span className="text-muted-foreground">{t('noSpeciesSelected')}</span>
+        </div>
+      </div>
+    )
+  }
 
   // Afficher l'erreur si le chargement a échoué
   if (error) {
@@ -192,32 +272,41 @@ export function MyBreeds({
     )
   }
 
+  // Trier les espèces par displayOrder
+  const sortedSpeciesPreferences = [...speciesPreferences].sort((a, b) => a.displayOrder - b.displayOrder)
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
-        <p className="text-sm text-muted-foreground">
-          {t('subtitle')}
-          {totalSelected > 0 && ` (${totalSelected > 1 ? t('totalSelected_plural', { count: totalSelected }) : t('totalSelected', { count: totalSelected })})`}
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        {activeSpeciesId && (
+          <Button onClick={handleAddLocalBreed} variant="outline" size="sm">
+            <Plus className="w-4 h-4 me-2" />
+            {t('addLocal')}
+          </Button>
+        )}
       </div>
 
       {/* Onglets par espèce */}
       <div className="flex flex-wrap gap-2">
-        {farmSpecies.map((species) => {
-          const count = (selectedItemsBySpecies[species] || []).length
+        {sortedSpeciesPreferences.map((speciesPref) => {
+          const count = preferencesBySpecies(speciesPref.speciesId).length
+          const isActive = activeSpeciesId === speciesPref.speciesId
           return (
             <Button
-              key={species}
-              variant={activeSpecies === species ? 'default' : 'outline'}
+              key={speciesPref.speciesId}
+              variant={isActive ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setActiveSpecies(species)}
+              onClick={() => setActiveSpeciesId(speciesPref.speciesId)}
               className="gap-2"
             >
-              {t(`species.${species}`)}
+              {speciesPref.species?.nameFr || speciesPref.speciesId}
               {count > 0 && (
                 <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                  activeSpecies === species
+                  isActive
                     ? 'bg-primary-foreground/20 text-primary-foreground'
                     : 'bg-primary/10 text-primary'
                 }`}>
@@ -229,36 +318,79 @@ export function MyBreeds({
         })}
       </div>
 
-      <TransferList
-        availableItems={availableBreeds}
-        selectedItems={selectedBreeds}
-        onSelect={handleSelect}
-        onDeselect={handleDeselect}
-        onCreateLocal={handleCreateLocal}
-        availableTitle={`${t('available')} - ${t(`species.${activeSpecies}`)}`}
-        selectedTitle={t('selected')}
-        searchPlaceholder={t('searchPlaceholder')}
-        createLocalLabel={t('addLocal')}
-        emptySelectedMessage={t('emptySelected')}
-        emptyAvailableMessage={t('emptyAvailable')}
-        isLoading={loading}
-      />
+      {activeSpeciesId && (
+        <>
+          <TransferList
+            availableItems={availableItems}
+            selectedItems={selectedItems}
+            onSelect={handleSelect}
+            onDeselect={handleDeselect}
+            availableTitle={`${t('available')} - ${activeSpeciesName}`}
+            selectedTitle={t('selected')}
+            searchPlaceholder={t('searchPlaceholder')}
+            emptySelectedMessage={t('emptySelected')}
+            emptyAvailableMessage={t('emptyAvailable')}
+            isLoading={loading}
+            showCreateLocal={false}
+          />
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
-          {isSaving ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
-              {ta('saving')}
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4 me-2" />
-              {ta('save')}
-            </>
-          )}
-        </Button>
-      </div>
+          <div className="flex justify-end gap-2">
+            <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
+              {isSaving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" />
+                  {ta('saving')}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 me-2" />
+                  {ta('save')}
+                </>
+              )}
+            </Button>
+          </div>
+        </>
+      )}
+
+      {/* Dialog de confirmation de suppression */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('confirmDelete')}</DialogTitle>
+            <DialogDescription>
+              {deletingItem && t('confirmDeleteMessage', { name: deletingItem.name })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              {tc('actions.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? tc('actions.deleting') : tc('actions.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog d'ajout de race locale */}
+      {activeSpeciesId && (
+        <BreedLocalFormDialog
+          open={localBreedDialogOpen}
+          onOpenChange={setLocalBreedDialogOpen}
+          onSubmit={handleSubmitLocalBreed}
+          speciesId={activeSpeciesId}
+          speciesName={activeSpeciesName}
+          loading={isSavingLocalBreed}
+        />
+      )}
     </div>
   )
 }

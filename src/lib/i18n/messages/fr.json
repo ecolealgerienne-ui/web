@@ -2500,6 +2500,7 @@
       "addLocal": "Ajouter une race locale",
       "emptySelected": "Sélectionnez vos races",
       "emptyAvailable": "Aucune race disponible pour cette espèce",
+      "noSpeciesSelected": "Veuillez d'abord sélectionner vos espèces dans la section \"Mes Espèces\"",
       "localNote": "Cette race sera privée et visible uniquement par vous.",
       "removed": "retirée",
       "restored": "a été restaurée",
@@ -2515,6 +2516,11 @@
       "loadError": "Erreur lors du chargement des races",
       "totalSelected": "{count} race sélectionnée",
       "totalSelected_plural": "{count} races sélectionnées",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Êtes-vous sûr de vouloir retirer {name} de vos races ?",
+      "removedFromPreferences": "Race retirée de votre liste",
+      "alreadyInList": "Déjà dans la liste",
+      "alreadyInListMessage": "{name} est déjà dans votre liste de races",
       "species": {
         "bovine": "Bovins",
         "ovine": "Ovins",
@@ -2532,6 +2538,21 @@
         "work": "Travail",
         "sport": "Sport",
         "local": "Race locale"
+      },
+      "form": {
+        "addTitle": "Ajouter une race locale",
+        "addDescription": "Ajoutez une race pour {species} qui n'est pas dans la liste.",
+        "code": "Code",
+        "codePlaceholder": "Ex: ODJ, HAM, TAD",
+        "nameFr": "Nom (Français)",
+        "nameFrPlaceholder": "Ex: Ouled Djellal, Hamra",
+        "nameEn": "Nom (Anglais)",
+        "nameEnPlaceholder": "Ex: Ouled Djellal, Hamra",
+        "description": "Description",
+        "descriptionPlaceholder": "Description de la race",
+        "addButton": "Ajouter la race",
+        "localNote": "Cette race sera privée et visible uniquement par vous.",
+        "createSuccess": "Race locale créée avec succès"
       }
     },
     "vaccines": {

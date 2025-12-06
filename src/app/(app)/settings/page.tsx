@@ -171,7 +171,7 @@ export default function SettingsPage() {
       case 'my-species':
         return <MySpecies />
       case 'my-breeds':
-        return <MyBreeds farmSpecies={['ovine', 'caprine', 'bovine']} />
+        return <MyBreeds />
       case 'my-vaccines':
         return <MyVaccines />
       case 'my-medications':
