@@ -61,7 +61,7 @@ export function AnimalEventDetailDialog({
         <div className="space-y-6">
           {/* Type et Date */}
           <div className="flex items-center gap-4 pb-4 border-b">
-            <Badge variant="secondary" className="text-sm px-3 py-1">
+            <Badge variant="default" className="text-sm px-3 py-1">
               {t(`types.${event.eventType}`)}
             </Badge>
             <div className="flex items-center gap-2 text-muted-foreground">
