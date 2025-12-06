@@ -33,7 +33,9 @@ export function useGlobalProducts(params?: UseGlobalProductsParams): UseGlobalPr
     try {
       // Récupérer tous les produits actifs
       const response = await productsService.getAll({
+        page: 1,
         limit: 200, // Récupérer plus de produits pour le TransferList
+        sortOrder: 'ASC',
         search: params?.search,
         therapeuticForm: params?.therapeuticForm,
       })

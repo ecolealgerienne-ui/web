@@ -27,7 +27,9 @@ export function useProductCategories(): UseProductCategoriesResult {
     try {
       // Récupérer toutes les catégories actives
       const response = await productCategoriesService.getAll({
+        page: 1,
         limit: 100,
+        sortOrder: 'ASC',
       })
 
       // Filtrer pour ne garder que les catégories actives
