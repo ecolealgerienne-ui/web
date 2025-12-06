@@ -1912,7 +1912,9 @@
       "officialNumber": "N° officiel",
       "visualId": "ID visuel",
       "notes": "Notes",
-      "isActive": "Actif"
+      "isActive": "Actif",
+      "createdAt": "Créé le",
+      "updatedAt": "Modifié le"
     },
     "sections": {
       "general": "Informations générales",

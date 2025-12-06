@@ -5,8 +5,7 @@
 import { apiClient } from '@/lib/api/client';
 import { Treatment, TreatmentFilters } from '@/lib/types/treatment';
 import { logger } from '@/lib/utils/logger';
-
-const TEMP_FARM_ID = 'f9b1c8e0-7f3a-4b6d-9e2a-1c5d8f3b4a7e';
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 interface CreateTreatmentDto {
   // XOR: soit animalId, soit animal_ids (batch)
