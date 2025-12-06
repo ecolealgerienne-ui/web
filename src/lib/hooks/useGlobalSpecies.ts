@@ -5,8 +5,39 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Species } from '@/lib/types/admin/species'
-import { speciesService } from '@/lib/services/admin/species.service'
+import { apiClient } from '@/lib/api/client'
 import { logger } from '@/lib/utils/logger'
+
+/**
+ * Structure retournée par l'API backend pour les espèces
+ * L'API retourne nameFr/nameEn/nameAr au lieu d'un simple name
+ */
+interface ApiSpecies {
+  id: string
+  nameFr: string
+  nameEn: string
+  nameAr: string
+  icon?: string
+  scientificName?: string
+  isActive?: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
+/**
+ * Mapper une espèce API vers le type frontend Species
+ */
+function mapApiSpeciesToSpecies(apiSpecies: ApiSpecies): Species {
+  return {
+    id: apiSpecies.id,
+    code: apiSpecies.id.toUpperCase(), // Utiliser l'id comme code
+    name: apiSpecies.nameFr, // Utiliser le nom français
+    description: apiSpecies.scientificName,
+    isActive: apiSpecies.isActive ?? true,
+    createdAt: apiSpecies.createdAt,
+    updatedAt: apiSpecies.updatedAt,
+  }
+}
 
 interface UseGlobalSpeciesResult {
   species: Species[]
@@ -25,11 +56,17 @@ export function useGlobalSpecies(): UseGlobalSpeciesResult {
     setError(null)
 
     try {
-      // Récupérer toutes les espèces actives
-      const response = await speciesService.getAll({ limit: 100 })
-      // Filtrer pour ne garder que les espèces actives
-      const activeSpecies = response.data.filter(s => s.isActive !== false)
-      setSpecies(activeSpecies)
+      // Récupérer toutes les espèces depuis l'API
+      // L'API retourne { data: ApiSpecies[], meta: {...} }
+      const response = await apiClient.get<{ data: ApiSpecies[]; meta: any }>('/api/v1/species?limit=100')
+
+      // Mapper les espèces API vers le type frontend
+      const mappedSpecies = response.data
+        .filter(s => s.isActive !== false)
+        .map(mapApiSpeciesToSpecies)
+
+      setSpecies(mappedSpecies)
+      logger.info('Global species fetched successfully', { count: mappedSpecies.length })
     } catch (err) {
       const error = err as Error
       setError(error)
