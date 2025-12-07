@@ -10,6 +10,7 @@ import {
   CreateAnimalEventDto,
   UpdateAnimalEventDto,
 } from '@/lib/types/animal-event';
+import { Animal } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
 
 // Type pour la réponse du backend (movements)
@@ -170,6 +171,25 @@ class AnimalEventsService {
   async delete(id: string): Promise<void> {
     await apiClient.delete(`${this.getBasePath()}/${id}`);
     logger.info('Movement deleted', { id });
+  }
+
+  async getAnimals(movementId: string): Promise<Animal[]> {
+    try {
+      const url = `${this.getBasePath()}/${movementId}/animals`;
+      const animals = await apiClient.get<Animal[]>(url);
+      logger.info('Animals fetched for movement', {
+        movementId,
+        count: (animals || []).length,
+      });
+      return animals || [];
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('No animals found for movement (404)', { movementId });
+        return [];
+      }
+      logger.error('Failed to fetch animals for movement', { error, movementId });
+      throw error;
+    }
   }
 }
 

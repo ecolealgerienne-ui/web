@@ -16,8 +16,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
+import { Animal } from '@/lib/types/animal';
+import { animalEventsService } from '@/lib/services/animal-events.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { Calendar, MapPin, User, Stethoscope, DollarSign, FileText, ChevronLeft, ChevronRight, PawPrint } from 'lucide-react';
+import { Calendar, MapPin, User, Stethoscope, DollarSign, FileText, ChevronLeft, ChevronRight, PawPrint, Loader2 } from 'lucide-react';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -56,6 +58,10 @@ export function AnimalEventDialog({
   const currentIndex = event ? events.findIndex((e) => e.id === event.id) : -1;
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < events.length - 1 && currentIndex !== -1;
+
+  // État pour les animaux du mouvement
+  const [movementAnimals, setMovementAnimals] = useState<Animal[]>([]);
+  const [animalsLoading, setAnimalsLoading] = useState(false);
 
   const [formData, setFormData] = useState<CreateAnimalEventDto>({
     animalId: '',
@@ -101,8 +107,30 @@ export function AnimalEventDialog({
         location: '',
         notes: '',
       });
+      setMovementAnimals([]);
     }
   }, [event, open]);
+
+  // Charger les animaux du mouvement
+  useEffect(() => {
+    const fetchAnimals = async () => {
+      if (!event?.id || !open) {
+        setMovementAnimals([]);
+        return;
+      }
+      setAnimalsLoading(true);
+      try {
+        const animals = await animalEventsService.getAnimals(event.id);
+        setMovementAnimals(animals);
+      } catch (error) {
+        console.error('Failed to fetch movement animals:', error);
+        setMovementAnimals([]);
+      } finally {
+        setAnimalsLoading(false);
+      }
+    };
+    fetchAnimals();
+  }, [event?.id, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,21 +233,57 @@ export function AnimalEventDialog({
       <div className="space-y-4">
         <div className="flex items-center gap-2 border-b pb-2">
           <PawPrint className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-medium">{t('fields.animalId')}</h3>
+          <h3 className="text-sm font-medium">{t('sections.animals')}</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Field
-            label={t('fields.animalId')}
-            value={isEditable ? formData.animalId : (event?.animalId || '')}
-            required={isEditable}
-            onChange={isEditable ? (v) => setFormData({ ...formData, animalId: v }) : undefined}
-          />
-          <Field
-            label={t('fields.relatedAnimalId')}
-            value={isEditable ? (formData.relatedAnimalId || '') : (event?.relatedAnimalId || '')}
-            onChange={isEditable ? (v) => setFormData({ ...formData, relatedAnimalId: v }) : undefined}
-          />
-        </div>
+
+        {/* Liste des animaux du mouvement */}
+        {animalsLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : movementAnimals.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">{t('fields.animalsInMovement')} ({movementAnimals.length})</p>
+            <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
+              {movementAnimals.map((animal) => (
+                <div key={animal.id} className="flex items-center gap-3 p-2 text-sm">
+                  <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium">{animal.visualId || animal.officialNumber || animal.currentEid || animal.id}</span>
+                    {animal.species?.name && (
+                      <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                    )}
+                    {animal.breed?.name && (
+                      <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                    )}
+                  </div>
+                  <Badge variant="secondary" className="flex-shrink-0">
+                    {animal.sex === 'male' ? 'M' : 'F'}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : mode !== 'create' ? (
+          <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInMovement')}</p>
+        ) : null}
+
+        {/* Champs animalId et relatedAnimalId pour création/édition */}
+        {isEditable && (
+          <div className="grid grid-cols-2 gap-4">
+            <Field
+              label={t('fields.animalId')}
+              value={formData.animalId}
+              required
+              onChange={(v) => setFormData({ ...formData, animalId: v })}
+            />
+            <Field
+              label={t('fields.relatedAnimalId')}
+              value={formData.relatedAnimalId || ''}
+              onChange={(v) => setFormData({ ...formData, relatedAnimalId: v })}
+            />
+          </div>
+        )}
       </div>
 
       {/* Section: Informations générales */}
