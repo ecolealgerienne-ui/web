@@ -198,90 +198,8 @@ export function AnimalEventDialog({
     );
   };
 
-  // Contenu en mode lecture
-  const ViewContent = () => (
-    <div className="space-y-6">
-      {/* Type et Date */}
-      <div className="flex items-center gap-4 pb-4 border-b">
-        <Badge variant="default" className="text-sm px-3 py-1">
-          {t(`types.${event?.eventType}`)}
-        </Badge>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span>{event?.eventDate ? formatDate(event.eventDate) : '-'}</span>
-        </div>
-      </div>
-
-      {/* Animaux concernés */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <PawPrint className="h-4 w-4 text-muted-foreground" />
-          <h4 className="text-sm font-medium">{t('fields.animalId')}</h4>
-        </div>
-        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-          {event?.animalId && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{event.animalId}</span>
-              <Badge variant="secondary" className="text-xs">Principal</Badge>
-            </div>
-          )}
-          {event?.relatedAnimalId && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm">{event.relatedAnimalId}</span>
-              <Badge variant="secondary" className="text-xs">{t('fields.relatedAnimalId')}</Badge>
-            </div>
-          )}
-          {!event?.animalId && !event?.relatedAnimalId && (
-            <p className="text-sm text-muted-foreground">{tc('fields.none')}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Description */}
-      {event?.description && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground">{t('fields.description')}</h4>
-          <p className="text-sm">{event.description}</p>
-        </div>
-      )}
-
-      {/* Détails en grille */}
-      <div className="grid grid-cols-2 gap-4">
-        <Field label={t('fields.location')} value={event?.location || ''} icon={MapPin} />
-        <Field label={t('fields.performedBy')} value={event?.performedBy || ''} icon={User} />
-        <Field label={t('fields.veterinarianId')} value={event?.veterinarianId || ''} icon={Stethoscope} />
-        {event?.cost !== undefined && event?.cost !== null && (
-          <div className="flex items-start gap-2">
-            <DollarSign className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div>
-              <p className="text-xs text-muted-foreground">{t('fields.cost')}</p>
-              <p className="text-sm">{event.cost} DZD</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Notes */}
-      {event?.notes && (
-        <div className="space-y-2 pt-4 border-t">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-muted-foreground" />
-            <h4 className="text-sm font-medium text-muted-foreground">{t('fields.notes')}</h4>
-          </div>
-          <p className="text-sm bg-muted/50 rounded-md p-3">{event.notes}</p>
-        </div>
-      )}
-
-      {/* Métadonnées */}
-      <div className="text-xs text-muted-foreground pt-4 border-t space-y-1">
-        {event?.createdAt && <p>{tc('fields.createdAt')}: {formatDate(event.createdAt)}</p>}
-        {event?.updatedAt && <p>{tc('fields.updatedAt')}: {formatDate(event.updatedAt)}</p>}
-      </div>
-    </div>
-  );
-
-  // Contenu en mode édition
-  const FormContent = () => (
+  // Contenu unifié (lecture et édition)
+  const DialogBody = () => (
     <div className="space-y-6 py-4">
       {/* Section: Animaux concernés */}
       <div className="space-y-4">
@@ -292,14 +210,14 @@ export function AnimalEventDialog({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t('fields.animalId')}
-            value={formData.animalId}
-            required
-            onChange={(v) => setFormData({ ...formData, animalId: v })}
+            value={isEditable ? formData.animalId : (event?.animalId || '')}
+            required={isEditable}
+            onChange={isEditable ? (v) => setFormData({ ...formData, animalId: v }) : undefined}
           />
           <Field
             label={t('fields.relatedAnimalId')}
-            value={formData.relatedAnimalId || ''}
-            onChange={(v) => setFormData({ ...formData, relatedAnimalId: v })}
+            value={isEditable ? (formData.relatedAnimalId || '') : (event?.relatedAnimalId || '')}
+            onChange={isEditable ? (v) => setFormData({ ...formData, relatedAnimalId: v }) : undefined}
           />
         </div>
       </div>
@@ -308,55 +226,62 @@ export function AnimalEventDialog({
       <div className="space-y-4">
         <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>{t('fields.eventType')} *</Label>
-            <Select
-              value={formData.eventType}
-              onValueChange={(value) => setFormData({ ...formData, eventType: value as CreateAnimalEventDto['eventType'] })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {EVENT_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {t(`types.${type}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {isEditable ? (
+            <div className="space-y-2">
+              <Label>{t('fields.eventType')} *</Label>
+              <Select
+                value={formData.eventType}
+                onValueChange={(value) => setFormData({ ...formData, eventType: value as CreateAnimalEventDto['eventType'] })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {EVENT_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {t(`types.${type}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <span className="text-sm text-muted-foreground">{t('fields.eventType')}</span>
+              <div><Badge>{t(`types.${event?.eventType}`)}</Badge></div>
+            </div>
+          )}
           <Field
             label={t('fields.eventDate')}
-            value={formData.eventDate}
+            value={isEditable ? formData.eventDate : (event?.eventDate?.split('T')[0] || '')}
             type="date"
-            required
-            onChange={(v) => setFormData({ ...formData, eventDate: v })}
+            required={isEditable}
+            onChange={isEditable ? (v) => setFormData({ ...formData, eventDate: v }) : undefined}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t('fields.title')}
-            value={formData.title}
-            required
+            value={isEditable ? formData.title : (event?.title || '')}
+            required={isEditable}
             placeholder={t('placeholders.title')}
-            onChange={(v) => setFormData({ ...formData, title: v })}
+            onChange={isEditable ? (v) => setFormData({ ...formData, title: v }) : undefined}
           />
           <Field
             label={t('fields.location')}
-            value={formData.location || ''}
+            value={isEditable ? (formData.location || '') : (event?.location || '')}
             placeholder={t('placeholders.location')}
-            onChange={(v) => setFormData({ ...formData, location: v })}
+            onChange={isEditable ? (v) => setFormData({ ...formData, location: v }) : undefined}
           />
         </div>
 
         <Field
           label={t('fields.description')}
-          value={formData.description || ''}
+          value={isEditable ? (formData.description || '') : (event?.description || '')}
           type="textarea"
           placeholder={t('placeholders.description')}
-          onChange={(v) => setFormData({ ...formData, description: v })}
+          onChange={isEditable ? (v) => setFormData({ ...formData, description: v }) : undefined}
         />
       </div>
 
@@ -366,22 +291,22 @@ export function AnimalEventDialog({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t('fields.performedBy')}
-            value={formData.performedBy || ''}
+            value={isEditable ? (formData.performedBy || '') : (event?.performedBy || '')}
             placeholder={t('placeholders.performedBy')}
-            onChange={(v) => setFormData({ ...formData, performedBy: v })}
+            onChange={isEditable ? (v) => setFormData({ ...formData, performedBy: v }) : undefined}
           />
           <Field
             label={t('fields.veterinarianId')}
-            value={formData.veterinarianId || ''}
-            onChange={(v) => setFormData({ ...formData, veterinarianId: v })}
+            value={isEditable ? (formData.veterinarianId || '') : (event?.veterinarianId || '')}
+            onChange={isEditable ? (v) => setFormData({ ...formData, veterinarianId: v }) : undefined}
           />
         </div>
 
         <Field
           label={t('fields.cost')}
-          value={formData.cost?.toString() || ''}
+          value={isEditable ? (formData.cost?.toString() || '') : (event?.cost?.toString() || '')}
           type="number"
-          onChange={(v) => setFormData({ ...formData, cost: v ? parseFloat(v) : undefined })}
+          onChange={isEditable ? (v) => setFormData({ ...formData, cost: v ? parseFloat(v) : undefined }) : undefined}
         />
       </div>
 
@@ -390,12 +315,20 @@ export function AnimalEventDialog({
         <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
         <Field
           label={t('fields.notes')}
-          value={formData.notes || ''}
+          value={isEditable ? (formData.notes || '') : (event?.notes || '')}
           type="textarea"
           placeholder={t('placeholders.notes')}
-          onChange={(v) => setFormData({ ...formData, notes: v })}
+          onChange={isEditable ? (v) => setFormData({ ...formData, notes: v }) : undefined}
         />
       </div>
+
+      {/* Métadonnées (lecture seule) */}
+      {!isEditable && (event?.createdAt || event?.updatedAt) && (
+        <div className="text-xs text-muted-foreground pt-4 border-t space-y-1">
+          {event?.createdAt && <p>{tc('fields.createdAt')}: {formatDate(event.createdAt)}</p>}
+          {event?.updatedAt && <p>{tc('fields.updatedAt')}: {formatDate(event.updatedAt)}</p>}
+        </div>
+      )}
     </div>
   );
 
@@ -437,7 +370,7 @@ export function AnimalEventDialog({
 
         {isEditable ? (
           <form onSubmit={handleSubmit}>
-            <FormContent />
+            <DialogBody />
             <DialogFooter className="mt-6">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
                 {tc('actions.cancel')}
@@ -448,7 +381,7 @@ export function AnimalEventDialog({
             </DialogFooter>
           </form>
         ) : (
-          <ViewContent />
+          <DialogBody />
         )}
       </DialogContent>
     </Dialog>
