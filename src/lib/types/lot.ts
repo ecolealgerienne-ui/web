@@ -16,9 +16,11 @@ export type LotType =
   | 'weaning'      // Sevrage
   | 'gestation'    // Gestation
   | 'lactation'    // Lactation
+  | 'birth'        // Naissance
+  | 'production'   // Production
   | 'other';       // Autre
 
-export type LotStatus = 'open' | 'closed' | 'archived';
+export type LotStatus = 'open' | 'closed' | 'archived' | 'completed';
 
 export interface Lot {
   id: string;

@@ -37,10 +37,10 @@ interface LotDialogProps {
 }
 
 const LOT_TYPES: LotType[] = [
-  'treatment', 'vaccination', 'fattening', 'quarantine', 'weaning', 'gestation', 'lactation', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction', 'other'
+  'treatment', 'vaccination', 'fattening', 'quarantine', 'weaning', 'gestation', 'lactation', 'birth', 'production', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction', 'other'
 ];
 
-const LOT_STATUSES: LotStatus[] = ['open', 'closed', 'archived'];
+const LOT_STATUSES: LotStatus[] = ['open', 'closed', 'archived', 'completed'];
 
 export function LotDialog({
   open,

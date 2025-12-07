@@ -98,6 +98,13 @@
     },
     "optional": "optionnel",
     "loading": "Chargement...",
+    "labels": {
+      "animals": "animaux"
+    },
+    "navigation": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
     "admin": {
       "products": {
         "subtitle": "Gestion du catalogue des produits vétérinaires"
@@ -1989,12 +1996,17 @@
       "weaning": "Sevrage",
       "gestation": "Gestation",
       "lactation": "Lactation",
-      "other": "Autre"
+      "birth": "Naissance",
+      "production": "Production",
+      "other": "Autre",
+      "undefined": "Non défini"
     },
     "status": {
       "open": "Ouvert",
       "closed": "Fermé",
-      "archived": "Archivé"
+      "archived": "Archivé",
+      "completed": "Terminé",
+      "undefined": "Non défini"
     },
     "sections": {
       "general": "Informations générales",
