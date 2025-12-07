@@ -70,26 +70,26 @@ export interface LotAnimal {
   animalId: string;
   farmId: string;
   joinedAt: string;
-  leftAt?: string;
+  leftAt?: string | null;
 
-  // Données de l'animal (pour affichage)
-  animal: {
+  // Données de l'animal (incluses par l'API via include)
+  animal?: {
     id: string;
-    officialNumber?: string;
-    visualId?: string;
-    currentEid?: string;
+    officialNumber?: string | null;
+    visualId?: string | null;
+    currentEid?: string | null;
     sex: string;
     status: string;
-    birthDate: string;
-    speciesId?: string;
+    birthDate?: string | null;
+    speciesId?: string | null;
     species?: {
       id: string;
       name: string;
-    };
+    } | null;
     breed?: {
       id: string;
       name: string;
-    };
+    } | null;
   };
 }
 

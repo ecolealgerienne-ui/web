@@ -511,14 +511,14 @@ export function LotDialog({
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">
-                              {la.animal.officialNumber || la.animal.visualId || la.animal.currentEid || la.animalId}
+                              {la.animal?.officialNumber || la.animal?.visualId || la.animal?.currentEid || la.animalId}
                             </span>
-                            {la.animal.species?.name && (
+                            {la.animal?.species?.name && (
                               <span className="text-muted-foreground ml-2">• {la.animal.species.name}</span>
                             )}
                           </div>
                           <Badge variant="secondary" className="flex-shrink-0">
-                            {la.animal.sex === 'male' ? 'M' : 'F'}
+                            {la.animal?.sex === 'male' ? 'M' : la.animal?.sex === 'female' ? 'F' : '-'}
                           </Badge>
                           {isEditable && (
                             <Button
@@ -745,14 +745,14 @@ export function LotDialog({
                         <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <span className="font-medium">
-                            {la.animal.officialNumber || la.animal.visualId || la.animal.currentEid || la.animalId}
+                            {la.animal?.officialNumber || la.animal?.visualId || la.animal?.currentEid || la.animalId}
                           </span>
-                          {la.animal.species?.name && (
+                          {la.animal?.species?.name && (
                             <span className="text-muted-foreground ml-2">• {la.animal.species.name}</span>
                           )}
                         </div>
                         <Badge variant="secondary" className="flex-shrink-0">
-                          {la.animal.sex === 'male' ? 'M' : 'F'}
+                          {la.animal?.sex === 'male' ? 'M' : la.animal?.sex === 'female' ? 'F' : '-'}
                         </Badge>
                       </div>
                     ))}

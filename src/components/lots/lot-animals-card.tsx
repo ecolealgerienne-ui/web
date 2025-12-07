@@ -111,21 +111,21 @@ export function LotAnimalsCard({ lotId }: LotAnimalsCardProps) {
                 {animals.map((lotAnimal) => (
                   <TableRow key={lotAnimal.id}>
                     <TableCell className="font-medium">
-                      {lotAnimal.animal.visualId || '-'}
+                      {lotAnimal.animal?.visualId || '-'}
                     </TableCell>
                     <TableCell className="font-mono text-xs">
-                      {lotAnimal.animal.currentEid || '-'}
+                      {lotAnimal.animal?.currentEid || '-'}
                     </TableCell>
                     <TableCell>
                       <Badge className="border border-border bg-background">
-                        {getSpeciesLabel(lotAnimal.animal.speciesId || '')}
+                        {getSpeciesLabel(lotAnimal.animal?.speciesId || '')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {sexLabels[lotAnimal.animal.sex] || lotAnimal.animal.sex}
+                      {lotAnimal.animal?.sex ? (sexLabels[lotAnimal.animal.sex] || lotAnimal.animal.sex) : '-'}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {calculateAge(lotAnimal.animal.birthDate)}
+                      {lotAnimal.animal?.birthDate ? calculateAge(lotAnimal.animal.birthDate) : '-'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(lotAnimal.joinedAt).toLocaleDateString('fr-FR')}
