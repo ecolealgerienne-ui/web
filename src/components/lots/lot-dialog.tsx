@@ -506,8 +506,8 @@ export function LotDialog({
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">{t('fields.animalsInLot')} ({lotAnimals.length})</p>
                     <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
-                      {lotAnimals.map((la) => (
-                        <div key={la.animalId} className="flex items-center gap-3 p-2 text-sm">
+                      {lotAnimals.map((la, index) => (
+                        <div key={la.id || `${la.animalId}-${index}`} className="flex items-center gap-3 p-2 text-sm">
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">
@@ -740,8 +740,8 @@ export function LotDialog({
                 <div className="space-y-2">
                   <p className="text-xs text-muted-foreground">{t('fields.animalsInLot')} ({lotAnimals.length})</p>
                   <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
-                    {lotAnimals.map((la) => (
-                      <div key={la.animalId} className="flex items-center gap-3 p-2 text-sm">
+                    {lotAnimals.map((la, index) => (
+                      <div key={la.id || `${la.animalId}-${index}`} className="flex items-center gap-3 p-2 text-sm">
                         <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <span className="font-medium">
