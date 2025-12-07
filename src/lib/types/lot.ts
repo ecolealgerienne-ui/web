@@ -3,7 +3,21 @@
  * Endpoint: POST/PUT /api/v1/farms/{farmId}/lots
  */
 
-export type LotType = 'treatment' | 'vaccination' | 'sale' | 'slaughter' | 'purchase' | 'breeding' | 'reproduction';
+export type LotType =
+  | 'treatment'
+  | 'vaccination'
+  | 'sale'
+  | 'slaughter'
+  | 'purchase'
+  | 'breeding'
+  | 'reproduction'
+  | 'fattening'    // Engraissement
+  | 'quarantine'   // Quarantaine
+  | 'weaning'      // Sevrage
+  | 'gestation'    // Gestation
+  | 'lactation'    // Lactation
+  | 'other';       // Autre
+
 export type LotStatus = 'open' | 'closed' | 'archived';
 
 export interface Lot {
@@ -12,25 +26,36 @@ export interface Lot {
   name: string;
   type: LotType;
   status: LotStatus;
-  description?: string;
-  notes?: string;
+  description?: string | null;
+  notes?: string | null;
   isActive: boolean;
 
   // Animaux (API uses animalIds array)
   animalIds?: string[];
 
+  // Nombre d'animaux (retourné par l'API via _count)
+  _count?: {
+    lotAnimals: number;
+  };
+
   // Traitement/Vaccination
-  productId?: string;
-  productName?: string;
-  treatmentDate?: string;
-  withdrawalEndDate?: string;
-  veterinarianId?: string;
-  veterinarianName?: string;
+  productId?: string | null;
+  productName?: string | null;
+  treatmentDate?: string | null;
+  withdrawalEndDate?: string | null;
+  veterinarianId?: string | null;
+  veterinarianName?: string | null;
 
   // Vente/Achat
-  priceTotal?: number;
-  buyerName?: string;
-  sellerName?: string;
+  priceTotal?: number | null;
+  buyerName?: string | null;
+  sellerName?: string | null;
+
+  // Champs supplémentaires de l'API
+  completed?: boolean;
+  completedAt?: string | null;
+  version?: number;
+  deletedAt?: string | null;
 
   // Métadonnées
   createdAt?: string;

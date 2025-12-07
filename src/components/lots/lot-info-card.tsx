@@ -26,7 +26,7 @@ interface LotInfoCardProps {
 
 export function LotInfoCard({ lot }: LotInfoCardProps) {
   const t = useTranslations('lots');
-  const animalCount = lot.animalIds?.length || 0;
+  const animalCount = lot._count?.lotAnimals || 0;
 
   return (
     <Card>

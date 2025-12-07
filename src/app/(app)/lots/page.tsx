@@ -148,7 +148,7 @@ export default function LotsPage() {
       header: t('fields.animals'),
       render: (lot) => (
         <span className="text-muted-foreground">
-          {lot.animalIds?.length || 0} {tc('labels.animals')}
+          {lot._count?.lotAnimals || 0} {tc('labels.animals')}
         </span>
       ),
     },
@@ -176,11 +176,16 @@ export default function LotsPage() {
           <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
           <SelectItem value="treatment">{t('type.treatment')}</SelectItem>
           <SelectItem value="vaccination">{t('type.vaccination')}</SelectItem>
+          <SelectItem value="fattening">{t('type.fattening')}</SelectItem>
+          <SelectItem value="quarantine">{t('type.quarantine')}</SelectItem>
+          <SelectItem value="weaning">{t('type.weaning')}</SelectItem>
+          <SelectItem value="gestation">{t('type.gestation')}</SelectItem>
+          <SelectItem value="lactation">{t('type.lactation')}</SelectItem>
           <SelectItem value="sale">{t('type.sale')}</SelectItem>
           <SelectItem value="slaughter">{t('type.slaughter')}</SelectItem>
           <SelectItem value="purchase">{t('type.purchase')}</SelectItem>
           <SelectItem value="breeding">{t('type.breeding')}</SelectItem>
-          <SelectItem value="reproduction">{t('type.reproduction')}</SelectItem>
+          <SelectItem value="other">{t('type.other')}</SelectItem>
         </SelectContent>
       </Select>
       <Select value={statusFilter} onValueChange={setStatusFilter}>

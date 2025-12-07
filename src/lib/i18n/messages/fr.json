@@ -1983,7 +1983,13 @@
       "slaughter": "Abattage",
       "purchase": "Achat",
       "breeding": "Reproduction",
-      "reproduction": "Reproduction"
+      "reproduction": "Reproduction",
+      "fattening": "Engraissement",
+      "quarantine": "Quarantaine",
+      "weaning": "Sevrage",
+      "gestation": "Gestation",
+      "lactation": "Lactation",
+      "other": "Autre"
     },
     "status": {
       "open": "Ouvert",

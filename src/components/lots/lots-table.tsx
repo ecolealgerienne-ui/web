@@ -106,7 +106,7 @@ export function LotsTable({ lots }: LotsTableProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-right font-medium">
-                {lot.animalIds?.length || 0}
+                {lot._count?.lotAnimals || 0}
               </TableCell>
               <TableCell className="text-sm">
                 {lot.treatmentDate

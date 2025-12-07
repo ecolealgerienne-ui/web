@@ -37,7 +37,7 @@ interface LotDialogProps {
 }
 
 const LOT_TYPES: LotType[] = [
-  'treatment', 'vaccination', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction'
+  'treatment', 'vaccination', 'fattening', 'quarantine', 'weaning', 'gestation', 'lactation', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction', 'other'
 ];
 
 const LOT_STATUSES: LotStatus[] = ['open', 'closed', 'archived'];
@@ -93,15 +93,15 @@ export function LotDialog({
         notes: lot.notes || '',
         isActive: lot.isActive,
         animalIds: lot.animalIds || [],
-        productId: lot.productId,
-        productName: lot.productName,
+        productId: lot.productId || undefined,
+        productName: lot.productName || undefined,
         treatmentDate: lot.treatmentDate?.split('T')[0] || '',
         withdrawalEndDate: lot.withdrawalEndDate?.split('T')[0] || '',
-        veterinarianId: lot.veterinarianId,
-        veterinarianName: lot.veterinarianName,
-        priceTotal: lot.priceTotal,
-        buyerName: lot.buyerName,
-        sellerName: lot.sellerName,
+        veterinarianId: lot.veterinarianId || undefined,
+        veterinarianName: lot.veterinarianName || undefined,
+        priceTotal: lot.priceTotal || undefined,
+        buyerName: lot.buyerName || undefined,
+        sellerName: lot.sellerName || undefined,
       });
     } else {
       setFormData({
