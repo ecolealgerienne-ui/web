@@ -1,48 +1,70 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Calendar } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useAnimalEvents } from '@/lib/hooks/useAnimalEvents';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { animalEventsService } from '@/lib/services/animal-events.service';
-import { AnimalEventFormDialog } from '@/components/data/animal-event-form-dialog';
-import { AnimalEventDetailDialog } from '@/components/data/animal-event-detail-dialog';
+import { AnimalEventDialog } from '@/components/animal-events/animal-event-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AnimalEventsPage() {
   const t = useTranslations('animalEvents');
   const tc = useCommonTranslations();
   const toast = useToast();
+  const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const { events, loading, error, refetch } = useAnimalEvents({ eventType: typeFilter });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
+  const [selectedEvent, setSelectedEvent] = useState<AnimalEvent | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<AnimalEvent | undefined>();
-  const [detailEvent, setDetailEvent] = useState<AnimalEvent | null>(null);
   const [eventToDelete, setEventToDelete] = useState<AnimalEvent | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAdd = () => {
-    setSelectedEvent(undefined);
-    setIsDialogOpen(true);
+    setSelectedEvent(null);
+    setDialogMode('create');
+    setDialogOpen(true);
   };
 
   const handleViewDetail = (event: AnimalEvent) => {
-    setDetailEvent(event);
-    setIsDetailDialogOpen(true);
+    setSelectedEvent(event);
+    setDialogMode('view');
+    setDialogOpen(true);
+  };
+
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    if (!selectedEvent) return;
+    const currentIndex = events.findIndex((e) => e.id === selectedEvent.id);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex >= 0 && newIndex < events.length) {
+      setSelectedEvent(events[newIndex]);
+    }
   };
 
   const handleEdit = (event: AnimalEvent) => {
     setSelectedEvent(event);
-    setIsDialogOpen(true);
+    setDialogMode('edit');
+    setDialogOpen(true);
   };
 
   const handleDelete = (event: AnimalEvent) => {
@@ -60,9 +82,9 @@ export default function AnimalEventsPage() {
         await animalEventsService.create(data as CreateAnimalEventDto);
         toast.success(tc('messages.success'), t('messages.created'));
       }
-      setIsDialogOpen(false);
+      setDialogOpen(false);
       refetch();
-    } catch (error) {
+    } catch (err) {
       toast.error(tc('messages.error'), t('messages.createError'));
     } finally {
       setIsSubmitting(false);
@@ -77,95 +99,142 @@ export default function AnimalEventsPage() {
       setIsDeleteDialogOpen(false);
       setEventToDelete(null);
       refetch();
-    } catch (error) {
+    } catch (err) {
       toast.error(tc('messages.error'), t('messages.deleteError'));
     }
   };
 
-  if (loading) return <div className="p-6"><div className="text-center py-12">{tc('messages.loading')}</div></div>;
-  if (error) return <div className="p-6"><Card><CardContent className="pt-6"><div className="text-center text-destructive">{tc('messages.loadError')}</div></CardContent></Card></div>;
+  // Définition des colonnes du tableau
+  const columns: ColumnDef<AnimalEvent>[] = [
+    {
+      key: 'movementDate',
+      header: t('fields.movementDate'),
+      sortable: true,
+      render: (event) => (
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <span>{new Date(event.movementDate).toLocaleDateString()}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'movementType',
+      header: t('fields.movementType'),
+      sortable: true,
+      render: (event) => (
+        <Badge>{t(`types.${event.movementType}`)}</Badge>
+      ),
+    },
+    {
+      key: 'reason',
+      header: t('fields.reason'),
+      sortable: true,
+      render: (event) => (
+        <div>
+          <div className="font-medium">{event.reason || t(`types.${event.movementType}`)}</div>
+          {event.notes && (
+            <div className="text-sm text-muted-foreground line-clamp-1">{event.notes}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: t('fields.status'),
+      sortable: true,
+      render: (event) => event.status ? (
+        <Badge variant="secondary">{t(`statuses.${event.status}`)}</Badge>
+      ) : '-',
+    },
+  ];
+
+  // Filtre personnalisé pour le type d'événement
+  const typeFilterComponent = (
+    <Select
+      value={typeFilter}
+      onValueChange={(value) => setTypeFilter(value)}
+    >
+      <SelectTrigger className="w-[200px]">
+        <SelectValue placeholder={t('filters.allTypes')} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
+        <SelectItem value="entry">{t('types.entry')}</SelectItem>
+        <SelectItem value="exit">{t('types.exit')}</SelectItem>
+        <SelectItem value="birth">{t('types.birth')}</SelectItem>
+        <SelectItem value="death">{t('types.death')}</SelectItem>
+        <SelectItem value="sale">{t('types.sale')}</SelectItem>
+        <SelectItem value="purchase">{t('types.purchase')}</SelectItem>
+        <SelectItem value="transfer_in">{t('types.transfer_in')}</SelectItem>
+        <SelectItem value="transfer_out">{t('types.transfer_out')}</SelectItem>
+      </SelectContent>
+    </Select>
+  );
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+      {/* Header avec bouton d'ajout */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+        </div>
+        <Button onClick={handleAdd}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('newEvent')}
+        </Button>
       </div>
 
-      <div className="flex gap-4 items-center">
-        <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value)}>
-          <SelectTrigger className="w-[250px]">
-            <SelectValue placeholder={t('filters.allTypes')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
-            <SelectItem value="entry">{t('types.entry')}</SelectItem>
-            <SelectItem value="exit">{t('types.exit')}</SelectItem>
-            <SelectItem value="birth">{t('types.birth')}</SelectItem>
-            <SelectItem value="death">{t('types.death')}</SelectItem>
-            <SelectItem value="sale">{t('types.sale')}</SelectItem>
-            <SelectItem value="purchase">{t('types.purchase')}</SelectItem>
-            <SelectItem value="transfer_in">{t('types.transfer_in')}</SelectItem>
-            <SelectItem value="transfer_out">{t('types.transfer_out')}</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button onClick={handleAdd} className="ml-auto"><Plus className="mr-2 h-4 w-4" />{t('newEvent')}</Button>
-      </div>
-
-      <Card>
-        <CardHeader><CardTitle>{t('title')} ({events.length})</CardTitle></CardHeader>
-        <CardContent>
-          {events.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">{t('noEvents')}</div>
-          ) : (
-            <div className="space-y-3">
-              {events.map((event) => (
-                <div
-                  key={event.id}
-                  className="p-4 border rounded-lg hover:bg-accent transition-colors cursor-pointer"
-                  onClick={() => handleViewDetail(event)}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">{new Date(event.eventDate).toLocaleDateString()}</span>
-                        <Badge>{t(`types.${event.eventType}`)}</Badge>
-                      </div>
-                      <h3 className="font-semibold">{event.title}</h3>
-                      {event.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>}
-                      {event.cost !== undefined && event.cost !== null && <p className="text-sm mt-1">Coût: {event.cost} €</p>}
-                    </div>
-                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(event)}><Edit2 className="h-3 w-3" /></Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDelete(event)} className="text-destructive"><Trash2 className="h-3 w-3" /></Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <AnimalEventFormDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSubmit={handleSubmit} event={selectedEvent} isLoading={isSubmitting} />
-
-      <AnimalEventDetailDialog
-        open={isDetailDialogOpen}
-        onOpenChange={setIsDetailDialogOpen}
-        event={detailEvent}
+      {/* DataTable avec filtres intégrés */}
+      <DataTable<AnimalEvent>
+        data={events}
+        columns={columns}
+        totalItems={events.length}
+        loading={loading}
+        error={error}
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t('filters.search')}
+        onRowClick={handleViewDetail}
         onEdit={handleEdit}
+        onDelete={handleDelete}
+        emptyMessage={t('noEvents')}
+        filters={typeFilterComponent}
       />
 
+      {/* Dialog unifié (consultation/modification/création) */}
+      <AnimalEventDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
+        event={selectedEvent}
+        onSubmit={handleSubmit}
+        isLoading={isSubmitting}
+        events={events}
+        onNavigate={handleNavigate}
+      />
+
+      {/* Dialog confirmation suppression */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('messages.deleteConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('messages.deleteConfirmDescription')}<br /><span className="text-destructive font-medium">{tc('messages.actionIrreversible')}</span></AlertDialogDescription>
+            <AlertDialogDescription>
+              {t('messages.deleteConfirmDescription')}
+              <br />
+              <span className="text-destructive font-medium">
+                {tc('messages.actionIrreversible')}
+              </span>
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{tc('actions.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{tc('actions.delete')}</AlertDialogAction>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {tc('actions.delete')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

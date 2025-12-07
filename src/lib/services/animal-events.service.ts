@@ -7,27 +7,61 @@ import { apiClient } from '@/lib/api/client';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 import {
   AnimalEvent,
+  AnimalEventType,
   CreateAnimalEventDto,
   UpdateAnimalEventDto,
+  MovementStatus,
+  BuyerType,
+  TemporaryType,
 } from '@/lib/types/animal-event';
+import { Animal } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
 
 // Type pour la réponse du backend (movements)
 interface BackendMovement {
   id: string;
   farmId: string;
-  animalId?: string;
+  animalIds?: string[];
   lotId?: string;
   movementType: string;
   movementDate: string;
   reason?: string;
+  status?: string;
   notes?: string;
-  quantity?: number;
-  sourceLocation?: string;
-  destinationLocation?: string;
-  performedBy?: string;
-  veterinarianId?: string;
-  cost?: number;
+
+  // Sale fields
+  buyerName?: string;
+  buyerType?: string;
+  buyerContact?: string;
+  buyerFarmId?: string;
+  buyerQrSignature?: string;
+  salePrice?: number;
+
+  // Purchase fields
+  sellerName?: string;
+  purchasePrice?: number;
+
+  // Transfer fields
+  destinationFarmId?: string;
+  originFarmId?: string;
+
+  // Slaughter fields
+  slaughterhouseName?: string;
+  slaughterhouseId?: string;
+
+  // Temporary movement fields
+  isTemporary?: boolean;
+  temporaryType?: string;
+  expectedReturnDate?: string;
+  returnDate?: string;
+  returnNotes?: string;
+  relatedMovementId?: string;
+
+  // Document and versioning
+  documentNumber?: string;
+  version?: number;
+
+  // Metadata
   createdAt?: string;
   updatedAt?: string;
 }
@@ -37,35 +71,97 @@ function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
   return {
     id: movement.id,
     farmId: movement.farmId,
-    animalId: movement.animalId || '',
-    eventType: movement.movementType as AnimalEvent['eventType'],
-    eventDate: movement.movementDate,
-    title: movement.reason || formatEventTitle(movement.movementType),
-    description: movement.notes,
-    performedBy: movement.performedBy,
-    veterinarianId: movement.veterinarianId,
-    cost: movement.cost,
-    location: movement.destinationLocation || movement.sourceLocation,
+    animalIds: movement.animalIds || [],
+    movementType: movement.movementType as AnimalEventType,
+    movementDate: movement.movementDate,
+    lotId: movement.lotId,
+    reason: movement.reason,
+    status: movement.status as MovementStatus | undefined,
+    notes: movement.notes,
+
+    // Sale fields
+    buyerName: movement.buyerName,
+    buyerType: movement.buyerType as BuyerType | undefined,
+    buyerContact: movement.buyerContact,
+    buyerFarmId: movement.buyerFarmId,
+    buyerQrSignature: movement.buyerQrSignature,
+    salePrice: movement.salePrice,
+
+    // Purchase fields
+    sellerName: movement.sellerName,
+    purchasePrice: movement.purchasePrice,
+
+    // Transfer fields
+    destinationFarmId: movement.destinationFarmId,
+    originFarmId: movement.originFarmId,
+
+    // Slaughter fields
+    slaughterhouseName: movement.slaughterhouseName,
+    slaughterhouseId: movement.slaughterhouseId,
+
+    // Temporary movement fields
+    isTemporary: movement.isTemporary,
+    temporaryType: movement.temporaryType as TemporaryType | undefined,
+    expectedReturnDate: movement.expectedReturnDate,
+    returnDate: movement.returnDate,
+    returnNotes: movement.returnNotes,
+    relatedMovementId: movement.relatedMovementId,
+
+    // Document and versioning
+    documentNumber: movement.documentNumber,
+    version: movement.version,
+
+    // Metadata
     createdAt: movement.createdAt,
     updatedAt: movement.updatedAt,
   };
 }
 
-// Générer un titre lisible pour l'événement
-function formatEventTitle(movementType: string): string {
-  const titles: Record<string, string> = {
-    entry: 'Entrée',
-    exit: 'Sortie',
-    birth: 'Naissance',
-    death: 'Décès',
-    sale: 'Vente',
-    purchase: 'Achat',
-    transfer_in: 'Transfert entrant',
-    transfer_out: 'Transfert sortant',
-    temporary_out: 'Sortie temporaire',
-    temporary_return: 'Retour temporaire',
-  };
-  return titles[movementType] || movementType;
+// Mapping frontend AnimalEvent -> backend payload for create/update
+function mapEventToPayload(data: CreateAnimalEventDto | UpdateAnimalEventDto): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+
+  if ('animalIds' in data && data.animalIds !== undefined) payload.animalIds = data.animalIds;
+  if ('movementType' in data && data.movementType !== undefined) payload.movementType = data.movementType;
+  if ('movementDate' in data && data.movementDate !== undefined) payload.movementDate = data.movementDate;
+  if (data.lotId !== undefined) payload.lotId = data.lotId;
+  if (data.reason !== undefined) payload.reason = data.reason;
+  if (data.status !== undefined) payload.status = data.status;
+  if (data.notes !== undefined) payload.notes = data.notes;
+
+  // Sale fields
+  if (data.buyerName !== undefined) payload.buyerName = data.buyerName;
+  if (data.buyerType !== undefined) payload.buyerType = data.buyerType;
+  if (data.buyerContact !== undefined) payload.buyerContact = data.buyerContact;
+  if (data.buyerFarmId !== undefined) payload.buyerFarmId = data.buyerFarmId;
+  if (data.salePrice !== undefined) payload.salePrice = data.salePrice;
+
+  // Purchase fields
+  if (data.sellerName !== undefined) payload.sellerName = data.sellerName;
+  if (data.purchasePrice !== undefined) payload.purchasePrice = data.purchasePrice;
+
+  // Transfer fields
+  if (data.destinationFarmId !== undefined) payload.destinationFarmId = data.destinationFarmId;
+  if (data.originFarmId !== undefined) payload.originFarmId = data.originFarmId;
+
+  // Slaughter fields
+  if (data.slaughterhouseName !== undefined) payload.slaughterhouseName = data.slaughterhouseName;
+  if (data.slaughterhouseId !== undefined) payload.slaughterhouseId = data.slaughterhouseId;
+
+  // Temporary movement fields
+  if (data.isTemporary !== undefined) payload.isTemporary = data.isTemporary;
+  if (data.temporaryType !== undefined) payload.temporaryType = data.temporaryType;
+  if (data.expectedReturnDate !== undefined) payload.expectedReturnDate = data.expectedReturnDate;
+  if (data.returnDate !== undefined) payload.returnDate = data.returnDate;
+  if (data.returnNotes !== undefined) payload.returnNotes = data.returnNotes;
+  if (data.relatedMovementId !== undefined) payload.relatedMovementId = data.relatedMovementId;
+
+  // Document and versioning
+  if (data.documentNumber !== undefined) payload.documentNumber = data.documentNumber;
+  if ('version' in data && data.version !== undefined) payload.version = data.version;
+  if ('farmId' in data && data.farmId !== undefined) payload.farmId = data.farmId;
+
+  return payload;
 }
 
 class AnimalEventsService {
@@ -101,8 +197,9 @@ class AnimalEventsService {
         count: events.length,
       });
       return events;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('No movements found (404)');
         return [];
       }
@@ -118,8 +215,9 @@ class AnimalEventsService {
       );
       logger.info('Movement fetched', { id });
       return mapMovementToEvent(response);
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('Movement not found (404)', { id });
         return null;
       }
@@ -139,8 +237,9 @@ class AnimalEventsService {
         count: events.length,
       });
       return events;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('No movements found for animal (404)', { animalId });
         return [];
       }
@@ -150,18 +249,20 @@ class AnimalEventsService {
   }
 
   async create(data: CreateAnimalEventDto): Promise<AnimalEvent> {
+    const payload = mapEventToPayload(data);
     const response = await apiClient.post<BackendMovement>(
       this.getBasePath(),
-      data
+      payload
     );
     logger.info('Movement created', { id: response.id });
     return mapMovementToEvent(response);
   }
 
   async update(id: string, data: UpdateAnimalEventDto): Promise<AnimalEvent> {
+    const payload = mapEventToPayload(data);
     const response = await apiClient.put<BackendMovement>(
       `${this.getBasePath()}/${id}`,
-      data
+      payload
     );
     logger.info('Movement updated', { id });
     return mapMovementToEvent(response);
@@ -170,6 +271,26 @@ class AnimalEventsService {
   async delete(id: string): Promise<void> {
     await apiClient.delete(`${this.getBasePath()}/${id}`);
     logger.info('Movement deleted', { id });
+  }
+
+  async getAnimals(movementId: string): Promise<Animal[]> {
+    try {
+      const url = `${this.getBasePath()}/${movementId}/animals`;
+      const animals = await apiClient.get<Animal[]>(url);
+      logger.info('Animals fetched for movement', {
+        movementId,
+        count: (animals || []).length,
+      });
+      return animals || [];
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
+        logger.info('No animals found for movement (404)', { movementId });
+        return [];
+      }
+      logger.error('Failed to fetch animals for movement', { error, movementId });
+      throw error;
+    }
   }
 }
 

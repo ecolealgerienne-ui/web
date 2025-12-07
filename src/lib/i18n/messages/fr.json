@@ -2002,6 +2002,7 @@
       "search": "Rechercher..."
     },
     "types": {
+      "undefined": "Non défini",
       "entry": "Entrée",
       "exit": "Sortie",
       "birth": "Naissance",
@@ -2023,17 +2024,36 @@
       "animalId": "Animal",
       "eventType": "Type d'événement",
       "eventDate": "Date",
+      "movementType": "Type de mouvement",
+      "movementDate": "Date du mouvement",
       "title": "Titre",
       "description": "Description",
       "performedBy": "Effectué par",
       "veterinarianId": "Vétérinaire",
+      "customVeterinarian": "Autre vétérinaire (si non listé)",
       "cost": "Coût",
       "relatedAnimalId": "Animal lié",
       "location": "Emplacement",
       "notes": "Notes",
-      "attachments": "Pièces jointes"
+      "attachments": "Pièces jointes",
+      "animalsInMovement": "Animaux dans ce mouvement",
+      "reason": "Motif",
+      "status": "Statut",
+      "buyerName": "Nom de l'acheteur",
+      "buyerType": "Type d'acheteur",
+      "buyerContact": "Contact de l'acheteur",
+      "salePrice": "Prix de vente",
+      "sellerName": "Nom du vendeur",
+      "purchasePrice": "Prix d'achat",
+      "originFarmId": "Exploitation d'origine",
+      "destinationFarmId": "Exploitation de destination",
+      "temporaryType": "Type de sortie temporaire",
+      "expectedReturnDate": "Date de retour prévue",
+      "returnDate": "Date de retour effective",
+      "documentNumber": "Numéro de document"
     },
     "sections": {
+      "animals": "Animaux concernés",
       "general": "Informations générales",
       "details": "Détails",
       "additional": "Informations supplémentaires"
@@ -2043,7 +2063,35 @@
       "description": "Description de l'événement...",
       "performedBy": "Nom de la personne",
       "location": "Ex: Étable 1",
-      "notes": "Notes additionnelles..."
+      "notes": "Notes additionnelles...",
+      "selectVeterinarian": "Sélectionner un vétérinaire",
+      "customVeterinarian": "Nom du vétérinaire non listé",
+      "selectType": "Sélectionner un type",
+      "selectTitle": "Sélectionner un titre",
+      "officialId": "Numéro officiel de l'animal",
+      "selectReason": "Sélectionner un motif",
+      "buyerName": "Nom de l'acheteur",
+      "sellerName": "Nom du vendeur",
+      "farmId": "ID de l'exploitation",
+      "selectTemporaryType": "Sélectionner un type",
+      "documentNumber": "Numéro de document"
+    },
+    "statuses": {
+      "ongoing": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "temporaryTypes": {
+      "veterinary": "Vétérinaire",
+      "exhibition": "Exposition",
+      "breeding": "Reproduction",
+      "grazing": "Pâturage",
+      "other": "Autre"
+    },
+    "actions": {
+      "addAnimal": "Ajouter un animal",
+      "searchAnimal": "Rechercher un animal",
+      "add": "Ajouter"
     },
     "messages": {
       "loadError": "Impossible de charger les événements",
@@ -2056,7 +2104,12 @@
       "deleteConfirmTitle": "Confirmer la suppression",
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cet événement ?",
       "addDescription": "Ajoutez les informations du nouvel événement",
-      "editDescription": "Modifiez les informations de l'événement"
+      "editDescription": "Modifiez les informations de l'événement",
+      "noAnimalsInMovement": "Aucun animal associé à ce mouvement",
+      "searching": "Recherche en cours...",
+      "animalNotFound": "Animal non trouvé",
+      "animalAlreadyInList": "Cet animal est déjà dans la liste",
+      "searchError": "Erreur lors de la recherche"
     }
   },
   "weighings": {
