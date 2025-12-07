@@ -2024,6 +2024,8 @@
       "animalId": "Animal",
       "eventType": "Type d'événement",
       "eventDate": "Date",
+      "movementType": "Type de mouvement",
+      "movementDate": "Date du mouvement",
       "title": "Titre",
       "description": "Description",
       "performedBy": "Effectué par",
@@ -2034,7 +2036,21 @@
       "location": "Emplacement",
       "notes": "Notes",
       "attachments": "Pièces jointes",
-      "animalsInMovement": "Animaux dans ce mouvement"
+      "animalsInMovement": "Animaux dans ce mouvement",
+      "reason": "Motif",
+      "status": "Statut",
+      "buyerName": "Nom de l'acheteur",
+      "buyerType": "Type d'acheteur",
+      "buyerContact": "Contact de l'acheteur",
+      "salePrice": "Prix de vente",
+      "sellerName": "Nom du vendeur",
+      "purchasePrice": "Prix d'achat",
+      "originFarmId": "Exploitation d'origine",
+      "destinationFarmId": "Exploitation de destination",
+      "temporaryType": "Type de sortie temporaire",
+      "expectedReturnDate": "Date de retour prévue",
+      "returnDate": "Date de retour effective",
+      "documentNumber": "Numéro de document"
     },
     "sections": {
       "animals": "Animaux concernés",
@@ -2052,7 +2068,25 @@
       "customVeterinarian": "Nom du vétérinaire non listé",
       "selectType": "Sélectionner un type",
       "selectTitle": "Sélectionner un titre",
-      "officialId": "Numéro officiel de l'animal"
+      "officialId": "Numéro officiel de l'animal",
+      "selectReason": "Sélectionner un motif",
+      "buyerName": "Nom de l'acheteur",
+      "sellerName": "Nom du vendeur",
+      "farmId": "ID de l'exploitation",
+      "selectTemporaryType": "Sélectionner un type",
+      "documentNumber": "Numéro de document"
+    },
+    "statuses": {
+      "ongoing": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "temporaryTypes": {
+      "veterinary": "Vétérinaire",
+      "exhibition": "Exposition",
+      "breeding": "Reproduction",
+      "grazing": "Pâturage",
+      "other": "Autre"
     },
     "actions": {
       "addAnimal": "Ajouter un animal",

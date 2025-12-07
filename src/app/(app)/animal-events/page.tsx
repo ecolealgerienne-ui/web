@@ -107,42 +107,44 @@ export default function AnimalEventsPage() {
   // Définition des colonnes du tableau
   const columns: ColumnDef<AnimalEvent>[] = [
     {
-      key: 'eventDate',
-      header: t('fields.eventDate'),
+      key: 'movementDate',
+      header: t('fields.movementDate'),
       sortable: true,
       render: (event) => (
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span>{new Date(event.eventDate).toLocaleDateString()}</span>
+          <span>{new Date(event.movementDate).toLocaleDateString()}</span>
         </div>
       ),
     },
     {
-      key: 'eventType',
-      header: t('fields.eventType'),
+      key: 'movementType',
+      header: t('fields.movementType'),
       sortable: true,
       render: (event) => (
-        <Badge>{t(`types.${event.eventType}`)}</Badge>
+        <Badge>{t(`types.${event.movementType}`)}</Badge>
       ),
     },
     {
-      key: 'title',
-      header: t('fields.title'),
+      key: 'reason',
+      header: t('fields.reason'),
       sortable: true,
       render: (event) => (
         <div>
-          <div className="font-medium">{event.title}</div>
-          {event.description && (
-            <div className="text-sm text-muted-foreground line-clamp-1">{event.description}</div>
+          <div className="font-medium">{event.reason || t(`types.${event.movementType}`)}</div>
+          {event.notes && (
+            <div className="text-sm text-muted-foreground line-clamp-1">{event.notes}</div>
           )}
         </div>
       ),
     },
     {
-      key: 'cost',
-      header: t('fields.cost'),
+      key: 'status',
+      header: t('fields.status'),
       sortable: true,
-      render: (event) => event.cost !== undefined && event.cost !== null ? `${event.cost} DZD` : '-',
+      render: (event) => event.status ? (
+        <Badge variant="secondary">{t(`statuses.${event.status}`)}</Badge>
+      ) : '-',
     },
   ];
 

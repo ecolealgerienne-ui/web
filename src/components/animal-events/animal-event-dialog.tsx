@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
+import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto, AnimalEventType } from '@/lib/types/animal-event';
 import { Animal } from '@/lib/types/animal';
 import { animalEventsService } from '@/lib/services/animal-events.service';
 import { animalsService } from '@/lib/services/animals.service';
@@ -36,10 +36,10 @@ interface AnimalEventDialogProps {
   onNavigate?: (direction: 'prev' | 'next') => void;
 }
 
-const EVENT_TYPES = [
+const EVENT_TYPES: AnimalEventType[] = [
   'entry', 'exit', 'birth', 'death', 'sale', 'purchase',
   'transfer_in', 'transfer_out', 'temporary_out', 'temporary_return'
-] as const;
+];
 
 export function AnimalEventDialog({
   open,
@@ -71,48 +71,51 @@ export function AnimalEventDialog({
   const [searchResult, setSearchResult] = useState<Animal | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
 
+  // Form data aligned with API schema
   const [formData, setFormData] = useState<CreateAnimalEventDto>({
-    animalId: '',
-    eventType: 'entry',
-    eventDate: new Date().toISOString().split('T')[0],
-    title: '',
-    description: '',
-    performedBy: '',
-    veterinarianId: '',
-    cost: undefined,
-    relatedAnimalId: '',
-    location: '',
+    animalIds: [],
+    movementType: 'entry',
+    movementDate: new Date().toISOString().split('T')[0],
+    reason: '',
     notes: '',
   });
 
   useEffect(() => {
     if (event) {
-      const formattedDate = event.eventDate ? event.eventDate.split('T')[0] : '';
+      const formattedDate = event.movementDate ? event.movementDate.split('T')[0] : '';
       setFormData({
-        animalId: event.animalId,
-        eventType: event.eventType,
-        eventDate: formattedDate,
-        title: event.title,
-        description: event.description || '',
-        performedBy: event.performedBy || '',
-        veterinarianId: event.veterinarianId || '',
-        cost: event.cost,
-        relatedAnimalId: event.relatedAnimalId || '',
-        location: event.location || '',
+        animalIds: event.animalIds || [],
+        movementType: event.movementType,
+        movementDate: formattedDate,
+        lotId: event.lotId,
+        reason: event.reason || '',
+        status: event.status,
         notes: event.notes || '',
+        buyerName: event.buyerName,
+        buyerType: event.buyerType,
+        buyerContact: event.buyerContact,
+        buyerFarmId: event.buyerFarmId,
+        salePrice: event.salePrice,
+        sellerName: event.sellerName,
+        purchasePrice: event.purchasePrice,
+        destinationFarmId: event.destinationFarmId,
+        originFarmId: event.originFarmId,
+        slaughterhouseName: event.slaughterhouseName,
+        slaughterhouseId: event.slaughterhouseId,
+        isTemporary: event.isTemporary,
+        temporaryType: event.temporaryType,
+        expectedReturnDate: event.expectedReturnDate,
+        returnDate: event.returnDate,
+        returnNotes: event.returnNotes,
+        relatedMovementId: event.relatedMovementId,
+        documentNumber: event.documentNumber,
       });
     } else {
       setFormData({
-        animalId: '',
-        eventType: 'entry',
-        eventDate: new Date().toISOString().split('T')[0],
-        title: '',
-        description: '',
-        performedBy: '',
-        veterinarianId: '',
-        cost: undefined,
-        relatedAnimalId: '',
-        location: '',
+        animalIds: [],
+        movementType: 'entry',
+        movementDate: new Date().toISOString().split('T')[0],
+        reason: '',
         notes: '',
       });
       setMovementAnimals([]);
@@ -209,18 +212,39 @@ export function AnimalEventDialog({
   // Ajouter l'animal trouvé à la liste
   const handleAddAnimal = () => {
     if (searchResult) {
-      setMovementAnimals([...movementAnimals, searchResult]);
+      const newAnimals = [...movementAnimals, searchResult];
+      setMovementAnimals(newAnimals);
+      // Update animalIds in formData
+      setFormData(prev => ({
+        ...prev,
+        animalIds: newAnimals.map(a => a.id)
+      }));
       setSearchOfficialId('');
       setSearchResult(null);
       setShowAddAnimal(false);
     }
   };
 
+  // Retirer un animal de la liste
+  const handleRemoveAnimal = (animalId: string) => {
+    const newAnimals = movementAnimals.filter(a => a.id !== animalId);
+    setMovementAnimals(newAnimals);
+    setFormData(prev => ({
+      ...prev,
+      animalIds: newAnimals.map(a => a.id)
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      await onSubmit(formData);
+      // Build the payload with animalIds from movementAnimals
+      const payload: CreateAnimalEventDto | UpdateAnimalEventDto = {
+        ...formData,
+        animalIds: movementAnimals.map(a => a.id),
+      };
+      await onSubmit(payload);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
@@ -230,7 +254,7 @@ export function AnimalEventDialog({
   const getDialogTitle = () => {
     if (mode === 'create') return t('newEvent');
     if (mode === 'edit') return t('editEvent');
-    return event?.title || '';
+    return event?.reason || t(`types.${event?.movementType}`);
   };
 
   const getDialogDescription = () => {
@@ -261,7 +285,7 @@ export function AnimalEventDialog({
             </div>
             {mode === 'view' && event && (
               <Badge variant="default" className="text-sm px-3 py-1">
-                {t(`types.${event.eventType}`)}
+                {t(`types.${event.movementType}`)}
               </Badge>
             )}
           </div>
@@ -318,6 +342,17 @@ export function AnimalEventDialog({
                           <Badge variant="secondary" className="flex-shrink-0">
                             {animal.sex === 'male' ? 'M' : 'F'}
                           </Badge>
+                          {isEditable && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                              onClick={() => handleRemoveAnimal(animal.id)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -381,8 +416,8 @@ export function AnimalEventDialog({
                   </div>
                 )}
 
-                {/* Bouton Ajouter un animal (mode édition uniquement) */}
-                {mode === 'edit' && !showAddAnimal && (
+                {/* Bouton Ajouter un animal */}
+                {!showAddAnimal && (
                   <Button
                     type="button"
                     variant="outline"
@@ -401,10 +436,10 @@ export function AnimalEventDialog({
                 <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>{t('fields.eventType')} *</Label>
+                    <Label>{t('fields.movementType')} *</Label>
                     <Select
-                      value={formData.eventType}
-                      onValueChange={(value) => setFormData({ ...formData, eventType: value as CreateAnimalEventDto['eventType'] })}
+                      value={formData.movementType}
+                      onValueChange={(value) => setFormData({ ...formData, movementType: value as AnimalEventType })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder={t('placeholders.selectType')} />
@@ -419,87 +454,147 @@ export function AnimalEventDialog({
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>{t('fields.eventDate')} *</Label>
+                    <Label>{t('fields.movementDate')} *</Label>
                     <Input
                       type="date"
-                      value={formData.eventDate}
-                      onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
+                      value={formData.movementDate}
+                      onChange={(e) => setFormData({ ...formData, movementDate: e.target.value })}
                       required
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t('fields.title')} *</Label>
-                    <Select
-                      value={formData.title}
-                      onValueChange={(value) => setFormData({ ...formData, title: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('placeholders.selectTitle')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {EVENT_TYPES.map((type) => (
-                          <SelectItem key={type} value={t(`types.${type}`)}>
-                            {t(`types.${type}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-2">
+                  <Label>{t('fields.reason')}</Label>
+                  <Select
+                    value={formData.reason || ''}
+                    onValueChange={(value) => setFormData({ ...formData, reason: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('placeholders.selectReason')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EVENT_TYPES.map((type) => (
+                        <SelectItem key={type} value={t(`types.${type}`)}>
+                          {t(`types.${type}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Champs conditionnels selon le type de mouvement */}
+                {(formData.movementType === 'sale') && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t('fields.buyerName')}</Label>
+                      <Input
+                        value={formData.buyerName || ''}
+                        onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })}
+                        placeholder={t('placeholders.buyerName')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t('fields.salePrice')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          value={formData.salePrice?.toString() || ''}
+                          onChange={(e) => setFormData({ ...formData, salePrice: e.target.value ? parseFloat(e.target.value) : undefined })}
+                          step="0.01"
+                          className="flex-1"
+                        />
+                        <span className="text-sm font-medium text-muted-foreground">€</span>
+                      </div>
+                    </div>
                   </div>
+                )}
+
+                {(formData.movementType === 'purchase') && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t('fields.sellerName')}</Label>
+                      <Input
+                        value={formData.sellerName || ''}
+                        onChange={(e) => setFormData({ ...formData, sellerName: e.target.value })}
+                        placeholder={t('placeholders.sellerName')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t('fields.purchasePrice')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          value={formData.purchasePrice?.toString() || ''}
+                          onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value ? parseFloat(e.target.value) : undefined })}
+                          step="0.01"
+                          className="flex-1"
+                        />
+                        <span className="text-sm font-medium text-muted-foreground">€</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(formData.movementType === 'transfer_in' || formData.movementType === 'transfer_out') && (
                   <div className="space-y-2">
-                    <Label>{t('fields.location')}</Label>
+                    <Label>{formData.movementType === 'transfer_in' ? t('fields.originFarmId') : t('fields.destinationFarmId')}</Label>
                     <Input
-                      value={formData.location || ''}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      placeholder={t('placeholders.location')}
+                      value={(formData.movementType === 'transfer_in' ? formData.originFarmId : formData.destinationFarmId) || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        ...(formData.movementType === 'transfer_in'
+                          ? { originFarmId: e.target.value }
+                          : { destinationFarmId: e.target.value })
+                      })}
+                      placeholder={t('placeholders.farmId')}
                     />
                   </div>
-                </div>
+                )}
 
-                <div className="space-y-2">
-                  <Label>{t('fields.description')}</Label>
-                  <Textarea
-                    value={formData.description || ''}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder={t('placeholders.description')}
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              {/* Section: Détails */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
-                <div className="space-y-2">
-                  <Label>{t('fields.performedBy')}</Label>
-                  <Input
-                    value={formData.performedBy || ''}
-                    onChange={(e) => setFormData({ ...formData, performedBy: e.target.value })}
-                    placeholder={t('placeholders.performedBy')}
-                  />
-                </div>
-
-                {/* Coût avec symbole € */}
-                <div className="space-y-2">
-                  <Label>{t('fields.cost')}</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      value={formData.cost?.toString() || ''}
-                      onChange={(e) => setFormData({ ...formData, cost: e.target.value ? parseFloat(e.target.value) : undefined })}
-                      step="0.01"
-                      className="flex-1"
-                    />
-                    <span className="text-sm font-medium text-muted-foreground">€</span>
+                {(formData.movementType === 'temporary_out') && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t('fields.temporaryType')}</Label>
+                      <Select
+                        value={formData.temporaryType || ''}
+                        onValueChange={(value) => setFormData({ ...formData, temporaryType: value as 'veterinary' | 'exhibition' | 'breeding' | 'grazing' | 'other', isTemporary: true })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('placeholders.selectTemporaryType')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="veterinary">{t('temporaryTypes.veterinary')}</SelectItem>
+                          <SelectItem value="exhibition">{t('temporaryTypes.exhibition')}</SelectItem>
+                          <SelectItem value="breeding">{t('temporaryTypes.breeding')}</SelectItem>
+                          <SelectItem value="grazing">{t('temporaryTypes.grazing')}</SelectItem>
+                          <SelectItem value="other">{t('temporaryTypes.other')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t('fields.expectedReturnDate')}</Label>
+                      <Input
+                        type="date"
+                        value={formData.expectedReturnDate?.split('T')[0] || ''}
+                        onChange={(e) => setFormData({ ...formData, expectedReturnDate: e.target.value })}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Section: Notes */}
               <div className="space-y-4">
                 <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
+                <div className="space-y-2">
+                  <Label>{t('fields.documentNumber')}</Label>
+                  <Input
+                    value={formData.documentNumber || ''}
+                    onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
+                    placeholder={t('placeholders.documentNumber')}
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label>{t('fields.notes')}</Label>
                   <Textarea
@@ -569,51 +664,85 @@ export function AnimalEventDialog({
               <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">{t('fields.eventType')}</p>
-                  <div className="mt-1"><Badge>{t(`types.${event?.eventType}`)}</Badge></div>
+                  <p className="text-xs text-muted-foreground">{t('fields.movementType')}</p>
+                  <div className="mt-1"><Badge>{t(`types.${event?.movementType}`)}</Badge></div>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">{t('fields.eventDate')}</p>
-                  <p className="text-sm">{event?.eventDate ? formatDate(event.eventDate) : '-'}</p>
+                  <p className="text-xs text-muted-foreground">{t('fields.movementDate')}</p>
+                  <p className="text-sm">{event?.movementDate ? formatDate(event.movementDate) : '-'}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">{t('fields.title')}</p>
-                  <p className="text-sm">{event?.title || '-'}</p>
+                  <p className="text-xs text-muted-foreground">{t('fields.reason')}</p>
+                  <p className="text-sm">{event?.reason || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">{t('fields.location')}</p>
-                  <p className={`text-sm ${!event?.location ? 'text-muted-foreground' : ''}`}>{event?.location || '-'}</p>
+                  <p className="text-xs text-muted-foreground">{t('fields.status')}</p>
+                  <p className="text-sm">{event?.status ? t(`statuses.${event.status}`) : '-'}</p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-xs text-muted-foreground">{t('fields.description')}</p>
-                <p className={`text-sm ${!event?.description ? 'text-muted-foreground' : ''}`}>{event?.description || '-'}</p>
-              </div>
-            </div>
+              {/* Champs conditionnels en mode lecture */}
+              {event?.movementType === 'sale' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('fields.buyerName')}</p>
+                    <p className="text-sm">{event?.buyerName || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('fields.salePrice')}</p>
+                    <p className="text-sm">{event?.salePrice ? `${event.salePrice} €` : '-'}</p>
+                  </div>
+                </div>
+              )}
 
-            {/* Section: Détails */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
-              <div>
-                <p className="text-xs text-muted-foreground">{t('fields.performedBy')}</p>
-                <p className={`text-sm ${!event?.performedBy ? 'text-muted-foreground' : ''}`}>{event?.performedBy || '-'}</p>
-              </div>
+              {event?.movementType === 'purchase' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('fields.sellerName')}</p>
+                    <p className="text-sm">{event?.sellerName || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('fields.purchasePrice')}</p>
+                    <p className="text-sm">{event?.purchasePrice ? `${event.purchasePrice} €` : '-'}</p>
+                  </div>
+                </div>
+              )}
 
-              <div>
-                <p className="text-xs text-muted-foreground">{t('fields.cost')}</p>
-                <p className={`text-sm ${!event?.cost ? 'text-muted-foreground' : ''}`}>
-                  {event?.cost ? `${event.cost} €` : '-'}
-                </p>
-              </div>
+              {(event?.movementType === 'transfer_in' || event?.movementType === 'transfer_out') && (
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {event.movementType === 'transfer_in' ? t('fields.originFarmId') : t('fields.destinationFarmId')}
+                  </p>
+                  <p className="text-sm">
+                    {(event.movementType === 'transfer_in' ? event.originFarmId : event.destinationFarmId) || '-'}
+                  </p>
+                </div>
+              )}
+
+              {event?.isTemporary && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('fields.temporaryType')}</p>
+                    <p className="text-sm">{event.temporaryType ? t(`temporaryTypes.${event.temporaryType}`) : '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('fields.expectedReturnDate')}</p>
+                    <p className="text-sm">{event.expectedReturnDate ? formatDate(event.expectedReturnDate) : '-'}</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Section: Notes */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('fields.documentNumber')}</p>
+                <p className={`text-sm ${!event?.documentNumber ? 'text-muted-foreground' : ''}`}>{event?.documentNumber || '-'}</p>
+              </div>
               <div>
                 <p className="text-xs text-muted-foreground">{t('fields.notes')}</p>
                 <p className={`text-sm ${!event?.notes ? 'text-muted-foreground' : ''}`}>{event?.notes || '-'}</p>
