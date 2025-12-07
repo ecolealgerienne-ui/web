@@ -16,18 +16,20 @@ services:
     container_name: anitra-web
     working_dir: /app
     volumes:
-      - ./:/app                    # Code source partagé (hot reload)
+      - ./:/app                         # Code source partagé (hot reload)
       - node_modules:/app/node_modules  # Persist node_modules
-      - next_cache:/app/.next          # Persist Next.js cache
+      - next_cache:/app/.next           # Persist Next.js cache
+      - ./logs:/app/logs                # Logs sur le host
     ports:
       - "4000:4000"
     environment:
       - NODE_ENV=development
-      - WATCHPACK_POLLING=true     # Hot reload dans Docker
+      - WATCHPACK_POLLING=true          # Hot reload dans Docker
+      - LOG_DIR=/app/logs               # Répertoire des logs
       # API Backend
       - API_URL=http://api:3001
       - NEXT_PUBLIC_API_URL=http://localhost:3001
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "mkdir -p /app/logs && npm install && npm run dev"
     stdin_open: true
     tty: true
 

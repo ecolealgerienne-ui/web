@@ -32,11 +32,16 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+# Créer le répertoire des logs
+RUN mkdir -p /app/logs && chown -R nextjs:nodejs /app/logs
+VOLUME /app/logs
+
 USER nextjs
 
 EXPOSE 4000
 
 ENV PORT=4000
 ENV HOSTNAME="0.0.0.0"
+ENV LOG_DIR=/app/logs
 
 CMD ["node", "server.js"]
