@@ -20,20 +20,11 @@ import {
 import { Plus, X, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useLot } from '@/lib/hooks/useLots';
-import { calculateAge, sexLabels, speciesLabels } from '@/lib/utils/animal-helpers';
+import { calculateAge, sexLabels } from '@/lib/utils/animal-helpers';
 
 interface LotAnimalsCardProps {
   lotId: string;
 }
-
-const getSpeciesLabel = (speciesId: string): string => {
-  const labels: Record<string, string> = {
-    sheep: 'Ovin',
-    goat: 'Caprin',
-    cattle: 'Bovin',
-  };
-  return labels[speciesId] || speciesId;
-};
 
 export function LotAnimalsCard({ lotId }: LotAnimalsCardProps) {
   const { animals, loading, error } = useLot(lotId);
@@ -111,28 +102,28 @@ export function LotAnimalsCard({ lotId }: LotAnimalsCardProps) {
                 {animals.map((lotAnimal) => (
                   <TableRow key={lotAnimal.id}>
                     <TableCell className="font-medium">
-                      {lotAnimal.animal?.visualId || '-'}
+                      {lotAnimal.visualId || '-'}
                     </TableCell>
                     <TableCell className="font-mono text-xs">
-                      {lotAnimal.animal?.currentEid || '-'}
+                      {lotAnimal.currentEid || '-'}
                     </TableCell>
                     <TableCell>
                       <Badge className="border border-border bg-background">
-                        {getSpeciesLabel(lotAnimal.animal?.speciesId || '')}
+                        {lotAnimal.species?.name || '-'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {lotAnimal.animal?.sex ? (sexLabels[lotAnimal.animal.sex] || lotAnimal.animal.sex) : '-'}
+                      {lotAnimal.sex ? (sexLabels[lotAnimal.sex] || lotAnimal.sex) : '-'}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {lotAnimal.animal?.birthDate ? calculateAge(lotAnimal.animal.birthDate) : '-'}
+                      {lotAnimal.birthDate ? calculateAge(lotAnimal.birthDate) : '-'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(lotAnimal.joinedAt).toLocaleDateString('fr-FR')}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link href={`/animals/${lotAnimal.animalId}`}>
+                        <Link href={`/animals/${lotAnimal.id}`}>
                           <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>

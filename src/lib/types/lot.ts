@@ -64,33 +64,24 @@ export interface Lot {
   updatedAt?: string;
 }
 
+// L'API retourne les données de l'animal directement (pas imbriquées)
 export interface LotAnimal {
   id: string;
-  lotId: string;
-  animalId: string;
-  farmId: string;
-  joinedAt: string;
-  leftAt?: string | null;
-
-  // Données de l'animal (incluses par l'API via include)
-  animal?: {
+  visualId?: string | null;
+  currentEid?: string | null;
+  officialNumber?: string | null;
+  sex: string;
+  birthDate?: string | null;
+  status: string;
+  breed?: {
     id: string;
-    officialNumber?: string | null;
-    visualId?: string | null;
-    currentEid?: string | null;
-    sex: string;
-    status: string;
-    birthDate?: string | null;
-    speciesId?: string | null;
-    species?: {
-      id: string;
-      name: string;
-    } | null;
-    breed?: {
-      id: string;
-      name: string;
-    } | null;
-  };
+    name: string;
+  } | null;
+  species?: {
+    id: string;
+    name: string;
+  } | null;
+  joinedAt: string;
 }
 
 export interface CreateLotDto {

@@ -165,7 +165,7 @@ export function LotDialog({
       );
 
       if (exactMatch) {
-        const alreadyInList = lotAnimals.some(la => la.animalId === exactMatch.id);
+        const alreadyInList = lotAnimals.some(la => la.id === exactMatch.id);
         if (alreadyInList) {
           setSearchError(t('messages.animalAlreadyInList'));
         } else {
@@ -173,7 +173,7 @@ export function LotDialog({
         }
       } else if (animals.length > 0) {
         const firstResult = animals[0];
-        const alreadyInList = lotAnimals.some(la => la.animalId === firstResult.id);
+        const alreadyInList = lotAnimals.some(la => la.id === firstResult.id);
         if (alreadyInList) {
           setSearchError(t('messages.animalAlreadyInList'));
         } else {
@@ -204,23 +204,16 @@ export function LotDialog({
   const handleAddAnimal = () => {
     if (searchResult) {
       const newAnimal: LotAnimal = {
-        id: `temp-${searchResult.id}`,
-        lotId: lot?.id || '',
-        animalId: searchResult.id,
-        farmId: searchResult.farmId || '',
+        id: searchResult.id,
+        officialNumber: searchResult.officialNumber,
+        visualId: searchResult.visualId,
+        currentEid: searchResult.currentEid,
+        sex: searchResult.sex,
+        status: searchResult.status,
+        birthDate: searchResult.birthDate,
+        species: searchResult.species,
+        breed: searchResult.breed,
         joinedAt: new Date().toISOString(),
-        animal: {
-          id: searchResult.id,
-          officialNumber: searchResult.officialNumber || undefined,
-          visualId: searchResult.visualId || undefined,
-          currentEid: searchResult.currentEid || undefined,
-          sex: searchResult.sex,
-          status: searchResult.status,
-          birthDate: searchResult.birthDate,
-          speciesId: searchResult.speciesId || undefined,
-          species: searchResult.species,
-          breed: searchResult.breed,
-        },
       };
       setLotAnimals([...lotAnimals, newAnimal]);
       setFormData(prev => ({
@@ -235,7 +228,7 @@ export function LotDialog({
 
   // Remove animal from list
   const handleRemoveAnimal = (animalId: string) => {
-    setLotAnimals(lotAnimals.filter(la => la.animalId !== animalId));
+    setLotAnimals(lotAnimals.filter(la => la.id !== animalId));
     setFormData(prev => ({
       ...prev,
       animalIds: (prev.animalIds || []).filter(id => id !== animalId)
@@ -248,7 +241,7 @@ export function LotDialog({
     try {
       const payload: CreateLotDto | UpdateLotDto = {
         ...formData,
-        animalIds: lotAnimals.map(la => la.animalId),
+        animalIds: lotAnimals.map(la => la.id),
       };
       await onSubmit(payload);
       onOpenChange(false);
@@ -507,21 +500,21 @@ export function LotDialog({
                     <p className="text-xs text-muted-foreground">{t('fields.animalsInLot')} ({lotAnimals.length})</p>
                     <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
                       {lotAnimals.map((la, index) => (
-                        <div key={la.id || `${la.animalId}-${index}`} className="flex items-center gap-3 p-2 text-sm">
+                        <div key={la.id || `animal-${index}`} className="flex items-center gap-3 p-2 text-sm">
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium font-mono">
-                              {la.animal?.officialNumber || la.animalId}
+                              {la.officialNumber || la.id}
                             </span>
-                            {la.animal?.visualId && (
-                              <span className="text-muted-foreground ml-2">({la.animal.visualId})</span>
+                            {la.visualId && (
+                              <span className="text-muted-foreground ml-2">({la.visualId})</span>
                             )}
-                            {la.animal?.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {la.animal.species.name}</span>
+                            {la.species?.name && (
+                              <span className="text-muted-foreground ml-2">• {la.species.name}</span>
                             )}
                           </div>
                           <Badge variant="secondary" className="flex-shrink-0">
-                            {la.animal?.sex === 'male' ? 'M' : la.animal?.sex === 'female' ? 'F' : '-'}
+                            {la.sex === 'male' ? 'M' : la.sex === 'female' ? 'F' : '-'}
                           </Badge>
                           {isEditable && (
                             <Button
@@ -529,7 +522,7 @@ export function LotDialog({
                               variant="ghost"
                               size="sm"
                               className="h-6 w-6 p-0"
-                              onClick={() => handleRemoveAnimal(la.animalId)}
+                              onClick={() => handleRemoveAnimal(la.id)}
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -744,21 +737,21 @@ export function LotDialog({
                   <p className="text-xs text-muted-foreground">{t('fields.animalsInLot')} ({lotAnimals.length})</p>
                   <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
                     {lotAnimals.map((la, index) => (
-                      <div key={la.id || `${la.animalId}-${index}`} className="flex items-center gap-3 p-2 text-sm">
+                      <div key={la.id || `animal-${index}`} className="flex items-center gap-3 p-2 text-sm">
                         <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <span className="font-medium font-mono">
-                            {la.animal?.officialNumber || la.animalId}
+                            {la.officialNumber || la.id}
                           </span>
-                          {la.animal?.visualId && (
-                            <span className="text-muted-foreground ml-2">({la.animal.visualId})</span>
+                          {la.visualId && (
+                            <span className="text-muted-foreground ml-2">({la.visualId})</span>
                           )}
-                          {la.animal?.species?.name && (
-                            <span className="text-muted-foreground ml-2">• {la.animal.species.name}</span>
+                          {la.species?.name && (
+                            <span className="text-muted-foreground ml-2">• {la.species.name}</span>
                           )}
                         </div>
                         <Badge variant="secondary" className="flex-shrink-0">
-                          {la.animal?.sex === 'male' ? 'M' : la.animal?.sex === 'female' ? 'F' : '-'}
+                          {la.sex === 'male' ? 'M' : la.sex === 'female' ? 'F' : '-'}
                         </Badge>
                       </div>
                     ))}
