@@ -1,6 +1,9 @@
-// Types pour les lots basés sur les specs backend
+/**
+ * Types pour les lots basés sur le schéma API
+ * Endpoint: POST/PUT /api/v1/farms/{farmId}/lots
+ */
 
-export type LotType = 'treatment' | 'vaccination' | 'sale' | 'slaughter' | 'purchase' | 'breeding';
+export type LotType = 'treatment' | 'vaccination' | 'sale' | 'slaughter' | 'purchase' | 'breeding' | 'reproduction';
 export type LotStatus = 'open' | 'closed' | 'archived';
 
 export interface Lot {
@@ -10,10 +13,13 @@ export interface Lot {
   type: LotType;
   status: LotStatus;
   description?: string;
-  completed: boolean;
-  completedAt?: string;
+  notes?: string;
+  isActive: boolean;
 
-  // Traitement
+  // Animaux (API uses animalIds array)
+  animalIds?: string[];
+
+  // Traitement/Vaccination
   productId?: string;
   productName?: string;
   treatmentDate?: string;
@@ -26,14 +32,9 @@ export interface Lot {
   buyerName?: string;
   sellerName?: string;
 
-  notes?: string;
-  isActive: boolean;
-
   // Métadonnées
-  animalCount: number;
-  version: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LotAnimal {
@@ -47,33 +48,52 @@ export interface LotAnimal {
   // Données de l'animal (pour affichage)
   animal: {
     id: string;
+    officialNumber?: string;
     visualId?: string;
     currentEid?: string;
     sex: string;
     status: string;
     birthDate: string;
     speciesId?: string;
+    species?: {
+      id: string;
+      name: string;
+    };
+    breed?: {
+      id: string;
+      name: string;
+    };
   };
 }
 
-export interface LotFilters {
-  search: string;
-  type: LotType | 'all';
-  status: LotStatus | 'all';
-  completed?: boolean;
+export interface CreateLotDto {
+  name: string;
+  type: LotType;
+  status?: LotStatus;
+  description?: string;
+  notes?: string;
+  isActive?: boolean;
+  animalIds?: string[];
+
+  // Traitement/Vaccination
+  productId?: string;
+  productName?: string;
+  treatmentDate?: string;
+  withdrawalEndDate?: string;
+  veterinarianId?: string;
+  veterinarianName?: string;
+
+  // Vente/Achat
+  priceTotal?: number;
+  buyerName?: string;
+  sellerName?: string;
 }
 
-export const LOT_TYPE_LABELS: Record<LotType, string> = {
-  treatment: 'Traitement',
-  vaccination: 'Vaccination',
-  sale: 'Vente',
-  slaughter: 'Abattage',
-  purchase: 'Achat',
-  breeding: 'Reproduction',
-};
+export interface UpdateLotDto extends Partial<CreateLotDto> {}
 
-export const LOT_STATUS_LABELS: Record<LotStatus, string> = {
-  open: 'Ouvert',
-  closed: 'Fermé',
-  archived: 'Archivé',
-};
+export interface LotFilters {
+  search?: string;
+  type?: LotType | 'all';
+  status?: LotStatus | 'all';
+  isActive?: boolean;
+}

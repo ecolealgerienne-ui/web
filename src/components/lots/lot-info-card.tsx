@@ -1,6 +1,6 @@
 'use client';
 
-import { Lot, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
+import { Lot } from '@/lib/types/lot';
 import { Badge } from '@/components/ui/badge';
 import { useTranslations } from '@/lib/i18n';
 import {
@@ -26,6 +26,7 @@ interface LotInfoCardProps {
 
 export function LotInfoCard({ lot }: LotInfoCardProps) {
   const t = useTranslations('lots');
+  const animalCount = lot.animalIds?.length || 0;
 
   return (
     <Card>
@@ -38,7 +39,6 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
         <div className="flex items-center gap-2">
           <Badge className="border border-border bg-background">{t(`type.${lot.type}`)}</Badge>
           <Badge variant="default">{t(`status.${lot.status}`)}</Badge>
-          {lot.completed && <Badge variant="success">Complété</Badge>}
         </div>
 
         {/* Description */}
@@ -58,7 +58,7 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
             <Users className="h-4 w-4 text-muted-foreground" />
             Animaux concernés
           </div>
-          <p className="text-2xl font-bold">{lot.animalCount}</p>
+          <p className="text-2xl font-bold">{animalCount}</p>
         </div>
 
         {/* Produit */}
@@ -153,9 +153,9 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
             <p className="text-2xl font-bold">
               {lot.priceTotal.toLocaleString('fr-DZ')} DA
             </p>
-            {lot.animalCount > 0 && (
+            {animalCount > 0 && (
               <p className="text-xs text-muted-foreground">
-                {(lot.priceTotal / lot.animalCount).toLocaleString('fr-DZ')} DA /
+                {(lot.priceTotal / animalCount).toLocaleString('fr-DZ')} DA /
                 animal
               </p>
             )}
@@ -171,22 +171,22 @@ export function LotInfoCard({ lot }: LotInfoCardProps) {
         )}
 
         {/* Métadonnées */}
-        <div className="border-t pt-4 text-xs text-muted-foreground">
-          <div className="space-y-1">
-            <div>
-              Créé le {new Date(lot.createdAt).toLocaleDateString('fr-FR')}
+        {(lot.createdAt || lot.updatedAt) && (
+          <div className="border-t pt-4 text-xs text-muted-foreground">
+            <div className="space-y-1">
+              {lot.createdAt && (
+                <div>
+                  Créé le {new Date(lot.createdAt).toLocaleDateString('fr-FR')}
+                </div>
+              )}
+              {lot.updatedAt && (
+                <div>
+                  Modifié le {new Date(lot.updatedAt).toLocaleDateString('fr-FR')}
+                </div>
+              )}
             </div>
-            <div>
-              Modifié le {new Date(lot.updatedAt).toLocaleDateString('fr-FR')}
-            </div>
-            {lot.completedAt && (
-              <div className="font-medium text-green-600 dark:text-green-400">
-                Clôturé le{' '}
-                {new Date(lot.completedAt).toLocaleDateString('fr-FR')}
-              </div>
-            )}
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

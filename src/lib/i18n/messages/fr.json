@@ -1951,6 +1951,8 @@
     "title": "Lots",
     "subtitle": "Gérez vos lots de traitement, vente et autres opérations groupées",
     "newLot": "Nouveau lot",
+    "editLot": "Modifier le lot",
+    "deleteLot": "Supprimer le lot",
     "noLots": "Aucun lot trouvé",
     "filters": {
       "search": "Recherche",
@@ -1980,12 +1982,72 @@
       "sale": "Vente",
       "slaughter": "Abattage",
       "purchase": "Achat",
-      "breeding": "Reproduction"
+      "breeding": "Reproduction",
+      "reproduction": "Reproduction"
     },
     "status": {
       "open": "Ouvert",
       "closed": "Fermé",
       "archived": "Archivé"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "treatment": "Traitement / Vaccination",
+      "sale": "Vente",
+      "purchase": "Achat",
+      "animals": "Animaux du lot",
+      "notes": "Notes"
+    },
+    "fields": {
+      "name": "Nom du lot",
+      "type": "Type de lot",
+      "status": "Statut",
+      "description": "Description",
+      "notes": "Notes",
+      "productName": "Produit utilisé",
+      "veterinarianName": "Vétérinaire",
+      "treatmentDate": "Date d'intervention",
+      "withdrawalEndDate": "Fin du délai d'attente",
+      "buyerName": "Acheteur",
+      "sellerName": "Vendeur",
+      "priceTotal": "Montant total",
+      "animals": "Animaux",
+      "animalsInLot": "Animaux dans ce lot",
+      "createdAt": "Date de création"
+    },
+    "placeholders": {
+      "name": "Ex: Traitement antiparasitaire Mars 2025",
+      "selectType": "Sélectionner un type",
+      "selectStatus": "Sélectionner un statut",
+      "description": "Description du lot...",
+      "productName": "Nom du produit",
+      "veterinarianName": "Nom du vétérinaire",
+      "buyerName": "Nom de l'acheteur",
+      "sellerName": "Nom du vendeur",
+      "notes": "Notes supplémentaires...",
+      "officialId": "Numéro officiel de l'animal"
+    },
+    "actions": {
+      "addAnimal": "Ajouter un animal",
+      "searchAnimal": "Rechercher un animal",
+      "add": "Ajouter"
+    },
+    "messages": {
+      "addDescription": "Créez un nouveau lot pour grouper des animaux",
+      "editDescription": "Modifiez les informations du lot",
+      "created": "Lot créé avec succès",
+      "updated": "Lot modifié avec succès",
+      "deleted": "Lot supprimé avec succès",
+      "createError": "Erreur lors de la création du lot",
+      "updateError": "Erreur lors de la modification du lot",
+      "deleteError": "Erreur lors de la suppression du lot",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce lot ?",
+      "noAnimalsInLot": "Aucun animal dans ce lot",
+      "searching": "Recherche en cours...",
+      "animalNotFound": "Animal non trouvé",
+      "animalAlreadyInList": "Cet animal est déjà dans le lot",
+      "searchError": "Erreur lors de la recherche"
     }
   },
   "animalEvents": {

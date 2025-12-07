@@ -12,14 +12,14 @@ export function useLots(filters?: Partial<LotFilters>) {
   const filterSearch = filters?.search;
   const filterType = filters?.type;
   const filterStatus = filters?.status;
-  const filterCompleted = filters?.completed;
+  const filterIsActive = filters?.isActive;
 
   const memoizedFilters = useMemo(() => ({
     search: filterSearch,
     type: filterType,
     status: filterStatus,
-    completed: filterCompleted,
-  }), [filterSearch, filterType, filterStatus, filterCompleted]);
+    isActive: filterIsActive,
+  }), [filterSearch, filterType, filterStatus, filterIsActive]);
 
   const fetchLots = useCallback(async () => {
     try {

@@ -9,9 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LotFilters, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
+import { LotFilters, LotType, LotStatus } from '@/lib/types/lot';
 import { Search } from 'lucide-react';
 import { useTranslations } from '@/lib/i18n';
+
+const LOT_TYPES: LotType[] = ['treatment', 'vaccination', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction'];
+const LOT_STATUSES: LotStatus[] = ['open', 'closed', 'archived'];
 
 interface LotsFiltersProps {
   filters: LotFilters;
@@ -33,7 +36,7 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
               id="search"
               placeholder={t('filters.searchPlaceholder')}
               className="pl-9"
-              value={filters.search}
+              value={filters.search || ''}
               onChange={(e) =>
                 onFiltersChange({ ...filters, search: e.target.value })
               }
@@ -45,9 +48,9 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
         <div>
           <Label htmlFor="type">{t('filters.type')}</Label>
           <Select
-            value={filters.type}
+            value={filters.type || 'all'}
             onValueChange={(value) =>
-              onFiltersChange({ ...filters, type: value as any })
+              onFiltersChange({ ...filters, type: value as LotType | 'all' })
             }
           >
             <SelectTrigger>
@@ -55,9 +58,9 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
-              {Object.keys(LOT_TYPE_LABELS).map((value) => (
-                <SelectItem key={value} value={value}>
-                  {t(`type.${value}`)}
+              {LOT_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {t(`type.${type}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -68,9 +71,9 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
         <div>
           <Label htmlFor="status">{t('filters.status')}</Label>
           <Select
-            value={filters.status}
+            value={filters.status || 'all'}
             onValueChange={(value) =>
-              onFiltersChange({ ...filters, status: value as any })
+              onFiltersChange({ ...filters, status: value as LotStatus | 'all' })
             }
           >
             <SelectTrigger>
@@ -78,9 +81,9 @@ export function LotsFilters({ filters, onFiltersChange }: LotsFiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
-              {Object.keys(LOT_STATUS_LABELS).map((value) => (
-                <SelectItem key={value} value={value}>
-                  {t(`status.${value}`)}
+              {LOT_STATUSES.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {t(`status.${status}`)}
                 </SelectItem>
               ))}
             </SelectContent>

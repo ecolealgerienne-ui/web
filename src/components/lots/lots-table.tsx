@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Lot, LOT_TYPE_LABELS, LOT_STATUS_LABELS } from '@/lib/types/lot';
+import { Lot } from '@/lib/types/lot';
 import { Badge } from '@/components/ui/badge';
 import { Eye } from 'lucide-react';
 import {
@@ -56,6 +56,7 @@ export function LotsTable({ lots }: LotsTableProps) {
       case 'purchase':
         return 'text-orange-600 bg-orange-50 dark:bg-orange-950 dark:text-orange-400 border-orange-200 dark:border-orange-800';
       case 'breeding':
+      case 'reproduction':
         return 'text-pink-600 bg-pink-50 dark:bg-pink-950 dark:text-pink-400 border-pink-200 dark:border-pink-800';
       default:
         return '';
@@ -105,12 +106,14 @@ export function LotsTable({ lots }: LotsTableProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-right font-medium">
-                {lot.animalCount}
+                {lot.animalIds?.length || 0}
               </TableCell>
               <TableCell className="text-sm">
                 {lot.treatmentDate
                   ? new Date(lot.treatmentDate).toLocaleDateString('fr-FR')
-                  : new Date(lot.createdAt).toLocaleDateString('fr-FR')}
+                  : lot.createdAt
+                    ? new Date(lot.createdAt).toLocaleDateString('fr-FR')
+                    : '-'}
               </TableCell>
               <TableCell className="text-sm">
                 <div className="space-y-1">
