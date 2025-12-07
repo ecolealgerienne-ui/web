@@ -261,6 +261,9 @@ export function LotDialog({
       if (formData.buyerName) cleanPayload.buyerName = formData.buyerName;
       if (formData.sellerName) cleanPayload.sellerName = formData.sellerName;
 
+      console.log('[LotDialog] Submitting payload:', cleanPayload);
+      console.log('[LotDialog] Animals in lot:', lotAnimals.length, lotAnimals.map(la => la.id));
+
       await onSubmit(cleanPayload);
       onOpenChange(false);
     } catch (error) {
