@@ -183,14 +183,16 @@ export function AnimalEventDialog({
     icon?: React.ComponentType<{ className?: string }>;
   }) => {
     if (!isEditable) {
-      // Mode lecture
-      if (!value && value !== '0') return null;
+      // Mode lecture - toujours afficher le champ
+      const displayValue = value && value !== ''
+        ? (type === 'date' ? formatDate(value) : value)
+        : '-';
       return (
         <div className="flex items-start gap-2">
           {Icon && <Icon className="h-4 w-4 text-muted-foreground mt-0.5" />}
           <div>
             <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="text-sm">{type === 'date' ? formatDate(value) : value}</p>
+            <p className={`text-sm ${!value ? 'text-muted-foreground' : ''}`}>{displayValue}</p>
           </div>
         </div>
       );
@@ -268,22 +270,20 @@ export function AnimalEventDialog({
           <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInMovement')}</p>
         ) : null}
 
-        {/* Champs animalId et relatedAnimalId pour création/édition */}
-        {isEditable && (
-          <div className="grid grid-cols-2 gap-4">
-            <Field
-              label={t('fields.animalId')}
-              value={formData.animalId}
-              required
-              onChange={(v) => setFormData({ ...formData, animalId: v })}
-            />
-            <Field
-              label={t('fields.relatedAnimalId')}
-              value={formData.relatedAnimalId || ''}
-              onChange={(v) => setFormData({ ...formData, relatedAnimalId: v })}
-            />
-          </div>
-        )}
+        {/* Champs animalId et relatedAnimalId */}
+        <div className="grid grid-cols-2 gap-4">
+          <Field
+            label={t('fields.animalId')}
+            value={isEditable ? formData.animalId : (event?.animalId || '')}
+            required={isEditable}
+            onChange={isEditable ? (v) => setFormData({ ...formData, animalId: v }) : undefined}
+          />
+          <Field
+            label={t('fields.relatedAnimalId')}
+            value={isEditable ? (formData.relatedAnimalId || '') : (event?.relatedAnimalId || '')}
+            onChange={isEditable ? (v) => setFormData({ ...formData, relatedAnimalId: v }) : undefined}
+          />
+        </div>
       </div>
 
       {/* Section: Informations générales */}
