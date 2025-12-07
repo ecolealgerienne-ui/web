@@ -2002,6 +2002,7 @@
       "search": "Rechercher..."
     },
     "types": {
+      "undefined": "Non défini",
       "entry": "Entrée",
       "exit": "Sortie",
       "birth": "Naissance",
@@ -2048,10 +2049,15 @@
       "location": "Ex: Étable 1",
       "notes": "Notes additionnelles...",
       "selectVeterinarian": "Sélectionner un vétérinaire",
-      "customVeterinarian": "Nom du vétérinaire non listé"
+      "customVeterinarian": "Nom du vétérinaire non listé",
+      "selectType": "Sélectionner un type",
+      "selectTitle": "Sélectionner un titre",
+      "officialId": "Numéro officiel de l'animal"
     },
     "actions": {
-      "addAnimal": "Ajouter un animal"
+      "addAnimal": "Ajouter un animal",
+      "searchAnimal": "Rechercher un animal",
+      "add": "Ajouter"
     },
     "messages": {
       "loadError": "Impossible de charger les événements",
@@ -2065,7 +2071,11 @@
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cet événement ?",
       "addDescription": "Ajoutez les informations du nouvel événement",
       "editDescription": "Modifiez les informations de l'événement",
-      "noAnimalsInMovement": "Aucun animal associé à ce mouvement"
+      "noAnimalsInMovement": "Aucun animal associé à ce mouvement",
+      "searching": "Recherche en cours...",
+      "animalNotFound": "Animal non trouvé",
+      "animalAlreadyInList": "Cet animal est déjà dans la liste",
+      "searchError": "Erreur lors de la recherche"
     }
   },
   "weighings": {
