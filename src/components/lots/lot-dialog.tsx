@@ -510,9 +510,12 @@ export function LotDialog({
                         <div key={la.id || `${la.animalId}-${index}`} className="flex items-center gap-3 p-2 text-sm">
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <span className="font-medium">
-                              {la.animal?.officialNumber || la.animal?.visualId || la.animal?.currentEid || la.animalId}
+                            <span className="font-medium font-mono">
+                              {la.animal?.officialNumber || la.animalId}
                             </span>
+                            {la.animal?.visualId && (
+                              <span className="text-muted-foreground ml-2">({la.animal.visualId})</span>
+                            )}
                             {la.animal?.species?.name && (
                               <span className="text-muted-foreground ml-2">• {la.animal.species.name}</span>
                             )}
@@ -744,9 +747,12 @@ export function LotDialog({
                       <div key={la.id || `${la.animalId}-${index}`} className="flex items-center gap-3 p-2 text-sm">
                         <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <span className="font-medium">
-                            {la.animal?.officialNumber || la.animal?.visualId || la.animal?.currentEid || la.animalId}
+                          <span className="font-medium font-mono">
+                            {la.animal?.officialNumber || la.animalId}
                           </span>
+                          {la.animal?.visualId && (
+                            <span className="text-muted-foreground ml-2">({la.animal.visualId})</span>
+                          )}
                           {la.animal?.species?.name && (
                             <span className="text-muted-foreground ml-2">• {la.animal.species.name}</span>
                           )}
