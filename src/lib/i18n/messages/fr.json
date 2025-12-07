@@ -2027,6 +2027,7 @@
       "description": "Description",
       "performedBy": "Effectué par",
       "veterinarianId": "Vétérinaire",
+      "customVeterinarian": "Autre vétérinaire (si non listé)",
       "cost": "Coût",
       "relatedAnimalId": "Animal lié",
       "location": "Emplacement",
@@ -2045,7 +2046,12 @@
       "description": "Description de l'événement...",
       "performedBy": "Nom de la personne",
       "location": "Ex: Étable 1",
-      "notes": "Notes additionnelles..."
+      "notes": "Notes additionnelles...",
+      "selectVeterinarian": "Sélectionner un vétérinaire",
+      "customVeterinarian": "Nom du vétérinaire non listé"
+    },
+    "actions": {
+      "addAnimal": "Ajouter un animal"
     },
     "messages": {
       "loadError": "Impossible de charger les événements",

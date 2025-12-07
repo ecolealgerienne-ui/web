@@ -17,9 +17,12 @@ import {
 } from '@/components/ui/dialog';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { Animal } from '@/lib/types/animal';
+import { Veterinarian } from '@/lib/types/veterinarian';
 import { animalEventsService } from '@/lib/services/animal-events.service';
+import { veterinariansService } from '@/lib/services/veterinarians.service';
+import { TEMP_FARM_ID } from '@/lib/auth/config';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { Calendar, MapPin, User, Stethoscope, DollarSign, FileText, ChevronLeft, ChevronRight, PawPrint, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PawPrint, Loader2, Plus } from 'lucide-react';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -63,6 +66,11 @@ export function AnimalEventDialog({
   const [movementAnimals, setMovementAnimals] = useState<Animal[]>([]);
   const [animalsLoading, setAnimalsLoading] = useState(false);
 
+  // État pour les vétérinaires
+  const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([]);
+  const [veterinariansLoading, setVeterinariansLoading] = useState(false);
+  const [customVeterinarian, setCustomVeterinarian] = useState('');
+
   const [formData, setFormData] = useState<CreateAnimalEventDto>({
     animalId: '',
     eventType: 'entry',
@@ -93,6 +101,7 @@ export function AnimalEventDialog({
         location: event.location || '',
         notes: event.notes || '',
       });
+      setCustomVeterinarian('');
     } else {
       setFormData({
         animalId: '',
@@ -108,6 +117,7 @@ export function AnimalEventDialog({
         notes: '',
       });
       setMovementAnimals([]);
+      setCustomVeterinarian('');
     }
   }, [event, open]);
 
@@ -132,11 +142,34 @@ export function AnimalEventDialog({
     fetchAnimals();
   }, [event?.id, open]);
 
+  // Charger les vétérinaires
+  useEffect(() => {
+    const fetchVeterinarians = async () => {
+      if (!open) return;
+      setVeterinariansLoading(true);
+      try {
+        const vets = await veterinariansService.getAll(TEMP_FARM_ID);
+        setVeterinarians(vets);
+      } catch (error) {
+        console.error('Failed to fetch veterinarians:', error);
+        setVeterinarians([]);
+      } finally {
+        setVeterinariansLoading(false);
+      }
+    };
+    fetchVeterinarians();
+  }, [open]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      await onSubmit(formData);
+      // Si un vétérinaire personnalisé est saisi, l'utiliser
+      const dataToSubmit = {
+        ...formData,
+        performedBy: customVeterinarian || formData.performedBy,
+      };
+      await onSubmit(dataToSubmit);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
@@ -164,237 +197,14 @@ export function AnimalEventDialog({
     });
   };
 
-  // Composant pour afficher un champ (lecture ou édition)
-  const Field = ({
-    label,
-    value,
-    type = 'text',
-    placeholder,
-    onChange,
-    required,
-    icon: Icon,
-  }: {
-    label: string;
-    value: string;
-    type?: 'text' | 'date' | 'number' | 'textarea';
-    placeholder?: string;
-    onChange?: (value: string) => void;
-    required?: boolean;
-    icon?: React.ComponentType<{ className?: string }>;
-  }) => {
-    if (!isEditable) {
-      // Mode lecture - toujours afficher le champ
-      const displayValue = value && value !== ''
-        ? (type === 'date' ? formatDate(value) : value)
-        : '-';
-      return (
-        <div className="flex items-start gap-2">
-          {Icon && <Icon className="h-4 w-4 text-muted-foreground mt-0.5" />}
-          <div>
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className={`text-sm ${!value ? 'text-muted-foreground' : ''}`}>{displayValue}</p>
-          </div>
-        </div>
-      );
+  // Trouver le nom du vétérinaire par son ID
+  const getVeterinarianName = (vetId: string) => {
+    const vet = veterinarians.find(v => v.id === vetId);
+    if (vet) {
+      return `${vet.firstName} ${vet.lastName}`;
     }
-
-    // Mode édition
-    if (type === 'textarea') {
-      return (
-        <div className="space-y-2">
-          <Label>{label}{required && ' *'}</Label>
-          <Textarea
-            value={value}
-            onChange={(e) => onChange?.(e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        <Label>{label}{required && ' *'}</Label>
-        <Input
-          type={type}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-          placeholder={placeholder}
-          required={required}
-          step={type === 'number' ? '0.01' : undefined}
-        />
-      </div>
-    );
+    return vetId;
   };
-
-  // Contenu unifié (lecture et édition)
-  const DialogBody = () => (
-    <div className="space-y-6 py-4">
-      {/* Section: Animaux concernés */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b pb-2">
-          <PawPrint className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-medium">{t('sections.animals')}</h3>
-        </div>
-
-        {/* Liste des animaux du mouvement */}
-        {animalsLoading ? (
-          <div className="flex items-center justify-center py-4">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          </div>
-        ) : movementAnimals.length > 0 ? (
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">{t('fields.animalsInMovement')} ({movementAnimals.length})</p>
-            <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
-              {movementAnimals.map((animal) => (
-                <div key={animal.id} className="flex items-center gap-3 p-2 text-sm">
-                  <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <span className="font-medium">{animal.visualId || animal.officialNumber || animal.currentEid || animal.id}</span>
-                    {animal.species?.name && (
-                      <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
-                    )}
-                    {animal.breed?.name && (
-                      <span className="text-muted-foreground"> ({animal.breed.name})</span>
-                    )}
-                  </div>
-                  <Badge variant="secondary" className="flex-shrink-0">
-                    {animal.sex === 'male' ? 'M' : 'F'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : mode !== 'create' ? (
-          <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInMovement')}</p>
-        ) : null}
-
-        {/* Champs animalId et relatedAnimalId */}
-        <div className="grid grid-cols-2 gap-4">
-          <Field
-            label={t('fields.animalId')}
-            value={isEditable ? formData.animalId : (event?.animalId || '')}
-            required={isEditable}
-            onChange={isEditable ? (v) => setFormData({ ...formData, animalId: v }) : undefined}
-          />
-          <Field
-            label={t('fields.relatedAnimalId')}
-            value={isEditable ? (formData.relatedAnimalId || '') : (event?.relatedAnimalId || '')}
-            onChange={isEditable ? (v) => setFormData({ ...formData, relatedAnimalId: v }) : undefined}
-          />
-        </div>
-      </div>
-
-      {/* Section: Informations générales */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {isEditable ? (
-            <div className="space-y-2">
-              <Label>{t('fields.eventType')} *</Label>
-              <Select
-                value={formData.eventType}
-                onValueChange={(value) => setFormData({ ...formData, eventType: value as CreateAnimalEventDto['eventType'] })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {EVENT_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {t(`types.${type}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <span className="text-sm text-muted-foreground">{t('fields.eventType')}</span>
-              <div><Badge>{t(`types.${event?.eventType}`)}</Badge></div>
-            </div>
-          )}
-          <Field
-            label={t('fields.eventDate')}
-            value={isEditable ? formData.eventDate : (event?.eventDate?.split('T')[0] || '')}
-            type="date"
-            required={isEditable}
-            onChange={isEditable ? (v) => setFormData({ ...formData, eventDate: v }) : undefined}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field
-            label={t('fields.title')}
-            value={isEditable ? formData.title : (event?.title || '')}
-            required={isEditable}
-            placeholder={t('placeholders.title')}
-            onChange={isEditable ? (v) => setFormData({ ...formData, title: v }) : undefined}
-          />
-          <Field
-            label={t('fields.location')}
-            value={isEditable ? (formData.location || '') : (event?.location || '')}
-            placeholder={t('placeholders.location')}
-            onChange={isEditable ? (v) => setFormData({ ...formData, location: v }) : undefined}
-          />
-        </div>
-
-        <Field
-          label={t('fields.description')}
-          value={isEditable ? (formData.description || '') : (event?.description || '')}
-          type="textarea"
-          placeholder={t('placeholders.description')}
-          onChange={isEditable ? (v) => setFormData({ ...formData, description: v }) : undefined}
-        />
-      </div>
-
-      {/* Section: Détails */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <Field
-            label={t('fields.performedBy')}
-            value={isEditable ? (formData.performedBy || '') : (event?.performedBy || '')}
-            placeholder={t('placeholders.performedBy')}
-            onChange={isEditable ? (v) => setFormData({ ...formData, performedBy: v }) : undefined}
-          />
-          <Field
-            label={t('fields.veterinarianId')}
-            value={isEditable ? (formData.veterinarianId || '') : (event?.veterinarianId || '')}
-            onChange={isEditable ? (v) => setFormData({ ...formData, veterinarianId: v }) : undefined}
-          />
-        </div>
-
-        <Field
-          label={t('fields.cost')}
-          value={isEditable ? (formData.cost?.toString() || '') : (event?.cost?.toString() || '')}
-          type="number"
-          onChange={isEditable ? (v) => setFormData({ ...formData, cost: v ? parseFloat(v) : undefined }) : undefined}
-        />
-      </div>
-
-      {/* Section: Notes */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
-        <Field
-          label={t('fields.notes')}
-          value={isEditable ? (formData.notes || '') : (event?.notes || '')}
-          type="textarea"
-          placeholder={t('placeholders.notes')}
-          onChange={isEditable ? (v) => setFormData({ ...formData, notes: v }) : undefined}
-        />
-      </div>
-
-      {/* Métadonnées (lecture seule) */}
-      {!isEditable && (event?.createdAt || event?.updatedAt) && (
-        <div className="text-xs text-muted-foreground pt-4 border-t space-y-1">
-          {event?.createdAt && <p>{tc('fields.createdAt')}: {formatDate(event.createdAt)}</p>}
-          {event?.updatedAt && <p>{tc('fields.updatedAt')}: {formatDate(event.updatedAt)}</p>}
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -434,7 +244,201 @@ export function AnimalEventDialog({
 
         {isEditable ? (
           <form onSubmit={handleSubmit}>
-            <DialogBody />
+            <div className="space-y-6 py-4">
+              {/* Section: Animaux concernés */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 border-b pb-2">
+                  <PawPrint className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-medium">{t('sections.animals')}</h3>
+                </div>
+
+                {/* Liste des animaux du mouvement */}
+                {animalsLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : movementAnimals.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">{t('fields.animalsInMovement')} ({movementAnimals.length})</p>
+                    <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
+                      {movementAnimals.map((animal) => (
+                        <div key={animal.id} className="flex items-center gap-3 p-2 text-sm">
+                          <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium">{animal.officialNumber || animal.visualId || animal.currentEid || animal.id}</span>
+                            {animal.species?.name && (
+                              <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                            )}
+                            {animal.breed?.name && (
+                              <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                            )}
+                          </div>
+                          <Badge variant="secondary" className="flex-shrink-0">
+                            {animal.sex === 'male' ? 'M' : 'F'}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : mode !== 'create' ? (
+                  <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInMovement')}</p>
+                ) : null}
+
+                {/* Bouton Ajouter un animal (mode édition uniquement) */}
+                {mode === 'edit' && (
+                  <Button type="button" variant="outline" size="sm" className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('actions.addAnimal')}
+                  </Button>
+                )}
+              </div>
+
+              {/* Section: Informations générales */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('fields.eventType')} *</Label>
+                    <Select
+                      value={formData.eventType}
+                      onValueChange={(value) => setFormData({ ...formData, eventType: value as CreateAnimalEventDto['eventType'] })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EVENT_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {t(`types.${type}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('fields.eventDate')} *</Label>
+                    <Input
+                      type="date"
+                      value={formData.eventDate}
+                      onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('fields.title')} *</Label>
+                    <Input
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder={t('placeholders.title')}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('fields.location')}</Label>
+                    <Input
+                      value={formData.location || ''}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      placeholder={t('placeholders.location')}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('fields.description')}</Label>
+                  <Textarea
+                    value={formData.description || ''}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder={t('placeholders.description')}
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              {/* Section: Détails */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('fields.performedBy')}</Label>
+                    <Input
+                      value={formData.performedBy || ''}
+                      onChange={(e) => setFormData({ ...formData, performedBy: e.target.value })}
+                      placeholder={t('placeholders.performedBy')}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('fields.veterinarianId')}</Label>
+                    <Select
+                      value={formData.veterinarianId || ''}
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, veterinarianId: value });
+                        setCustomVeterinarian('');
+                      }}
+                      disabled={veterinariansLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('placeholders.selectVeterinarian')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {veterinarians.map((vet) => (
+                          <SelectItem key={vet.id} value={vet.id}>
+                            {vet.firstName} {vet.lastName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Champ vétérinaire personnalisé */}
+                <div className="space-y-2">
+                  <Label>{t('fields.customVeterinarian')}</Label>
+                  <Input
+                    value={customVeterinarian}
+                    onChange={(e) => {
+                      setCustomVeterinarian(e.target.value);
+                      if (e.target.value) {
+                        setFormData({ ...formData, veterinarianId: '' });
+                      }
+                    }}
+                    placeholder={t('placeholders.customVeterinarian')}
+                  />
+                </div>
+
+                {/* Coût avec symbole € */}
+                <div className="space-y-2">
+                  <Label>{t('fields.cost')}</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={formData.cost?.toString() || ''}
+                      onChange={(e) => setFormData({ ...formData, cost: e.target.value ? parseFloat(e.target.value) : undefined })}
+                      step="0.01"
+                      className="flex-1"
+                    />
+                    <span className="text-sm font-medium text-muted-foreground">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: Notes */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
+                <div className="space-y-2">
+                  <Label>{t('fields.notes')}</Label>
+                  <Textarea
+                    value={formData.notes || ''}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder={t('placeholders.notes')}
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+
             <DialogFooter className="mt-6">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
                 {tc('actions.cancel')}
@@ -445,7 +449,120 @@ export function AnimalEventDialog({
             </DialogFooter>
           </form>
         ) : (
-          <DialogBody />
+          /* Mode lecture */
+          <div className="space-y-6 py-4">
+            {/* Section: Animaux concernés */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b pb-2">
+                <PawPrint className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-medium">{t('sections.animals')}</h3>
+              </div>
+
+              {/* Liste des animaux du mouvement */}
+              {animalsLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : movementAnimals.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">{t('fields.animalsInMovement')} ({movementAnimals.length})</p>
+                  <div className="border rounded-lg divide-y max-h-40 overflow-y-auto">
+                    {movementAnimals.map((animal) => (
+                      <div key={animal.id} className="flex items-center gap-3 p-2 text-sm">
+                        <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium">{animal.officialNumber || animal.visualId || animal.currentEid || animal.id}</span>
+                          {animal.species?.name && (
+                            <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                          )}
+                          {animal.breed?.name && (
+                            <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                          )}
+                        </div>
+                        <Badge variant="secondary" className="flex-shrink-0">
+                          {animal.sex === 'male' ? 'M' : 'F'}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInMovement')}</p>
+              )}
+            </div>
+
+            {/* Section: Informations générales */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('fields.eventType')}</p>
+                  <div className="mt-1"><Badge>{t(`types.${event?.eventType}`)}</Badge></div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('fields.eventDate')}</p>
+                  <p className="text-sm">{event?.eventDate ? formatDate(event.eventDate) : '-'}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('fields.title')}</p>
+                  <p className="text-sm">{event?.title || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('fields.location')}</p>
+                  <p className={`text-sm ${!event?.location ? 'text-muted-foreground' : ''}`}>{event?.location || '-'}</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground">{t('fields.description')}</p>
+                <p className={`text-sm ${!event?.description ? 'text-muted-foreground' : ''}`}>{event?.description || '-'}</p>
+              </div>
+            </div>
+
+            {/* Section: Détails */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('fields.performedBy')}</p>
+                  <p className={`text-sm ${!event?.performedBy ? 'text-muted-foreground' : ''}`}>{event?.performedBy || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('fields.veterinarianId')}</p>
+                  <p className={`text-sm ${!event?.veterinarianId ? 'text-muted-foreground' : ''}`}>
+                    {event?.veterinarianId ? getVeterinarianName(event.veterinarianId) : '-'}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground">{t('fields.cost')}</p>
+                <p className={`text-sm ${!event?.cost ? 'text-muted-foreground' : ''}`}>
+                  {event?.cost ? `${event.cost} €` : '-'}
+                </p>
+              </div>
+            </div>
+
+            {/* Section: Notes */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('fields.notes')}</p>
+                <p className={`text-sm ${!event?.notes ? 'text-muted-foreground' : ''}`}>{event?.notes || '-'}</p>
+              </div>
+            </div>
+
+            {/* Métadonnées (lecture seule) */}
+            {(event?.createdAt || event?.updatedAt) && (
+              <div className="text-xs text-muted-foreground pt-4 border-t space-y-1">
+                {event?.createdAt && <p>{tc('fields.createdAt')}: {formatDate(event.createdAt)}</p>}
+                {event?.updatedAt && <p>{tc('fields.updatedAt')}: {formatDate(event.updatedAt)}</p>}
+              </div>
+            )}
+          </div>
         )}
       </DialogContent>
     </Dialog>
