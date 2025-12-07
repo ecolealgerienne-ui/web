@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { Calendar, MapPin, User, Stethoscope, DollarSign, FileText } from 'lucide-react';
+import { Calendar, MapPin, User, Stethoscope, DollarSign, FileText, ChevronLeft, ChevronRight, PawPrint } from 'lucide-react';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -28,6 +28,9 @@ interface AnimalEventDialogProps {
   event?: AnimalEvent | null;
   onSubmit?: (data: CreateAnimalEventDto | UpdateAnimalEventDto) => Promise<void>;
   isLoading?: boolean;
+  // Navigation pour le mode view
+  events?: AnimalEvent[];
+  onNavigate?: (direction: 'prev' | 'next') => void;
 }
 
 const EVENT_TYPES = [
@@ -42,10 +45,17 @@ export function AnimalEventDialog({
   event,
   onSubmit,
   isLoading,
+  events = [],
+  onNavigate,
 }: AnimalEventDialogProps) {
   const t = useTranslations('animalEvents');
   const tc = useCommonTranslations();
   const isEditable = mode === 'edit' || mode === 'create';
+
+  // Navigation
+  const currentIndex = event ? events.findIndex((e) => e.id === event.id) : -1;
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex < events.length - 1 && currentIndex !== -1;
 
   const [formData, setFormData] = useState<CreateAnimalEventDto>({
     animalId: '',
@@ -202,6 +212,31 @@ export function AnimalEventDialog({
         </div>
       </div>
 
+      {/* Animaux concernés */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <PawPrint className="h-4 w-4 text-muted-foreground" />
+          <h4 className="text-sm font-medium">{t('fields.animalId')}</h4>
+        </div>
+        <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+          {event?.animalId && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">{event.animalId}</span>
+              <Badge variant="secondary" className="text-xs">Principal</Badge>
+            </div>
+          )}
+          {event?.relatedAnimalId && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm">{event.relatedAnimalId}</span>
+              <Badge variant="secondary" className="text-xs">{t('fields.relatedAnimalId')}</Badge>
+            </div>
+          )}
+          {!event?.animalId && !event?.relatedAnimalId && (
+            <p className="text-sm text-muted-foreground">{tc('fields.none')}</p>
+          )}
+        </div>
+      </div>
+
       {/* Description */}
       {event?.description && (
         <div className="space-y-2">
@@ -239,8 +274,8 @@ export function AnimalEventDialog({
 
       {/* Métadonnées */}
       <div className="text-xs text-muted-foreground pt-4 border-t space-y-1">
-        <p>{t('fields.animalId')}: {event?.animalId || tc('fields.none')}</p>
         {event?.createdAt && <p>{tc('fields.createdAt')}: {formatDate(event.createdAt)}</p>}
+        {event?.updatedAt && <p>{tc('fields.updatedAt')}: {formatDate(event.updatedAt)}</p>}
       </div>
     </div>
   );
@@ -248,9 +283,12 @@ export function AnimalEventDialog({
   // Contenu en mode édition
   const FormContent = () => (
     <div className="space-y-6 py-4">
-      {/* Section: Informations générales */}
+      {/* Section: Animaux concernés */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
+        <div className="flex items-center gap-2 border-b pb-2">
+          <PawPrint className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-medium">{t('fields.animalId')}</h3>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t('fields.animalId')}
@@ -258,6 +296,18 @@ export function AnimalEventDialog({
             required
             onChange={(v) => setFormData({ ...formData, animalId: v })}
           />
+          <Field
+            label={t('fields.relatedAnimalId')}
+            value={formData.relatedAnimalId || ''}
+            onChange={(v) => setFormData({ ...formData, relatedAnimalId: v })}
+          />
+        </div>
+      </div>
+
+      {/* Section: Informations générales */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium border-b pb-2">{t('sections.general')}</h3>
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>{t('fields.eventType')} *</Label>
             <Select
@@ -276,9 +326,6 @@ export function AnimalEventDialog({
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
           <Field
             label={t('fields.eventDate')}
             value={formData.eventDate}
@@ -286,12 +333,21 @@ export function AnimalEventDialog({
             required
             onChange={(v) => setFormData({ ...formData, eventDate: v })}
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <Field
             label={t('fields.title')}
             value={formData.title}
             required
             placeholder={t('placeholders.title')}
             onChange={(v) => setFormData({ ...formData, title: v })}
+          />
+          <Field
+            label={t('fields.location')}
+            value={formData.location || ''}
+            placeholder={t('placeholders.location')}
+            onChange={(v) => setFormData({ ...formData, location: v })}
           />
         </div>
 
@@ -321,25 +377,12 @@ export function AnimalEventDialog({
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <Field
-            label={t('fields.cost')}
-            value={formData.cost?.toString() || ''}
-            type="number"
-            onChange={(v) => setFormData({ ...formData, cost: v ? parseFloat(v) : undefined })}
-          />
-          <Field
-            label={t('fields.relatedAnimalId')}
-            value={formData.relatedAnimalId || ''}
-            onChange={(v) => setFormData({ ...formData, relatedAnimalId: v })}
-          />
-          <Field
-            label={t('fields.location')}
-            value={formData.location || ''}
-            placeholder={t('placeholders.location')}
-            onChange={(v) => setFormData({ ...formData, location: v })}
-          />
-        </div>
+        <Field
+          label={t('fields.cost')}
+          value={formData.cost?.toString() || ''}
+          type="number"
+          onChange={(v) => setFormData({ ...formData, cost: v ? parseFloat(v) : undefined })}
+        />
       </div>
 
       {/* Section: Notes */}
@@ -373,6 +416,23 @@ export function AnimalEventDialog({
               </Badge>
             )}
           </div>
+
+          {/* Navigation (mode view uniquement) */}
+          {mode === 'view' && onNavigate && events.length > 1 && (
+            <div className="flex items-center gap-2 mt-4">
+              <Button variant="outline" size="sm" onClick={() => onNavigate('prev')} disabled={!canGoPrev}>
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Précédent
+              </Button>
+              <span className="text-sm text-muted-foreground px-2">
+                {currentIndex + 1} / {events.length}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => onNavigate('next')} disabled={!canGoNext}>
+                Suivant
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          )}
         </DialogHeader>
 
         {isEditable ? (

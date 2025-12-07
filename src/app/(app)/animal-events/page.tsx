@@ -50,6 +50,17 @@ export default function AnimalEventsPage() {
     setDialogOpen(true);
   };
 
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    if (!selectedEvent) return;
+    const currentIndex = events.findIndex((e) => e.id === selectedEvent.id);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex >= 0 && newIndex < events.length) {
+      setSelectedEvent(events[newIndex]);
+    }
+  };
+
   const handleEdit = (event: AnimalEvent) => {
     setSelectedEvent(event);
     setDialogMode('edit');
@@ -197,6 +208,8 @@ export default function AnimalEventsPage() {
         event={selectedEvent}
         onSubmit={handleSubmit}
         isLoading={isSubmitting}
+        events={events}
+        onNavigate={handleNavigate}
       />
 
       {/* Dialog confirmation suppression */}
