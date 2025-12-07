@@ -32,9 +32,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Créer le répertoire des logs
+# Volumes pour sources et logs
 RUN mkdir -p /app/logs && chown -R nextjs:nodejs /app/logs
-VOLUME /app/logs
+VOLUME ["/app", "/app/logs"]
 
 USER nextjs
 
