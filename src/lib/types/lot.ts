@@ -91,6 +91,7 @@ export interface CreateLotDto {
   description?: string;
   notes?: string;
   isActive?: boolean;
+  completed?: boolean;
   animalIds?: string[];
 
   // Traitement/Vaccination
@@ -105,9 +106,37 @@ export interface CreateLotDto {
   priceTotal?: number;
   buyerName?: string;
   sellerName?: string;
+
+  // Sync offline-first
+  version?: number;
 }
 
-export interface UpdateLotDto extends Partial<CreateLotDto> {}
+export interface UpdateLotDto {
+  name?: string;
+  type?: LotType;
+  status?: LotStatus;
+  description?: string;
+  notes?: string;
+  isActive?: boolean;
+  completed?: boolean;
+  animalIds?: string[];
+
+  // Traitement/Vaccination
+  productId?: string;
+  productName?: string;
+  treatmentDate?: string;
+  withdrawalEndDate?: string;
+  veterinarianId?: string;
+  veterinarianName?: string;
+
+  // Vente/Achat
+  priceTotal?: number;
+  buyerName?: string;
+  sellerName?: string;
+
+  // Sync offline-first
+  version?: number;
+}
 
 export interface LotFilters {
   search?: string;

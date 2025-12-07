@@ -239,11 +239,29 @@ export function LotDialog({
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      const payload: CreateLotDto | UpdateLotDto = {
-        ...formData,
+      // Clean payload - remove empty strings and undefined values
+      const cleanPayload: CreateLotDto | UpdateLotDto = {
+        name: formData.name,
+        type: formData.type,
+        status: formData.status,
+        isActive: formData.isActive,
         animalIds: lotAnimals.map(la => la.id),
       };
-      await onSubmit(payload);
+
+      // Only add optional fields if they have values
+      if (formData.description) cleanPayload.description = formData.description;
+      if (formData.notes) cleanPayload.notes = formData.notes;
+      if (formData.productId) cleanPayload.productId = formData.productId;
+      if (formData.productName) cleanPayload.productName = formData.productName;
+      if (formData.treatmentDate) cleanPayload.treatmentDate = formData.treatmentDate;
+      if (formData.withdrawalEndDate) cleanPayload.withdrawalEndDate = formData.withdrawalEndDate;
+      if (formData.veterinarianId) cleanPayload.veterinarianId = formData.veterinarianId;
+      if (formData.veterinarianName) cleanPayload.veterinarianName = formData.veterinarianName;
+      if (formData.priceTotal !== undefined) cleanPayload.priceTotal = formData.priceTotal;
+      if (formData.buyerName) cleanPayload.buyerName = formData.buyerName;
+      if (formData.sellerName) cleanPayload.sellerName = formData.sellerName;
+
+      await onSubmit(cleanPayload);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
