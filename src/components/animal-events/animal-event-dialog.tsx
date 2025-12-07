@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,8 +18,9 @@ import {
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { Animal } from '@/lib/types/animal';
 import { animalEventsService } from '@/lib/services/animal-events.service';
+import { animalsService } from '@/lib/services/animals.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { ChevronLeft, ChevronRight, PawPrint, Loader2, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PawPrint, Loader2, Plus, Search, X } from 'lucide-react';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -62,6 +63,13 @@ export function AnimalEventDialog({
   // État pour les animaux du mouvement
   const [movementAnimals, setMovementAnimals] = useState<Animal[]>([]);
   const [animalsLoading, setAnimalsLoading] = useState(false);
+
+  // État pour l'ajout d'animal
+  const [showAddAnimal, setShowAddAnimal] = useState(false);
+  const [searchOfficialId, setSearchOfficialId] = useState('');
+  const [searchingAnimal, setSearchingAnimal] = useState(false);
+  const [searchResult, setSearchResult] = useState<Animal | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CreateAnimalEventDto>({
     animalId: '',
@@ -109,6 +117,11 @@ export function AnimalEventDialog({
       });
       setMovementAnimals([]);
     }
+    // Reset search state when dialog opens/closes
+    setShowAddAnimal(false);
+    setSearchOfficialId('');
+    setSearchResult(null);
+    setSearchError(null);
   }, [event, open]);
 
   // Charger les animaux du mouvement
@@ -131,6 +144,77 @@ export function AnimalEventDialog({
     };
     fetchAnimals();
   }, [event?.id, open]);
+
+  // Recherche automatique d'animal par ID officiel
+  const searchAnimalByOfficialId = useCallback(async (officialId: string) => {
+    if (!officialId || officialId.length < 3) {
+      setSearchResult(null);
+      setSearchError(null);
+      return;
+    }
+
+    setSearchingAnimal(true);
+    setSearchError(null);
+    setSearchResult(null);
+
+    try {
+      // Rechercher par numéro officiel
+      const animals = await animalsService.getAll({ search: officialId, limit: 10 });
+
+      // Trouver l'animal avec le numéro officiel exact ou le plus proche
+      const exactMatch = animals.find(a =>
+        a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
+        a.visualId?.toLowerCase() === officialId.toLowerCase() ||
+        a.currentEid?.toLowerCase() === officialId.toLowerCase()
+      );
+
+      if (exactMatch) {
+        // Vérifier si l'animal n'est pas déjà dans la liste
+        const alreadyInList = movementAnimals.some(a => a.id === exactMatch.id);
+        if (alreadyInList) {
+          setSearchError(t('messages.animalAlreadyInList'));
+        } else {
+          setSearchResult(exactMatch);
+        }
+      } else if (animals.length > 0) {
+        // Prendre le premier résultat si pas de correspondance exacte
+        const firstResult = animals[0];
+        const alreadyInList = movementAnimals.some(a => a.id === firstResult.id);
+        if (alreadyInList) {
+          setSearchError(t('messages.animalAlreadyInList'));
+        } else {
+          setSearchResult(firstResult);
+        }
+      } else {
+        setSearchError(t('messages.animalNotFound'));
+      }
+    } catch (error) {
+      console.error('Failed to search animal:', error);
+      setSearchError(t('messages.searchError'));
+    } finally {
+      setSearchingAnimal(false);
+    }
+  }, [movementAnimals, t]);
+
+  // Debounce la recherche
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchOfficialId) {
+        searchAnimalByOfficialId(searchOfficialId);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchOfficialId, searchAnimalByOfficialId]);
+
+  // Ajouter l'animal trouvé à la liste
+  const handleAddAnimal = () => {
+    if (searchResult) {
+      setMovementAnimals([...movementAnimals, searchResult]);
+      setSearchOfficialId('');
+      setSearchResult(null);
+      setShowAddAnimal(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,9 +326,70 @@ export function AnimalEventDialog({
                   <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInMovement')}</p>
                 ) : null}
 
+                {/* Champ de recherche d'animal */}
+                {showAddAnimal && (
+                  <div className="space-y-3 p-3 border rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">{t('actions.searchAnimal')}</span>
+                    </div>
+                    <div className="space-y-2">
+                      <Input
+                        placeholder={t('placeholders.officialId')}
+                        value={searchOfficialId}
+                        onChange={(e) => setSearchOfficialId(e.target.value)}
+                        autoFocus
+                      />
+                      {searchingAnimal && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          {t('messages.searching')}
+                        </div>
+                      )}
+                      {searchError && (
+                        <p className="text-sm text-destructive">{searchError}</p>
+                      )}
+                      {searchResult && (
+                        <div className="flex items-center gap-3 p-2 border rounded-lg bg-background">
+                          <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium">{searchResult.officialNumber || searchResult.visualId || searchResult.currentEid}</span>
+                            {searchResult.species?.name && (
+                              <span className="text-muted-foreground ml-2">• {searchResult.species.name}</span>
+                            )}
+                          </div>
+                          <Button type="button" size="sm" onClick={handleAddAnimal}>
+                            {t('actions.add')}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowAddAnimal(false);
+                        setSearchOfficialId('');
+                        setSearchResult(null);
+                        setSearchError(null);
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      {tc('actions.cancel')}
+                    </Button>
+                  </div>
+                )}
+
                 {/* Bouton Ajouter un animal (mode édition uniquement) */}
-                {mode === 'edit' && (
-                  <Button type="button" variant="outline" size="sm" className="w-full">
+                {mode === 'edit' && !showAddAnimal && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setShowAddAnimal(true)}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     {t('actions.addAnimal')}
                   </Button>
@@ -262,7 +407,7 @@ export function AnimalEventDialog({
                       onValueChange={(value) => setFormData({ ...formData, eventType: value as CreateAnimalEventDto['eventType'] })}
                     >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder={t('placeholders.selectType')} />
                       </SelectTrigger>
                       <SelectContent>
                         {EVENT_TYPES.map((type) => (
@@ -287,12 +432,21 @@ export function AnimalEventDialog({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>{t('fields.title')} *</Label>
-                    <Input
+                    <Select
                       value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder={t('placeholders.title')}
-                      required
-                    />
+                      onValueChange={(value) => setFormData({ ...formData, title: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('placeholders.selectTitle')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EVENT_TYPES.map((type) => (
+                          <SelectItem key={type} value={t(`types.${type}`)}>
+                            {t(`types.${type}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>{t('fields.location')}</Label>
