@@ -17,10 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { AnimalEvent, CreateAnimalEventDto, UpdateAnimalEventDto } from '@/lib/types/animal-event';
 import { Animal } from '@/lib/types/animal';
-import { Veterinarian } from '@/lib/types/veterinarian';
 import { animalEventsService } from '@/lib/services/animal-events.service';
-import { veterinariansService } from '@/lib/services/veterinarians.service';
-import { TEMP_FARM_ID } from '@/lib/auth/config';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { ChevronLeft, ChevronRight, PawPrint, Loader2, Plus } from 'lucide-react';
 
@@ -66,11 +63,6 @@ export function AnimalEventDialog({
   const [movementAnimals, setMovementAnimals] = useState<Animal[]>([]);
   const [animalsLoading, setAnimalsLoading] = useState(false);
 
-  // État pour les vétérinaires
-  const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([]);
-  const [veterinariansLoading, setVeterinariansLoading] = useState(false);
-  const [customVeterinarian, setCustomVeterinarian] = useState('');
-
   const [formData, setFormData] = useState<CreateAnimalEventDto>({
     animalId: '',
     eventType: 'entry',
@@ -101,7 +93,6 @@ export function AnimalEventDialog({
         location: event.location || '',
         notes: event.notes || '',
       });
-      setCustomVeterinarian('');
     } else {
       setFormData({
         animalId: '',
@@ -117,7 +108,6 @@ export function AnimalEventDialog({
         notes: '',
       });
       setMovementAnimals([]);
-      setCustomVeterinarian('');
     }
   }, [event, open]);
 
@@ -142,34 +132,11 @@ export function AnimalEventDialog({
     fetchAnimals();
   }, [event?.id, open]);
 
-  // Charger les vétérinaires
-  useEffect(() => {
-    const fetchVeterinarians = async () => {
-      if (!open) return;
-      setVeterinariansLoading(true);
-      try {
-        const vets = await veterinariansService.getAll(TEMP_FARM_ID);
-        setVeterinarians(vets);
-      } catch (error) {
-        console.error('Failed to fetch veterinarians:', error);
-        setVeterinarians([]);
-      } finally {
-        setVeterinariansLoading(false);
-      }
-    };
-    fetchVeterinarians();
-  }, [open]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      // Si un vétérinaire personnalisé est saisi, l'utiliser
-      const dataToSubmit = {
-        ...formData,
-        performedBy: customVeterinarian || formData.performedBy,
-      };
-      await onSubmit(dataToSubmit);
+      await onSubmit(formData);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
@@ -195,15 +162,6 @@ export function AnimalEventDialog({
       month: 'long',
       day: 'numeric',
     });
-  };
-
-  // Trouver le nom du vétérinaire par son ID
-  const getVeterinarianName = (vetId: string) => {
-    const vet = veterinarians.find(v => v.id === vetId);
-    if (vet) {
-      return `${vet.firstName} ${vet.lastName}`;
-    }
-    return vetId;
   };
 
   return (
@@ -360,51 +318,12 @@ export function AnimalEventDialog({
               {/* Section: Détails */}
               <div className="space-y-4">
                 <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t('fields.performedBy')}</Label>
-                    <Input
-                      value={formData.performedBy || ''}
-                      onChange={(e) => setFormData({ ...formData, performedBy: e.target.value })}
-                      placeholder={t('placeholders.performedBy')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t('fields.veterinarianId')}</Label>
-                    <Select
-                      value={formData.veterinarianId || ''}
-                      onValueChange={(value) => {
-                        setFormData({ ...formData, veterinarianId: value });
-                        setCustomVeterinarian('');
-                      }}
-                      disabled={veterinariansLoading}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('placeholders.selectVeterinarian')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {veterinarians.map((vet) => (
-                          <SelectItem key={vet.id} value={vet.id}>
-                            {vet.firstName} {vet.lastName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {/* Champ vétérinaire personnalisé */}
                 <div className="space-y-2">
-                  <Label>{t('fields.customVeterinarian')}</Label>
+                  <Label>{t('fields.performedBy')}</Label>
                   <Input
-                    value={customVeterinarian}
-                    onChange={(e) => {
-                      setCustomVeterinarian(e.target.value);
-                      if (e.target.value) {
-                        setFormData({ ...formData, veterinarianId: '' });
-                      }
-                    }}
-                    placeholder={t('placeholders.customVeterinarian')}
+                    value={formData.performedBy || ''}
+                    onChange={(e) => setFormData({ ...formData, performedBy: e.target.value })}
+                    placeholder={t('placeholders.performedBy')}
                   />
                 </div>
 
@@ -525,17 +444,9 @@ export function AnimalEventDialog({
             {/* Section: Détails */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium border-b pb-2">{t('sections.details')}</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('fields.performedBy')}</p>
-                  <p className={`text-sm ${!event?.performedBy ? 'text-muted-foreground' : ''}`}>{event?.performedBy || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('fields.veterinarianId')}</p>
-                  <p className={`text-sm ${!event?.veterinarianId ? 'text-muted-foreground' : ''}`}>
-                    {event?.veterinarianId ? getVeterinarianName(event.veterinarianId) : '-'}
-                  </p>
-                </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('fields.performedBy')}</p>
+                <p className={`text-sm ${!event?.performedBy ? 'text-muted-foreground' : ''}`}>{event?.performedBy || '-'}</p>
               </div>
 
               <div>
