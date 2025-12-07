@@ -2369,6 +2369,196 @@ const handleAdd = () => {
 
 **Pattern appliqué dans** :
 - `src/components/animals/animal-dialog.tsx` ✅
+- `src/components/animal-events/animal-event-dialog.tsx` ✅
+- `src/components/lots/lot-dialog.tsx` ✅
+
+### 7.10 Navigation Prev/Next dans les Dialogs Transactionnels ⚠️ RÈGLE RECOMMANDÉE
+
+**Contexte** : En mode consultation, permettre à l'utilisateur de naviguer entre les entités sans fermer le dialog.
+
+**✅ Pattern recommandé :**
+
+```typescript
+interface EntityDialogProps {
+  // ... props existantes
+  entities?: Entity[];  // Liste pour navigation
+  onNavigate?: (direction: 'prev' | 'next') => void;
+}
+
+export function EntityDialog({ entities = [], onNavigate, ...props }: EntityDialogProps) {
+  const currentIndex = entity ? entities.findIndex((e) => e.id === entity.id) : -1;
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex < entities.length - 1 && currentIndex !== -1;
+
+  return (
+    <Dialog>
+      <DialogHeader>
+        {/* Navigation uniquement en mode view */}
+        {mode === 'view' && onNavigate && entities.length > 1 && (
+          <div className="flex items-center gap-2 mt-4">
+            <Button variant="outline" size="sm" onClick={() => onNavigate('prev')} disabled={!canGoPrev}>
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Précédent
+            </Button>
+            <span className="text-sm text-muted-foreground px-2">
+              {currentIndex + 1} / {entities.length}
+            </span>
+            <Button variant="outline" size="sm" onClick={() => onNavigate('next')} disabled={!canGoNext}>
+              Suivant
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        )}
+      </DialogHeader>
+    </Dialog>
+  );
+}
+```
+
+**Utilisation dans la page :**
+
+```typescript
+const handleNavigate = (direction: 'prev' | 'next') => {
+  if (!selectedEntity) return;
+  const currentIndex = entities.findIndex((e) => e.id === selectedEntity.id);
+  const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1;
+  if (newIndex >= 0 && newIndex < entities.length) {
+    setSelectedEntity(entities[newIndex]);
+  }
+};
+
+<EntityDialog
+  entities={entities}
+  onNavigate={handleNavigate}
+/>
+```
+
+**Pattern appliqué dans** :
+- `src/components/animal-events/animal-event-dialog.tsx` ✅
+- `src/components/lots/lot-dialog.tsx` ✅
+
+### 7.11 Recherche d'Animal par ID Officiel avec Auto-Search ⚠️ PATTERN STANDARD
+
+**Contexte** : Dans les dialogs transactionnels (mouvements, lots), permettre d'ajouter des animaux par recherche de leur ID officiel.
+
+**✅ Pattern obligatoire :**
+
+```typescript
+// État pour la recherche
+const [showAddAnimal, setShowAddAnimal] = useState(false);
+const [searchOfficialId, setSearchOfficialId] = useState('');
+const [searchingAnimal, setSearchingAnimal] = useState(false);
+const [searchResult, setSearchResult] = useState<Animal | null>(null);
+const [searchError, setSearchError] = useState<string | null>(null);
+
+// Recherche avec callback mémoïsé
+const searchAnimalByOfficialId = useCallback(async (officialId: string) => {
+  if (!officialId || officialId.length < 3) {
+    setSearchResult(null);
+    setSearchError(null);
+    return;
+  }
+
+  setSearchingAnimal(true);
+  setSearchError(null);
+  setSearchResult(null);
+
+  try {
+    const animals = await animalsService.getAll({ search: officialId, limit: 10 });
+
+    // Trouver correspondance exacte ou première correspondance
+    const exactMatch = animals.find(a =>
+      a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
+      a.visualId?.toLowerCase() === officialId.toLowerCase()
+    );
+
+    if (exactMatch) {
+      // Vérifier si déjà dans la liste
+      const alreadyInList = existingAnimals.some(a => a.id === exactMatch.id);
+      if (alreadyInList) {
+        setSearchError(t('messages.animalAlreadyInList'));
+      } else {
+        setSearchResult(exactMatch);
+      }
+    } else {
+      setSearchError(t('messages.animalNotFound'));
+    }
+  } catch (error) {
+    setSearchError(t('messages.searchError'));
+  } finally {
+    setSearchingAnimal(false);
+  }
+}, [existingAnimals, t]);
+
+// Debounce de 500ms
+useEffect(() => {
+  const timer = setTimeout(() => {
+    if (searchOfficialId) {
+      searchAnimalByOfficialId(searchOfficialId);
+    }
+  }, 500);
+  return () => clearTimeout(timer);
+}, [searchOfficialId, searchAnimalByOfficialId]);
+```
+
+**Traductions requises :**
+
+```json
+{
+  "messages": {
+    "searching": "Recherche en cours...",
+    "animalNotFound": "Animal non trouvé",
+    "animalAlreadyInList": "Cet animal est déjà dans la liste",
+    "searchError": "Erreur lors de la recherche"
+  },
+  "placeholders": {
+    "officialId": "Numéro officiel de l'animal"
+  }
+}
+```
+
+**Pattern appliqué dans** :
+- `src/components/animal-events/animal-event-dialog.tsx` ✅
+- `src/components/lots/lot-dialog.tsx` ✅
+
+### 7.12 Types Alignés avec l'API - animalIds Array ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS utiliser `animalId: string` pour les relations multi-animaux**
+
+**Problème** : Le backend utilise `animalIds: string[]` (array) pour les mouvements et lots, pas `animalId: string` (single).
+
+**✅ SOLUTION :**
+
+```typescript
+// ❌ MAUVAIS
+interface Movement {
+  animalId: string;  // ❌ Ne correspond pas à l'API
+}
+
+// ✅ BON - Aligné avec le schéma Swagger
+interface Movement {
+  animalIds: string[];  // ✅ Array comme dans l'API
+}
+
+// ✅ BON - DTO aligné avec POST/PUT
+interface CreateMovementDto {
+  animalIds: string[];
+  movementType: MovementType;
+  movementDate: string;
+  // ... autres champs du schéma Swagger
+}
+```
+
+**Checklist avant implémentation :**
+1. Consulter le schéma Swagger de l'endpoint
+2. Vérifier si c'est `animalId` (single) ou `animalIds` (array)
+3. Aligner les types frontend avec le schéma backend
+
+**Endpoints concernés :**
+- `POST /api/v1/farms/{farmId}/movements` → `animalIds: string[]`
+- `PUT /api/v1/farms/{farmId}/movements/{id}` → `animalIds: string[]`
+- `POST /api/v1/farms/{farmId}/lots` → `animalIds: string[]`
+- `PUT /api/v1/farms/{farmId}/lots/{id}` → `animalIds: string[]`
 
 ### 7.3 Composants Génériques Transactionnels (farm-scoped)
 
