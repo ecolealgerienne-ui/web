@@ -364,10 +364,65 @@ class DashboardService {
    */
   async getStatsV2(): Promise<DashboardStatsV2> {
     try {
-      const response = await apiClient.get<DashboardStatsV2>(
+      const response = await apiClient.get<any>(
         `/api/v1/farms/${TEMP_FARM_ID}/dashboard/stats`
       );
-      return response;
+
+      // Map backend response to our expected format
+      // Backend returns: { success, data: { success, data: { herd, movements, ... } } }
+      const raw = response?.data || response;
+
+      return {
+        herd: {
+          totalAnimals: raw.herd?.alive ?? raw.herd?.total ?? 0,
+          byStatus: raw.herd?.statusBreakdown ?? {},
+          bySex: raw.herd?.genderBreakdown ?? {},
+          changeThisMonth: raw.herd?.monthlyChange ?? 0,
+          changePercentage: 0, // Not provided by backend
+        },
+        movements: {
+          thisMonth: {
+            births: raw.movements?.thisMonth?.birth ?? 0,
+            deaths: raw.movements?.thisMonth?.death ?? 0,
+            sales: raw.movements?.thisMonth?.sale ?? 0,
+            purchases: raw.movements?.thisMonth?.purchase ?? 0,
+          },
+          previousMonth: {
+            births: raw.movements?.previousMonth?.birth ?? 0,
+            deaths: raw.movements?.previousMonth?.death ?? 0,
+            sales: raw.movements?.previousMonth?.sale ?? 0,
+            purchases: raw.movements?.previousMonth?.purchase ?? 0,
+          },
+        },
+        weights: {
+          avgDailyGain: raw.weights?.avgDailyGain ?? 0,
+          avgDailyGainTrend: raw.weights?.avgDailyGain > 0 ? 'up' : raw.weights?.avgDailyGain < 0 ? 'down' : 'stable',
+          avgDailyGainChange: 0, // Not provided by backend
+          avgWeight: raw.weights?.avgWeight ?? 0,
+          totalWeighings: raw.weights?.totalWeighings ?? 0,
+          weighingsThisMonth: raw.weights?.weighingsLast30Days ?? 0,
+        },
+        health: {
+          vaccinationsUpToDate: 0, // Not provided
+          vaccinationsUpToDatePercentage: raw.health?.vaccinationCoverage ?? 0,
+          vaccinationsDueThisWeek: 0, // Not provided
+          activeWithdrawals: raw.health?.activeWithdrawals ?? 0,
+          treatmentsThisMonth: raw.health?.treatmentsThisMonth ?? 0,
+          treatmentsCost: 0, // Not provided
+        },
+        mortality: {
+          rate: raw.mortality?.rate ?? 0,
+          rateStatus: raw.mortality?.assessment === 'critical' ? 'critical' :
+                      raw.mortality?.assessment === 'warning' ? 'warning' : 'good',
+          threshold: raw.mortality?.threshold?.critical ?? 5,
+        },
+        alerts: {
+          urgent: raw.alerts?.urgent ?? 0,
+          warning: raw.alerts?.warning ?? 0,
+          info: raw.alerts?.info ?? 0,
+        },
+        lastUpdated: raw.lastUpdated ?? new Date().toISOString(),
+      };
     } catch (error: any) {
       logger.error('Failed to fetch dashboard stats v2', { error });
       throw error;
