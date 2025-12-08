@@ -122,16 +122,31 @@ export default function DashboardPage() {
 
         // Fetch all Phase 2 data in parallel with fallbacks
         const [stats, actions, lotsStats, rankings, trends] = await Promise.all([
-          dashboardService.getStatsV2().catch(() => null),
+          dashboardService.getStatsV2().catch((err) => {
+            logger.warn('Failed to fetch Phase 2 stats, will fallback', { error: err });
+            return null;
+          }),
           dashboardService.getActions().catch(() => null),
           dashboardService.getLotsStats({ isActive: true }).catch(() => null),
           dashboardService.getWeightRankings({ limit: 5, period: '30d' }).catch(() => null),
           dashboardService.getWeightTrends({ period: '6months', groupBy: 'month' }).catch(() => null),
         ]);
 
+        // If Phase 2 stats failed, fallback to Phase 1 stats for basic data
+        let fallbackTotalAnimals = 0;
+        if (!stats || !stats.herd || stats.herd.totalAnimals === undefined) {
+          try {
+            const phase1Stats = await dashboardService.getStats();
+            fallbackTotalAnimals = phase1Stats.totalAnimals || 0;
+            logger.info('Using Phase 1 stats fallback', { totalAnimals: fallbackTotalAnimals });
+          } catch (e) {
+            logger.warn('Phase 1 stats fallback also failed', { error: e });
+          }
+        }
+
         // Default values for missing data
         const defaultStats: DashboardStatsV2 = {
-          herd: { totalAnimals: 0, byStatus: {}, bySex: {}, changeThisMonth: 0, changePercentage: 0 },
+          herd: { totalAnimals: fallbackTotalAnimals, byStatus: {}, bySex: {}, changeThisMonth: 0, changePercentage: 0 },
           movements: {
             thisMonth: { births: 0, deaths: 0, sales: 0, purchases: 0 },
             previousMonth: { births: 0, deaths: 0, sales: 0, purchases: 0 },
