@@ -2518,12 +2518,51 @@
     "configAdvice": "Conseil : Complétez votre configuration",
     "configAdviceDescription": "Pour saisir vos soins plus rapidement, configurez vos vaccins et vétérinaires habituels.",
     "configure": "Configurer",
-    "totalAnimals": "Total Animaux",
-    "births": "Naissances",
-    "deaths": "Décès",
-    "vaccinations": "Vaccinations",
+    "retry": "Réessayer",
+    "loadError": "Erreur lors du chargement des données",
+    "kpis": {
+      "totalAnimals": "Effectif total",
+      "births": "Naissances",
+      "deaths": "Décès",
+      "mortality": "mortalité",
+      "avgDailyGain": "GMQ moyen",
+      "vaccinations": "Vaccinations",
+      "upcomingDays": "À venir (30j)",
+      "thisMonth": "Ce mois",
+      "animals": "animaux"
+    },
+    "actions": {
+      "title": "Actions requises",
+      "noActions": "Aucune action requise pour le moment",
+      "withdrawals": "Délais d'attente actifs",
+      "withdrawalsDesc": "{count} traitement(s) avec délai en cours",
+      "vaccinationsDue": "Vaccinations à effectuer",
+      "vaccinationsDueDesc": "Dans les 30 prochains jours",
+      "weighingsThisMonth": "Pesées ce mois",
+      "weighingsRegistered": "{count} pesées enregistrées",
+      "totalWeighings": "{count} total",
+      "activeLots": "Lots actifs",
+      "activeLotsDesc": "{count} lot(s) en cours"
+    },
     "chart": {
-      "evolution": "Évolution du cheptel"
+      "evolution": "Évolution du cheptel",
+      "noData": "Pas de données disponibles",
+      "animals": "animaux",
+      "herd": "Effectif"
+    },
+    "growth": {
+      "title": "Statistiques de croissance",
+      "avgWeight": "Poids moyen",
+      "minWeight": "Poids min",
+      "maxWeight": "Poids max",
+      "animalsWeighed": "Animaux pesés"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "newAnimal": "Nouvel animal",
+      "newWeighing": "Nouvelle pesée",
+      "newTreatment": "Nouveau traitement",
+      "manageLots": "Gérer les lots"
     },
     "alerts": {
       "title": "Alertes"
