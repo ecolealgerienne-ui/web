@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp } from 'lucide-react';
+import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
@@ -208,6 +208,22 @@ export default function WeighingsPage() {
       render: (weighing: Weighing) => (
         <Badge variant="secondary">{t(`source.${weighing.source || 'undefined'}`)}</Badge>
       ),
+    },
+    {
+      key: 'dailyGain',
+      header: t('labels.rate'),
+      render: (weighing: Weighing) => {
+        if (weighing.dailyGain === null || weighing.dailyGain === undefined) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const isPositive = weighing.dailyGain >= 0;
+        return (
+          <span className={`flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+            {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {weighing.dailyGain.toFixed(2)} kg/j
+          </span>
+        );
+      },
     },
     {
       key: 'actions',
