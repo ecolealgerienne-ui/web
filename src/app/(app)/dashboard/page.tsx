@@ -269,21 +269,27 @@ export default function DashboardPage() {
   const { stats, actions, lotsStats, rankings, trends } = data!;
 
   // Prepare GMQ trend chart data (with defensive check)
-  // Normalize small negative values to 0 and validate data
-  const trendChartData = (trends?.dataPoints || []).map((point) => {
-    // If value is very small (< 0.01), treat as 0
-    const gmq = Math.abs(point.avgDailyGain) < 0.01 ? 0 : point.avgDailyGain;
-    return {
-      date: point.date,
-      gmq: gmq,
-      weight: point.avgWeight,
-      animals: point.animalCount,
-    };
-  });
+  // Filter out invalid GMQ values (negative or extreme values are likely calculation errors)
+  // Valid GMQ for cattle is typically between 0 and 2 kg/day
+  const trendChartData = (trends?.dataPoints || [])
+    .map((point) => {
+      // Only keep reasonable positive GMQ values (0 to 3 kg/j for cattle)
+      // Negative or extreme values indicate backend calculation errors
+      const isValidGmq = point.avgDailyGain >= 0 && point.avgDailyGain <= 3;
+      return {
+        date: point.date,
+        gmq: isValidGmq ? point.avgDailyGain : null,
+        weight: point.avgWeight,
+        animals: point.animalCount,
+      };
+    })
+    .filter((point) => point.gmq !== null);
 
-  // Calculate Y-axis domain based on actual data
-  const gmqValues = trendChartData.map(d => d.gmq).filter(v => v !== 0);
-  const hasValidGmqData = gmqValues.length > 0 && gmqValues.some(v => v > 0);
+  // Check if we have valid data to display
+  const hasValidGmqData = trendChartData.length > 0 && trendChartData.some(d => d.gmq !== null && d.gmq > 0);
+
+  // Check if the main GMQ stat is valid (not negative, not near zero)
+  const isMainGmqValid = stats.weights.avgDailyGain > 0.01 && stats.weights.avgDailyGain <= 3;
 
   // Total actions count (with defensive check)
   const totalActions = (actions?.summary?.urgent || 0) + (actions?.summary?.thisWeek || 0) + (actions?.summary?.planned || 0);
@@ -418,11 +424,14 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <div className={cn(
                 'p-3 rounded-lg',
+                !isMainGmqValid ? 'bg-muted' :
                 stats.weights.avgDailyGainTrend === 'up' ? 'bg-green-100 dark:bg-green-900' :
                 stats.weights.avgDailyGainTrend === 'down' ? 'bg-red-100 dark:bg-red-900' :
                 'bg-muted'
               )}>
-                {stats.weights.avgDailyGainTrend === 'up' ? (
+                {!isMainGmqValid ? (
+                  <Activity className="h-6 w-6 text-muted-foreground" />
+                ) : stats.weights.avgDailyGainTrend === 'up' ? (
                   <TrendingUp className="h-6 w-6 text-green-600" />
                 ) : stats.weights.avgDailyGainTrend === 'down' ? (
                   <TrendingDown className="h-6 w-6 text-red-600" />
@@ -431,15 +440,19 @@ export default function DashboardPage() {
                 )}
               </div>
               <div className="flex-1">
-                <p className={cn(
-                  'text-3xl font-bold',
-                  dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'excellent' ? 'text-green-600' :
-                  dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'good' ? 'text-blue-600' :
-                  dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'warning' ? 'text-orange-600' :
-                  'text-red-600'
-                )}>
-                  {Math.abs(stats.weights.avgDailyGain) < 0.005 ? '0.00' : stats.weights.avgDailyGain.toFixed(2)} kg/j
-                </p>
+                {isMainGmqValid ? (
+                  <p className={cn(
+                    'text-3xl font-bold',
+                    dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'excellent' ? 'text-green-600' :
+                    dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'good' ? 'text-blue-600' :
+                    dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'warning' ? 'text-orange-600' :
+                    'text-red-600'
+                  )}>
+                    {stats.weights.avgDailyGain.toFixed(2)} kg/j
+                  </p>
+                ) : (
+                  <p className="text-3xl font-bold text-muted-foreground">--</p>
+                )}
                 <p className="text-sm font-medium">{t('kpis.avgDailyGain')}</p>
                 <p className="text-xs text-muted-foreground">
                   {t('kpis.avgWeight')}: {stats.weights.avgWeight.toFixed(0)} kg
