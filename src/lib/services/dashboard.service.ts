@@ -372,54 +372,69 @@ class DashboardService {
       // Backend returns: { success, data: { success, data: { herd, movements, ... } } }
       const raw = response?.data || response;
 
-      // Calculate real monthly change from movements
+      // Backend uses: { birth, purchase, exit, entry, transfer } in movements
+      // thisMonth might be empty {} if no movements this month
       const thisMonthMovements = raw.movements?.thisMonth || {};
-      const monthlyChange = (thisMonthMovements.birth || 0) + (thisMonthMovements.purchase || 0)
-                          - (thisMonthMovements.death || 0) - (thisMonthMovements.sale || 0);
+      const thisMonthTotal = raw.movements?.thisMonthTotal ?? 0;
+
+      // All-time movements for reference
+      const allTimeMovements = raw.movements?.allTime || {};
+      const allTimeBirths = allTimeMovements.birth ?? 0;
 
       const totalAnimals = raw.herd?.alive ?? raw.herd?.total ?? 0;
-      // Calculate percentage only if we have previous data
+      const totalRegistered = raw.herd?.total ?? totalAnimals;
+
+      // Monthly change based on thisMonthTotal or calculate from movements
+      const monthlyChange = thisMonthTotal > 0
+        ? (thisMonthMovements.birth ?? 0) + (thisMonthMovements.purchase ?? 0) + (thisMonthMovements.entry ?? 0)
+          - (thisMonthMovements.exit ?? 0)
+        : 0;
+
       const changePercentage = totalAnimals > 0 && monthlyChange !== 0
         ? (monthlyChange / (totalAnimals - monthlyChange)) * 100
         : 0;
 
+      // Get counts from status breakdown
+      const statusBreakdown = raw.herd?.statusBreakdown || {};
+      const totalDeaths = statusBreakdown.dead ?? 0;
+
       return {
         herd: {
           totalAnimals,
-          byStatus: raw.herd?.statusBreakdown ?? {},
+          byStatus: statusBreakdown,
           bySex: raw.herd?.genderBreakdown ?? {},
           changeThisMonth: monthlyChange,
           changePercentage,
         },
         movements: {
           thisMonth: {
-            births: raw.movements?.thisMonth?.birth ?? 0,
-            deaths: raw.movements?.thisMonth?.death ?? 0,
-            sales: raw.movements?.thisMonth?.sale ?? 0,
-            purchases: raw.movements?.thisMonth?.purchase ?? 0,
+            births: thisMonthMovements.birth ?? 0,
+            deaths: thisMonthMovements.exit ?? 0, // Backend uses 'exit' for outgoing
+            sales: 0,
+            purchases: thisMonthMovements.purchase ?? 0,
           },
           previousMonth: {
-            births: raw.movements?.previousMonth?.birth ?? 0,
-            deaths: raw.movements?.previousMonth?.death ?? 0,
-            sales: raw.movements?.previousMonth?.sale ?? 0,
-            purchases: raw.movements?.previousMonth?.purchase ?? 0,
+            births: 0, // Backend doesn't provide previousMonth
+            deaths: 0,
+            sales: 0,
+            purchases: 0,
           },
         },
         weights: {
           avgDailyGain: raw.weights?.avgDailyGain ?? 0,
           avgDailyGainTrend: (raw.weights?.avgDailyGain ?? 0) > 0.01 ? 'up' : (raw.weights?.avgDailyGain ?? 0) < -0.01 ? 'down' : 'stable',
-          avgDailyGainChange: 0, // Not provided by backend
+          avgDailyGainChange: 0,
           avgWeight: raw.weights?.avgWeight ?? 0,
-          totalWeighings: raw.weights?.totalWeighings ?? 0,
+          totalWeighings: raw.weights?.totalWeights ?? raw.weights?.totalWeighings ?? 0,
           weighingsThisMonth: raw.weights?.weighingsLast30Days ?? 0,
         },
         health: {
-          vaccinationsUpToDate: 0, // Not provided
+          vaccinationsUpToDate: raw.health?.vaccinatedAnimals ?? 0,
           vaccinationsUpToDatePercentage: raw.health?.vaccinationCoverage ?? 0,
-          vaccinationsDueThisWeek: 0, // Not provided
+          vaccinationsDueThisWeek: 0,
           activeWithdrawals: raw.health?.activeWithdrawals ?? 0,
           treatmentsThisMonth: raw.health?.treatmentsThisMonth ?? 0,
-          treatmentsCost: 0, // Not provided
+          treatmentsCost: 0,
         },
         mortality: {
           rate: raw.mortality?.rate ?? 0,

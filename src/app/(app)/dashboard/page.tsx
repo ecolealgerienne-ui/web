@@ -361,14 +361,14 @@ export default function DashboardPage() {
                 <p className="text-3xl font-bold">{stats.movements.thisMonth.births}</p>
                 <p className="text-sm font-medium">{t('kpis.births')}</p>
                 <p className="text-xs text-muted-foreground">
-                  {t('kpis.previousMonth')}: {stats.movements.previousMonth.births}
+                  {t('kpis.thisMonth')}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Deaths & Mortality */}
+        {/* Mortality */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -386,15 +386,17 @@ export default function DashboardPage() {
                 )} />
               </div>
               <div className="flex-1">
-                <p className="text-3xl font-bold">{stats.movements.thisMonth.deaths}</p>
-                <p className="text-sm font-medium">{t('kpis.deaths')}</p>
                 <p className={cn(
-                  'text-xs',
+                  'text-3xl font-bold',
                   stats.mortality.rateStatus === 'good' ? 'text-green-600' :
                   stats.mortality.rateStatus === 'warning' ? 'text-orange-600' :
                   'text-red-600'
                 )}>
-                  {stats.mortality.rate.toFixed(1)}% {t('kpis.mortality')}
+                  {stats.mortality.rate.toFixed(1)}%
+                </p>
+                <p className="text-sm font-medium">{t('kpis.mortalityRate')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {stats.herd.byStatus?.dead || 0} {t('kpis.totalDeaths')}
                 </p>
               </div>
             </div>

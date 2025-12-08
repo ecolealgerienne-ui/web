@@ -2526,6 +2526,8 @@
       "births": "Naissances",
       "deaths": "Décès",
       "mortality": "mortalité",
+      "mortalityRate": "Taux mortalité",
+      "totalDeaths": "décès au total",
       "avgDailyGain": "GMQ moyen",
       "avgWeight": "Poids moy.",
       "vaccinations": "Vaccinations",
