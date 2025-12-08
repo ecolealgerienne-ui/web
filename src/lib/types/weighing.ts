@@ -1,6 +1,6 @@
 // Types pour les pesées basés sur l'API backend
 
-export type WeightSource = 'manual' | 'scale' | 'estimated';
+export type WeightSource = 'manual' | 'scale' | 'estimated' | 'automatic' | 'weighbridge';
 
 export interface Weighing {
   id: string;

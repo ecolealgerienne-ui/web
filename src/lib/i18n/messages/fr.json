@@ -2308,6 +2308,8 @@
       "manual": "Manuel",
       "scale": "Balance",
       "estimated": "Estimé",
+      "automatic": "Automatique",
+      "weighbridge": "Pont-bascule",
       "undefined": "Non défini"
     },
     "list": "Liste des pesées",

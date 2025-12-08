@@ -38,7 +38,7 @@ interface WeightDialogProps {
   onNavigate?: (direction: 'prev' | 'next') => void;
 }
 
-const SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
+const SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
 
 export function WeightDialog({
   open,

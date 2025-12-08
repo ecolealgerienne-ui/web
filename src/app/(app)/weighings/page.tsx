@@ -24,7 +24,7 @@ import type { Weighing, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWei
 import { weighingsService } from '@/lib/services/weighings.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 
-const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
+const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
 
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
