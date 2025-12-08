@@ -2561,6 +2561,7 @@
     "chart": {
       "evolution": "Évolution du cheptel",
       "noData": "Pas de données disponibles",
+      "noDataHint": "Effectuez des pesées pour voir l'évolution du GMQ",
       "animals": "animaux",
       "herd": "Effectif"
     },

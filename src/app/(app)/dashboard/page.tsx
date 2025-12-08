@@ -269,12 +269,21 @@ export default function DashboardPage() {
   const { stats, actions, lotsStats, rankings, trends } = data!;
 
   // Prepare GMQ trend chart data (with defensive check)
-  const trendChartData = (trends?.dataPoints || []).map((point) => ({
-    date: point.date,
-    gmq: point.avgDailyGain,
-    weight: point.avgWeight,
-    animals: point.animalCount,
-  }));
+  // Normalize small negative values to 0 and validate data
+  const trendChartData = (trends?.dataPoints || []).map((point) => {
+    // If value is very small (< 0.01), treat as 0
+    const gmq = Math.abs(point.avgDailyGain) < 0.01 ? 0 : point.avgDailyGain;
+    return {
+      date: point.date,
+      gmq: gmq,
+      weight: point.avgWeight,
+      animals: point.animalCount,
+    };
+  });
+
+  // Calculate Y-axis domain based on actual data
+  const gmqValues = trendChartData.map(d => d.gmq).filter(v => v !== 0);
+  const hasValidGmqData = gmqValues.length > 0 && gmqValues.some(v => v > 0);
 
   // Total actions count (with defensive check)
   const totalActions = (actions?.summary?.urgent || 0) + (actions?.summary?.thisWeek || 0) + (actions?.summary?.planned || 0);
@@ -429,7 +438,7 @@ export default function DashboardPage() {
                   dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'warning' ? 'text-orange-600' :
                   'text-red-600'
                 )}>
-                  {stats.weights.avgDailyGain.toFixed(2)} kg/j
+                  {Math.abs(stats.weights.avgDailyGain) < 0.005 ? '0.00' : stats.weights.avgDailyGain.toFixed(2)} kg/j
                 </p>
                 <p className="text-sm font-medium">{t('kpis.avgDailyGain')}</p>
                 <p className="text-xs text-muted-foreground">
@@ -565,7 +574,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {trendChartData.length > 0 ? (
+            {trendChartData.length > 0 && hasValidGmqData ? (
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={trendChartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -577,7 +586,7 @@ export default function DashboardPage() {
                   <YAxis
                     className="text-xs"
                     tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    domain={[0, 'auto']}
+                    domain={[0, (dataMax: number) => Math.max(dataMax * 1.1, GMQ_THRESHOLDS.excellent)]}
                   />
                   <Tooltip
                     contentStyle={{
@@ -610,7 +619,11 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             ) : (
               <div className="flex items-center justify-center h-[250px] text-muted-foreground">
-                <p className="text-sm">{t('chart.noData')}</p>
+                <div className="text-center">
+                  <Scale className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">{t('chart.noData')}</p>
+                  <p className="text-xs mt-1">{t('chart.noDataHint')}</p>
+                </div>
               </div>
             )}
           </CardContent>
