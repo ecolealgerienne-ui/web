@@ -500,8 +500,41 @@ class DashboardService {
         ? `/api/v1/farms/${TEMP_FARM_ID}/lots/stats?${params}`
         : `/api/v1/farms/${TEMP_FARM_ID}/lots/stats`;
 
-      const response = await apiClient.get<LotsStatsResponse>(url);
-      return response;
+      const response = await apiClient.get<any>(url);
+
+      // Handle nested response structure
+      const raw = response?.data || response;
+
+      return {
+        lots: (raw.lots || []).map((lot: any) => ({
+          lotId: lot.lotId || lot.id,
+          name: lot.name || '',
+          type: lot.type || '',
+          animalCount: lot.animalCount ?? 0,
+          weights: {
+            avgWeight: lot.weights?.avgWeight ?? 0,
+            minWeight: lot.weights?.minWeight ?? 0,
+            maxWeight: lot.weights?.maxWeight ?? 0,
+            targetWeight: lot.weights?.targetWeight ?? null,
+          },
+          growth: {
+            avgDailyGain: lot.growth?.avgDailyGain ?? 0,
+            minDailyGain: lot.growth?.minDailyGain ?? 0,
+            maxDailyGain: lot.growth?.maxDailyGain ?? 0,
+            status: lot.growth?.status || this.getGmqStatus(lot.growth?.avgDailyGain ?? 0),
+          },
+          predictions: {
+            estimatedDaysToTarget: lot.predictions?.estimatedDaysToTarget ?? null,
+            estimatedTargetDate: lot.predictions?.estimatedTargetDate ?? null,
+          },
+          lastWeighingDate: lot.lastWeighingDate || null,
+        })),
+        summary: {
+          totalLots: raw.summary?.totalLots ?? raw.lots?.length ?? 0,
+          totalAnimals: raw.summary?.totalAnimals ?? 0,
+          overallAvgDailyGain: raw.summary?.overallAvgDailyGain ?? 0,
+        },
+      };
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No lots stats found (404)');
@@ -534,8 +567,30 @@ class DashboardService {
         ? `/api/v1/farms/${TEMP_FARM_ID}/weights/rankings?${params}`
         : `/api/v1/farms/${TEMP_FARM_ID}/weights/rankings`;
 
-      const response = await apiClient.get<WeightRankingsResponse>(url);
-      return response;
+      const response = await apiClient.get<any>(url);
+
+      // Handle nested response structure
+      const raw = response?.data || response;
+
+      const mapAnimal = (animal: any) => ({
+        animalId: animal.animalId || animal.id,
+        visualId: animal.visualId || null,
+        officialNumber: animal.officialNumber || null,
+        avgDailyGain: animal.avgDailyGain ?? 0,
+        weightGain: animal.weightGain ?? 0,
+        weighingsCount: animal.weighingsCount ?? 0,
+        currentWeight: animal.currentWeight ?? 0,
+        lotName: animal.lotName || null,
+        alert: animal.alert,
+      });
+
+      return {
+        period: raw.period || filters?.period || '30d',
+        calculatedAt: raw.calculatedAt || new Date().toISOString(),
+        top: (raw.top || []).map(mapAnimal),
+        bottom: (raw.bottom || []).map(mapAnimal),
+        thresholds: raw.thresholds || GMQ_THRESHOLDS,
+      };
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No weight rankings found (404)');
