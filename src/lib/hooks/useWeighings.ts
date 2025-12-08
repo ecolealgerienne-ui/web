@@ -3,8 +3,16 @@ import { weighingsService } from '@/lib/services/weighings.service';
 import type { Weighing, QueryWeightDto, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { logger } from '@/lib/utils/logger';
 
+interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 interface UseWeighingsResult {
   weighings: Weighing[];
+  meta: PaginationMeta;
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
@@ -15,6 +23,7 @@ interface UseWeighingsResult {
 
 export function useWeighings(filters?: QueryWeightDto & { search?: string }): UseWeighingsResult {
   const [weighings, setWeighings] = useState<Weighing[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta>({ total: 0, page: 1, limit: 10, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -43,8 +52,9 @@ export function useWeighings(filters?: QueryWeightDto & { search?: string }): Us
     try {
       setLoading(true);
       setError(null);
-      const data = await weighingsService.getAll(memoizedFilters);
-      setWeighings(data);
+      const response = await weighingsService.getAll(memoizedFilters);
+      setWeighings(response.data);
+      setMeta(response.meta);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch weighings');
       setError(error);
@@ -77,6 +87,7 @@ export function useWeighings(filters?: QueryWeightDto & { search?: string }): Us
 
   return {
     weighings,
+    meta,
     loading,
     error,
     refresh: fetchWeighings,

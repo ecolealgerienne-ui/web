@@ -31,10 +31,12 @@ export default function WeighingsPage() {
   const tc = useCommonTranslations();
   const toast = useToast();
 
-  // Filters state
-  const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({
-    search: '',
-  });
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  // Filters state (includes pagination for server-side)
+  const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({});
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -46,16 +48,16 @@ export default function WeighingsPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [weighingToDelete, setWeighingToDelete] = useState<Weighing | null>(null);
 
-  // Pagination state
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-
   // Stats state
   const [stats, setStats] = useState<WeightStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  // Fetch weighings
-  const { weighings, loading, refresh } = useWeighings(filters);
+  // Fetch weighings with server-side pagination
+  const { weighings, meta, loading, refresh } = useWeighings({
+    ...filters,
+    page,
+    limit,
+  });
 
   // Fetch stats
   const fetchStats = async () => {
@@ -82,7 +84,7 @@ export default function WeighingsPage() {
     await Promise.all([refresh(), fetchStats()]);
   };
 
-  // Client-side search filtering
+  // Client-side search filtering (filters current page only)
   const filteredWeighings = useMemo(() => {
     if (!filters.search) return weighings;
     const search = filters.search.toLowerCase();
@@ -95,12 +97,6 @@ export default function WeighingsPage() {
       );
     });
   }, [weighings, filters.search]);
-
-  // Paginated data
-  const paginatedWeighings = useMemo(() => {
-    const startIndex = (page - 1) * limit;
-    return filteredWeighings.slice(startIndex, startIndex + limit);
-  }, [filteredWeighings, page, limit]);
 
   // Reset page when filters change
   const handleFilterChange = (newFilters: QueryWeightDto & { search?: string }) => {
@@ -357,7 +353,7 @@ export default function WeighingsPage() {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      ) : filteredWeighings.length === 0 ? (
+      ) : meta.total === 0 ? (
         <div className="rounded-lg border bg-card p-12 text-center">
           <Scale className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-lg font-medium">{t('messages.noWeighings')}</h3>
@@ -369,9 +365,9 @@ export default function WeighingsPage() {
         </div>
       ) : (
         <DataTable
-          data={paginatedWeighings}
+          data={filteredWeighings}
           columns={columns}
-          totalItems={filteredWeighings.length}
+          totalItems={filters.search ? filteredWeighings.length : meta.total}
           page={page}
           limit={limit}
           onPageChange={setPage}

@@ -3,9 +3,9 @@ import { logger } from '@/lib/utils/logger';
 import type { Weighing, WeightHistory, WeightStats, QueryWeightDto, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 
-interface PaginatedResponse<T> {
+export interface PaginatedResponse<T> {
   data: T[];
-  meta?: {
+  meta: {
     total: number;
     page: number;
     limit: number;
@@ -18,7 +18,7 @@ class WeighingsService {
     return `/api/v1/farms/${TEMP_FARM_ID}/weights`;
   }
 
-  async getAll(filters?: QueryWeightDto): Promise<Weighing[]> {
+  async getAll(filters?: QueryWeightDto): Promise<PaginatedResponse<Weighing>> {
     try {
       const params = new URLSearchParams();
 
@@ -33,11 +33,14 @@ class WeighingsService {
 
       const url = params.toString() ? `${this.getBasePath()}?${params.toString()}` : this.getBasePath();
       const response = await apiClient.get<PaginatedResponse<Weighing>>(url);
-      return response.data || [];
+      return {
+        data: response.data || [],
+        meta: response.meta || { total: 0, page: 1, limit: 10, totalPages: 0 },
+      };
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No weights found (404)');
-        return [];
+        return { data: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
       }
       logger.error('Failed to fetch weights', error);
       throw error;
