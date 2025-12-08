@@ -571,14 +571,39 @@ class DashboardService {
         ? `/api/v1/farms/${TEMP_FARM_ID}/weights/trends?${params}`
         : `/api/v1/farms/${TEMP_FARM_ID}/weights/trends`;
 
-      const response = await apiClient.get<WeightTrendsResponse>(url);
-      return response;
+      const response = await apiClient.get<any>(url);
+
+      // Handle nested response structure: { success, data: { success, data: {...} } }
+      const raw = response?.data || response;
+
+      return {
+        period: raw.period || filters?.period || '6months',
+        groupBy: raw.groupBy || filters?.groupBy || 'month',
+        startDate: raw.startDate || '',
+        endDate: raw.endDate || '',
+        dataPoints: (raw.dataPoints || []).map((point: any) => ({
+          date: point.date,
+          avgDailyGain: point.avgDailyGain ?? 0,
+          animalCount: point.animalCount ?? 0,
+          weighingsCount: point.weighingsCount ?? point.weighingCount ?? 0,
+          avgWeight: point.avgWeight ?? 0,
+        })),
+        summary: {
+          overallAvgDailyGain: raw.summary?.overallAvgDailyGain ?? 0,
+          trend: raw.summary?.trend || 'stable',
+          trendPercentage: raw.summary?.trendPercentage ?? 0,
+        },
+        benchmarks: {
+          farmTarget: raw.benchmarks?.farmTarget ?? null,
+          nationalAverage: raw.benchmarks?.nationalAverage ?? null,
+        },
+      };
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No weight trends found (404)');
         return {
-          period: filters?.period || '3months',
-          groupBy: filters?.groupBy || 'week',
+          period: filters?.period || '6months',
+          groupBy: filters?.groupBy || 'month',
           startDate: '',
           endDate: '',
           dataPoints: [],
