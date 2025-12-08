@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ChevronLeft, ChevronRight, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { animalsService } from '@/lib/services/animals.service';
 import { weighingsService } from '@/lib/services/weighings.service';
@@ -70,7 +70,7 @@ export function WeightDialog({
     source: 'manual',
   });
 
-  // Animal search state
+  // Animal search state (only for create mode)
   const [animalSearch, setAnimalSearch] = useState('');
   const [animalSearchResults, setAnimalSearchResults] = useState<Array<{ id: string; officialNumber?: string; visualId?: string }>>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -80,10 +80,41 @@ export function WeightDialog({
   const [weightHistory, setWeightHistory] = useState<WeightHistory[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
+  // Inline add weighing state
+  const [showInlineAdd, setShowInlineAdd] = useState(false);
+  const [inlineFormData, setInlineFormData] = useState({
+    weight: 0,
+    source: 'manual' as WeightSource,
+    weightDate: new Date().toISOString().split('T')[0],
+  });
+  const [isAddingInline, setIsAddingInline] = useState(false);
+
   // Navigation state
   const currentIndex = weighing ? weighings.findIndex((w) => w.id === weighing.id) : -1;
   const canNavigatePrev = currentIndex > 0;
   const canNavigateNext = currentIndex < weighings.length - 1;
+
+  // Sort history from most recent to oldest
+  const sortedHistory = useMemo(() => {
+    return [...weightHistory].sort((a, b) =>
+      new Date(b.weightDate).getTime() - new Date(a.weightDate).getTime()
+    );
+  }, [weightHistory]);
+
+  // Calculate daily gain for inline form
+  const calculatedDailyGain = useMemo(() => {
+    if (!inlineFormData.weight || sortedHistory.length === 0) return null;
+
+    const lastWeighing = sortedHistory[0];
+    const lastDate = new Date(lastWeighing.weightDate);
+    const newDate = new Date(inlineFormData.weightDate);
+    const daysDiff = Math.ceil((newDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff <= 0) return null;
+
+    const weightDiff = inlineFormData.weight - lastWeighing.weight;
+    return weightDiff / daysDiff;
+  }, [inlineFormData.weight, inlineFormData.weightDate, sortedHistory]);
 
   // Reset form when weighing changes
   useEffect(() => {
@@ -112,6 +143,13 @@ export function WeightDialog({
         setAnimalSearch(weighing.animal.officialNumber || weighing.animal.visualId || '');
       }
     }
+    // Reset inline add form
+    setShowInlineAdd(false);
+    setInlineFormData({
+      weight: 0,
+      source: 'manual',
+      weightDate: new Date().toISOString().split('T')[0],
+    });
   }, [weighing, mode]);
 
   // Fetch weight history when viewing/editing an existing weighing
@@ -137,7 +175,7 @@ export function WeightDialog({
     fetchHistory();
   }, [open, mode, weighing?.animalId]);
 
-  // Animal search with debounce
+  // Animal search with debounce (only for create mode)
   const searchAnimals = useCallback(async (query: string) => {
     if (query.length < 2) {
       setAnimalSearchResults([]);
@@ -162,7 +200,7 @@ export function WeightDialog({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (animalSearch && mode !== 'view') {
+      if (animalSearch && mode === 'create') {
         searchAnimals(animalSearch);
       }
     }, 500);
@@ -187,6 +225,36 @@ export function WeightDialog({
     ) as CreateWeightDto | UpdateWeightDto;
 
     await onSubmit(cleanData);
+  };
+
+  const handleInlineAdd = async () => {
+    if (!weighing?.animalId || !inlineFormData.weight) return;
+
+    setIsAddingInline(true);
+    try {
+      await weighingsService.create({
+        animalId: weighing.animalId,
+        weight: inlineFormData.weight,
+        weightDate: inlineFormData.weightDate,
+        source: inlineFormData.source,
+      });
+
+      // Refresh history
+      const history = await weighingsService.getAnimalHistory(weighing.animalId);
+      setWeightHistory(history);
+
+      // Reset inline form
+      setShowInlineAdd(false);
+      setInlineFormData({
+        weight: 0,
+        source: 'manual',
+        weightDate: new Date().toISOString().split('T')[0],
+      });
+    } catch (error) {
+      console.error('Error adding weighing:', error);
+    } finally {
+      setIsAddingInline(false);
+    }
   };
 
   const getDialogTitle = () => {
@@ -263,12 +331,8 @@ export function WeightDialog({
           <div className="space-y-4">
             <h3 className="text-sm font-medium border-b pb-2">{t('labels.animal')}</h3>
             <div className="space-y-2">
-              <Label>{t('fields.animalId')} *</Label>
-              {isViewMode ? (
-                <p className="text-sm font-mono">
-                  {selectedAnimal?.officialNumber || selectedAnimal?.visualId || weighing?.animalId || '-'}
-                </p>
-              ) : (
+              <Label>{t('fields.animalId')} {mode === 'create' && '*'}</Label>
+              {mode === 'create' ? (
                 <div className="relative">
                   <Input
                     value={animalSearch}
@@ -300,6 +364,13 @@ export function WeightDialog({
                       ))}
                     </div>
                   )}
+                </div>
+              ) : (
+                // View/Edit mode - display as read-only
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md border">
+                  <span className="text-base font-mono">
+                    {selectedAnimal?.officialNumber || selectedAnimal?.visualId || weighing?.animalId || '-'}
+                  </span>
                 </div>
               )}
             </div>
@@ -353,7 +424,7 @@ export function WeightDialog({
               ) : (
                 <Input
                   type="date"
-                  value={formData.weightDate || ''}
+                  value={formData.weightDate?.split('T')[0] || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, weightDate: e.target.value }))}
                 />
               )}
@@ -404,64 +475,153 @@ export function WeightDialog({
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
-              ) : weightHistory.length === 0 ? (
+              ) : sortedHistory.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   {t('messages.noHistory')}
                 </p>
               ) : (
-                <div className="border rounded-md max-h-64 overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('fields.weightDate')}</TableHead>
-                        <TableHead className="text-right">{t('fields.weight')}</TableHead>
-                        <TableHead className="text-right">{t('labels.rate')}</TableHead>
-                        <TableHead>{t('fields.source')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {weightHistory.map((record) => {
-                        const isCurrentRecord = record.id === weighing?.id;
-                        return (
-                          <TableRow
-                            key={record.id}
-                            className={isCurrentRecord ? 'bg-primary/10' : ''}
-                          >
-                            <TableCell className="font-medium">
-                              {formatDate(record.weightDate)}
-                              {isCurrentRecord && (
-                                <Badge variant="secondary" className="ml-2 text-xs">
-                                  {t('labels.current')}
+                <div className="border rounded-md">
+                  <div className="max-h-64 overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t('fields.weightDate')}</TableHead>
+                          <TableHead className="text-right">{t('fields.weight')}</TableHead>
+                          <TableHead className="text-right">{t('labels.rate')}</TableHead>
+                          <TableHead>{t('fields.source')}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sortedHistory.map((record) => {
+                          const isCurrentRecord = record.id === weighing?.id;
+                          return (
+                            <TableRow
+                              key={record.id}
+                              className={isCurrentRecord ? 'bg-primary/10' : ''}
+                            >
+                              <TableCell className="font-medium">
+                                {formatDate(record.weightDate)}
+                                {isCurrentRecord && (
+                                  <Badge variant="secondary" className="ml-2 text-xs">
+                                    {t('labels.current')}
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right font-mono">
+                                {record.weight} kg
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {record.dailyGain ? (
+                                  <span className={`flex items-center justify-end gap-1 ${record.dailyGain > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {record.dailyGain > 0 ? (
+                                      <TrendingUp className="h-3 w-3" />
+                                    ) : (
+                                      <TrendingDown className="h-3 w-3" />
+                                    )}
+                                    {record.dailyGain.toFixed(2)} kg/j
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground">-</span>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="secondary" className="text-xs">
+                                  {t(`source.${record.source || 'undefined'}`)}
                                 </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-right font-mono">
-                              {record.weight} kg
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {record.dailyGain ? (
-                                <span className={`flex items-center justify-end gap-1 ${record.dailyGain > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                  {record.dailyGain > 0 ? (
-                                    <TrendingUp className="h-3 w-3" />
-                                  ) : (
-                                    <TrendingDown className="h-3 w-3" />
-                                  )}
-                                  {record.dailyGain.toFixed(2)} kg/j
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground">-</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="secondary" className="text-xs">
-                                {t(`source.${record.source || 'undefined'}`)}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Inline add form */}
+                  {showInlineAdd ? (
+                    <div className="border-t p-3 bg-muted/50 space-y-3">
+                      <div className="grid grid-cols-4 gap-2 items-end">
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('fields.weightDate')}</Label>
+                          <Input
+                            type="date"
+                            value={inlineFormData.weightDate}
+                            onChange={(e) => setInlineFormData((prev) => ({ ...prev, weightDate: e.target.value }))}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('fields.weight')} (kg)</Label>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            value={inlineFormData.weight || ''}
+                            onChange={(e) => setInlineFormData((prev) => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
+                            placeholder="0.0"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('fields.source')}</Label>
+                          <Select
+                            value={inlineFormData.source}
+                            onValueChange={(value) => setInlineFormData((prev) => ({ ...prev, source: value as WeightSource }))}
+                          >
+                            <SelectTrigger className="h-8 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SOURCES.map((source) => (
+                                <SelectItem key={source} value={source}>
+                                  {t(`source.${source}`)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('labels.rate')}</Label>
+                          <div className="h-8 flex items-center px-2 bg-background border rounded-md text-sm">
+                            {calculatedDailyGain !== null ? (
+                              <span className={calculatedDailyGain >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                {calculatedDailyGain >= 0 ? '+' : ''}{calculatedDailyGain.toFixed(2)} kg/j
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowInlineAdd(false)}
+                        >
+                          {tc('actions.cancel')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleInlineAdd}
+                          disabled={isAddingInline || !inlineFormData.weight}
+                        >
+                          {isAddingInline && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                          {tc('actions.add')}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border-t p-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => setShowInlineAdd(true)}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t('actions.addWeighing')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

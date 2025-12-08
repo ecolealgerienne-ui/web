@@ -2338,6 +2338,9 @@
     },
     "cancel": "Annuler",
     "delete": "Supprimer",
+    "actions": {
+      "addWeighing": "Ajouter une pesée"
+    },
     "sections": {
       "general": "Informations générales",
       "data": "Données de pesée",
