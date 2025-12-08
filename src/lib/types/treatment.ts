@@ -38,6 +38,11 @@ export interface Treatment {
     id: string;
     name: string;
   } | null;
+  lotId?: string | null;
+  lot?: {
+    id: string;
+    name: string;
+  } | null;
 
   // Dates
   treatmentDate: string;
@@ -109,6 +114,7 @@ export interface CreateTreatmentDto {
   routeId?: string;
   productName?: string;
   farmerLotId?: string;
+  lotId?: string;
 
   quantityAdministered?: number;
   quantityUnitId?: string;
@@ -144,6 +150,7 @@ export interface UpdateTreatmentDto {
   routeId?: string;
   productName?: string;
   farmerLotId?: string;
+  lotId?: string;
 
   quantityAdministered?: number;
   quantityUnitId?: string;
