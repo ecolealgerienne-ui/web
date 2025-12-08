@@ -42,6 +42,26 @@ export interface WeightHistory {
   dailyGain?: number; // Calculé par l'API
 }
 
+export interface WeightStats {
+  totalWeighings: number;
+  uniqueAnimals: number;
+  periodWeighings: number;
+  bySource: Record<WeightSource, number>;
+  weights: {
+    avg: number;
+    min: number;
+    max: number;
+    latestAvg: number;
+  };
+  growth: {
+    avgDailyGain: number;
+    animalsWithGain: number;
+    minDailyGain: number;
+    maxDailyGain: number;
+  };
+  lastWeighingDate: string | null;
+}
+
 export interface QueryWeightDto {
   animalId?: string;
   source?: WeightSource;

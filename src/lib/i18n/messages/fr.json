@@ -2292,8 +2292,8 @@
     "editWeighing": "Modifier la pesée",
     "stats": {
       "total": "Total pesées",
-      "manual": "Pesées manuelles",
-      "avgWeight": "Poids moyen",
+      "uniqueAnimals": "Animaux pesés",
+      "latestAvgWeight": "Poids moyen actuel",
       "avgDailyGain": "GMQ moyen"
     },
     "filters": {

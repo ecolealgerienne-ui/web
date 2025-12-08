@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 import { logger } from '@/lib/utils/logger';
-import type { Weighing, WeightHistory, QueryWeightDto, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
+import type { Weighing, WeightHistory, WeightStats, QueryWeightDto, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 interface PaginatedResponse<T> {
@@ -74,6 +74,25 @@ class WeighingsService {
   async update(id: string, data: UpdateWeightDto): Promise<Weighing> {
     const response = await apiClient.put<{ data: Weighing }>(`${this.getBasePath()}/${id}`, data);
     return response.data;
+  }
+
+  async getStats(filters?: { fromDate?: string; toDate?: string }): Promise<WeightStats> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters?.toDate) params.append('toDate', filters.toDate);
+
+      const url = params.toString()
+        ? `${this.getBasePath()}/stats?${params.toString()}`
+        : `${this.getBasePath()}/stats`;
+
+      // apiClient auto-unwraps { success, data } -> returns data directly
+      const response = await apiClient.get<WeightStats>(url);
+      return response;
+    } catch (error: any) {
+      logger.error('Failed to fetch weight stats', error);
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<void> {

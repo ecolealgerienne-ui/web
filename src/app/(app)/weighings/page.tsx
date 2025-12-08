@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -15,12 +15,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, Loader2, Eye, Edit, Trash2, Scale } from 'lucide-react';
+import { Plus, Search, Loader2, Eye, Edit, Trash2, Scale, Users, TrendingUp } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
 import { useToast } from '@/contexts/toast-context';
-import type { Weighing, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
+import type { Weighing, WeightStats, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { weighingsService } from '@/lib/services/weighings.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 
@@ -50,8 +50,37 @@ export default function WeighingsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
+  // Stats state
+  const [stats, setStats] = useState<WeightStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
   // Fetch weighings
   const { weighings, loading, refresh } = useWeighings(filters);
+
+  // Fetch stats
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try {
+      const data = await weighingsService.getStats({
+        fromDate: filters.fromDate,
+        toDate: filters.toDate,
+      });
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, [filters.fromDate, filters.toDate]);
+
+  // Refresh stats after CRUD operations
+  const refreshAll = async () => {
+    await Promise.all([refresh(), fetchStats()]);
+  };
 
   // Client-side search filtering
   const filteredWeighings = useMemo(() => {
@@ -78,25 +107,6 @@ export default function WeighingsPage() {
     setFilters(newFilters);
     setPage(1);
   };
-
-  // Stats
-  const stats = useMemo(() => {
-    const totalWeight = weighings.reduce((sum, w) => sum + w.weight, 0);
-    const avgWeight = weighings.length > 0 ? totalWeight / weighings.length : 0;
-
-    // Calculate average daily gain if we have dailyGain data
-    const weighingsWithGrowth = weighings.filter((w) => w.dailyGain);
-    const avgDailyGain = weighingsWithGrowth.length > 0
-      ? weighingsWithGrowth.reduce((sum, w) => sum + (w.dailyGain || 0), 0) / weighingsWithGrowth.length
-      : 0;
-
-    return {
-      total: weighings.length,
-      manual: weighings.filter((w) => w.source === 'manual').length,
-      avgWeight: avgWeight.toFixed(1),
-      avgDailyGain: avgDailyGain.toFixed(2),
-    };
-  }, [weighings]);
 
   // Handlers
   const handleView = (weighing: Weighing) => {
@@ -133,7 +143,7 @@ export default function WeighingsPage() {
         toast.success(t('messages.updateSuccess'));
       }
       setDialogOpen(false);
-      refresh();
+      refreshAll();
     } catch (error) {
       console.error('Error submitting weighing:', error);
       toast.error(dialogMode === 'create' ? t('messages.createError') : t('messages.updateError'));
@@ -149,7 +159,7 @@ export default function WeighingsPage() {
       toast.success(t('messages.deleteSuccess'));
       setIsDeleteDialogOpen(false);
       setWeighingToDelete(null);
-      refresh();
+      refreshAll();
     } catch (error) {
       console.error('Error deleting weighing:', error);
       toast.error(t('messages.deleteError'));
@@ -247,20 +257,34 @@ export default function WeighingsPage() {
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center gap-2">
             <Scale className="h-5 w-5 text-muted-foreground" />
-            <span className="text-2xl font-bold">{stats.total}</span>
+            <span className="text-2xl font-bold">
+              {statsLoading ? '-' : stats?.totalWeighings ?? 0}
+            </span>
           </div>
           <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold">{stats.manual}</div>
-          <p className="text-xs text-muted-foreground">{t('stats.manual')}</p>
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-muted-foreground" />
+            <span className="text-2xl font-bold">
+              {statsLoading ? '-' : stats?.uniqueAnimals ?? 0}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stats.uniqueAnimals')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold">{stats.avgWeight} kg</div>
-          <p className="text-xs text-muted-foreground">{t('stats.avgWeight')}</p>
+          <div className="text-2xl font-bold">
+            {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stats.latestAvgWeight')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold text-green-600">{stats.avgDailyGain} kg/j</div>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-green-600" />
+            <span className="text-2xl font-bold text-green-600">
+              {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
+            </span>
+          </div>
           <p className="text-xs text-muted-foreground">{t('stats.avgDailyGain')}</p>
         </div>
       </div>
