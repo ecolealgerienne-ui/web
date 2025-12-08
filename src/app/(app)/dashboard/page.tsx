@@ -268,16 +268,16 @@ export default function DashboardPage() {
 
   const { stats, actions, lotsStats, rankings, trends } = data!;
 
-  // Prepare GMQ trend chart data
-  const trendChartData = trends.dataPoints.map((point) => ({
+  // Prepare GMQ trend chart data (with defensive check)
+  const trendChartData = (trends?.dataPoints || []).map((point) => ({
     date: point.date,
     gmq: point.avgDailyGain,
     weight: point.avgWeight,
     animals: point.animalCount,
   }));
 
-  // Total actions count
-  const totalActions = actions.summary.urgent + actions.summary.thisWeek + actions.summary.planned;
+  // Total actions count (with defensive check)
+  const totalActions = (actions?.summary?.urgent || 0) + (actions?.summary?.thisWeek || 0) + (actions?.summary?.planned || 0);
 
   // Render action item
   const renderActionItem = (action: ActionItem) => {
@@ -476,32 +476,32 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {/* Urgent Actions */}
-            {actions.urgent.length > 0 && (
+            {(actions?.urgent?.length || 0) > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">
-                  {t('actions.urgent')} ({actions.summary.urgent})
+                  {t('actions.urgent')} ({actions?.summary?.urgent || 0})
                 </p>
-                {actions.urgent.slice(0, 2).map(renderActionItem)}
+                {(actions?.urgent || []).slice(0, 2).map(renderActionItem)}
               </div>
             )}
 
             {/* This Week Actions */}
-            {actions.thisWeek.length > 0 && (
+            {(actions?.thisWeek?.length || 0) > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide">
-                  {t('actions.thisWeek')} ({actions.summary.thisWeek})
+                  {t('actions.thisWeek')} ({actions?.summary?.thisWeek || 0})
                 </p>
-                {actions.thisWeek.slice(0, 2).map(renderActionItem)}
+                {(actions?.thisWeek || []).slice(0, 2).map(renderActionItem)}
               </div>
             )}
 
             {/* Opportunities */}
-            {actions.opportunities.length > 0 && (
+            {(actions?.opportunities?.length || 0) > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-green-600 uppercase tracking-wide">
-                  {t('actions.opportunities')} ({actions.summary.opportunities})
+                  {t('actions.opportunities')} ({actions?.summary?.opportunities || 0})
                 </p>
-                {actions.opportunities.slice(0, 1).map(renderActionItem)}
+                {(actions?.opportunities || []).slice(0, 1).map(renderActionItem)}
               </div>
             )}
 
@@ -597,7 +597,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Row 3: Lots Performance */}
-      {lotsStats.lots.length > 0 && (
+      {(lotsStats?.lots?.length || 0) > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -607,7 +607,7 @@ export default function DashboardPage() {
                   {t('lots.title')}
                 </CardTitle>
                 <CardDescription>
-                  {lotsStats.summary.totalLots} {t('lots.activeLots')} · {lotsStats.summary.totalAnimals} {t('lots.animals')}
+                  {lotsStats?.summary?.totalLots || 0} {t('lots.activeLots')} · {lotsStats?.summary?.totalAnimals || 0} {t('lots.animals')}
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm" onClick={() => router.push('/lots')}>
@@ -628,7 +628,7 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {lotsStats.lots.slice(0, 5).map((lot) => {
+                {(lotsStats?.lots || []).slice(0, 5).map((lot) => {
                   const gmqStatus = lot.growth.status;
                   const statusColors = gmqStatusColors[gmqStatus];
                   const progress = lot.weights.targetWeight
@@ -683,7 +683,7 @@ export default function DashboardPage() {
       {/* Row 4: Top/Bottom Rankings */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Top Performers */}
-        {rankings.top.length > 0 && (
+        {(rankings?.top?.length || 0) > 0 && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -694,7 +694,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {rankings.top.map((animal, index) => (
+                {(rankings?.top || []).map((animal, index) => (
                   <div
                     key={animal.animalId}
                     className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
@@ -721,7 +721,7 @@ export default function DashboardPage() {
         )}
 
         {/* Bottom Performers (need attention) */}
-        {rankings.bottom.length > 0 && (
+        {(rankings?.bottom?.length || 0) > 0 && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -732,7 +732,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {rankings.bottom.map((animal, index) => (
+                {(rankings?.bottom || []).map((animal, index) => (
                   <div
                     key={animal.animalId}
                     className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors"
@@ -740,7 +740,7 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white font-bold text-sm">
-                        {rankings.bottom.length - index}
+                        {(rankings?.bottom?.length || 0) - index}
                       </div>
                       <div>
                         <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
