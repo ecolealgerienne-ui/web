@@ -2520,6 +2520,7 @@
     "configure": "Configurer",
     "retry": "Réessayer",
     "loadError": "Erreur lors du chargement des données",
+    "lastUpdated": "Mis à jour",
     "kpis": {
       "totalAnimals": "Effectif total",
       "births": "Naissances",
@@ -2529,11 +2530,18 @@
       "vaccinations": "Vaccinations",
       "upcomingDays": "À venir (30j)",
       "thisMonth": "Ce mois",
+      "previousMonth": "Mois précédent",
+      "vsLastMonth": "vs mois dernier",
+      "upToDate": "à jour",
       "animals": "animaux"
     },
     "actions": {
       "title": "Actions requises",
-      "noActions": "Aucune action requise pour le moment",
+      "noActions": "Aucune action requise",
+      "urgent": "Urgent",
+      "thisWeek": "Cette semaine",
+      "opportunities": "Opportunités",
+      "viewAll": "Voir tout",
       "withdrawals": "Délais d'attente actifs",
       "withdrawalsDesc": "{count} traitement(s) avec délai en cours",
       "vaccinationsDue": "Vaccinations à effectuer",
@@ -2549,6 +2557,36 @@
       "noData": "Pas de données disponibles",
       "animals": "animaux",
       "herd": "Effectif"
+    },
+    "trends": {
+      "title": "Évolution du GMQ",
+      "subtitle": "Gain moyen quotidien sur 6 mois",
+      "gmq": "GMQ",
+      "target": "Objectif"
+    },
+    "lots": {
+      "title": "Performance des lots",
+      "activeLots": "lots actifs",
+      "animals": "animaux",
+      "viewAll": "Voir tous les lots",
+      "name": "Nom du lot",
+      "avgWeight": "Poids moy.",
+      "gmq": "GMQ",
+      "progress": "Progression",
+      "daysToTarget": "Jours restants"
+    },
+    "rankings": {
+      "topPerformers": "Meilleures performances",
+      "topSubtitle": "Top 5 GMQ sur 30 jours",
+      "needAttention": "À surveiller",
+      "bottomSubtitle": "GMQ les plus faibles sur 30 jours"
+    },
+    "health": {
+      "title": "Santé du troupeau",
+      "vaccinationsUpToDate": "Vaccinations à jour",
+      "activeWithdrawals": "Délais d'attente",
+      "treatmentsThisMonth": "Traitements ce mois",
+      "treatmentsCost": "Coût traitements"
     },
     "growth": {
       "title": "Statistiques de croissance",

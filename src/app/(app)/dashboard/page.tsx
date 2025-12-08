@@ -17,10 +17,20 @@ import {
   FileSpreadsheet,
   Loader2,
   ChevronRight,
+  Activity,
+  Target,
+  Users,
+  Award,
+  AlertCircle,
+  CheckCircle,
+  Info,
+  DollarSign,
+  Heart,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import {
   LineChart,
   Line,
@@ -29,27 +39,72 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { EmptyState, EmptyStateIllustration } from '@/components/ui/empty-state';
 import { useTranslations } from '@/lib/i18n';
-import { dashboardService } from '@/lib/services/dashboard.service';
-import { weighingsService } from '@/lib/services/weighings.service';
-import { treatmentsService } from '@/lib/services/treatments.service';
-import { lotsService } from '@/lib/services/lots.service';
+import {
+  dashboardService,
+  type DashboardStatsV2,
+  type DashboardActionsResponse,
+  type LotsStatsResponse,
+  type WeightRankingsResponse,
+  type WeightTrendsResponse,
+  type ActionItem,
+  type GmqStatus,
+  GMQ_THRESHOLDS,
+} from '@/lib/services/dashboard.service';
 import { logger } from '@/lib/utils/logger';
-import type { DashboardStats, HerdEvolution } from '@/lib/services/dashboard.service';
-import type { WeightStats } from '@/lib/types/weighing';
-import type { Treatment } from '@/lib/types/treatment';
-import type { Lot } from '@/lib/types/lot';
+import { cn } from '@/lib/utils';
 
 interface DashboardData {
-  stats: DashboardStats;
-  weightStats: WeightStats | null;
-  herdEvolution: HerdEvolution;
-  upcomingVaccinations: Treatment[];
-  activeWithdrawals: Treatment[];
-  lots: Lot[];
+  stats: DashboardStatsV2;
+  actions: DashboardActionsResponse;
+  lotsStats: LotsStatsResponse;
+  rankings: WeightRankingsResponse;
+  trends: WeightTrendsResponse;
 }
+
+// GMQ status color mapping
+const gmqStatusColors: Record<GmqStatus, { bg: string; text: string; badge: string }> = {
+  excellent: {
+    bg: 'bg-green-100 dark:bg-green-900',
+    text: 'text-green-600 dark:text-green-400',
+    badge: 'bg-green-500',
+  },
+  good: {
+    bg: 'bg-blue-100 dark:bg-blue-900',
+    text: 'text-blue-600 dark:text-blue-400',
+    badge: 'bg-blue-500',
+  },
+  warning: {
+    bg: 'bg-orange-100 dark:bg-orange-900',
+    text: 'text-orange-600 dark:text-orange-400',
+    badge: 'bg-orange-500',
+  },
+  critical: {
+    bg: 'bg-red-100 dark:bg-red-900',
+    text: 'text-red-600 dark:text-red-400',
+    badge: 'bg-red-500',
+  },
+};
+
+// Action priority colors
+const priorityColors: Record<string, { bg: string; border: string; icon: typeof AlertTriangle }> = {
+  critical: { bg: 'bg-red-50 dark:bg-red-950', border: 'border-red-200 dark:border-red-800', icon: AlertCircle },
+  high: { bg: 'bg-orange-50 dark:bg-orange-950', border: 'border-orange-200 dark:border-orange-800', icon: AlertTriangle },
+  medium: { bg: 'bg-yellow-50 dark:bg-yellow-950', border: 'border-yellow-200 dark:border-yellow-800', icon: Clock },
+  low: { bg: 'bg-blue-50 dark:bg-blue-950', border: 'border-blue-200 dark:border-blue-800', icon: Info },
+  success: { bg: 'bg-green-50 dark:bg-green-950', border: 'border-green-200 dark:border-green-800', icon: CheckCircle },
+};
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
@@ -65,48 +120,16 @@ export default function DashboardPage() {
         setLoading(true);
         setError(null);
 
-        // Fetch all data in parallel
-        const [
-          stats,
-          weightStats,
-          herdEvolution,
-          vaccinations,
-          treatments,
-          lots,
-        ] = await Promise.all([
-          dashboardService.getStats(),
-          weighingsService.getStats().catch(() => null),
-          dashboardService.getHerdEvolution('6months').catch(() => ({ data: [], period: '6months' })),
-          treatmentsService.getAll({ type: 'vaccination' }).catch(() => []),
-          treatmentsService.getAll().catch(() => []),
-          lotsService.getAll({ isActive: true }).catch(() => []),
+        // Fetch all Phase 2 data in parallel
+        const [stats, actions, lotsStats, rankings, trends] = await Promise.all([
+          dashboardService.getStatsV2(),
+          dashboardService.getActions(),
+          dashboardService.getLotsStats({ isActive: true }),
+          dashboardService.getWeightRankings({ limit: 5, period: '30d' }),
+          dashboardService.getWeightTrends({ period: '6months', groupBy: 'month' }),
         ]);
 
-        // Filter upcoming vaccinations (next 30 days)
-        const now = new Date();
-        const in30Days = new Date();
-        in30Days.setDate(now.getDate() + 30);
-
-        const upcomingVaccinations = vaccinations.filter((v) => {
-          if (!v.nextDueDate) return false;
-          const dueDate = new Date(v.nextDueDate);
-          return dueDate >= now && dueDate <= in30Days;
-        });
-
-        // Filter active withdrawals
-        const activeWithdrawals = treatments.filter((t) => {
-          if (!t.withdrawalEndDate) return false;
-          return new Date(t.withdrawalEndDate) > now;
-        });
-
-        setData({
-          stats,
-          weightStats,
-          herdEvolution,
-          upcomingVaccinations,
-          activeWithdrawals,
-          lots,
-        });
+        setData({ stats, actions, lotsStats, rankings, trends });
       } catch (err) {
         logger.error('Error fetching dashboard data', { error: err });
         setError(t('loadError'));
@@ -141,7 +164,7 @@ export default function DashboardPage() {
   }
 
   // Empty state - no animals
-  if (data?.stats.totalAnimals === 0) {
+  if (data?.stats.herd.totalAnimals === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <EmptyState
@@ -162,28 +185,65 @@ export default function DashboardPage() {
     );
   }
 
-  const { stats, weightStats, herdEvolution, upcomingVaccinations, activeWithdrawals, lots } = data!;
+  const { stats, actions, lotsStats, rankings, trends } = data!;
 
-  // Calculate mortality rate
-  const mortalityRate = stats.totalAnimals > 0
-    ? ((stats.deaths.count / (stats.totalAnimals + stats.deaths.count)) * 100).toFixed(1)
-    : '0';
-
-  // Prepare chart data
-  const chartData = herdEvolution.data.map((point) => ({
-    date: new Date(point.date).toLocaleDateString('fr-FR', { month: 'short' }),
-    count: point.count,
+  // Prepare GMQ trend chart data
+  const trendChartData = trends.dataPoints.map((point) => ({
+    date: point.date,
+    gmq: point.avgDailyGain,
+    weight: point.avgWeight,
+    animals: point.animalCount,
   }));
+
+  // Total actions count
+  const totalActions = actions.summary.urgent + actions.summary.thisWeek + actions.summary.planned;
+
+  // Render action item
+  const renderActionItem = (action: ActionItem) => {
+    const colors = priorityColors[action.priority] || priorityColors.low;
+    const Icon = colors.icon;
+
+    return (
+      <div
+        key={action.id}
+        className={cn(
+          'flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:shadow-sm transition-all',
+          colors.bg,
+          colors.border
+        )}
+        onClick={() => router.push(action.actionUrl)}
+      >
+        <div className="flex items-center gap-3">
+          <Icon className="h-5 w-5" />
+          <div>
+            <p className="text-sm font-medium">{action.title}</p>
+            <p className="text-xs text-muted-foreground">{action.description}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{action.count}</Badge>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground">{t('overview')}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('overview')}</p>
+        </div>
+        {stats.lastUpdated && (
+          <p className="text-xs text-muted-foreground">
+            {t('lastUpdated')}: {new Date(stats.lastUpdated).toLocaleString('fr-FR')}
+          </p>
+        )}
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards - Row 1: Herd & Movements */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {/* Total Animals */}
         <Card>
@@ -193,8 +253,17 @@ export default function DashboardPage() {
                 <Beef className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-3xl font-bold">{stats.totalAnimals}</p>
+                <p className="text-3xl font-bold">{stats.herd.totalAnimals}</p>
                 <p className="text-sm font-medium">{t('kpis.totalAnimals')}</p>
+                {stats.herd.changeThisMonth !== 0 && (
+                  <p className={cn(
+                    'text-xs flex items-center gap-1',
+                    stats.herd.changeThisMonth > 0 ? 'text-green-600' : 'text-red-600'
+                  )}>
+                    {stats.herd.changeThisMonth > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {stats.herd.changeThisMonth > 0 ? '+' : ''}{stats.herd.changeThisMonth} ({stats.herd.changePercentage.toFixed(1)}%)
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -208,25 +277,44 @@ export default function DashboardPage() {
                 <Plus className="h-6 w-6 text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="text-3xl font-bold">{stats.births.count}</p>
+                <p className="text-3xl font-bold">{stats.movements.thisMonth.births}</p>
                 <p className="text-sm font-medium">{t('kpis.births')}</p>
-                <p className="text-xs text-muted-foreground">{t('kpis.thisMonth')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('kpis.previousMonth')}: {stats.movements.previousMonth.births}
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Deaths */}
+        {/* Deaths & Mortality */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900">
-                <Skull className="h-6 w-6 text-red-600" />
+              <div className={cn(
+                'p-3 rounded-lg',
+                stats.mortality.rateStatus === 'good' ? 'bg-green-100 dark:bg-green-900' :
+                stats.mortality.rateStatus === 'warning' ? 'bg-orange-100 dark:bg-orange-900' :
+                'bg-red-100 dark:bg-red-900'
+              )}>
+                <Skull className={cn(
+                  'h-6 w-6',
+                  stats.mortality.rateStatus === 'good' ? 'text-green-600' :
+                  stats.mortality.rateStatus === 'warning' ? 'text-orange-600' :
+                  'text-red-600'
+                )} />
               </div>
               <div className="flex-1">
-                <p className="text-3xl font-bold">{stats.deaths.count}</p>
+                <p className="text-3xl font-bold">{stats.movements.thisMonth.deaths}</p>
                 <p className="text-sm font-medium">{t('kpis.deaths')}</p>
-                <p className="text-xs text-muted-foreground">{mortalityRate}% {t('kpis.mortality')}</p>
+                <p className={cn(
+                  'text-xs',
+                  stats.mortality.rateStatus === 'good' ? 'text-green-600' :
+                  stats.mortality.rateStatus === 'warning' ? 'text-orange-600' :
+                  'text-red-600'
+                )}>
+                  {stats.mortality.rate.toFixed(1)}% {t('kpis.mortality')}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -236,33 +324,40 @@ export default function DashboardPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-lg ${
-                (weightStats?.growth?.avgDailyGain ?? 0) >= 0
-                  ? 'bg-green-100 dark:bg-green-900'
-                  : 'bg-red-100 dark:bg-red-900'
-              }`}>
-                {(weightStats?.growth?.avgDailyGain ?? 0) >= 0 ? (
+              <div className={cn(
+                'p-3 rounded-lg',
+                stats.weights.avgDailyGainTrend === 'up' ? 'bg-green-100 dark:bg-green-900' :
+                stats.weights.avgDailyGainTrend === 'down' ? 'bg-red-100 dark:bg-red-900' :
+                'bg-muted'
+              )}>
+                {stats.weights.avgDailyGainTrend === 'up' ? (
                   <TrendingUp className="h-6 w-6 text-green-600" />
-                ) : (
+                ) : stats.weights.avgDailyGainTrend === 'down' ? (
                   <TrendingDown className="h-6 w-6 text-red-600" />
+                ) : (
+                  <Activity className="h-6 w-6 text-muted-foreground" />
                 )}
               </div>
               <div className="flex-1">
-                <p className={`text-3xl font-bold ${
-                  (weightStats?.growth?.avgDailyGain ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {weightStats?.growth?.avgDailyGain?.toFixed(2) ?? '-'} kg/j
+                <p className={cn(
+                  'text-3xl font-bold',
+                  dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'excellent' ? 'text-green-600' :
+                  dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'good' ? 'text-blue-600' :
+                  dashboardService.getGmqStatus(stats.weights.avgDailyGain) === 'warning' ? 'text-orange-600' :
+                  'text-red-600'
+                )}>
+                  {stats.weights.avgDailyGain.toFixed(2)} kg/j
                 </p>
                 <p className="text-sm font-medium">{t('kpis.avgDailyGain')}</p>
                 <p className="text-xs text-muted-foreground">
-                  {weightStats?.growth?.animalsWithGain ?? 0} {t('kpis.animals')}
+                  {stats.weights.avgDailyGainChange > 0 ? '+' : ''}{stats.weights.avgDailyGainChange.toFixed(1)}% {t('kpis.vsLastMonth')}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Vaccinations */}
+        {/* Health - Vaccinations */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -270,140 +365,107 @@ export default function DashboardPage() {
                 <Syringe className="h-6 w-6 text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="text-3xl font-bold">{upcomingVaccinations.length}</p>
+                <p className="text-3xl font-bold">{stats.health.vaccinationsDueThisWeek}</p>
                 <p className="text-sm font-medium">{t('kpis.vaccinations')}</p>
-                <p className="text-xs text-muted-foreground">{t('kpis.upcomingDays')}</p>
+                <p className="text-xs text-green-600">
+                  {stats.health.vaccinationsUpToDatePercentage.toFixed(0)}% {t('kpis.upToDate')}
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Actions Required + Herd Evolution */}
+      {/* Row 2: Actions Center + GMQ Trends Chart */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Actions Required */}
+        {/* Actions Center */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              {t('actions.title')}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                {t('actions.title')}
+              </CardTitle>
+              {totalActions > 0 && (
+                <Badge variant={actions.summary.urgent > 0 ? 'destructive' : 'secondary'}>
+                  {totalActions}
+                </Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* Active Withdrawals */}
-            {activeWithdrawals.length > 0 && (
-              <div
-                className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors"
-                onClick={() => router.push('/treatments?filter=withdrawal')}
-              >
-                <div className="flex items-center gap-3">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  <div>
-                    <p className="text-sm font-medium">{t('actions.withdrawals')}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t('actions.withdrawalsDesc', { count: activeWithdrawals.length })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-                    {activeWithdrawals.length}
-                  </Badge>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
+            {/* Urgent Actions */}
+            {actions.urgent.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">
+                  {t('actions.urgent')} ({actions.summary.urgent})
+                </p>
+                {actions.urgent.slice(0, 2).map(renderActionItem)}
               </div>
             )}
 
-            {/* Upcoming Vaccinations */}
-            {upcomingVaccinations.length > 0 && (
-              <div
-                className="flex items-center justify-between p-3 rounded-lg bg-blue-50 dark:bg-blue-950 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
-                onClick={() => router.push('/treatments?type=vaccination')}
-              >
-                <div className="flex items-center gap-3">
-                  <Syringe className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium">{t('actions.vaccinationsDue')}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t('actions.vaccinationsDueDesc')}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                    {upcomingVaccinations.length}
-                  </Badge>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
+            {/* This Week Actions */}
+            {actions.thisWeek.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide">
+                  {t('actions.thisWeek')} ({actions.summary.thisWeek})
+                </p>
+                {actions.thisWeek.slice(0, 2).map(renderActionItem)}
               </div>
             )}
 
-            {/* Weighings Stats */}
-            {weightStats && (
-              <div
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-                onClick={() => router.push('/weighings')}
-              >
-                <div className="flex items-center gap-3">
-                  <Scale className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">{t('actions.weighingsThisMonth')}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t('actions.weighingsRegistered', { count: weightStats.periodWeighings })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">
-                    {t('actions.totalWeighings', { count: weightStats.totalWeighings })}
-                  </Badge>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </div>
-            )}
-
-            {/* Active Lots */}
-            {lots.length > 0 && (
-              <div
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-                onClick={() => router.push('/lots')}
-              >
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">{t('actions.activeLots')}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t('actions.activeLotsDesc', { count: lots.length })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
+            {/* Opportunities */}
+            {actions.opportunities.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-green-600 uppercase tracking-wide">
+                  {t('actions.opportunities')} ({actions.summary.opportunities})
+                </p>
+                {actions.opportunities.slice(0, 1).map(renderActionItem)}
               </div>
             )}
 
             {/* No actions */}
-            {activeWithdrawals.length === 0 &&
-              upcomingVaccinations.length === 0 &&
-              !weightStats &&
-              lots.length === 0 && (
-                <div className="text-center py-6 text-muted-foreground">
-                  <p className="text-sm">{t('actions.noActions')}</p>
-                </div>
-              )}
+            {totalActions === 0 && (
+              <div className="text-center py-6 text-muted-foreground">
+                <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                <p className="text-sm">{t('actions.noActions')}</p>
+              </div>
+            )}
+
+            {/* View all link */}
+            {totalActions > 5 && (
+              <Button variant="ghost" className="w-full" onClick={() => router.push('/actions')}>
+                {t('actions.viewAll')}
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            )}
           </CardContent>
         </Card>
 
-        {/* Herd Evolution Chart */}
+        {/* GMQ Trends Chart */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">{t('chart.evolution')}</CardTitle>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">{t('trends.title')}</CardTitle>
+                <CardDescription>{t('trends.subtitle')}</CardDescription>
+              </div>
+              {trends.summary && (
+                <Badge variant={
+                  trends.summary.trend === 'increasing' ? 'default' :
+                  trends.summary.trend === 'decreasing' ? 'destructive' : 'secondary'
+                }>
+                  {trends.summary.trend === 'increasing' && <TrendingUp className="h-3 w-3 mr-1" />}
+                  {trends.summary.trend === 'decreasing' && <TrendingDown className="h-3 w-3 mr-1" />}
+                  {trends.summary.trendPercentage > 0 ? '+' : ''}{trends.summary.trendPercentage.toFixed(1)}%
+                </Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
-            {chartData.length > 0 ? (
+            {trendChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={chartData}>
+                <LineChart data={trendChartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis
                     dataKey="date"
@@ -413,6 +475,7 @@ export default function DashboardPage() {
                   <YAxis
                     className="text-xs"
                     tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    domain={[0, 'auto']}
                   />
                   <Tooltip
                     contentStyle={{
@@ -420,11 +483,22 @@ export default function DashboardPage() {
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.5rem',
                     }}
-                    formatter={(value: number) => [`${value} ${t('chart.animals')}`, t('chart.herd')]}
+                    formatter={(value: number, name: string) => [
+                      `${value.toFixed(2)} kg/j`,
+                      t('trends.gmq'),
+                    ]}
+                    labelFormatter={(label) => label}
+                  />
+                  {/* Threshold lines */}
+                  <ReferenceLine
+                    y={GMQ_THRESHOLDS.good}
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeDasharray="3 3"
+                    label={{ value: t('trends.target'), position: 'right', fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   />
                   <Line
                     type="monotone"
-                    dataKey="count"
+                    dataKey="gmq"
                     stroke="hsl(var(--primary))"
                     strokeWidth={2}
                     dot={{ fill: 'hsl(var(--primary))', r: 4 }}
@@ -441,64 +515,233 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Weight Stats Details */}
-      {weightStats && (
+      {/* Row 3: Lots Performance */}
+      {lotsStats.lots.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Scale className="h-5 w-5" />
-              {t('growth.title')}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  {t('lots.title')}
+                </CardTitle>
+                <CardDescription>
+                  {lotsStats.summary.totalLots} {t('lots.activeLots')} · {lotsStats.summary.totalAnimals} {t('lots.animals')}
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => router.push('/lots')}>
+                {t('lots.viewAll')}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-4">
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold">{weightStats.weights?.avg?.toFixed(1) ?? '-'} kg</p>
-                <p className="text-sm text-muted-foreground">{t('growth.avgWeight')}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold">{weightStats.weights?.min?.toFixed(1) ?? '-'} kg</p>
-                <p className="text-sm text-muted-foreground">{t('growth.minWeight')}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold">{weightStats.weights?.max?.toFixed(1) ?? '-'} kg</p>
-                <p className="text-sm text-muted-foreground">{t('growth.maxWeight')}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold">{weightStats.uniqueAnimals}</p>
-                <p className="text-sm text-muted-foreground">{t('growth.animalsWeighed')}</p>
-              </div>
-            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('lots.name')}</TableHead>
+                  <TableHead className="text-center">{t('lots.animals')}</TableHead>
+                  <TableHead className="text-center">{t('lots.avgWeight')}</TableHead>
+                  <TableHead className="text-center">{t('lots.gmq')}</TableHead>
+                  <TableHead className="text-center">{t('lots.progress')}</TableHead>
+                  <TableHead className="text-center">{t('lots.daysToTarget')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {lotsStats.lots.slice(0, 5).map((lot) => {
+                  const gmqStatus = lot.growth.status;
+                  const statusColors = gmqStatusColors[gmqStatus];
+                  const progress = lot.weights.targetWeight
+                    ? Math.min(100, (lot.weights.avgWeight / lot.weights.targetWeight) * 100)
+                    : 0;
+
+                  return (
+                    <TableRow
+                      key={lot.lotId}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => router.push(`/lots/${lot.lotId}`)}
+                    >
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{lot.name}</p>
+                          <p className="text-xs text-muted-foreground">{lot.type}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">{lot.animalCount}</TableCell>
+                      <TableCell className="text-center">{lot.weights.avgWeight.toFixed(0)} kg</TableCell>
+                      <TableCell className="text-center">
+                        <Badge className={cn('text-white', statusColors.badge)}>
+                          {lot.growth.avgDailyGain.toFixed(2)} kg/j
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {lot.weights.targetWeight ? (
+                          <div className="flex items-center gap-2">
+                            <Progress value={progress} className="h-2 w-16" />
+                            <span className="text-xs text-muted-foreground">{progress.toFixed(0)}%</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {lot.predictions.estimatedDaysToTarget ? (
+                          <span className="text-sm">{lot.predictions.estimatedDaysToTarget}j</span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       )}
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">{t('quickActions.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => router.push('/animals?action=new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('quickActions.newAnimal')}
-            </Button>
-            <Button variant="outline" onClick={() => router.push('/weighings')}>
-              <Scale className="h-4 w-4 mr-2" />
-              {t('quickActions.newWeighing')}
-            </Button>
-            <Button variant="outline" onClick={() => router.push('/treatments?action=new')}>
-              <Syringe className="h-4 w-4 mr-2" />
-              {t('quickActions.newTreatment')}
-            </Button>
-            <Button variant="outline" onClick={() => router.push('/lots')}>
-              <Calendar className="h-4 w-4 mr-2" />
-              {t('quickActions.manageLots')}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Row 4: Top/Bottom Rankings */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Top Performers */}
+        {rankings.top.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Award className="h-5 w-5 text-green-600" />
+                {t('rankings.topPerformers')}
+              </CardTitle>
+              <CardDescription>{t('rankings.topSubtitle')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {rankings.top.map((animal, index) => (
+                  <div
+                    key={animal.animalId}
+                    className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
+                    onClick={() => router.push(`/animals/${animal.animalId}`)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-green-600">{animal.avgDailyGain.toFixed(2)} kg/j</p>
+                      <p className="text-xs text-muted-foreground">+{animal.weightGain.toFixed(1)} kg</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Bottom Performers (need attention) */}
+        {rankings.bottom.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                {t('rankings.needAttention')}
+              </CardTitle>
+              <CardDescription>{t('rankings.bottomSubtitle')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {rankings.bottom.map((animal, index) => (
+                  <div
+                    key={animal.animalId}
+                    className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors"
+                    onClick={() => router.push(`/animals/${animal.animalId}`)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white font-bold text-sm">
+                        {rankings.bottom.length - index}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={cn(
+                        'text-lg font-bold',
+                        animal.avgDailyGain < GMQ_THRESHOLDS.critical ? 'text-red-600' : 'text-orange-600'
+                      )}>
+                        {animal.avgDailyGain.toFixed(2)} kg/j
+                      </p>
+                      <p className="text-xs text-muted-foreground">+{animal.weightGain.toFixed(1)} kg</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Row 5: Health Summary + Quick Actions */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Health Summary */}
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              {t('health.title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950">
+                <p className="text-2xl font-bold text-green-600">{stats.health.vaccinationsUpToDatePercentage.toFixed(0)}%</p>
+                <p className="text-sm text-muted-foreground">{t('health.vaccinationsUpToDate')}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-orange-50 dark:bg-orange-950">
+                <p className="text-2xl font-bold text-orange-600">{stats.health.activeWithdrawals}</p>
+                <p className="text-sm text-muted-foreground">{t('health.activeWithdrawals')}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950">
+                <p className="text-2xl font-bold text-blue-600">{stats.health.treatmentsThisMonth}</p>
+                <p className="text-sm text-muted-foreground">{t('health.treatmentsThisMonth')}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50">
+                <p className="text-2xl font-bold">{stats.health.treatmentsCost.toLocaleString('fr-FR')} DA</p>
+                <p className="text-sm text-muted-foreground">{t('health.treatmentsCost')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">{t('quickActions.title')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-2">
+              <Button variant="outline" className="justify-start" onClick={() => router.push('/animals?action=new')}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('quickActions.newAnimal')}
+              </Button>
+              <Button variant="outline" className="justify-start" onClick={() => router.push('/weighings')}>
+                <Scale className="h-4 w-4 mr-2" />
+                {t('quickActions.newWeighing')}
+              </Button>
+              <Button variant="outline" className="justify-start" onClick={() => router.push('/treatments?action=new')}>
+                <Syringe className="h-4 w-4 mr-2" />
+                {t('quickActions.newTreatment')}
+              </Button>
+              <Button variant="outline" className="justify-start" onClick={() => router.push('/lots')}>
+                <Calendar className="h-4 w-4 mr-2" />
+                {t('quickActions.manageLots')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
