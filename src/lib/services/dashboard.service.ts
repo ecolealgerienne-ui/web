@@ -7,7 +7,7 @@ import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 import { animalsService } from './animals.service';
 import { movementsService } from './movements.service';
-import { vaccinationsService } from './vaccinations.service';
+import { treatmentsService } from './treatments.service';
 
 
 export interface DashboardStats {
@@ -70,10 +70,10 @@ class DashboardService {
       // Get real data from multiple endpoints
       const { fromDate, toDate } = this.getThisMonthDates();
 
-      const [animals, movementStats, vaccinations] = await Promise.all([
+      const [animals, movementStats, treatments] = await Promise.all([
         animalsService.getAll(),
         movementsService.getStatistics(fromDate, toDate),
-        vaccinationsService.getAll(),
+        treatmentsService.getAll({ type: 'vaccination' }),
       ]);
 
       // Calculate real stats
@@ -97,9 +97,9 @@ class DashboardService {
       const futureDate = new Date();
       futureDate.setDate(now.getDate() + upcomingDays);
 
-      const upcomingVaccinations = vaccinations.filter((vacc) => {
-        if (!vacc.nextDueDate) return false;
-        const dueDate = new Date(vacc.nextDueDate);
+      const upcomingVaccinations = treatments.filter((treatment) => {
+        if (!treatment.nextDueDate) return false;
+        const dueDate = new Date(treatment.nextDueDate);
         return dueDate >= now && dueDate <= futureDate;
       }).length;
 
