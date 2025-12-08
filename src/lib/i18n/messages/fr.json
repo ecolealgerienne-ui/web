@@ -2092,13 +2092,15 @@
     },
     "type": {
       "treatment": "Traitement",
-      "vaccination": "Vaccination"
+      "vaccination": "Vaccination",
+      "undefined": "Non défini"
     },
     "status": {
       "scheduled": "Planifié",
       "in_progress": "En cours",
       "completed": "Terminé",
-      "cancelled": "Annulé"
+      "cancelled": "Annulé",
+      "undefined": "Non défini"
     },
     "stats": {
       "total": "Total des traitements",
