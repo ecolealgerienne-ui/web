@@ -49,8 +49,24 @@ export default function TreatmentsPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [treatmentToDelete, setTreatmentToDelete] = useState<Treatment | null>(null);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   // Fetch treatments
   const { treatments, loading, refresh } = useTreatments(filters);
+
+  // Paginated data
+  const paginatedTreatments = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    return treatments.slice(startIndex, startIndex + limit);
+  }, [treatments, page, limit]);
+
+  // Reset page when filters change
+  const handleFilterChange = (newFilters: TreatmentFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
 
   // Stats
   const stats = useMemo(() => {
@@ -263,7 +279,7 @@ export default function TreatmentsPage() {
               <Input
                 placeholder={t('filters.searchPlaceholder')}
                 value={filters.search || ''}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
                 className="pl-10"
               />
             </div>
@@ -273,7 +289,7 @@ export default function TreatmentsPage() {
             <label className="text-sm font-medium">{t('filters.type')}</label>
             <Select
               value={filters.type || 'all'}
-              onValueChange={(value) => setFilters({ ...filters, type: value as TreatmentType | 'all' })}
+              onValueChange={(value) => handleFilterChange({ ...filters, type: value as TreatmentType | 'all' })}
             >
               <SelectTrigger>
                 <SelectValue placeholder={t('filters.allTypes')} />
@@ -293,7 +309,7 @@ export default function TreatmentsPage() {
             <label className="text-sm font-medium">{t('filters.status')}</label>
             <Select
               value={filters.status || 'all'}
-              onValueChange={(value) => setFilters({ ...filters, status: value as TreatmentStatus | 'all' })}
+              onValueChange={(value) => handleFilterChange({ ...filters, status: value as TreatmentStatus | 'all' })}
             >
               <SelectTrigger>
                 <SelectValue placeholder={t('filters.allStatuses')} />
@@ -328,8 +344,16 @@ export default function TreatmentsPage() {
         </div>
       ) : (
         <DataTable
-          data={treatments}
+          data={paginatedTreatments}
           columns={columns}
+          totalItems={treatments.length}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
           onRowClick={handleView}
         />
       )}
