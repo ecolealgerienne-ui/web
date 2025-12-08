@@ -117,7 +117,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
             <Input
               id="description"
               placeholder="Description du lot..."
-              value={formData.description}
+              value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
           </div>
@@ -129,7 +129,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
               <Input
                 id="productName"
                 placeholder="Nom du produit..."
-                value={formData.productName}
+                value={formData.productName || ''}
                 onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
               />
             </div>
@@ -142,7 +142,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
               <Input
                 id="veterinarianName"
                 placeholder="Dr. Karim Benali"
-                value={formData.veterinarianName}
+                value={formData.veterinarianName || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, veterinarianName: e.target.value })
                 }
@@ -187,7 +187,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
                 <Input
                   id="buyer"
                   placeholder="Nom..."
-                  value={formData.type === 'sale' ? formData.buyerName : formData.sellerName}
+                  value={(formData.type === 'sale' ? formData.buyerName : formData.sellerName) || ''}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -207,7 +207,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
             <Input
               id="notes"
               placeholder="Notes supplémentaires..."
-              value={formData.notes}
+              value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             />
           </div>

@@ -1,33 +1,12 @@
 /**
  * Service pour la gestion des lots
+ * Endpoint: /api/v1/farms/{farmId}/lots
  */
 
 import { apiClient } from '@/lib/api/client';
-import { Lot, LotFilters, LotAnimal } from '@/lib/types/lot';
+import { Lot, LotFilters, LotAnimal, CreateLotDto, UpdateLotDto } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
-
-
-export interface CreateLotDto {
-  name: string;
-  type: string;
-  status?: string;
-  description?: string;
-  completed?: boolean;
-  completedAt?: string;
-  productId?: string;
-  productName?: string;
-  treatmentDate?: string;
-  withdrawalEndDate?: string;
-  veterinarianId?: string;
-  veterinarianName?: string;
-  priceTotal?: number;
-  buyerName?: string;
-  sellerName?: string;
-  notes?: string;
-}
-
-export interface UpdateLotDto extends Partial<CreateLotDto> {}
 
 class LotsService {
   private getBasePath(): string {
@@ -40,13 +19,15 @@ class LotsService {
       if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.search) params.append('search', filters.search);
-      if (filters?.completed !== undefined) params.append('completed', filters.completed.toString());
+      if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<{ data: Lot[] }>(url);
-      return response.data || [];
-    } catch (error: any) {
-      if (error.status === 404) {
+      const response = await apiClient.get<Lot[]>(url);
+      logger.info('Lots fetched', { count: (response || []).length });
+      return response || [];
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('No lots found (404)');
         return [];
       }
@@ -58,9 +39,11 @@ class LotsService {
   async getById(id: string): Promise<Lot | null> {
     try {
       const response = await apiClient.get<Lot>(`${this.getBasePath()}/${id}`);
+      logger.info('Lot fetched', { id });
       return response;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('Lot not found (404)', { id });
         return null;
       }
@@ -71,10 +54,12 @@ class LotsService {
 
   async getLotAnimals(lotId: string): Promise<LotAnimal[]> {
     try {
-      const response = await apiClient.get<{ data: LotAnimal[] }>(`${this.getBasePath()}/${lotId}/animals`);
-      return response.data || [];
-    } catch (error: any) {
-      if (error.status === 404) {
+      const response = await apiClient.get<LotAnimal[]>(`${this.getBasePath()}/${lotId}/animals`);
+      logger.info('Lot animals fetched', { lotId, count: (response || []).length });
+      return response || [];
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('No animals found for lot (404)', { lotId });
         return [];
       }
@@ -100,20 +85,30 @@ class LotsService {
     logger.info('Lot deleted', { id });
   }
 
+  async addAnimals(lotId: string, animalIds: string[]): Promise<void> {
+    await apiClient.post(`${this.getBasePath()}/${lotId}/animals`, { animalIds });
+    logger.info('Animals added to lot', { lotId, count: animalIds.length });
+  }
+
+  async removeAnimals(lotId: string, animalIds: string[]): Promise<void> {
+    await apiClient.delete(`${this.getBasePath()}/${lotId}/animals`, {
+      body: JSON.stringify({ animalIds }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    logger.info('Animals removed from lot', { lotId, count: animalIds.length });
+  }
+
+  // Convenience methods for single animal operations
   async addAnimal(lotId: string, animalId: string): Promise<void> {
-    // API expects animalIds (plural) as array
-    await apiClient.post(`${this.getBasePath()}/${lotId}/animals`, { animalIds: [animalId] });
-    logger.info('Animal added to lot', { lotId, animalId });
+    return this.addAnimals(lotId, [animalId]);
   }
 
   async removeAnimal(lotId: string, animalId: string): Promise<void> {
-    // API expects DELETE with body containing animalIds array
-    await apiClient.delete(`${this.getBasePath()}/${lotId}/animals`, {
-      body: JSON.stringify({ animalIds: [animalId] }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    logger.info('Animal removed from lot', { lotId, animalId });
+    return this.removeAnimals(lotId, [animalId]);
   }
 }
 
 export const lotsService = new LotsService();
+
+// Re-export types for convenience
+export type { CreateLotDto, UpdateLotDto };

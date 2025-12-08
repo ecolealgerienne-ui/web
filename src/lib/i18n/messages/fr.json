@@ -98,6 +98,13 @@
     },
     "optional": "optionnel",
     "loading": "Chargement...",
+    "labels": {
+      "animals": "animaux"
+    },
+    "navigation": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
     "admin": {
       "products": {
         "subtitle": "Gestion du catalogue des produits vétérinaires"
@@ -1951,6 +1958,8 @@
     "title": "Lots",
     "subtitle": "Gérez vos lots de traitement, vente et autres opérations groupées",
     "newLot": "Nouveau lot",
+    "editLot": "Modifier le lot",
+    "deleteLot": "Supprimer le lot",
     "noLots": "Aucun lot trouvé",
     "filters": {
       "search": "Recherche",
@@ -1980,12 +1989,175 @@
       "sale": "Vente",
       "slaughter": "Abattage",
       "purchase": "Achat",
-      "breeding": "Reproduction"
+      "breeding": "Reproduction",
+      "reproduction": "Reproduction",
+      "fattening": "Engraissement",
+      "quarantine": "Quarantaine",
+      "weaning": "Sevrage",
+      "gestation": "Gestation",
+      "lactation": "Lactation",
+      "birth": "Naissance",
+      "production": "Production",
+      "other": "Autre",
+      "undefined": "Non défini"
     },
     "status": {
       "open": "Ouvert",
       "closed": "Fermé",
-      "archived": "Archivé"
+      "archived": "Archivé",
+      "completed": "Terminé",
+      "undefined": "Non défini"
+    },
+    "sections": {
+      "general": "Informations générales",
+      "treatment": "Traitement / Vaccination",
+      "sale": "Vente",
+      "purchase": "Achat",
+      "animals": "Animaux du lot",
+      "notes": "Notes"
+    },
+    "fields": {
+      "name": "Nom du lot",
+      "type": "Type de lot",
+      "status": "Statut",
+      "description": "Description",
+      "notes": "Notes",
+      "productName": "Produit utilisé",
+      "veterinarianName": "Vétérinaire",
+      "treatmentDate": "Date d'intervention",
+      "withdrawalEndDate": "Fin du délai d'attente",
+      "buyerName": "Acheteur",
+      "sellerName": "Vendeur",
+      "priceTotal": "Montant total",
+      "animals": "Animaux",
+      "animalsInLot": "Animaux dans ce lot",
+      "createdAt": "Date de création"
+    },
+    "placeholders": {
+      "name": "Ex: Traitement antiparasitaire Mars 2025",
+      "selectType": "Sélectionner un type",
+      "selectStatus": "Sélectionner un statut",
+      "description": "Description du lot...",
+      "productName": "Nom du produit",
+      "veterinarianName": "Nom du vétérinaire",
+      "buyerName": "Nom de l'acheteur",
+      "sellerName": "Nom du vendeur",
+      "notes": "Notes supplémentaires...",
+      "officialId": "Numéro officiel de l'animal"
+    },
+    "actions": {
+      "addAnimal": "Ajouter un animal",
+      "searchAnimal": "Rechercher un animal",
+      "add": "Ajouter"
+    },
+    "messages": {
+      "addDescription": "Créez un nouveau lot pour grouper des animaux",
+      "editDescription": "Modifiez les informations du lot",
+      "created": "Lot créé avec succès",
+      "updated": "Lot modifié avec succès",
+      "deleted": "Lot supprimé avec succès",
+      "createError": "Erreur lors de la création du lot",
+      "updateError": "Erreur lors de la modification du lot",
+      "deleteError": "Erreur lors de la suppression du lot",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce lot ?",
+      "noAnimalsInLot": "Aucun animal dans ce lot",
+      "searching": "Recherche en cours...",
+      "animalNotFound": "Animal non trouvé",
+      "animalAlreadyInList": "Cet animal est déjà dans le lot",
+      "searchError": "Erreur lors de la recherche"
+    }
+  },
+  "treatments": {
+    "title": "Traitements",
+    "subtitle": "Gérez les traitements et vaccinations de vos animaux",
+    "newTreatment": "Nouveau traitement",
+    "editTreatment": "Modifier le traitement",
+    "noTreatments": "Aucun traitement trouvé",
+    "filters": {
+      "search": "Recherche",
+      "searchPlaceholder": "Rechercher un traitement...",
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "fromDate": "Date de début",
+      "toDate": "Date de fin"
+    },
+    "table": {
+      "animal": "Animal",
+      "type": "Type",
+      "product": "Produit",
+      "date": "Date",
+      "veterinarian": "Vétérinaire",
+      "status": "Statut"
+    },
+    "type": {
+      "treatment": "Traitement",
+      "vaccination": "Vaccination",
+      "undefined": "Non défini"
+    },
+    "status": {
+      "scheduled": "Planifié",
+      "in_progress": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "undefined": "Non défini"
+    },
+    "stats": {
+      "total": "Total des traitements",
+      "inProgress": "En cours",
+      "completed": "Terminés",
+      "totalCost": "Coût total"
+    },
+    "sections": {
+      "animal": "Animal",
+      "general": "Informations générales",
+      "veterinarian": "Vétérinaire",
+      "notes": "Coût et notes"
+    },
+    "fields": {
+      "animal": "Animal",
+      "type": "Type",
+      "status": "Statut",
+      "treatmentDate": "Date de traitement",
+      "withdrawalEndDate": "Fin du délai d'attente",
+      "productName": "Produit utilisé",
+      "dose": "Dosage",
+      "dosageUnit": "Unité de dosage",
+      "veterinarianName": "Nom du vétérinaire",
+      "duration": "Durée",
+      "diagnosis": "Diagnostic",
+      "cost": "Coût",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "searchAnimal": "Numéro officiel de l'animal",
+      "selectType": "Sélectionner un type",
+      "selectStatus": "Sélectionner un statut",
+      "productName": "Nom du produit",
+      "veterinarianName": "Nom du vétérinaire",
+      "diagnosis": "Description du diagnostic...",
+      "notes": "Notes supplémentaires..."
+    },
+    "labels": {
+      "days": "jours"
+    },
+    "messages": {
+      "created": "Traitement créé avec succès",
+      "updated": "Traitement modifié avec succès",
+      "deleted": "Traitement supprimé avec succès",
+      "createError": "Erreur lors de la création du traitement",
+      "updateError": "Erreur lors de la modification du traitement",
+      "deleteError": "Erreur lors de la suppression du traitement",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce traitement ?",
+      "noTreatmentsDescription": "Ajoutez votre premier traitement pour commencer le suivi sanitaire",
+      "addDescription": "Enregistrez un nouveau traitement ou vaccination",
+      "editDescription": "Modifiez les informations du traitement",
+      "searching": "Recherche en cours...",
+      "animalNotFound": "Animal non trouvé",
+      "searchError": "Erreur lors de la recherche"
     }
   },
   "animalEvents": {
@@ -2116,33 +2288,43 @@
     "title": "Pesées",
     "subtitle": "Suivez le poids et la croissance de vos animaux",
     "newWeighing": "Nouvelle pesée",
+    "viewWeighing": "Détails de la pesée",
+    "editWeighing": "Modifier la pesée",
     "stats": {
       "total": "Total pesées",
-      "routine": "Pesées de routine",
-      "medical": "Pesées médicales",
-      "avgWeight": "Poids moyen"
+      "uniqueAnimals": "Animaux pesés",
+      "latestAvgWeight": "Poids moyen actuel",
+      "avgDailyGain": "GMQ moyen"
     },
-    "filters": "Filtres",
-    "searchPlaceholder": "Rechercher...",
-    "purpose": {
-      "all": "Tous les types",
-      "routine": "Routine",
-      "medical": "Médical",
-      "sale": "Vente",
-      "growth_monitoring": "Suivi croissance",
-      "other": "Autre"
+    "filters": {
+      "title": "Filtres",
+      "search": "Recherche",
+      "fromDate": "Date début",
+      "toDate": "Date fin"
+    },
+    "searchPlaceholder": "Rechercher un animal...",
+    "source": {
+      "all": "Toutes les sources",
+      "manual": "Manuel",
+      "scale": "Balance",
+      "estimated": "Estimé",
+      "automatic": "Automatique",
+      "weighbridge": "Pont-bascule",
+      "undefined": "Non défini"
     },
     "list": "Liste des pesées",
     "loading": "Chargement...",
     "labels": {
       "animal": "Animal",
       "gain": "Gain",
-      "rate": "Taux",
+      "rate": "GMQ",
       "perDay": "kg/jour",
-      "method": "Méthode"
+      "current": "Actuel"
     },
     "messages": {
       "noWeighings": "Aucune pesée enregistrée",
+      "noWeighingsDescription": "Ajoutez votre première pesée pour commencer le suivi de croissance",
+      "noHistory": "Aucun historique de pesée pour cet animal",
       "createSuccess": "Pesée créée avec succès",
       "createError": "Erreur lors de la création de la pesée",
       "updateSuccess": "Pesée modifiée avec succès",
@@ -2151,40 +2333,31 @@
       "deleteError": "Erreur lors de la suppression de la pesée",
       "deleteConfirmTitle": "Confirmer la suppression",
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
-      "addDescription": "Ajouter une nouvelle pesée",
-      "editDescription": "Modifier la pesée"
+      "addDescription": "Enregistrez une nouvelle pesée",
+      "editDescription": "Modifiez les informations de la pesée"
     },
     "cancel": "Annuler",
     "delete": "Supprimer",
+    "actions": {
+      "addWeighing": "Ajouter une pesée"
+    },
     "sections": {
       "general": "Informations générales",
       "data": "Données de pesée",
-      "additional": "Informations complémentaires"
+      "notes": "Notes",
+      "history": "Historique des pesées"
     },
     "fields": {
-      "animalId": "ID Animal",
-      "weighingDate": "Date de pesée",
-      "weighingTime": "Heure",
-      "purpose": "Objectif",
+      "animalId": "Animal",
+      "weightDate": "Date de pesée",
+      "source": "Source",
       "weight": "Poids",
-      "unit": "Unité",
-      "method": "Méthode",
-      "location": "Emplacement",
-      "recordedBy": "Enregistré par",
-      "conditions": "Conditions",
       "notes": "Notes"
     },
     "placeholders": {
+      "animalId": "Numéro officiel de l'animal",
       "weight": "ex: 45.5",
-      "method": "ex: Balance électronique",
-      "location": "ex: Étable 1",
-      "recordedBy": "ex: Jean Dupont",
-      "conditions": "ex: À jeun",
       "notes": "Notes additionnelles..."
-    },
-    "units": {
-      "kg": "Kilogrammes (kg)",
-      "lbs": "Livres (lbs)"
     }
   },
   "reports": {
@@ -2345,12 +2518,103 @@
     "configAdvice": "Conseil : Complétez votre configuration",
     "configAdviceDescription": "Pour saisir vos soins plus rapidement, configurez vos vaccins et vétérinaires habituels.",
     "configure": "Configurer",
-    "totalAnimals": "Total Animaux",
-    "births": "Naissances",
-    "deaths": "Décès",
-    "vaccinations": "Vaccinations",
+    "retry": "Réessayer",
+    "loadError": "Erreur lors du chargement des données",
+    "lastUpdated": "Mis à jour",
+    "kpis": {
+      "totalAnimals": "Effectif total",
+      "births": "Naissances",
+      "deaths": "Décès",
+      "mortality": "mortalité",
+      "mortalityRate": "Taux mortalité",
+      "totalDeaths": "décès au total",
+      "avgDailyGain": "GMQ moyen",
+      "avgWeight": "Poids moy.",
+      "vaccinations": "Vaccinations",
+      "vaccinationCoverage": "Couverture vaccinale",
+      "upcomingDays": "À venir (30j)",
+      "thisMonth": "Ce mois",
+      "previousMonth": "Mois précédent",
+      "vsLastMonth": "vs mois dernier",
+      "upToDate": "à jour",
+      "activeWithdrawals": "délai(s) d'attente",
+      "noWithdrawals": "Aucun délai d'attente",
+      "animals": "animaux"
+    },
+    "actions": {
+      "title": "Actions requises",
+      "noActions": "Aucune action requise",
+      "urgent": "Urgent",
+      "thisWeek": "Cette semaine",
+      "opportunities": "Opportunités",
+      "viewAll": "Voir tout",
+      "withdrawals": "Délais d'attente actifs",
+      "withdrawalsDesc": "{count} traitement(s) avec délai en cours",
+      "vaccinationsDue": "Vaccinations à effectuer",
+      "vaccinationsDueDesc": "Dans les 30 prochains jours",
+      "weighingsThisMonth": "Pesées ce mois",
+      "weighingsRegistered": "{count} pesées enregistrées",
+      "totalWeighings": "{count} total",
+      "activeLots": "Lots actifs",
+      "activeLotsDesc": "{count} lot(s) en cours"
+    },
     "chart": {
-      "evolution": "Évolution du cheptel"
+      "evolution": "Évolution du cheptel",
+      "noData": "Pas de données disponibles",
+      "noDataHint": "Effectuez des pesées pour voir l'évolution du GMQ",
+      "animals": "animaux",
+      "herd": "Effectif"
+    },
+    "trends": {
+      "title": "Évolution du GMQ",
+      "subtitle": "Gain moyen quotidien sur 6 mois",
+      "gmq": "GMQ",
+      "target": "Objectif"
+    },
+    "period": {
+      "1month": "1 mois",
+      "3months": "3 mois",
+      "6months": "6 mois",
+      "1year": "1 an",
+      "2years": "2 ans"
+    },
+    "lots": {
+      "title": "Performance des lots",
+      "activeLots": "lots actifs",
+      "animals": "animaux",
+      "viewAll": "Voir tous les lots",
+      "name": "Nom du lot",
+      "avgWeight": "Poids moy.",
+      "gmq": "GMQ",
+      "progress": "Progression",
+      "daysToTarget": "Jours restants"
+    },
+    "rankings": {
+      "topPerformers": "Meilleures performances",
+      "topSubtitle": "Top 5 GMQ sur 30 jours",
+      "needAttention": "À surveiller",
+      "bottomSubtitle": "GMQ les plus faibles sur 30 jours"
+    },
+    "health": {
+      "title": "Santé du troupeau",
+      "vaccinationsUpToDate": "Vaccinations à jour",
+      "activeWithdrawals": "Délais d'attente",
+      "treatmentsThisMonth": "Traitements ce mois",
+      "treatmentsCost": "Coût traitements"
+    },
+    "growth": {
+      "title": "Statistiques de croissance",
+      "avgWeight": "Poids moyen",
+      "minWeight": "Poids min",
+      "maxWeight": "Poids max",
+      "animalsWeighed": "Animaux pesés"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "newAnimal": "Nouvel animal",
+      "newWeighing": "Nouvelle pesée",
+      "newTreatment": "Nouveau traitement",
+      "manageLots": "Gérer les lots"
     },
     "alerts": {
       "title": "Alertes"

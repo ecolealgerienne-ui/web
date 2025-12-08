@@ -1,24 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from '@/lib/i18n';
-import { Plus, Pencil, Trash2, Search, Scale } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,274 +15,399 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown } from 'lucide-react';
+import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
+import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
-import { WeighingFormDialog } from '@/components/weighings/weighing-form-dialog';
-import type { Weighing, CreateWeighingDto, UpdateWeighingDto, WeighingPurpose } from '@/lib/types/weighing';
-import { toast } from 'sonner';
+import { useToast } from '@/contexts/toast-context';
+import type { Weighing, WeightStats, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
+import { weighingsService } from '@/lib/services/weighings.service';
+import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+
+const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
 
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
-  const [search, setSearch] = useState('');
-  const [purposeFilter, setPurposeFilter] = useState<WeighingPurpose | 'all'>('all');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedWeighing, setSelectedWeighing] = useState<Weighing | undefined>();
+  const tc = useCommonTranslations();
+  const toast = useToast();
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  // Filters state (includes pagination for server-side)
+  const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({});
+
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
+  const [selectedWeighing, setSelectedWeighing] = useState<Weighing | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Delete dialog state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [weighingToDelete, setWeighingToDelete] = useState<Weighing | null>(null);
 
-  const { weighings, loading, createWeighing, updateWeighing, deleteWeighing } = useWeighings({
-    purpose: purposeFilter,
-    search,
+  // Stats state
+  const [stats, setStats] = useState<WeightStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Fetch weighings with server-side pagination
+  const { weighings, meta, loading, refresh } = useWeighings({
+    ...filters,
+    page,
+    limit,
   });
 
-  const handleCreate = async (data: CreateWeighingDto | UpdateWeighingDto) => {
+  // Fetch stats
+  const fetchStats = async () => {
+    setStatsLoading(true);
     try {
-      await createWeighing(data as CreateWeighingDto);
-      toast.success(t('messages.createSuccess'));
-      setIsFormOpen(false);
+      const data = await weighingsService.getStats({
+        fromDate: filters.fromDate,
+        toDate: filters.toDate,
+      });
+      setStats(data);
     } catch (error) {
-      toast.error(t('messages.createError'));
-      console.error('Error creating weighing:', error);
+      console.error('Error fetching stats:', error);
+    } finally {
+      setStatsLoading(false);
     }
   };
 
-  const handleUpdate = async (data: UpdateWeighingDto) => {
-    if (!selectedWeighing) return;
+  useEffect(() => {
+    fetchStats();
+  }, [filters.fromDate, filters.toDate]);
+
+  // Refresh stats after CRUD operations
+  const refreshAll = async () => {
+    await Promise.all([refresh(), fetchStats()]);
+  };
+
+  // Client-side search filtering (filters current page only)
+  const filteredWeighings = useMemo(() => {
+    if (!filters.search) return weighings;
+    const search = filters.search.toLowerCase();
+    return weighings.filter((w) => {
+      const animal = w.animal;
+      return (
+        animal?.officialNumber?.toLowerCase().includes(search) ||
+        animal?.visualId?.toLowerCase().includes(search) ||
+        w.animalId.toLowerCase().includes(search)
+      );
+    });
+  }, [weighings, filters.search]);
+
+  // Reset page when filters change
+  const handleFilterChange = (newFilters: QueryWeightDto & { search?: string }) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  // Handlers
+  const handleView = (weighing: Weighing) => {
+    setSelectedWeighing(weighing);
+    setDialogMode('view');
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (weighing: Weighing) => {
+    setSelectedWeighing(weighing);
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedWeighing(null);
+    setDialogMode('create');
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (weighing: Weighing) => {
+    setWeighingToDelete(weighing);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleSubmit = async (data: CreateWeightDto | UpdateWeightDto) => {
+    setIsSubmitting(true);
     try {
-      await updateWeighing(selectedWeighing.id, data);
-      toast.success(t('messages.updateSuccess'));
-      setIsFormOpen(false);
-      setSelectedWeighing(undefined);
+      if (dialogMode === 'create') {
+        await weighingsService.create(data as CreateWeightDto);
+        toast.success(t('messages.createSuccess'));
+      } else if (dialogMode === 'edit' && selectedWeighing) {
+        await weighingsService.update(selectedWeighing.id, data as UpdateWeightDto);
+        toast.success(t('messages.updateSuccess'));
+      }
+      setDialogOpen(false);
+      refreshAll();
     } catch (error) {
-      toast.error(t('messages.updateError'));
-      console.error('Error updating weighing:', error);
+      console.error('Error submitting weighing:', error);
+      toast.error(dialogMode === 'create' ? t('messages.createError') : t('messages.updateError'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDelete = async () => {
+  const confirmDelete = async () => {
     if (!weighingToDelete) return;
     try {
-      await deleteWeighing(weighingToDelete.id);
+      await weighingsService.delete(weighingToDelete.id);
       toast.success(t('messages.deleteSuccess'));
+      setIsDeleteDialogOpen(false);
       setWeighingToDelete(null);
+      refreshAll();
     } catch (error) {
-      toast.error(t('messages.deleteError'));
       console.error('Error deleting weighing:', error);
+      toast.error(t('messages.deleteError'));
     }
   };
 
-  const openEditDialog = (weighing: Weighing) => {
-    setSelectedWeighing(weighing);
-    setIsFormOpen(true);
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    if (!selectedWeighing) return;
+    const currentIndex = weighings.findIndex((w) => w.id === selectedWeighing.id);
+    const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex >= 0 && newIndex < weighings.length) {
+      setSelectedWeighing(weighings[newIndex]);
+    }
   };
 
-  const openCreateDialog = () => {
-    setSelectedWeighing(undefined);
-    setIsFormOpen(true);
-  };
-
-  // Calculate stats
-  const totalWeighings = weighings.length;
-  const routineWeighings = weighings.filter(w => w.purpose === 'routine').length;
-  const medicalWeighings = weighings.filter(w => w.purpose === 'medical').length;
-  const avgWeight = weighings.length > 0
-    ? weighings.reduce((sum, w) => sum + w.weight, 0) / weighings.length
-    : 0;
+  // Table columns
+  const columns: ColumnDef<Weighing>[] = [
+    {
+      key: 'animal',
+      header: t('labels.animal'),
+      render: (weighing: Weighing) => (
+        <span className="font-mono text-sm">
+          {weighing.animal?.officialNumber || weighing.animal?.visualId || weighing.animalId.slice(0, 8)}
+        </span>
+      ),
+    },
+    {
+      key: 'weight',
+      header: t('fields.weight'),
+      render: (weighing: Weighing) => (
+        <span className="text-sm font-medium">{weighing.weight} kg</span>
+      ),
+    },
+    {
+      key: 'weightDate',
+      header: t('fields.weightDate'),
+      render: (weighing: Weighing) => (
+        <span className="text-sm">
+          {new Date(weighing.weightDate).toLocaleDateString('fr-FR')}
+        </span>
+      ),
+    },
+    {
+      key: 'source',
+      header: t('fields.source'),
+      render: (weighing: Weighing) => (
+        <Badge variant="secondary">{t(`source.${weighing.source || 'undefined'}`)}</Badge>
+      ),
+    },
+    {
+      key: 'dailyGain',
+      header: t('labels.rate'),
+      render: (weighing: Weighing) => {
+        if (weighing.dailyGain === null || weighing.dailyGain === undefined) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const isPositive = weighing.dailyGain >= 0;
+        return (
+          <span className={`flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+            {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {weighing.dailyGain.toFixed(2)} kg/j
+          </span>
+        );
+      },
+    },
+    {
+      key: 'actions',
+      header: tc('table.actions'),
+      align: 'right',
+      render: (weighing: Weighing) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(weighing); }}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="sm" className="text-destructive" onClick={(e) => { e.stopPropagation(); handleDeleteClick(weighing); }}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button onClick={openCreateDialog}>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           {t('newWeighing')}
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.total')}</CardTitle>
-            <Scale className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalWeighings}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.routine')}</CardTitle>
-            <Scale className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{routineWeighings}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.medical')}</CardTitle>
-            <Scale className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{medicalWeighings}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('stats.avgWeight')}</CardTitle>
-            <Scale className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgWeight.toFixed(1)} kg</div>
-          </CardContent>
-        </Card>
+      {/* Stats */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <div className="rounded-lg border bg-card p-6">
+          <div className="flex items-center gap-2">
+            <Scale className="h-5 w-5 text-muted-foreground" />
+            <span className="text-2xl font-bold">
+              {statsLoading ? '-' : stats?.totalWeighings ?? 0}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-6">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-muted-foreground" />
+            <span className="text-2xl font-bold">
+              {statsLoading ? '-' : stats?.uniqueAnimals ?? 0}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stats.uniqueAnimals')}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-6">
+          <div className="text-2xl font-bold">
+            {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stats.latestAvgWeight')}</p>
+        </div>
+        <div className="rounded-lg border bg-card p-6">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-green-600" />
+            <span className="text-2xl font-bold text-green-600">
+              {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stats.avgDailyGain')}</p>
+        </div>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('filters')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('searchPlaceholder')}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.title')}</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t('searchPlaceholder')}
+                value={filters.search || ''}
+                onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
+                className="pl-10"
+              />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('fields.source')}</label>
             <Select
-              value={purposeFilter}
-              onValueChange={(value) => setPurposeFilter(value as WeighingPurpose | 'all')}
+              value={filters.source || 'all'}
+              onValueChange={(value) => handleFilterChange({
+                ...filters,
+                source: value === 'all' ? undefined : value as WeightSource
+              })}
             >
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
+              <SelectTrigger>
+                <SelectValue placeholder={t('source.all')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('purpose.all')}</SelectItem>
-                <SelectItem value="routine">{t('purpose.routine')}</SelectItem>
-                <SelectItem value="medical">{t('purpose.medical')}</SelectItem>
-                <SelectItem value="sale">{t('purpose.sale')}</SelectItem>
-                <SelectItem value="growth_monitoring">{t('purpose.growth_monitoring')}</SelectItem>
-                <SelectItem value="other">{t('purpose.other')}</SelectItem>
+                <SelectItem value="all">{t('source.all')}</SelectItem>
+                {WEIGHT_SOURCES.map((source) => (
+                  <SelectItem key={source} value={source}>
+                    {t(`source.${source}`)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Weighings List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('list')}</CardTitle>
-          <CardDescription>
-            {totalWeighings} pesée{totalWeighings !== 1 ? 's' : ''} au total
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {t('loading')}
-            </div>
-          ) : weighings.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {t('messages.noWeighings')}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {weighings.map((weighing) => (
-                <div
-                  key={weighing.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">
-                        {weighing.weight} {weighing.unit}
-                      </p>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                        {t(`purpose.${weighing.purpose}`)}
-                      </span>
-                    </div>
-                    <div className="flex gap-4 text-sm text-muted-foreground">
-                      <span>🗓️ {new Date(weighing.weighingDate).toLocaleDateString('fr-FR')}</span>
-                      {weighing.weighingTime && <span>🕐 {weighing.weighingTime}</span>}
-                      <span>🐄 {t('labels.animal')}: {weighing.animalId}</span>
-                    </div>
-                    {weighing.weightGain && (
-                      <div className="flex gap-4 mt-1 text-sm text-green-600">
-                        <span>📈 {t('labels.gain')}: {weighing.weightGain} kg</span>
-                        {weighing.growthRate && <span>📊 {t('labels.rate')}: {weighing.growthRate} {t('labels.perDay')}</span>}
-                      </div>
-                    )}
-                    {weighing.method && (
-                      <p className="text-sm text-muted-foreground">
-                        {t('labels.method')}: {weighing.method}
-                      </p>
-                    )}
-                    {weighing.notes && (
-                      <p className="text-sm text-muted-foreground italic">
-                        {weighing.notes}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => openEditDialog(weighing)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setWeighingToDelete(weighing)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
+            <Input
+              type="date"
+              value={filters.fromDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
+            />
+          </div>
 
-      {/* Form Dialog */}
-      <WeighingFormDialog
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        onSubmit={selectedWeighing ? handleUpdate : handleCreate}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.toDate')}</label>
+            <Input
+              type="date"
+              value={filters.toDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : meta.total === 0 ? (
+        <div className="rounded-lg border bg-card p-12 text-center">
+          <Scale className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">{t('messages.noWeighings')}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{t('messages.noWeighingsDescription')}</p>
+          <Button className="mt-4" onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newWeighing')}
+          </Button>
+        </div>
+      ) : (
+        <DataTable
+          data={filteredWeighings}
+          columns={columns}
+          totalItems={filters.search ? filteredWeighings.length : meta.total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
+          onRowClick={handleView}
+        />
+      )}
+
+      {/* Weight Dialog */}
+      <WeightDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
         weighing={selectedWeighing}
+        onSubmit={handleSubmit}
+        isLoading={isSubmitting}
+        weighings={weighings}
+        onNavigate={handleNavigate}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={!!weighingToDelete}
-        onOpenChange={() => setWeighingToDelete(null)}
-      >
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('messages.deleteConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('messages.deleteConfirmDescription')}
+              <br />
+              <span className="text-destructive font-medium">
+                {tc('messages.actionIrreversible')}
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              {t('delete')}
+            <AlertDialogCancel>{tc('actions.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {tc('actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -12,6 +12,13 @@ export function AnimalTreatmentsCard({
     (a, b) => new Date(b.treatmentDate).getTime() - new Date(a.treatmentDate).getTime()
   );
 
+  const getVeterinarianName = (treatment: Treatment) => {
+    if (treatment.veterinarian) {
+      return `Dr. ${treatment.veterinarian.lastName}`;
+    }
+    return treatment.veterinarianName || '-';
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -31,19 +38,19 @@ export function AnimalTreatmentsCard({
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium">{treatment.productName}</p>
+                    <p className="font-medium">{treatment.productName || '-'}</p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(treatment.treatmentDate).toLocaleDateString("fr-FR")} •{" "}
-                      {treatment.administeredBy}
+                      {getVeterinarianName(treatment)}
                     </p>
                   </div>
-                  {treatment.withdrawalPeriodMeat && (
+                  {treatment.withdrawalEndDate && (
                     <div className="text-right">
                       <p className="text-sm font-medium">
-                        Délai d&apos;attente
+                        Fin délai d&apos;attente
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {treatment.withdrawalPeriodMeat} jours
+                        {new Date(treatment.withdrawalEndDate).toLocaleDateString("fr-FR")}
                       </p>
                     </div>
                   )}
