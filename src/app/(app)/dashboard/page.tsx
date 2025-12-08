@@ -120,16 +120,82 @@ export default function DashboardPage() {
         setLoading(true);
         setError(null);
 
-        // Fetch all Phase 2 data in parallel
+        // Fetch all Phase 2 data in parallel with fallbacks
         const [stats, actions, lotsStats, rankings, trends] = await Promise.all([
-          dashboardService.getStatsV2(),
-          dashboardService.getActions(),
-          dashboardService.getLotsStats({ isActive: true }),
-          dashboardService.getWeightRankings({ limit: 5, period: '30d' }),
-          dashboardService.getWeightTrends({ period: '6months', groupBy: 'month' }),
+          dashboardService.getStatsV2().catch(() => null),
+          dashboardService.getActions().catch(() => null),
+          dashboardService.getLotsStats({ isActive: true }).catch(() => null),
+          dashboardService.getWeightRankings({ limit: 5, period: '30d' }).catch(() => null),
+          dashboardService.getWeightTrends({ period: '6months', groupBy: 'month' }).catch(() => null),
         ]);
 
-        setData({ stats, actions, lotsStats, rankings, trends });
+        // Default values for missing data
+        const defaultStats: DashboardStatsV2 = {
+          herd: { totalAnimals: 0, byStatus: {}, bySex: {}, changeThisMonth: 0, changePercentage: 0 },
+          movements: {
+            thisMonth: { births: 0, deaths: 0, sales: 0, purchases: 0 },
+            previousMonth: { births: 0, deaths: 0, sales: 0, purchases: 0 },
+          },
+          weights: { avgDailyGain: 0, avgDailyGainTrend: 'stable', avgDailyGainChange: 0, avgWeight: 0, totalWeighings: 0, weighingsThisMonth: 0 },
+          health: { vaccinationsUpToDate: 0, vaccinationsUpToDatePercentage: 0, vaccinationsDueThisWeek: 0, activeWithdrawals: 0, treatmentsThisMonth: 0, treatmentsCost: 0 },
+          mortality: { rate: 0, rateStatus: 'good', threshold: 5 },
+          alerts: { urgent: 0, warning: 0, info: 0 },
+          lastUpdated: new Date().toISOString(),
+        };
+
+        const defaultActions: DashboardActionsResponse = {
+          summary: { urgent: 0, thisWeek: 0, planned: 0, opportunities: 0 },
+          urgent: [],
+          thisWeek: [],
+          planned: [],
+          opportunities: [],
+        };
+
+        const defaultLotsStats: LotsStatsResponse = {
+          lots: [],
+          summary: { totalLots: 0, totalAnimals: 0, overallAvgDailyGain: 0 },
+        };
+
+        const defaultRankings: WeightRankingsResponse = {
+          period: '30d',
+          calculatedAt: new Date().toISOString(),
+          top: [],
+          bottom: [],
+          thresholds: GMQ_THRESHOLDS,
+        };
+
+        const defaultTrends: WeightTrendsResponse = {
+          period: '6months',
+          groupBy: 'month',
+          startDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+          endDate: new Date().toISOString(),
+          dataPoints: [],
+          summary: { overallAvgDailyGain: 0, trend: 'stable', trendPercentage: 0 },
+          benchmarks: { farmTarget: null, nationalAverage: null },
+        };
+
+        // Merge with defaults to ensure all properties exist
+        const mergedStats = stats ? {
+          ...defaultStats,
+          ...stats,
+          herd: { ...defaultStats.herd, ...(stats.herd || {}) },
+          movements: {
+            thisMonth: { ...defaultStats.movements.thisMonth, ...(stats.movements?.thisMonth || {}) },
+            previousMonth: { ...defaultStats.movements.previousMonth, ...(stats.movements?.previousMonth || {}) },
+          },
+          weights: { ...defaultStats.weights, ...(stats.weights || {}) },
+          health: { ...defaultStats.health, ...(stats.health || {}) },
+          mortality: { ...defaultStats.mortality, ...(stats.mortality || {}) },
+          alerts: { ...defaultStats.alerts, ...(stats.alerts || {}) },
+        } : defaultStats;
+
+        setData({
+          stats: mergedStats,
+          actions: actions || defaultActions,
+          lotsStats: lotsStats || defaultLotsStats,
+          rankings: rankings || defaultRankings,
+          trends: trends || defaultTrends,
+        });
       } catch (err) {
         logger.error('Error fetching dashboard data', { error: err });
         setError(t('loadError'));
