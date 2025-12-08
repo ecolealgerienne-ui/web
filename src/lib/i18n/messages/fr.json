@@ -2527,12 +2527,16 @@
       "deaths": "Décès",
       "mortality": "mortalité",
       "avgDailyGain": "GMQ moyen",
+      "avgWeight": "Poids moy.",
       "vaccinations": "Vaccinations",
+      "vaccinationCoverage": "Couverture vaccinale",
       "upcomingDays": "À venir (30j)",
       "thisMonth": "Ce mois",
       "previousMonth": "Mois précédent",
       "vsLastMonth": "vs mois dernier",
       "upToDate": "à jour",
+      "activeWithdrawals": "délai(s) d'attente",
+      "noWithdrawals": "Aucun délai d'attente",
       "animals": "animaux"
     },
     "actions": {

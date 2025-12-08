@@ -372,13 +372,24 @@ class DashboardService {
       // Backend returns: { success, data: { success, data: { herd, movements, ... } } }
       const raw = response?.data || response;
 
+      // Calculate real monthly change from movements
+      const thisMonthMovements = raw.movements?.thisMonth || {};
+      const monthlyChange = (thisMonthMovements.birth || 0) + (thisMonthMovements.purchase || 0)
+                          - (thisMonthMovements.death || 0) - (thisMonthMovements.sale || 0);
+
+      const totalAnimals = raw.herd?.alive ?? raw.herd?.total ?? 0;
+      // Calculate percentage only if we have previous data
+      const changePercentage = totalAnimals > 0 && monthlyChange !== 0
+        ? (monthlyChange / (totalAnimals - monthlyChange)) * 100
+        : 0;
+
       return {
         herd: {
-          totalAnimals: raw.herd?.alive ?? raw.herd?.total ?? 0,
+          totalAnimals,
           byStatus: raw.herd?.statusBreakdown ?? {},
           bySex: raw.herd?.genderBreakdown ?? {},
-          changeThisMonth: raw.herd?.monthlyChange ?? 0,
-          changePercentage: 0, // Not provided by backend
+          changeThisMonth: monthlyChange,
+          changePercentage,
         },
         movements: {
           thisMonth: {
@@ -396,7 +407,7 @@ class DashboardService {
         },
         weights: {
           avgDailyGain: raw.weights?.avgDailyGain ?? 0,
-          avgDailyGainTrend: raw.weights?.avgDailyGain > 0 ? 'up' : raw.weights?.avgDailyGain < 0 ? 'down' : 'stable',
+          avgDailyGainTrend: (raw.weights?.avgDailyGain ?? 0) > 0.01 ? 'up' : (raw.weights?.avgDailyGain ?? 0) < -0.01 ? 'down' : 'stable',
           avgDailyGainChange: 0, // Not provided by backend
           avgWeight: raw.weights?.avgWeight ?? 0,
           totalWeighings: raw.weights?.totalWeighings ?? 0,

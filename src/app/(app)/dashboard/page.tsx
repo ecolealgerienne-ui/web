@@ -431,7 +431,7 @@ export default function DashboardPage() {
                 </p>
                 <p className="text-sm font-medium">{t('kpis.avgDailyGain')}</p>
                 <p className="text-xs text-muted-foreground">
-                  {stats.weights.avgDailyGainChange > 0 ? '+' : ''}{stats.weights.avgDailyGainChange.toFixed(1)}% {t('kpis.vsLastMonth')}
+                  {t('kpis.avgWeight')}: {stats.weights.avgWeight.toFixed(0)} kg
                 </p>
               </div>
             </div>
@@ -442,14 +442,33 @@ export default function DashboardPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900">
-                <Syringe className="h-6 w-6 text-blue-600" />
+              <div className={cn(
+                'p-3 rounded-lg',
+                stats.health.vaccinationsUpToDatePercentage >= 90 ? 'bg-green-100 dark:bg-green-900' :
+                stats.health.vaccinationsUpToDatePercentage >= 70 ? 'bg-orange-100 dark:bg-orange-900' :
+                'bg-red-100 dark:bg-red-900'
+              )}>
+                <Syringe className={cn(
+                  'h-6 w-6',
+                  stats.health.vaccinationsUpToDatePercentage >= 90 ? 'text-green-600' :
+                  stats.health.vaccinationsUpToDatePercentage >= 70 ? 'text-orange-600' :
+                  'text-red-600'
+                )} />
               </div>
               <div className="flex-1">
-                <p className="text-3xl font-bold">{stats.health.vaccinationsDueThisWeek}</p>
-                <p className="text-sm font-medium">{t('kpis.vaccinations')}</p>
-                <p className="text-xs text-green-600">
-                  {stats.health.vaccinationsUpToDatePercentage.toFixed(0)}% {t('kpis.upToDate')}
+                <p className={cn(
+                  'text-3xl font-bold',
+                  stats.health.vaccinationsUpToDatePercentage >= 90 ? 'text-green-600' :
+                  stats.health.vaccinationsUpToDatePercentage >= 70 ? 'text-orange-600' :
+                  'text-red-600'
+                )}>
+                  {stats.health.vaccinationsUpToDatePercentage.toFixed(0)}%
+                </p>
+                <p className="text-sm font-medium">{t('kpis.vaccinationCoverage')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {stats.health.activeWithdrawals > 0
+                    ? `${stats.health.activeWithdrawals} ${t('kpis.activeWithdrawals')}`
+                    : t('kpis.noWithdrawals')}
                 </p>
               </div>
             </div>
