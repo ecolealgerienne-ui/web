@@ -431,20 +431,26 @@ export function WeightDialog({
             </div>
 
             {/* Growth info (view mode only) */}
-            {isViewMode && (weighing?.weightGain || weighing?.dailyGain) && (
-              <div className="grid grid-cols-2 gap-4 p-3 bg-green-50 dark:bg-green-950 rounded-md">
-                {weighing.weightGain && (
+            {isViewMode && weighing?.dailyGain !== undefined && weighing?.dailyGain !== null && (
+              <div className={`grid grid-cols-2 gap-4 p-3 rounded-md ${
+                weighing.dailyGain >= 0
+                  ? 'bg-green-50 dark:bg-green-950'
+                  : 'bg-red-50 dark:bg-red-950'
+              }`}>
+                {weighing.weightGain !== undefined && weighing.weightGain !== null && (
                   <div>
                     <p className="text-xs text-muted-foreground">{t('labels.gain')}</p>
-                    <p className="text-sm font-medium text-green-600">+{weighing.weightGain} kg</p>
+                    <p className={`text-sm font-medium ${weighing.weightGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {weighing.weightGain >= 0 ? '+' : ''}{weighing.weightGain} kg
+                    </p>
                   </div>
                 )}
-                {weighing.dailyGain && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('labels.rate')}</p>
-                    <p className="text-sm font-medium text-green-600">{weighing.dailyGain.toFixed(2)} kg/j</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-xs text-muted-foreground">{t('labels.rate')}</p>
+                  <p className={`text-sm font-medium ${weighing.dailyGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {weighing.dailyGain >= 0 ? '+' : ''}{weighing.dailyGain.toFixed(2)} kg/j
+                  </p>
+                </div>
               </div>
             )}
           </div>
