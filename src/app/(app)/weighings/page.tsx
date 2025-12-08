@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, Loader2, Eye, Edit, Trash2, Scale, Users, TrendingUp } from 'lucide-react';
+import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
@@ -210,27 +210,15 @@ export default function WeighingsPage() {
       ),
     },
     {
-      key: 'dailyGain',
-      header: t('labels.rate'),
-      render: (weighing: Weighing) => (
-        <span className={`text-sm ${weighing.dailyGain ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
-          {weighing.dailyGain ? `${weighing.dailyGain.toFixed(2)} kg/j` : '-'}
-        </span>
-      ),
-    },
-    {
       key: 'actions',
       header: tc('table.actions'),
       align: 'right',
       render: (weighing: Weighing) => (
         <div className="flex items-center justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => handleView(weighing)}>
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => handleEdit(weighing)}>
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(weighing); }}>
             <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(weighing)}>
+          <Button variant="ghost" size="sm" className="text-destructive" onClick={(e) => { e.stopPropagation(); handleDeleteClick(weighing); }}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

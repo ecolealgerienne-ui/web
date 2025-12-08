@@ -536,91 +536,93 @@ export function WeightDialog({
                     </Table>
                   </div>
 
-                  {/* Inline add form */}
-                  {showInlineAdd ? (
-                    <div className="border-t p-3 bg-muted/50 space-y-3">
-                      <div className="grid grid-cols-4 gap-2 items-end">
-                        <div className="space-y-1">
-                          <Label className="text-xs">{t('fields.weightDate')}</Label>
-                          <Input
-                            type="date"
-                            value={inlineFormData.weightDate}
-                            onChange={(e) => setInlineFormData((prev) => ({ ...prev, weightDate: e.target.value }))}
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">{t('fields.weight')} (kg)</Label>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            value={inlineFormData.weight || ''}
-                            onChange={(e) => setInlineFormData((prev) => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
-                            placeholder="0.0"
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">{t('fields.source')}</Label>
-                          <Select
-                            value={inlineFormData.source}
-                            onValueChange={(value) => setInlineFormData((prev) => ({ ...prev, source: value as WeightSource }))}
-                          >
-                            <SelectTrigger className="h-8 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {SOURCES.map((source) => (
-                                <SelectItem key={source} value={source}>
-                                  {t(`source.${source}`)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">{t('labels.rate')}</Label>
-                          <div className="h-8 flex items-center px-2 bg-background border rounded-md text-sm">
-                            {calculatedDailyGain !== null ? (
-                              <span className={calculatedDailyGain >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                {calculatedDailyGain >= 0 ? '+' : ''}{calculatedDailyGain.toFixed(2)} kg/j
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
+                  {/* Inline add form (edit mode only) */}
+                  {mode === 'edit' && (
+                    showInlineAdd ? (
+                      <div className="border-t p-3 bg-muted/50 space-y-3">
+                        <div className="grid grid-cols-4 gap-2 items-end">
+                          <div className="space-y-1">
+                            <Label className="text-xs">{t('fields.weightDate')}</Label>
+                            <Input
+                              type="date"
+                              value={inlineFormData.weightDate}
+                              onChange={(e) => setInlineFormData((prev) => ({ ...prev, weightDate: e.target.value }))}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">{t('fields.weight')} (kg)</Label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={inlineFormData.weight || ''}
+                              onChange={(e) => setInlineFormData((prev) => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
+                              placeholder="0.0"
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">{t('fields.source')}</Label>
+                            <Select
+                              value={inlineFormData.source}
+                              onValueChange={(value) => setInlineFormData((prev) => ({ ...prev, source: value as WeightSource }))}
+                            >
+                              <SelectTrigger className="h-8 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {SOURCES.map((source) => (
+                                  <SelectItem key={source} value={source}>
+                                    {t(`source.${source}`)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">{t('labels.rate')}</Label>
+                            <div className="h-8 flex items-center px-2 bg-background border rounded-md text-sm">
+                              {calculatedDailyGain !== null ? (
+                                <span className={calculatedDailyGain >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                  {calculatedDailyGain >= 0 ? '+' : ''}{calculatedDailyGain.toFixed(2)} kg/j
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowInlineAdd(false)}
+                          >
+                            {tc('actions.cancel')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleInlineAdd}
+                            disabled={isAddingInline || !inlineFormData.weight}
+                          >
+                            {isAddingInline && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                            {tc('actions.add')}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex justify-end gap-2">
+                    ) : (
+                      <div className="border-t p-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setShowInlineAdd(false)}
+                          className="w-full"
+                          onClick={() => setShowInlineAdd(true)}
                         >
-                          {tc('actions.cancel')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={handleInlineAdd}
-                          disabled={isAddingInline || !inlineFormData.weight}
-                        >
-                          {isAddingInline && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-                          {tc('actions.add')}
+                          <Plus className="h-4 w-4 mr-2" />
+                          {t('actions.addWeighing')}
                         </Button>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="border-t p-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => setShowInlineAdd(true)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {t('actions.addWeighing')}
-                      </Button>
-                    </div>
+                    )
                   )}
                 </div>
               )}
