@@ -87,8 +87,14 @@ class WeighingsService {
         : `${this.getBasePath()}/stats`;
 
       // apiClient auto-unwraps { success, data } -> returns data directly
-      const response = await apiClient.get<WeightStats>(url);
-      return response;
+      // Note: backend currently double-wraps response, handle both cases
+      const response = await apiClient.get<WeightStats | { success: boolean; data: WeightStats }>(url);
+
+      // Handle double-wrapped response from backend
+      if (response && 'success' in response && 'data' in response) {
+        return (response as { success: boolean; data: WeightStats }).data;
+      }
+      return response as WeightStats;
     } catch (error: any) {
       logger.error('Failed to fetch weight stats', error);
       throw error;
