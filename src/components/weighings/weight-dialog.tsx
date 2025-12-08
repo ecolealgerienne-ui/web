@@ -24,22 +24,21 @@ import {
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { animalsService } from '@/lib/services/animals.service';
-import type { Weighing, CreateWeighingDto, UpdateWeighingDto, WeighingPurpose, WeightUnit } from '@/lib/types/weighing';
+import type { Weighing, CreateWeightDto, UpdateWeightDto, WeightSource } from '@/lib/types/weighing';
 
 interface WeightDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: 'view' | 'edit' | 'create';
   weighing?: Weighing | null;
-  onSubmit: (data: CreateWeighingDto | UpdateWeighingDto) => Promise<void>;
+  onSubmit: (data: CreateWeightDto | UpdateWeightDto) => Promise<void>;
   isLoading?: boolean;
   // Navigation
   weighings?: Weighing[];
   onNavigate?: (direction: 'prev' | 'next') => void;
 }
 
-const PURPOSES: WeighingPurpose[] = ['routine', 'medical', 'sale', 'growth_monitoring', 'other'];
-const UNITS: WeightUnit[] = ['kg', 'lbs'];
+const SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
 
 export function WeightDialog({
   open,
@@ -55,12 +54,11 @@ export function WeightDialog({
   const tc = useCommonTranslations();
 
   // Form state
-  const [formData, setFormData] = useState<Partial<CreateWeighingDto>>({
+  const [formData, setFormData] = useState<Partial<CreateWeightDto>>({
     animalId: '',
     weight: 0,
-    unit: 'kg',
-    weighingDate: new Date().toISOString().split('T')[0],
-    purpose: 'routine',
+    weightDate: new Date().toISOString().split('T')[0],
+    source: 'manual',
   });
 
   // Animal search state
@@ -80,10 +78,8 @@ export function WeightDialog({
       setFormData({
         animalId: '',
         weight: 0,
-        unit: 'kg',
-        weighingDate: new Date().toISOString().split('T')[0],
-        purpose: 'routine',
-        method: '',
+        weightDate: new Date().toISOString().split('T')[0],
+        source: 'manual',
         notes: '',
       });
       setSelectedAnimal(null);
@@ -92,18 +88,14 @@ export function WeightDialog({
       setFormData({
         animalId: weighing.animalId,
         weight: weighing.weight,
-        unit: weighing.unit,
-        weighingDate: weighing.weighingDate,
-        purpose: weighing.purpose,
-        method: weighing.method || '',
-        location: weighing.location || '',
+        weightDate: weighing.weightDate,
+        source: weighing.source || 'manual',
         notes: weighing.notes || '',
-        conditions: weighing.conditions || '',
       });
       // Set animal display info if available
-      if ((weighing as any).animal) {
-        setSelectedAnimal((weighing as any).animal);
-        setAnimalSearch((weighing as any).animal.officialNumber || (weighing as any).animal.visualId || '');
+      if (weighing.animal) {
+        setSelectedAnimal(weighing.animal);
+        setAnimalSearch(weighing.animal.officialNumber || weighing.animal.visualId || '');
       }
     }
   }, [weighing, mode]);
@@ -148,14 +140,14 @@ export function WeightDialog({
   };
 
   const handleSubmit = async () => {
-    if (!formData.animalId || !formData.weight || !formData.weighingDate) {
+    if (!formData.animalId || !formData.weight || !formData.weightDate) {
       return;
     }
 
     // Clean empty strings
     const cleanData = Object.fromEntries(
       Object.entries(formData).filter(([, value]) => value !== '' && value !== null && value !== undefined)
-    ) as CreateWeighingDto | UpdateWeighingDto;
+    ) as CreateWeightDto | UpdateWeightDto;
 
     await onSubmit(cleanData);
   };
@@ -163,9 +155,9 @@ export function WeightDialog({
   const getDialogTitle = () => {
     switch (mode) {
       case 'view':
-        return t('viewWeighing') || 'Détails de la pesée';
+        return t('viewWeighing');
       case 'edit':
-        return t('editWeighing') || 'Modifier la pesée';
+        return t('editWeighing');
       case 'create':
         return t('newWeighing');
       default:
@@ -196,7 +188,7 @@ export function WeightDialog({
             </div>
             {isViewMode && weighing && (
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {weighing.weight} {weighing.unit}
+                {weighing.weight} kg
               </Badge>
             )}
           </div>
@@ -250,7 +242,7 @@ export function WeightDialog({
                         setFormData((prev) => ({ ...prev, animalId: '' }));
                       }
                     }}
-                    placeholder={t('placeholders.animalId') || 'Numéro officiel de l\'animal'}
+                    placeholder={t('placeholders.animalId')}
                   />
                   {isSearching && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -281,9 +273,9 @@ export function WeightDialog({
             <h3 className="text-sm font-medium border-b pb-2">{t('sections.data')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>{t('fields.weight')} *</Label>
+                <Label>{t('fields.weight')} * (kg)</Label>
                 {isViewMode ? (
-                  <p className="text-sm">{weighing?.weight} {weighing?.unit}</p>
+                  <p className="text-sm">{weighing?.weight} kg</p>
                 ) : (
                   <Input
                     type="number"
@@ -295,21 +287,21 @@ export function WeightDialog({
                 )}
               </div>
               <div className="space-y-2">
-                <Label>{t('fields.unit')}</Label>
+                <Label>{t('fields.source')}</Label>
                 {isViewMode ? (
-                  <p className="text-sm">{weighing?.unit}</p>
+                  <p className="text-sm">{weighing?.source ? t(`source.${weighing.source}`) : '-'}</p>
                 ) : (
                   <Select
-                    value={formData.unit}
-                    onValueChange={(value) => setFormData((prev) => ({ ...prev, unit: value as WeightUnit }))}
+                    value={formData.source}
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, source: value as WeightSource }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {UNITS.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {t(`units.${unit}`)}
+                      {SOURCES.map((source) => (
+                        <SelectItem key={source} value={source}>
+                          {t(`source.${source}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -317,45 +309,21 @@ export function WeightDialog({
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{t('fields.weighingDate')} *</Label>
-                {isViewMode ? (
-                  <p className="text-sm">{weighing?.weighingDate ? formatDate(weighing.weighingDate) : '-'}</p>
-                ) : (
-                  <Input
-                    type="date"
-                    value={formData.weighingDate || ''}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, weighingDate: e.target.value }))}
-                  />
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label>{t('fields.purpose')}</Label>
-                {isViewMode ? (
-                  <p className="text-sm">{weighing?.purpose ? t(`purpose.${weighing.purpose}`) : '-'}</p>
-                ) : (
-                  <Select
-                    value={formData.purpose}
-                    onValueChange={(value) => setFormData((prev) => ({ ...prev, purpose: value as WeighingPurpose }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PURPOSES.map((purpose) => (
-                        <SelectItem key={purpose} value={purpose}>
-                          {t(`purpose.${purpose}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label>{t('fields.weightDate')} *</Label>
+              {isViewMode ? (
+                <p className="text-sm">{weighing?.weightDate ? formatDate(weighing.weightDate) : '-'}</p>
+              ) : (
+                <Input
+                  type="date"
+                  value={formData.weightDate || ''}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, weightDate: e.target.value }))}
+                />
+              )}
             </div>
 
             {/* Growth info (view mode only) */}
-            {isViewMode && (weighing?.weightGain || weighing?.growthRate) && (
+            {isViewMode && (weighing?.weightGain || weighing?.dailyGain) && (
               <div className="grid grid-cols-2 gap-4 p-3 bg-green-50 dark:bg-green-950 rounded-md">
                 {weighing.weightGain && (
                   <div>
@@ -363,45 +331,19 @@ export function WeightDialog({
                     <p className="text-sm font-medium text-green-600">+{weighing.weightGain} kg</p>
                   </div>
                 )}
-                {weighing.growthRate && (
+                {weighing.dailyGain && (
                   <div>
                     <p className="text-xs text-muted-foreground">{t('labels.rate')}</p>
-                    <p className="text-sm font-medium text-green-600">{weighing.growthRate} {t('labels.perDay')}</p>
+                    <p className="text-sm font-medium text-green-600">{weighing.dailyGain.toFixed(2)} kg/j</p>
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* Section: Additional */}
+          {/* Section: Notes */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium border-b pb-2">{t('sections.additional')}</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{t('fields.method')}</Label>
-                {isViewMode ? (
-                  <p className="text-sm">{weighing?.method || '-'}</p>
-                ) : (
-                  <Input
-                    value={formData.method || ''}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, method: e.target.value }))}
-                    placeholder={t('placeholders.method')}
-                  />
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label>{t('fields.conditions')}</Label>
-                {isViewMode ? (
-                  <p className="text-sm">{weighing?.conditions || '-'}</p>
-                ) : (
-                  <Input
-                    value={formData.conditions || ''}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, conditions: e.target.value }))}
-                    placeholder={t('placeholders.conditions')}
-                  />
-                )}
-              </div>
-            </div>
+            <h3 className="text-sm font-medium border-b pb-2">{t('sections.notes')}</h3>
             <div className="space-y-2">
               <Label>{t('fields.notes')}</Label>
               {isViewMode ? (

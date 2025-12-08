@@ -2292,24 +2292,22 @@
     "editWeighing": "Modifier la pesée",
     "stats": {
       "total": "Total pesées",
-      "routine": "Pesées de routine",
-      "medical": "Pesées médicales",
+      "manual": "Pesées manuelles",
       "avgWeight": "Poids moyen",
-      "avgGrowthRate": "GMQ moyen"
+      "avgDailyGain": "GMQ moyen"
     },
     "filters": {
+      "title": "Filtres",
       "search": "Recherche",
       "fromDate": "Date début",
       "toDate": "Date fin"
     },
-    "searchPlaceholder": "Rechercher...",
-    "purpose": {
-      "all": "Tous les types",
-      "routine": "Routine",
-      "medical": "Médical",
-      "sale": "Vente",
-      "growth_monitoring": "Suivi croissance",
-      "other": "Autre",
+    "searchPlaceholder": "Rechercher un animal...",
+    "source": {
+      "all": "Toutes les sources",
+      "manual": "Manuel",
+      "scale": "Balance",
+      "estimated": "Estimé",
       "undefined": "Non défini"
     },
     "list": "Liste des pesées",
@@ -2318,8 +2316,7 @@
       "animal": "Animal",
       "gain": "Gain",
       "rate": "GMQ",
-      "perDay": "kg/jour",
-      "method": "Méthode"
+      "perDay": "kg/jour"
     },
     "messages": {
       "noWeighings": "Aucune pesée enregistrée",
@@ -2340,33 +2337,19 @@
     "sections": {
       "general": "Informations générales",
       "data": "Données de pesée",
-      "additional": "Informations complémentaires"
+      "notes": "Notes"
     },
     "fields": {
       "animalId": "Animal",
-      "weighingDate": "Date de pesée",
-      "weighingTime": "Heure",
-      "purpose": "Objectif",
+      "weightDate": "Date de pesée",
+      "source": "Source",
       "weight": "Poids",
-      "unit": "Unité",
-      "method": "Méthode",
-      "location": "Emplacement",
-      "recordedBy": "Enregistré par",
-      "conditions": "Conditions",
       "notes": "Notes"
     },
     "placeholders": {
       "animalId": "Numéro officiel de l'animal",
       "weight": "ex: 45.5",
-      "method": "ex: Balance électronique",
-      "location": "ex: Étable 1",
-      "recordedBy": "ex: Jean Dupont",
-      "conditions": "ex: À jeun",
       "notes": "Notes additionnelles..."
-    },
-    "units": {
-      "kg": "Kilogrammes (kg)",
-      "lbs": "Livres (lbs)"
     }
   },
   "reports": {

@@ -20,11 +20,11 @@ import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
 import { useToast } from '@/contexts/toast-context';
-import type { Weighing, WeighingFilters, WeighingPurpose, CreateWeighingDto, UpdateWeighingDto } from '@/lib/types/weighing';
+import type { Weighing, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { weighingsService } from '@/lib/services/weighings.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 
-const WEIGHING_PURPOSES: WeighingPurpose[] = ['routine', 'medical', 'sale', 'growth_monitoring', 'other'];
+const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
 
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
@@ -32,9 +32,8 @@ export default function WeighingsPage() {
   const toast = useToast();
 
   // Filters state
-  const [filters, setFilters] = useState<Partial<WeighingFilters>>({
+  const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({
     search: '',
-    purpose: 'all',
   });
 
   // Dialog state
@@ -54,14 +53,28 @@ export default function WeighingsPage() {
   // Fetch weighings
   const { weighings, loading, refresh } = useWeighings(filters);
 
+  // Client-side search filtering
+  const filteredWeighings = useMemo(() => {
+    if (!filters.search) return weighings;
+    const search = filters.search.toLowerCase();
+    return weighings.filter((w) => {
+      const animal = w.animal;
+      return (
+        animal?.officialNumber?.toLowerCase().includes(search) ||
+        animal?.visualId?.toLowerCase().includes(search) ||
+        w.animalId.toLowerCase().includes(search)
+      );
+    });
+  }, [weighings, filters.search]);
+
   // Paginated data
   const paginatedWeighings = useMemo(() => {
     const startIndex = (page - 1) * limit;
-    return weighings.slice(startIndex, startIndex + limit);
-  }, [weighings, page, limit]);
+    return filteredWeighings.slice(startIndex, startIndex + limit);
+  }, [filteredWeighings, page, limit]);
 
   // Reset page when filters change
-  const handleFilterChange = (newFilters: Partial<WeighingFilters>) => {
+  const handleFilterChange = (newFilters: QueryWeightDto & { search?: string }) => {
     setFilters(newFilters);
     setPage(1);
   };
@@ -71,17 +84,17 @@ export default function WeighingsPage() {
     const totalWeight = weighings.reduce((sum, w) => sum + w.weight, 0);
     const avgWeight = weighings.length > 0 ? totalWeight / weighings.length : 0;
 
-    // Calculate average daily gain if we have growth rate data
-    const weighingsWithGrowth = weighings.filter((w) => w.growthRate);
-    const avgGrowthRate = weighingsWithGrowth.length > 0
-      ? weighingsWithGrowth.reduce((sum, w) => sum + (w.growthRate || 0), 0) / weighingsWithGrowth.length
+    // Calculate average daily gain if we have dailyGain data
+    const weighingsWithGrowth = weighings.filter((w) => w.dailyGain);
+    const avgDailyGain = weighingsWithGrowth.length > 0
+      ? weighingsWithGrowth.reduce((sum, w) => sum + (w.dailyGain || 0), 0) / weighingsWithGrowth.length
       : 0;
 
     return {
       total: weighings.length,
-      routine: weighings.filter((w) => w.purpose === 'routine').length,
+      manual: weighings.filter((w) => w.source === 'manual').length,
       avgWeight: avgWeight.toFixed(1),
-      avgGrowthRate: avgGrowthRate.toFixed(2),
+      avgDailyGain: avgDailyGain.toFixed(2),
     };
   }, [weighings]);
 
@@ -109,14 +122,14 @@ export default function WeighingsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (data: CreateWeighingDto | UpdateWeighingDto) => {
+  const handleSubmit = async (data: CreateWeightDto | UpdateWeightDto) => {
     setIsSubmitting(true);
     try {
       if (dialogMode === 'create') {
-        await weighingsService.create(data as CreateWeighingDto);
+        await weighingsService.create(data as CreateWeightDto);
         toast.success(t('messages.createSuccess'));
       } else if (dialogMode === 'edit' && selectedWeighing) {
-        await weighingsService.update(selectedWeighing.id, data as UpdateWeighingDto);
+        await weighingsService.update(selectedWeighing.id, data as UpdateWeightDto);
         toast.success(t('messages.updateSuccess'));
       }
       setDialogOpen(false);
@@ -159,7 +172,7 @@ export default function WeighingsPage() {
       header: t('labels.animal'),
       render: (weighing: Weighing) => (
         <span className="font-mono text-sm">
-          {(weighing as any).animal?.officialNumber || (weighing as any).animal?.visualId || weighing.animalId.slice(0, 8)}
+          {weighing.animal?.officialNumber || weighing.animal?.visualId || weighing.animalId.slice(0, 8)}
         </span>
       ),
     },
@@ -167,31 +180,31 @@ export default function WeighingsPage() {
       key: 'weight',
       header: t('fields.weight'),
       render: (weighing: Weighing) => (
-        <span className="text-sm font-medium">{weighing.weight} {weighing.unit}</span>
+        <span className="text-sm font-medium">{weighing.weight} kg</span>
       ),
     },
     {
-      key: 'weighingDate',
-      header: t('fields.weighingDate'),
+      key: 'weightDate',
+      header: t('fields.weightDate'),
       render: (weighing: Weighing) => (
         <span className="text-sm">
-          {new Date(weighing.weighingDate).toLocaleDateString('fr-FR')}
+          {new Date(weighing.weightDate).toLocaleDateString('fr-FR')}
         </span>
       ),
     },
     {
-      key: 'purpose',
-      header: t('fields.purpose'),
+      key: 'source',
+      header: t('fields.source'),
       render: (weighing: Weighing) => (
-        <Badge variant="secondary">{t(`purpose.${weighing.purpose}`)}</Badge>
+        <Badge variant="secondary">{t(`source.${weighing.source || 'undefined'}`)}</Badge>
       ),
     },
     {
-      key: 'growthRate',
+      key: 'dailyGain',
       header: t('labels.rate'),
       render: (weighing: Weighing) => (
-        <span className={`text-sm ${weighing.growthRate ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
-          {weighing.growthRate ? `${weighing.growthRate} kg/j` : '-'}
+        <span className={`text-sm ${weighing.dailyGain ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
+          {weighing.dailyGain ? `${weighing.dailyGain.toFixed(2)} kg/j` : '-'}
         </span>
       ),
     },
@@ -239,16 +252,16 @@ export default function WeighingsPage() {
           <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold">{stats.routine}</div>
-          <p className="text-xs text-muted-foreground">{t('stats.routine')}</p>
+          <div className="text-2xl font-bold">{stats.manual}</div>
+          <p className="text-xs text-muted-foreground">{t('stats.manual')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="text-2xl font-bold">{stats.avgWeight} kg</div>
           <p className="text-xs text-muted-foreground">{t('stats.avgWeight')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold text-green-600">{stats.avgGrowthRate} kg/j</div>
-          <p className="text-xs text-muted-foreground">{t('stats.avgGrowthRate') || 'GMQ moyen'}</p>
+          <div className="text-2xl font-bold text-green-600">{stats.avgDailyGain} kg/j</div>
+          <p className="text-xs text-muted-foreground">{t('stats.avgDailyGain')}</p>
         </div>
       </div>
 
@@ -256,7 +269,7 @@ export default function WeighingsPage() {
       <div className="rounded-lg border bg-card p-6 space-y-4">
         <div className="grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters') || 'Filtres'}</label>
+            <label className="text-sm font-medium">{t('filters.title')}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -269,19 +282,22 @@ export default function WeighingsPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('fields.purpose')}</label>
+            <label className="text-sm font-medium">{t('fields.source')}</label>
             <Select
-              value={filters.purpose || 'all'}
-              onValueChange={(value) => handleFilterChange({ ...filters, purpose: value as WeighingPurpose | 'all' })}
+              value={filters.source || 'all'}
+              onValueChange={(value) => handleFilterChange({
+                ...filters,
+                source: value === 'all' ? undefined : value as WeightSource
+              })}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t('purpose.all')} />
+                <SelectValue placeholder={t('source.all')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('purpose.all')}</SelectItem>
-                {WEIGHING_PURPOSES.map((purpose) => (
-                  <SelectItem key={purpose} value={purpose}>
-                    {t(`purpose.${purpose}`)}
+                <SelectItem value="all">{t('source.all')}</SelectItem>
+                {WEIGHT_SOURCES.map((source) => (
+                  <SelectItem key={source} value={source}>
+                    {t(`source.${source}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -289,20 +305,20 @@ export default function WeighingsPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters.fromDate') || 'Date début'}</label>
+            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
             <Input
               type="date"
-              value={filters.dateFrom || ''}
-              onChange={(e) => handleFilterChange({ ...filters, dateFrom: e.target.value || undefined })}
+              value={filters.fromDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters.toDate') || 'Date fin'}</label>
+            <label className="text-sm font-medium">{t('filters.toDate')}</label>
             <Input
               type="date"
-              value={filters.dateTo || ''}
-              onChange={(e) => handleFilterChange({ ...filters, dateTo: e.target.value || undefined })}
+              value={filters.toDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
             />
           </div>
         </div>
@@ -313,11 +329,11 @@ export default function WeighingsPage() {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      ) : weighings.length === 0 ? (
+      ) : filteredWeighings.length === 0 ? (
         <div className="rounded-lg border bg-card p-12 text-center">
           <Scale className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-lg font-medium">{t('messages.noWeighings')}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{t('messages.noWeighingsDescription') || 'Ajoutez votre première pesée pour commencer le suivi'}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t('messages.noWeighingsDescription')}</p>
           <Button className="mt-4" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             {t('newWeighing')}
@@ -327,7 +343,7 @@ export default function WeighingsPage() {
         <DataTable
           data={paginatedWeighings}
           columns={columns}
-          totalItems={weighings.length}
+          totalItems={filteredWeighings.length}
           page={page}
           limit={limit}
           onPageChange={setPage}

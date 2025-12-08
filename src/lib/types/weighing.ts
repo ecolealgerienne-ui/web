@@ -1,7 +1,6 @@
-// Types pour les pesées basés sur les specs backend
+// Types pour les pesées basés sur l'API backend
 
-export type WeighingPurpose = 'routine' | 'medical' | 'sale' | 'growth_monitoring' | 'other';
-export type WeightUnit = 'kg' | 'lbs';
+export type WeightSource = 'manual' | 'scale' | 'estimated';
 
 export interface Weighing {
   id: string;
@@ -10,85 +9,81 @@ export interface Weighing {
 
   // Données de pesée
   weight: number;
-  unit: WeightUnit;
-  weighingDate: string;
-  weighingTime?: string;
-
-  // Contexte
-  purpose: WeighingPurpose;
-  method?: string; // balance électronique, bascule, ruban
-  location?: string;
-
-  // Suivi de croissance
-  previousWeight?: number;
-  weightGain?: number; // kg
-  growthRate?: number; // kg/jour
-  age?: number; // jours
-
-  // Métadonnées
-  recordedBy?: string;
+  weightDate: string;
+  source?: WeightSource;
   notes?: string;
-  conditions?: string; // à jeun, après repas, etc.
 
-  // Traçabilité
-  createdAt: string;
-  updatedAt: string;
-  version: number;
-}
+  // Suivi de croissance (calculé par l'API history)
+  previousWeight?: number;
+  weightGain?: number;
+  dailyGain?: number; // kg/jour
 
-export interface WeighingWithDetails extends Weighing {
-  animalDetails?: {
+  // Animal (inclus dans la réponse)
+  animal?: {
     id: string;
     visualId?: string;
+    officialNumber?: string;
     currentEid?: string;
-    speciesId?: string;
-    birthDate?: string;
   };
+
+  // Traçabilité
+  created_at?: string;
+  updated_at?: string;
+  version?: number;
 }
 
-export interface WeighingFilters {
-  search: string;
-  purpose: WeighingPurpose | 'all';
-  dateFrom?: string;
-  dateTo?: string;
-  minWeight?: number;
-  maxWeight?: number;
-  animalId?: string;
-  source?: string;
-}
-
-export const WEIGHING_PURPOSE_LABELS: Record<WeighingPurpose, string> = {
-  routine: 'Routine',
-  medical: 'Médical',
-  sale: 'Vente',
-  growth_monitoring: 'Suivi croissance',
-  other: 'Autre',
-};
-
-export interface CreateWeighingDto {
+export interface WeightHistory {
+  id: string;
   animalId: string;
   weight: number;
-  unit?: WeightUnit;
-  weighingDate: string;
-  weighingTime?: string;
-  purpose: WeighingPurpose;
-  method?: string;
-  location?: string;
-  recordedBy?: string;
+  weightDate: string;
+  source?: WeightSource;
   notes?: string;
-  conditions?: string;
+  dailyGain?: number; // Calculé par l'API
 }
 
-export interface UpdateWeighingDto {
+export interface QueryWeightDto {
+  animalId?: string;
+  source?: WeightSource;
+  fromDate?: string;
+  toDate?: string;
+  page?: number;
+  limit?: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+}
+
+export interface CreateWeightDto {
+  id?: string;
+  animalId: string;
+  weight: number;
+  weightDate: string;
+  source?: WeightSource;
+  notes?: string;
+  farmId?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UpdateWeightDto {
   animalId?: string;
   weight?: number;
-  unit?: WeightUnit;
-  weighingDate?: string;
-  weighingTime?: string;
-  purpose?: WeighingPurpose;
-  method?: string;
-  location?: string;
-  recordedBy?: string;
+  weightDate?: string;
+  source?: WeightSource;
   notes?: string;
-  conditions?: string;
+  version?: number;
+  farmId?: string;
+  created_at?: string;
+  updated_at?: string;
 }
+
+export const WEIGHT_SOURCE_LABELS: Record<WeightSource, string> = {
+  manual: 'Manuel',
+  scale: 'Balance',
+  estimated: 'Estimé',
+};
+
+// Legacy aliases for compatibility
+export type WeighingFilters = QueryWeightDto & { search?: string };
+export type CreateWeighingDto = CreateWeightDto;
+export type UpdateWeighingDto = UpdateWeightDto;

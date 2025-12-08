@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { weighingsService } from '@/lib/services/weighings.service';
-import type { Weighing, WeighingFilters, CreateWeighingDto, UpdateWeighingDto } from '@/lib/types/weighing';
+import type { Weighing, QueryWeightDto, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { logger } from '@/lib/utils/logger';
 
 interface UseWeighingsResult {
@@ -8,36 +8,36 @@ interface UseWeighingsResult {
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
-  createWeighing: (data: CreateWeighingDto) => Promise<Weighing>;
-  updateWeighing: (id: string, data: UpdateWeighingDto) => Promise<Weighing>;
+  createWeighing: (data: CreateWeightDto) => Promise<Weighing>;
+  updateWeighing: (id: string, data: UpdateWeightDto) => Promise<Weighing>;
   deleteWeighing: (id: string) => Promise<void>;
 }
 
-export function useWeighings(filters?: Partial<WeighingFilters>): UseWeighingsResult {
+export function useWeighings(filters?: QueryWeightDto & { search?: string }): UseWeighingsResult {
   const [weighings, setWeighings] = useState<Weighing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
-  const filterSearch = filters?.search;
-  const filterPurpose = filters?.purpose;
-  const filterDateFrom = filters?.dateFrom;
-  const filterDateTo = filters?.dateTo;
-  const filterMinWeight = filters?.minWeight;
-  const filterMaxWeight = filters?.maxWeight;
+  // Extract filter values to avoid unnecessary re-renders
   const filterAnimalId = filters?.animalId;
   const filterSource = filters?.source;
+  const filterFromDate = filters?.fromDate;
+  const filterToDate = filters?.toDate;
+  const filterPage = filters?.page;
+  const filterLimit = filters?.limit;
+  const filterSort = filters?.sort;
+  const filterOrder = filters?.order;
 
   const memoizedFilters = useMemo(() => ({
-    search: filterSearch,
-    purpose: filterPurpose,
-    dateFrom: filterDateFrom,
-    dateTo: filterDateTo,
-    minWeight: filterMinWeight,
-    maxWeight: filterMaxWeight,
     animalId: filterAnimalId,
     source: filterSource,
-  }), [filterSearch, filterPurpose, filterDateFrom, filterDateTo, filterMinWeight, filterMaxWeight, filterAnimalId, filterSource]);
+    fromDate: filterFromDate,
+    toDate: filterToDate,
+    page: filterPage,
+    limit: filterLimit,
+    sort: filterSort,
+    order: filterOrder,
+  }), [filterAnimalId, filterSource, filterFromDate, filterToDate, filterPage, filterLimit, filterSort, filterOrder]);
 
   const fetchWeighings = useCallback(async () => {
     try {
@@ -58,13 +58,13 @@ export function useWeighings(filters?: Partial<WeighingFilters>): UseWeighingsRe
     fetchWeighings();
   }, [fetchWeighings]);
 
-  const createWeighing = useCallback(async (data: CreateWeighingDto) => {
+  const createWeighing = useCallback(async (data: CreateWeightDto) => {
     const weighing = await weighingsService.create(data);
     await fetchWeighings();
     return weighing;
   }, [fetchWeighings]);
 
-  const updateWeighing = useCallback(async (id: string, data: UpdateWeighingDto) => {
+  const updateWeighing = useCallback(async (id: string, data: UpdateWeightDto) => {
     const weighing = await weighingsService.update(id, data);
     await fetchWeighings();
     return weighing;
