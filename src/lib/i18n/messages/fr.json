@@ -2080,7 +2080,9 @@
       "type": "Type",
       "allTypes": "Tous les types",
       "status": "Statut",
-      "allStatuses": "Tous les statuts"
+      "allStatuses": "Tous les statuts",
+      "fromDate": "Date de début",
+      "toDate": "Date de fin"
     },
     "table": {
       "animal": "Animal",

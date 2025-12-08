@@ -270,7 +270,7 @@ export default function TreatmentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg border bg-card p-6">
+      <div className="rounded-lg border bg-card p-6 space-y-4">
         <div className="grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('filters.search')}</label>
@@ -323,6 +323,26 @@ export default function TreatmentsPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        {/* Date filters */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
+            <Input
+              type="date"
+              value={filters.fromDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.toDate')}</label>
+            <Input
+              type="date"
+              value={filters.toDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
+            />
           </div>
         </div>
       </div>

@@ -93,12 +93,16 @@ export interface Treatment {
 }
 
 export interface TreatmentFilters {
-  search?: string;
+  // Filtres API
   type?: TreatmentType | 'all';
   status?: TreatmentStatus | 'all';
   animalId?: string;
-  dateFrom?: string;
-  dateTo?: string;
+  productId?: string;
+  lotId?: string;
+  fromDate?: string;  // ISO 8601
+  toDate?: string;    // ISO 8601
+  // Filtre client-side
+  search?: string;
 }
 
 export interface CreateTreatmentDto {

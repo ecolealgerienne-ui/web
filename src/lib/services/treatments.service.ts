@@ -18,17 +18,21 @@ class TreatmentsService {
   }
 
   /**
-   * Récupère tous les traitements avec filtres
+   * Récupère tous les traitements avec filtres API
+   * @see GET /api/v1/farms/{farmId}/treatments
    */
   async getAll(filters?: Partial<TreatmentFilters>): Promise<Treatment[]> {
     try {
       const params = new URLSearchParams();
+
+      // Filtres API
       if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.animalId) params.append('animalId', filters.animalId);
-      if (filters?.dateFrom) params.append('fromDate', filters.dateFrom);
-      if (filters?.dateTo) params.append('toDate', filters.dateTo);
-      if (filters?.search) params.append('search', filters.search);
+      if (filters?.productId) params.append('productId', filters.productId);
+      if (filters?.lotId) params.append('lotId', filters.lotId);
+      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters?.toDate) params.append('toDate', filters.toDate);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
       const response = await apiClient.get<Treatment[]>(url);
