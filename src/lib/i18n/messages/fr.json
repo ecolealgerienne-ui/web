@@ -2068,6 +2068,94 @@
       "searchError": "Erreur lors de la recherche"
     }
   },
+  "treatments": {
+    "title": "Traitements",
+    "subtitle": "Gérez les traitements et vaccinations de vos animaux",
+    "newTreatment": "Nouveau traitement",
+    "editTreatment": "Modifier le traitement",
+    "noTreatments": "Aucun traitement trouvé",
+    "filters": {
+      "search": "Recherche",
+      "searchPlaceholder": "Rechercher un traitement...",
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts"
+    },
+    "table": {
+      "animal": "Animal",
+      "type": "Type",
+      "product": "Produit",
+      "date": "Date",
+      "veterinarian": "Vétérinaire",
+      "status": "Statut"
+    },
+    "type": {
+      "treatment": "Traitement",
+      "vaccination": "Vaccination"
+    },
+    "status": {
+      "scheduled": "Planifié",
+      "in_progress": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "stats": {
+      "total": "Total des traitements",
+      "inProgress": "En cours",
+      "completed": "Terminés",
+      "totalCost": "Coût total"
+    },
+    "sections": {
+      "animal": "Animal",
+      "general": "Informations générales",
+      "veterinarian": "Vétérinaire",
+      "notes": "Coût et notes"
+    },
+    "fields": {
+      "animal": "Animal",
+      "type": "Type",
+      "status": "Statut",
+      "treatmentDate": "Date de traitement",
+      "withdrawalEndDate": "Fin du délai d'attente",
+      "productName": "Produit utilisé",
+      "dose": "Dosage",
+      "dosageUnit": "Unité de dosage",
+      "veterinarianName": "Nom du vétérinaire",
+      "duration": "Durée",
+      "diagnosis": "Diagnostic",
+      "cost": "Coût",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "searchAnimal": "Numéro officiel de l'animal",
+      "selectType": "Sélectionner un type",
+      "selectStatus": "Sélectionner un statut",
+      "productName": "Nom du produit",
+      "veterinarianName": "Nom du vétérinaire",
+      "diagnosis": "Description du diagnostic...",
+      "notes": "Notes supplémentaires..."
+    },
+    "labels": {
+      "days": "jours"
+    },
+    "messages": {
+      "created": "Traitement créé avec succès",
+      "updated": "Traitement modifié avec succès",
+      "deleted": "Traitement supprimé avec succès",
+      "createError": "Erreur lors de la création du traitement",
+      "updateError": "Erreur lors de la modification du traitement",
+      "deleteError": "Erreur lors de la suppression du traitement",
+      "deleteConfirmTitle": "Confirmer la suppression",
+      "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce traitement ?",
+      "noTreatmentsDescription": "Ajoutez votre premier traitement pour commencer le suivi sanitaire",
+      "addDescription": "Enregistrez un nouveau traitement ou vaccination",
+      "editDescription": "Modifiez les informations du traitement",
+      "searching": "Recherche en cours...",
+      "animalNotFound": "Animal non trouvé",
+      "searchError": "Erreur lors de la recherche"
+    }
+  },
   "animalEvents": {
     "title": "Événements des animaux",
     "subtitle": "Enregistrez et suivez tous les événements de vos animaux",

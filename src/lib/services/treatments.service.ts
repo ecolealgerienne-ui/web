@@ -1,52 +1,12 @@
 /**
  * Service pour la gestion des traitements
+ * Endpoint: /api/v1/farms/{farmId}/treatments
  */
 
 import { apiClient } from '@/lib/api/client';
-import { Treatment, TreatmentFilters } from '@/lib/types/treatment';
+import { Treatment, TreatmentFilters, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
-
-interface CreateTreatmentDto {
-  // XOR: soit animalId, soit animal_ids (batch)
-  animalId?: string;
-  animal_ids?: string[];
-
-  productId: string;
-  productName: string;
-  treatmentDate: string; // ISO 8601
-  dose: number;
-  dosageUnit: string; // ml, mg, g, comprimé
-  withdrawalEndDate: string; // ISO 8601, REQUIRED
-
-  veterinarianId?: string;
-  veterinarianName?: string;
-  campaignId?: string;
-  diagnosis?: string;
-  duration?: number; // jours
-  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  administrationRoute?: string; // IM, SC, oral, etc.
-  cost?: number;
-  notes?: string;
-}
-
-interface UpdateTreatmentDto {
-  productId?: string;
-  productName?: string;
-  treatmentDate?: string;
-  dose?: number;
-  dosageUnit?: string;
-  withdrawalEndDate?: string;
-  veterinarianId?: string;
-  veterinarianName?: string;
-  campaignId?: string;
-  diagnosis?: string;
-  duration?: number;
-  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  administrationRoute?: string;
-  cost?: number;
-  notes?: string;
-}
 
 class TreatmentsService {
   private getBasePath(): string {
@@ -58,54 +18,49 @@ class TreatmentsService {
   }
 
   /**
-   * Récupère les traitements d'un animal spécifique
-   * @param animalId - ID de l'animal
-   */
-  async getByAnimalId(animalId: string): Promise<Treatment[]> {
-    try {
-      const url = this.getAnimalTreatmentsPath(animalId);
-      const response = await apiClient.get<Treatment[] | { data: Treatment[] }>(url);
-
-      // Gérer les deux formats possibles de réponse
-      const treatments = Array.isArray(response) ? response : (response?.data || []);
-      logger.info('Animal treatments fetched', { animalId, count: treatments.length });
-      return treatments;
-    } catch (error: any) {
-      if (error.status === 404) {
-        logger.info('No treatments found for animal (404)', { animalId });
-        return [];
-      }
-      logger.error('Failed to fetch animal treatments', { error, animalId });
-      throw error;
-    }
-  }
-
-  /**
    * Récupère tous les traitements avec filtres
-   * @param filters - Filtres optionnels (status, dateFrom, dateTo)
    */
   async getAll(filters?: Partial<TreatmentFilters>): Promise<Treatment[]> {
     try {
       const params = new URLSearchParams();
+      if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.animalId) params.append('animalId', filters.animalId);
       if (filters?.dateFrom) params.append('fromDate', filters.dateFrom);
       if (filters?.dateTo) params.append('toDate', filters.dateTo);
       if (filters?.search) params.append('search', filters.search);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      // apiClient dépasse automatiquement { success, data } -> data
-      const response = await apiClient.get<Treatment[] | { data: Treatment[] }>(url);
-
-      // Gérer les deux formats possibles de réponse
-      const treatments = Array.isArray(response) ? response : (response?.data || []);
-      logger.info('Treatments fetched', { count: treatments.length, filters });
-      return treatments;
-    } catch (error: any) {
-      if (error.status === 404) {
+      const response = await apiClient.get<Treatment[]>(url);
+      logger.info('Treatments fetched', { count: (response || []).length });
+      return response || [];
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('No treatments found (404)');
         return [];
       }
       logger.error('Failed to fetch treatments', { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Récupère les traitements d'un animal spécifique
+   */
+  async getByAnimalId(animalId: string): Promise<Treatment[]> {
+    try {
+      const url = this.getAnimalTreatmentsPath(animalId);
+      const response = await apiClient.get<Treatment[]>(url);
+      logger.info('Animal treatments fetched', { animalId, count: (response || []).length });
+      return response || [];
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
+        logger.info('No treatments found for animal (404)', { animalId });
+        return [];
+      }
+      logger.error('Failed to fetch animal treatments', { error, animalId });
       throw error;
     }
   }
@@ -118,8 +73,9 @@ class TreatmentsService {
       const response = await apiClient.get<Treatment>(`${this.getBasePath()}/${id}`);
       logger.info('Treatment fetched', { id });
       return response;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404) {
         logger.info('Treatment not found (404)', { id });
         return null;
       }
@@ -129,24 +85,11 @@ class TreatmentsService {
   }
 
   /**
-   * Crée un traitement (simple ou batch)
-   * @param data - Données du traitement (animalId XOR animal_ids)
+   * Crée un traitement
    */
   async create(data: CreateTreatmentDto): Promise<Treatment> {
-    // Validation XOR
-    if (data.animalId && data.animal_ids) {
-      throw new Error('Provide either animalId OR animal_ids, not both');
-    }
-    if (!data.animalId && !data.animal_ids) {
-      throw new Error('Either animalId or animal_ids is required');
-    }
-
     const response = await apiClient.post<Treatment>(this.getBasePath(), data);
-    logger.info('Treatment created', {
-      id: response.id,
-      productName: data.productName,
-      isBatch: !!data.animal_ids,
-    });
+    logger.info('Treatment created', { id: response.id, type: data.type });
     return response;
   }
 

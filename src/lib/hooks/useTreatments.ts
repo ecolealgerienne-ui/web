@@ -3,42 +3,31 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Treatment, TreatmentFilters } from '@/lib/types/treatment';
+import { Treatment, TreatmentFilters, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
 import { treatmentsService } from '@/lib/services/treatments.service';
 import { logger } from '@/lib/utils/logger';
 
-interface UseTreatmentsResult {
-  treatments: Treatment[];
-  loading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
-}
-
-export function useTreatments(
-  filters?: Partial<TreatmentFilters> & { animalId?: string }
-): UseTreatmentsResult {
+export function useTreatments(filters?: Partial<TreatmentFilters>) {
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   // Extraire les valeurs des filtres pour éviter les re-renders inutiles
-  const filterAnimalId = filters?.animalId;
   const filterSearch = filters?.search;
   const filterStatus = filters?.status;
   const filterType = filters?.type;
-  const filterTargetType = filters?.targetType;
+  const filterAnimalId = filters?.animalId;
   const filterDateFrom = filters?.dateFrom;
   const filterDateTo = filters?.dateTo;
 
   const memoizedFilters = useMemo(() => ({
-    animalId: filterAnimalId,
     search: filterSearch,
     status: filterStatus,
     type: filterType,
-    targetType: filterTargetType,
+    animalId: filterAnimalId,
     dateFrom: filterDateFrom,
     dateTo: filterDateTo,
-  }), [filterAnimalId, filterSearch, filterStatus, filterType, filterTargetType, filterDateFrom, filterDateTo]);
+  }), [filterSearch, filterStatus, filterType, filterAnimalId, filterDateFrom, filterDateTo]);
 
   const fetchTreatments = useCallback(async () => {
     setLoading(true);
@@ -60,10 +49,30 @@ export function useTreatments(
     fetchTreatments();
   }, [fetchTreatments]);
 
+  const createTreatment = async (data: CreateTreatmentDto): Promise<Treatment> => {
+    const newTreatment = await treatmentsService.create(data);
+    await fetchTreatments();
+    return newTreatment;
+  };
+
+  const updateTreatment = async (id: string, data: UpdateTreatmentDto): Promise<Treatment> => {
+    const updatedTreatment = await treatmentsService.update(id, data);
+    await fetchTreatments();
+    return updatedTreatment;
+  };
+
+  const deleteTreatment = async (id: string): Promise<void> => {
+    await treatmentsService.delete(id);
+    await fetchTreatments();
+  };
+
   return {
     treatments,
     loading,
     error,
-    refetch: fetchTreatments,
+    refresh: fetchTreatments,
+    createTreatment,
+    updateTreatment,
+    deleteTreatment,
   };
 }

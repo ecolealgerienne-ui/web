@@ -508,8 +508,8 @@ export function AnimalDialog({
                   <div key={treatment.id} className="border rounded-lg p-4 space-y-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium">{treatment.productName}</p>
-                        <p className="text-sm text-muted-foreground">{treatment.reason}</p>
+                        <p className="font-medium">{treatment.productName || '-'}</p>
+                        <p className="text-sm text-muted-foreground">{treatment.diagnosis || '-'}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className={`h-2 w-2 rounded-full ${getTreatmentStatusColor(treatment.status)}`} />
@@ -554,8 +554,8 @@ export function AnimalDialog({
                   <div key={vaccination.id} className="border rounded-lg p-4 space-y-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium">{vaccination.productName}</p>
-                        <p className="text-sm text-muted-foreground">{vaccination.reason}</p>
+                        <p className="font-medium">{vaccination.productName || '-'}</p>
+                        <p className="text-sm text-muted-foreground">{vaccination.diagnosis || '-'}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className={`h-2 w-2 rounded-full ${getTreatmentStatusColor(vaccination.status)}`} />

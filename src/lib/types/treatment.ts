@@ -1,109 +1,170 @@
-// Types pour les traitements basés sur les specs backend
+/**
+ * Types pour les traitements basés sur le schéma API
+ * Endpoint: GET/POST/PUT /api/v1/farms/{farmId}/treatments
+ */
 
+export type TreatmentType = 'treatment' | 'vaccination';
 export type TreatmentStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-export type TreatmentCategory = 'treatment' | 'vaccination'; // Backend type: treatment vs vaccination
-export type TreatmentType = 'antibiotic' | 'antiparasitic' | 'anti_inflammatory' | 'vitamin' | 'other';
-export type TreatmentTarget = 'individual' | 'lot';
 
 export interface Treatment {
   id: string;
   farmId: string;
+  type: TreatmentType;
 
-  // Cible
-  animalId?: string;
-  lotId?: string;
-  targetType: TreatmentTarget;
-
-  // Type: treatment ou vaccination (selon backend API)
-  type?: TreatmentCategory;
-
-  // Détails traitement
-  productId?: string;
-  productName: string;
-  treatmentType: TreatmentType;
-  manufacturer?: string;
-  batchNumber?: string;
-
-  // Administration
-  reason: string;
-  diagnosis?: string;
-  dose: number; // Changed from dosage: string to dose: number
-  dosageUnit: string; // Séparé : ml, mg, g, comprimé, etc.
-  administrationRoute?: string; // IM, SC, oral, IV, etc.
-  frequency?: string; // Ex: "2x par jour"
-  duration?: number; // Nombre de jours
-
-  // Dates
-  treatmentDate: string; // Renamed from startDate
-  endDate?: string;
-  administeredDate?: string;
-
-  // Responsable
-  administeredBy?: string;
-  veterinarianId?: string;
-  veterinarianName?: string;
-  prescriptionNumber?: string;
-
-  // Délai d'attente
-  withdrawalPeriodMeat?: number; // Jours
-  withdrawalPeriodMilk?: number; // Jours
-  withdrawalEndDate: string; // REQUIRED selon API (removed ?)
-
-  // Statut
-  status: TreatmentStatus;
-
-  // Métadonnées
-  notes?: string;
-  adverseReactions?: string;
-  effectiveness?: string;
-  cost?: number;
-
-  // Traçabilité
-  createdAt: string;
-  updatedAt: string;
-  version: number;
-}
-
-export interface TreatmentWithDetails extends Treatment {
-  // Animal ou Lot
-  animalDetails?: {
+  // Animal
+  animalId: string;
+  animalWeightKg?: number | null;
+  animal?: {
     id: string;
-    visualId?: string;
-    currentEid?: string;
-    speciesId?: string;
+    visualId?: string | null;
+    currentEid?: string | null;
+    officialNumber?: string | null;
   };
-  lotDetails?: {
+
+  // Produit
+  packagingId?: string | null;
+  productId?: string | null;
+  indicationId?: string | null;
+  routeId?: string | null;
+  productName?: string | null;
+  product?: {
     id: string;
     name: string;
-    animalCount: number;
-  };
+  } | null;
+
+  // Lot
+  farmerLotId?: string | null;
+  farmerLot?: {
+    id: string;
+    name: string;
+  } | null;
+
+  // Dates
+  treatmentDate: string;
+  withdrawalEndDate?: string | null;
+  nextDueDate?: string | null;
+
+  // Dosage
+  quantityAdministered?: number | null;
+  quantityUnitId?: string | null;
+  dose?: number | null;
+  dosage?: string | null;
+  dosageUnit?: string | null;
+  computedDoseMgPerKg?: number | null;
+
+  // Délais d'attente calculés
+  computedWithdrawalMeatDate?: string | null;
+  computedWithdrawalMilkDate?: string | null;
+
+  // Vétérinaire
+  veterinarianId?: string | null;
+  veterinarianName?: string | null;
+  veterinarian?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  } | null;
+
+  // Diagnostic et traitement
+  diagnosis?: string | null;
+  duration?: number | null;
+  targetDisease?: string | null;
+
+  // Vaccination spécifique
+  vaccinationType?: string | null;
+  protocolStep?: number | null;
+  campaignId?: string | null;
+
+  // Statut et coût
+  status: TreatmentStatus;
+  cost?: number | null;
+  notes?: string | null;
+
+  // Métadonnées
+  version: number;
+  deletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TreatmentFilters {
-  search: string;
-  status: TreatmentStatus | 'all';
-  type: TreatmentType | 'all';
-  targetType: TreatmentTarget | 'all';
+  search?: string;
+  type?: TreatmentType | 'all';
+  status?: TreatmentStatus | 'all';
+  animalId?: string;
   dateFrom?: string;
   dateTo?: string;
 }
 
-export const TREATMENT_STATUS_LABELS: Record<TreatmentStatus, string> = {
-  scheduled: 'Programmé',
-  in_progress: 'En cours',
-  completed: 'Terminé',
-  cancelled: 'Annulé',
-};
+export interface CreateTreatmentDto {
+  type: TreatmentType;
+  animalId: string;
+  treatmentDate: string;
 
-export const TREATMENT_TYPE_LABELS: Record<TreatmentType, string> = {
-  antibiotic: 'Antibiotique',
-  antiparasitic: 'Antiparasitaire',
-  anti_inflammatory: 'Anti-inflammatoire',
-  vitamin: 'Vitamine/Complément',
-  other: 'Autre',
-};
+  // Optionnels
+  animalWeightKg?: number;
+  packagingId?: string;
+  productId?: string;
+  indicationId?: string;
+  routeId?: string;
+  productName?: string;
+  farmerLotId?: string;
 
-export const TREATMENT_TARGET_LABELS: Record<TreatmentTarget, string> = {
-  individual: 'Individuel',
-  lot: 'Lot',
-};
+  quantityAdministered?: number;
+  quantityUnitId?: string;
+  dose?: number;
+  dosage?: string;
+  dosageUnit?: string;
+
+  withdrawalEndDate?: string;
+  veterinarianId?: string;
+  veterinarianName?: string;
+  diagnosis?: string;
+  duration?: number;
+  targetDisease?: string;
+
+  vaccinationType?: string;
+  protocolStep?: number;
+  campaignId?: string;
+
+  status?: TreatmentStatus;
+  cost?: number;
+  notes?: string;
+}
+
+export interface UpdateTreatmentDto {
+  type?: TreatmentType;
+  animalId?: string;
+  treatmentDate?: string;
+
+  animalWeightKg?: number;
+  packagingId?: string;
+  productId?: string;
+  indicationId?: string;
+  routeId?: string;
+  productName?: string;
+  farmerLotId?: string;
+
+  quantityAdministered?: number;
+  quantityUnitId?: string;
+  dose?: number;
+  dosage?: string;
+  dosageUnit?: string;
+
+  withdrawalEndDate?: string;
+  veterinarianId?: string;
+  veterinarianName?: string;
+  diagnosis?: string;
+  duration?: number;
+  targetDisease?: string;
+
+  vaccinationType?: string;
+  protocolStep?: number;
+  campaignId?: string;
+
+  status?: TreatmentStatus;
+  cost?: number;
+  notes?: string;
+
+  version?: number;
+}
