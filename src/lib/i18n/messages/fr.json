@@ -2288,13 +2288,20 @@
     "title": "Pesées",
     "subtitle": "Suivez le poids et la croissance de vos animaux",
     "newWeighing": "Nouvelle pesée",
+    "viewWeighing": "Détails de la pesée",
+    "editWeighing": "Modifier la pesée",
     "stats": {
       "total": "Total pesées",
       "routine": "Pesées de routine",
       "medical": "Pesées médicales",
-      "avgWeight": "Poids moyen"
+      "avgWeight": "Poids moyen",
+      "avgGrowthRate": "GMQ moyen"
     },
-    "filters": "Filtres",
+    "filters": {
+      "search": "Recherche",
+      "fromDate": "Date début",
+      "toDate": "Date fin"
+    },
     "searchPlaceholder": "Rechercher...",
     "purpose": {
       "all": "Tous les types",
@@ -2302,19 +2309,21 @@
       "medical": "Médical",
       "sale": "Vente",
       "growth_monitoring": "Suivi croissance",
-      "other": "Autre"
+      "other": "Autre",
+      "undefined": "Non défini"
     },
     "list": "Liste des pesées",
     "loading": "Chargement...",
     "labels": {
       "animal": "Animal",
       "gain": "Gain",
-      "rate": "Taux",
+      "rate": "GMQ",
       "perDay": "kg/jour",
       "method": "Méthode"
     },
     "messages": {
       "noWeighings": "Aucune pesée enregistrée",
+      "noWeighingsDescription": "Ajoutez votre première pesée pour commencer le suivi de croissance",
       "createSuccess": "Pesée créée avec succès",
       "createError": "Erreur lors de la création de la pesée",
       "updateSuccess": "Pesée modifiée avec succès",
@@ -2323,8 +2332,8 @@
       "deleteError": "Erreur lors de la suppression de la pesée",
       "deleteConfirmTitle": "Confirmer la suppression",
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
-      "addDescription": "Ajouter une nouvelle pesée",
-      "editDescription": "Modifier la pesée"
+      "addDescription": "Enregistrez une nouvelle pesée",
+      "editDescription": "Modifiez les informations de la pesée"
     },
     "cancel": "Annuler",
     "delete": "Supprimer",
@@ -2334,7 +2343,7 @@
       "additional": "Informations complémentaires"
     },
     "fields": {
-      "animalId": "ID Animal",
+      "animalId": "Animal",
       "weighingDate": "Date de pesée",
       "weighingTime": "Heure",
       "purpose": "Objectif",
@@ -2347,6 +2356,7 @@
       "notes": "Notes"
     },
     "placeholders": {
+      "animalId": "Numéro officiel de l'animal",
       "weight": "ex: 45.5",
       "method": "ex: Balance électronique",
       "location": "ex: Étable 1",
