@@ -110,17 +110,18 @@ const priorityColors: Record<string, { bg: string; border: string; icon: typeof 
 type PeriodOption = {
   value: string;
   labelKey: string;
-  rankingPeriod: string;
-  trendPeriod: string;
+  statsPeriod: string;    // For /dashboard/stats and /lots/stats
+  rankingPeriod: string;  // For /weights/rankings
+  trendPeriod: string;    // For /weights/trends
   trendGroupBy: string;
 };
 
 const PERIOD_OPTIONS: PeriodOption[] = [
-  { value: '1month', labelKey: 'period.1month', rankingPeriod: '30d', trendPeriod: '1month', trendGroupBy: 'week' },
-  { value: '3months', labelKey: 'period.3months', rankingPeriod: '90d', trendPeriod: '3months', trendGroupBy: 'week' },
-  { value: '6months', labelKey: 'period.6months', rankingPeriod: '180d', trendPeriod: '6months', trendGroupBy: 'month' },
-  { value: '1year', labelKey: 'period.1year', rankingPeriod: '365d', trendPeriod: '12months', trendGroupBy: 'month' },
-  { value: '2years', labelKey: 'period.2years', rankingPeriod: '730d', trendPeriod: '24months', trendGroupBy: 'month' },
+  { value: '1month', labelKey: 'period.1month', statsPeriod: '30d', rankingPeriod: '30d', trendPeriod: '1month', trendGroupBy: 'week' },
+  { value: '3months', labelKey: 'period.3months', statsPeriod: '3months', rankingPeriod: '90d', trendPeriod: '3months', trendGroupBy: 'week' },
+  { value: '6months', labelKey: 'period.6months', statsPeriod: '6months', rankingPeriod: '180d', trendPeriod: '6months', trendGroupBy: 'month' },
+  { value: '1year', labelKey: 'period.1year', statsPeriod: '12months', rankingPeriod: '365d', trendPeriod: '12months', trendGroupBy: 'month' },
+  { value: '2years', labelKey: 'period.2years', statsPeriod: '24months', rankingPeriod: '730d', trendPeriod: '24months', trendGroupBy: 'month' },
 ];
 
 export default function DashboardPage() {
@@ -143,12 +144,12 @@ export default function DashboardPage() {
 
         // Fetch all Phase 2 data in parallel with fallbacks
         const [stats, actions, lotsStats, rankings, trends] = await Promise.all([
-          dashboardService.getStatsV2().catch((err) => {
+          dashboardService.getStatsV2({ period: periodConfig.statsPeriod }).catch((err) => {
             logger.warn('Failed to fetch Phase 2 stats, will fallback', { error: err });
             return null;
           }),
           dashboardService.getActions().catch(() => null),
-          dashboardService.getLotsStats({ isActive: true }).catch(() => null),
+          dashboardService.getLotsStats({ isActive: true, period: periodConfig.statsPeriod }).catch(() => null),
           dashboardService.getWeightRankings({ limit: 5, period: periodConfig.rankingPeriod }).catch(() => null),
           dashboardService.getWeightTrends({ period: periodConfig.trendPeriod, groupBy: periodConfig.trendGroupBy }).catch(() => null),
         ]);

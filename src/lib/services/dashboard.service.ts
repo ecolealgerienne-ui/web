@@ -362,11 +362,16 @@ class DashboardService {
    * GET /api/v1/farms/{farmId}/dashboard/stats
    * Stats globales unifiées
    */
-  async getStatsV2(): Promise<DashboardStatsV2> {
+  async getStatsV2(filters?: { period?: string }): Promise<DashboardStatsV2> {
     try {
-      const response = await apiClient.get<any>(
-        `/api/v1/farms/${TEMP_FARM_ID}/dashboard/stats`
-      );
+      const params = new URLSearchParams();
+      if (filters?.period) params.append('period', filters.period);
+
+      const url = params.toString()
+        ? `/api/v1/farms/${TEMP_FARM_ID}/dashboard/stats?${params}`
+        : `/api/v1/farms/${TEMP_FARM_ID}/dashboard/stats`;
+
+      const response = await apiClient.get<any>(url);
 
       // Map backend response to our expected format
       // Backend returns: { success, data: { success, data: { herd, movements, ... } } }
@@ -524,11 +529,12 @@ class DashboardService {
    * GET /api/v1/farms/{farmId}/lots/stats
    * Stats par lot
    */
-  async getLotsStats(filters?: { type?: string; isActive?: boolean }): Promise<LotsStatsResponse> {
+  async getLotsStats(filters?: { type?: string; isActive?: boolean; period?: string }): Promise<LotsStatsResponse> {
     try {
       const params = new URLSearchParams();
       if (filters?.type) params.append('type', filters.type);
       if (filters?.isActive !== undefined) params.append('isActive', String(filters.isActive));
+      if (filters?.period) params.append('period', filters.period);
 
       const url = params.toString()
         ? `/api/v1/farms/${TEMP_FARM_ID}/lots/stats?${params}`
