@@ -51,10 +51,11 @@ class WeighingsService {
 
   async getAnimalHistory(animalId: string): Promise<WeightHistory[]> {
     try {
-      const response = await apiClient.get<{ data: WeightHistory[] }>(
+      // apiClient auto-unwraps { success, data } -> returns data directly
+      const response = await apiClient.get<WeightHistory[]>(
         `${this.getBasePath()}/animal/${animalId}/history`
       );
-      return response.data || [];
+      return response || [];
     } catch (error: any) {
       if (error.status === 404) {
         logger.info(`No weight history found for animal ${animalId}`);
