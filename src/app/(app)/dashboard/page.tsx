@@ -106,6 +106,23 @@ const priorityColors: Record<string, { bg: string; border: string; icon: typeof 
   success: { bg: 'bg-green-50 dark:bg-green-950', border: 'border-green-200 dark:border-green-800', icon: CheckCircle },
 };
 
+// Period options for dashboard
+type PeriodOption = {
+  value: string;
+  labelKey: string;
+  rankingPeriod: string;
+  trendPeriod: string;
+  trendGroupBy: string;
+};
+
+const PERIOD_OPTIONS: PeriodOption[] = [
+  { value: '1month', labelKey: 'period.1month', rankingPeriod: '30d', trendPeriod: '1month', trendGroupBy: 'week' },
+  { value: '3months', labelKey: 'period.3months', rankingPeriod: '90d', trendPeriod: '3months', trendGroupBy: 'week' },
+  { value: '6months', labelKey: 'period.6months', rankingPeriod: '180d', trendPeriod: '6months', trendGroupBy: 'month' },
+  { value: '1year', labelKey: 'period.1year', rankingPeriod: '365d', trendPeriod: '12months', trendGroupBy: 'month' },
+  { value: '2years', labelKey: 'period.2years', rankingPeriod: '730d', trendPeriod: '24months', trendGroupBy: 'month' },
+];
+
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const router = useRouter();
@@ -113,12 +130,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('6months');
 
   useEffect(() => {
     async function fetchDashboardData() {
       try {
         setLoading(true);
         setError(null);
+
+        // Get period configuration
+        const periodConfig = PERIOD_OPTIONS.find(p => p.value === selectedPeriod) || PERIOD_OPTIONS[2]; // default 6months
 
         // Fetch all Phase 2 data in parallel with fallbacks
         const [stats, actions, lotsStats, rankings, trends] = await Promise.all([
@@ -128,8 +149,8 @@ export default function DashboardPage() {
           }),
           dashboardService.getActions().catch(() => null),
           dashboardService.getLotsStats({ isActive: true }).catch(() => null),
-          dashboardService.getWeightRankings({ limit: 5, period: '30d' }).catch(() => null),
-          dashboardService.getWeightTrends({ period: '6months', groupBy: 'month' }).catch(() => null),
+          dashboardService.getWeightRankings({ limit: 5, period: periodConfig.rankingPeriod }).catch(() => null),
+          dashboardService.getWeightTrends({ period: periodConfig.trendPeriod, groupBy: periodConfig.trendGroupBy }).catch(() => null),
         ]);
 
         // If Phase 2 stats failed, fallback to Phase 1 stats for basic data
@@ -220,7 +241,7 @@ export default function DashboardPage() {
     }
 
     fetchDashboardData();
-  }, [t]);
+  }, [t, selectedPeriod]);
 
   if (loading) {
     return (
@@ -327,16 +348,35 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('overview')}</p>
         </div>
-        {stats.lastUpdated && (
-          <p className="text-xs text-muted-foreground">
-            {t('lastUpdated')}: {new Date(stats.lastUpdated).toLocaleString('fr-FR')}
-          </p>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Period Selector */}
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+            {PERIOD_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                variant={selectedPeriod === option.value ? 'default' : 'ghost'}
+                size="sm"
+                className={cn(
+                  'text-xs h-8 px-3',
+                  selectedPeriod === option.value && 'shadow-sm'
+                )}
+                onClick={() => setSelectedPeriod(option.value)}
+              >
+                {t(option.labelKey)}
+              </Button>
+            ))}
+          </div>
+          {stats.lastUpdated && (
+            <p className="text-xs text-muted-foreground hidden lg:block">
+              {t('lastUpdated')}: {new Date(stats.lastUpdated).toLocaleString('fr-FR')}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* KPI Cards - Row 1: Herd & Movements */}

@@ -468,8 +468,42 @@ class DashboardService {
         ? `/api/v1/farms/${TEMP_FARM_ID}/dashboard/actions?${params}`
         : `/api/v1/farms/${TEMP_FARM_ID}/dashboard/actions`;
 
-      const response = await apiClient.get<DashboardActionsResponse>(url);
-      return response;
+      const response = await apiClient.get<any>(url);
+
+      // Handle nested response structure
+      const raw = response?.data || response;
+
+      // Map backend action to frontend ActionItem
+      const mapAction = (action: any): ActionItem => ({
+        id: action.id,
+        type: action.type,
+        priority: action.priority || 'medium',
+        title: action.title,
+        description: action.description,
+        count: action.affectedCount ?? action.count ?? 0,
+        expiresAt: action.expiresAt,
+        expiresIn: action.expiresIn,
+        dueDate: action.dueDate,
+        periodStart: action.periodStart,
+        periodEnd: action.periodEnd,
+        animals: action.animals || [],
+        actionUrl: action.url || action.actionUrl || '',
+      });
+
+      // Group actions by category
+      const actions = raw.actions || [];
+      const urgent = actions.filter((a: any) => a.category === 'urgent').map(mapAction);
+      const thisWeek = actions.filter((a: any) => a.category === 'this_week').map(mapAction);
+      const planned = actions.filter((a: any) => a.category === 'planned').map(mapAction);
+      const opportunities = actions.filter((a: any) => a.category === 'opportunities').map(mapAction);
+
+      return {
+        summary: raw.summary || { urgent: 0, thisWeek: 0, planned: 0, opportunities: 0 },
+        urgent,
+        thisWeek,
+        planned,
+        opportunities,
+      };
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No actions found (404)');

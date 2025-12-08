@@ -2571,6 +2571,13 @@
       "gmq": "GMQ",
       "target": "Objectif"
     },
+    "period": {
+      "1month": "1 mois",
+      "3months": "3 mois",
+      "6months": "6 mois",
+      "1year": "1 an",
+      "2years": "2 ans"
+    },
     "lots": {
       "title": "Performance des lots",
       "activeLots": "lots actifs",
