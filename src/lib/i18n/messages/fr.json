@@ -2318,11 +2318,13 @@
       "animal": "Animal",
       "gain": "Gain",
       "rate": "GMQ",
-      "perDay": "kg/jour"
+      "perDay": "kg/jour",
+      "current": "Actuel"
     },
     "messages": {
       "noWeighings": "Aucune pesée enregistrée",
       "noWeighingsDescription": "Ajoutez votre première pesée pour commencer le suivi de croissance",
+      "noHistory": "Aucun historique de pesée pour cet animal",
       "createSuccess": "Pesée créée avec succès",
       "createError": "Erreur lors de la création de la pesée",
       "updateSuccess": "Pesée modifiée avec succès",
@@ -2339,7 +2341,8 @@
     "sections": {
       "general": "Informations générales",
       "data": "Données de pesée",
-      "notes": "Notes"
+      "notes": "Notes",
+      "history": "Historique des pesées"
     },
     "fields": {
       "animalId": "Animal",

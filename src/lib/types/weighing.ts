@@ -81,6 +81,8 @@ export const WEIGHT_SOURCE_LABELS: Record<WeightSource, string> = {
   manual: 'Manuel',
   scale: 'Balance',
   estimated: 'Estimé',
+  automatic: 'Automatique',
+  weighbridge: 'Pont-bascule',
 };
 
 // Legacy aliases for compatibility

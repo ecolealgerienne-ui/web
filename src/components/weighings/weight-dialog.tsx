@@ -21,10 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ChevronLeft, ChevronRight, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { animalsService } from '@/lib/services/animals.service';
-import type { Weighing, CreateWeightDto, UpdateWeightDto, WeightSource } from '@/lib/types/weighing';
+import { weighingsService } from '@/lib/services/weighings.service';
+import type { Weighing, WeightHistory, CreateWeightDto, UpdateWeightDto, WeightSource } from '@/lib/types/weighing';
 
 interface WeightDialogProps {
   open: boolean;
@@ -67,6 +76,10 @@ export function WeightDialog({
   const [isSearching, setIsSearching] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState<{ id: string; officialNumber?: string; visualId?: string } | null>(null);
 
+  // Weight history state
+  const [weightHistory, setWeightHistory] = useState<WeightHistory[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
   // Navigation state
   const currentIndex = weighing ? weighings.findIndex((w) => w.id === weighing.id) : -1;
   const canNavigatePrev = currentIndex > 0;
@@ -84,6 +97,7 @@ export function WeightDialog({
       });
       setSelectedAnimal(null);
       setAnimalSearch('');
+      setWeightHistory([]);
     } else if (weighing) {
       setFormData({
         animalId: weighing.animalId,
@@ -99,6 +113,29 @@ export function WeightDialog({
       }
     }
   }, [weighing, mode]);
+
+  // Fetch weight history when viewing/editing an existing weighing
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!open || mode === 'create' || !weighing?.animalId) {
+        setWeightHistory([]);
+        return;
+      }
+
+      setIsLoadingHistory(true);
+      try {
+        const history = await weighingsService.getAnimalHistory(weighing.animalId);
+        setWeightHistory(history);
+      } catch (error) {
+        console.error('Error fetching weight history:', error);
+        setWeightHistory([]);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    fetchHistory();
+  }, [open, mode, weighing?.animalId]);
 
   // Animal search with debounce
   const searchAnimals = useCallback(async (query: string) => {
@@ -168,7 +205,7 @@ export function WeightDialog({
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
     });
   };
@@ -177,7 +214,7 @@ export function WeightDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -358,6 +395,77 @@ export function WeightDialog({
               )}
             </div>
           </div>
+
+          {/* Section: Weight History (view/edit mode only) */}
+          {mode !== 'create' && weighing?.animalId && (
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium border-b pb-2">{t('sections.history')}</h3>
+              {isLoadingHistory ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : weightHistory.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  {t('messages.noHistory')}
+                </p>
+              ) : (
+                <div className="border rounded-md max-h-64 overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t('fields.weightDate')}</TableHead>
+                        <TableHead className="text-right">{t('fields.weight')}</TableHead>
+                        <TableHead className="text-right">{t('labels.rate')}</TableHead>
+                        <TableHead>{t('fields.source')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {weightHistory.map((record) => {
+                        const isCurrentRecord = record.id === weighing?.id;
+                        return (
+                          <TableRow
+                            key={record.id}
+                            className={isCurrentRecord ? 'bg-primary/10' : ''}
+                          >
+                            <TableCell className="font-medium">
+                              {formatDate(record.weightDate)}
+                              {isCurrentRecord && (
+                                <Badge variant="secondary" className="ml-2 text-xs">
+                                  {t('labels.current')}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right font-mono">
+                              {record.weight} kg
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {record.dailyGain ? (
+                                <span className={`flex items-center justify-end gap-1 ${record.dailyGain > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {record.dailyGain > 0 ? (
+                                    <TrendingUp className="h-3 w-3" />
+                                  ) : (
+                                    <TrendingDown className="h-3 w-3" />
+                                  )}
+                                  {record.dailyGain.toFixed(2)} kg/j
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className="text-xs">
+                                {t(`source.${record.source || 'undefined'}`)}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter>
