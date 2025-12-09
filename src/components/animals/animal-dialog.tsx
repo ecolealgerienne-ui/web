@@ -675,7 +675,7 @@ export function AnimalDialog({
 
           {isEditable && (
             <div className="text-sm text-muted-foreground text-center pt-4 border-t">
-              Pour ajouter des pesées, utilisez l'écran dédié.
+              Pour ajouter des pesées, utilisez l&apos;écran dédié.
             </div>
           )}
         </>
