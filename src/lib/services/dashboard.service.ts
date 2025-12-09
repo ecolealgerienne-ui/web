@@ -283,7 +283,7 @@ class DashboardService {
       const futureDate = new Date();
       futureDate.setDate(now.getDate() + upcomingDays);
 
-      const upcomingVaccinations = treatments.filter((treatment) => {
+      const upcomingVaccinations = treatments.data.filter((treatment) => {
         if (!treatment.nextDueDate) return false;
         const dueDate = new Date(treatment.nextDueDate);
         return dueDate >= now && dueDate <= futureDate;

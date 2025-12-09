@@ -2116,7 +2116,8 @@
       "total": "Total des traitements",
       "inProgress": "En cours",
       "completed": "Terminés",
-      "totalCost": "Coût total"
+      "totalCost": "Coût total",
+      "activeWithdrawals": "Délais d'attente actifs"
     },
     "sections": {
       "animal": "Animal",
