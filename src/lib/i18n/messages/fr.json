@@ -3127,7 +3127,69 @@
     "login": "Se connecter",
     "getStarted": "Commencer",
     "accessDashboard": "Accéder au tableau de bord",
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "login": "Connexion",
+      "getStarted": "Commencer",
+      "dashboard": "Tableau de bord"
+    },
+    "hero": {
+      "badge": "Nouvelle génération de gestion d'élevage",
+      "titleHighlight": "Gérez votre élevage",
+      "titleRest": "avec intelligence",
+      "subtitle": "La plateforme tout-en-un qui simplifie la gestion de votre cheptel. Suivi sanitaire, traçabilité, rapports — tout ce dont vous avez besoin pour une exploitation moderne.",
+      "cta": {
+        "primary": "Commencer gratuitement",
+        "secondary": "Voir la démo"
+      },
+      "trust": {
+        "noCard": "Sans carte bancaire",
+        "freeTrial": "14 jours d'essai gratuit",
+        "cancel": "Annulation à tout moment"
+      },
+      "preview": {
+        "title": "Tableau de bord intelligent",
+        "subtitle": "Visualisez toutes vos données en un coup d'œil"
+      }
+    },
+    "stats": {
+      "animals": "Animaux gérés",
+      "farms": "Exploitations",
+      "uptime": "Disponibilité",
+      "rating": "Note moyenne"
+    },
     "features": {
+      "badge": "Fonctionnalités",
+      "title": "Tout ce dont vous avez besoin",
+      "subtitle": "Une suite complète d'outils pour gérer votre élevage de manière professionnelle",
+      "items": {
+        "tracking": {
+          "title": "Suivi des animaux",
+          "description": "Gérez vos animaux avec traçabilité complète de la naissance à la sortie du troupeau"
+        },
+        "health": {
+          "title": "Santé & Traitements",
+          "description": "Planifiez vaccinations, traitements et suivez l'historique sanitaire complet"
+        },
+        "reports": {
+          "title": "Rapports avancés",
+          "description": "Analysez vos données avec des rapports détaillés et des graphiques interactifs"
+        },
+        "lots": {
+          "title": "Gestion des lots",
+          "description": "Organisez vos animaux en lots pour optimiser l'alimentation et le suivi"
+        },
+        "compliance": {
+          "title": "Conformité réglementaire",
+          "description": "Respectez les normes avec un historique détaillé et des exports officiels"
+        },
+        "team": {
+          "title": "Travail en équipe",
+          "description": "Collaborez avec votre équipe grâce aux rôles et permissions personnalisés"
+        }
+      },
       "animalTracking": {
         "title": "Suivi des animaux",
         "description": "Gérez vos animaux avec traçabilité complète de la naissance à la sortie"
@@ -3153,6 +3215,97 @@
         "description": "Collaborez avec votre équipe avec des rôles et permissions adaptés"
       }
     },
+    "howItWorks": {
+      "badge": "Comment ça marche",
+      "title": "Démarrez en 3 étapes simples",
+      "subtitle": "Commencez à gérer votre élevage en quelques minutes seulement",
+      "steps": {
+        "signup": {
+          "title": "Créez votre compte",
+          "description": "Inscription gratuite en moins de 2 minutes. Aucune carte bancaire requise."
+        },
+        "configure": {
+          "title": "Configurez votre ferme",
+          "description": "Ajoutez vos animaux, définissez vos lots et personnalisez vos paramètres."
+        },
+        "manage": {
+          "title": "Gérez efficacement",
+          "description": "Suivez vos animaux, enregistrez les événements et analysez vos performances."
+        }
+      }
+    },
+    "testimonials": {
+      "badge": "Témoignages",
+      "title": "Ils nous font confiance",
+      "items": {
+        "farmer1": {
+          "quote": "AniTra a révolutionné la gestion de mon exploitation. Je gagne un temps précieux chaque jour.",
+          "author": "Ahmed B.",
+          "role": "Éleveur bovin, Sétif"
+        },
+        "farmer2": {
+          "quote": "Interface intuitive et support réactif. Je recommande vivement à tous les éleveurs.",
+          "author": "Karim M.",
+          "role": "Éleveur ovin, Djelfa"
+        },
+        "farmer3": {
+          "quote": "Enfin une solution adaptée à nos besoins locaux. La traçabilité n'a jamais été aussi simple.",
+          "author": "Fatima Z.",
+          "role": "Gérante d'exploitation, Tiaret"
+        }
+      }
+    },
+    "pricing": {
+      "badge": "Tarifs",
+      "title": "Des offres adaptées à votre exploitation",
+      "subtitle": "Choisissez le plan qui correspond à vos besoins. Évoluez à tout moment.",
+      "plans": {
+        "starter": {
+          "name": "Débutant",
+          "price": "Gratuit",
+          "period": "mois",
+          "description": "Parfait pour les petites exploitations",
+          "features": {
+            "animals": "Jusqu'à 50 animaux",
+            "users": "1 utilisateur",
+            "reports": "Rapports de base",
+            "support": "Support par email"
+          }
+        },
+        "professional": {
+          "name": "Professionnel",
+          "price": "4 900 DA",
+          "period": "mois",
+          "description": "Pour les exploitations en croissance",
+          "features": {
+            "animals": "Jusqu'à 500 animaux",
+            "users": "5 utilisateurs",
+            "reports": "Rapports avancés",
+            "support": "Support prioritaire",
+            "api": "Accès API"
+          }
+        },
+        "enterprise": {
+          "name": "Entreprise",
+          "price": "Sur devis",
+          "period": "mois",
+          "description": "Pour les grandes exploitations",
+          "features": {
+            "animals": "Animaux illimités",
+            "users": "Utilisateurs illimités",
+            "reports": "Rapports personnalisés",
+            "support": "Support dédié 24/7",
+            "api": "API complète",
+            "sla": "SLA garanti"
+          }
+        }
+      }
+    },
+    "cta": {
+      "title": "Prêt à transformer votre élevage ?",
+      "subtitle": "Rejoignez des centaines d'éleveurs qui ont déjà modernisé leur gestion avec AniTra",
+      "button": "Commencer maintenant"
+    },
     "benefits": {
       "title": "Pourquoi choisir notre solution ?",
       "modernInterface": "Interface moderne et intuitive pour une prise en main facile",
@@ -3162,6 +3315,25 @@
       "regularUpdates": "Mises à jour régulières avec de nouvelles fonctionnalités"
     },
     "footer": {
+      "description": "La solution complète pour la gestion moderne de votre élevage",
+      "product": {
+        "title": "Produit",
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "demo": "Démonstration"
+      },
+      "company": {
+        "title": "Entreprise",
+        "about": "À propos",
+        "contact": "Contact",
+        "blog": "Blog"
+      },
+      "legal": {
+        "title": "Légal",
+        "privacy": "Confidentialité",
+        "terms": "Conditions d'utilisation",
+        "cookies": "Politique de cookies"
+      },
       "copyright": "© 2024 École Algérienne. Tous droits réservés."
     }
   }
