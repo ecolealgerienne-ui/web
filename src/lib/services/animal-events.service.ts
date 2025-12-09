@@ -184,16 +184,19 @@ class AnimalEventsService {
 
   /**
    * Récupère la liste paginée des événements d'animaux
+   * Note: Le backend ne supporte pas encore la pagination côté serveur pour les mouvements
+   * La pagination est donc simulée côté client
    */
   async getAll(params: AnimalEventFilterParams = {}): Promise<PaginatedResponse<AnimalEvent>> {
     try {
       const queryParams = new URLSearchParams();
 
-      // Pagination
+      // Pagination params - stockés pour la pagination client
       const page = params.page || 1;
       const limit = Math.min(params.limit || 25, 100); // Max 100
-      queryParams.append('page', String(page));
-      queryParams.append('limit', String(limit));
+      // Note: Ne pas envoyer page/limit au backend car il ne les supporte pas encore
+      // queryParams.append('page', String(page));
+      // queryParams.append('limit', String(limit));
 
       // Filtres
       if (params.animalId) queryParams.append('animalId', params.animalId);
@@ -203,39 +206,35 @@ class AnimalEventsService {
       if (params.fromDate) queryParams.append('fromDate', params.fromDate);
       if (params.toDate) queryParams.append('toDate', params.toDate);
 
-      const url = `${this.getBasePath()}?${queryParams.toString()}`;
+      const queryString = queryParams.toString();
+      const url = queryString ? `${this.getBasePath()}?${queryString}` : this.getBasePath();
       const response = await apiClient.get<PaginatedResponse<BackendMovement> | BackendMovement[]>(url);
 
       // Handle both paginated and non-paginated responses from backend
-      let movements: BackendMovement[];
-      let meta: { total: number; page: number; limit: number; totalPages: number };
+      let allMovements: BackendMovement[];
 
       if (Array.isArray(response)) {
         // Backend returns array (non-paginated)
-        movements = response;
-        meta = {
-          total: movements.length,
-          page,
-          limit,
-          totalPages: Math.ceil(movements.length / limit)
-        };
+        allMovements = response;
       } else if (response && 'data' in response && Array.isArray(response.data)) {
         // Backend returns paginated response
-        movements = response.data;
-        meta = response.meta || {
-          total: movements.length,
-          page,
-          limit,
-          totalPages: Math.ceil(movements.length / limit)
-        };
+        allMovements = response.data;
       } else {
         // Fallback for unexpected format
-        movements = [];
-        meta = { total: 0, page, limit, totalPages: 0 };
+        allMovements = [];
       }
 
+      // Client-side pagination since backend doesn't support it yet
+      const total = allMovements.length;
+      const totalPages = Math.ceil(total / limit);
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedMovements = allMovements.slice(startIndex, endIndex);
+
+      const meta = { total, page, limit, totalPages };
+
       // Map backend movements to frontend AnimalEvent format
-      const events = movements.map(mapMovementToEvent);
+      const events = paginatedMovements.map(mapMovementToEvent);
 
       logger.info('Animal events (movements) fetched', {
         total: meta.total,
