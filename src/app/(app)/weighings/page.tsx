@@ -28,7 +28,7 @@ import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
 const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
-const ANIMAL_STATUSES = ['alive', 'sold', 'dead'] as const;
+const ANIMAL_STATUSES = ['alive', 'sold', 'dead', 'slaughtered', 'draft'] as const;
 type AnimalStatus = typeof ANIMAL_STATUSES[number];
 
 /**

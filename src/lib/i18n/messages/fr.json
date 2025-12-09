@@ -2321,7 +2321,9 @@
     "animalStatus": {
       "alive": "Vivant",
       "sold": "Vendu",
-      "dead": "Mort"
+      "dead": "Mort",
+      "slaughtered": "Abattu",
+      "draft": "Brouillon"
     },
     "source": {
       "all": "Toutes les sources",

@@ -25,7 +25,7 @@ export interface Weighing {
     visualId?: string;
     officialNumber?: string;
     currentEid?: string;
-    status?: 'alive' | 'sold' | 'dead';
+    status?: 'alive' | 'sold' | 'dead' | 'slaughtered' | 'draft';
   };
 
   // Traçabilité
@@ -66,7 +66,7 @@ export interface WeightStats {
 
 export interface QueryWeightDto {
   animalId?: string;
-  animalStatus?: 'alive' | 'sold' | 'dead';
+  animalStatus?: 'alive' | 'sold' | 'dead' | 'slaughtered' | 'draft';
   source?: WeightSource;
   fromDate?: string;
   toDate?: string;
