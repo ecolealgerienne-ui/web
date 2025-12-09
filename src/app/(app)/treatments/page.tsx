@@ -64,7 +64,6 @@ function exportToCSV(treatments: Treatment[], t: (key: string) => string, tc: (k
     t('table.date'),
     t('table.veterinarian'),
     t('table.status'),
-    t('fields.cost'),
     t('fields.withdrawalEndDate'),
   ];
 
@@ -75,7 +74,6 @@ function exportToCSV(treatments: Treatment[], t: (key: string) => string, tc: (k
     new Date(treatment.treatmentDate).toLocaleDateString('fr-FR'),
     treatment.veterinarian ? `Dr. ${treatment.veterinarian.lastName}` : treatment.veterinarianName || '-',
     t(`status.${treatment.status}`),
-    treatment.cost ? `${treatment.cost} DA` : '-',
     treatment.withdrawalEndDate ? new Date(treatment.withdrawalEndDate).toLocaleDateString('fr-FR') : '-',
   ]);
 
@@ -113,10 +111,6 @@ export default function TreatmentsPage() {
 
   // Stats calculées à partir des données affichées
   const stats = useMemo(() => {
-    const totalCost = treatments
-      .filter((tr) => tr.cost)
-      .reduce((sum, tr) => sum + (tr.cost || 0), 0);
-
     const activeWithdrawals = treatments.filter(tr => {
       if (!tr.withdrawalEndDate) return false;
       return new Date(tr.withdrawalEndDate) > new Date();
@@ -126,7 +120,6 @@ export default function TreatmentsPage() {
       total,
       inProgress: treatments.filter((tr) => tr.status === 'in_progress').length,
       completed: treatments.filter((tr) => tr.status === 'completed').length,
-      cost: totalCost,
       activeWithdrawals,
     };
   }, [treatments, total]);
@@ -393,7 +386,7 @@ export default function TreatmentsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center gap-2">
             <Syringe className="h-5 w-5 text-muted-foreground" />
@@ -415,10 +408,6 @@ export default function TreatmentsPage() {
             <span className="text-2xl font-bold text-orange-600">{stats.activeWithdrawals}</span>
           </div>
           <p className="text-xs text-muted-foreground">{t('stats.activeWithdrawals')}</p>
-        </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold">{stats.cost.toLocaleString()} DA</div>
-          <p className="text-xs text-muted-foreground">{t('stats.totalCost')}</p>
         </div>
       </div>
 
