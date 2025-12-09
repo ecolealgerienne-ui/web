@@ -179,7 +179,7 @@ export function exportHerdInventory(
     t('reports.columns.weight'),
   ];
 
-  const rows = data.details.map(animal => [
+  const rows = (data?.details || []).map(animal => [
     animal.visualId || '-',
     animal.officialNumber || '-',
     animal.species,
@@ -232,7 +232,7 @@ export function exportTreatmentsReport(
     t('reports.columns.status'),
   ];
 
-  const rows = data.details.map(treatment => [
+  const rows = (data?.details || []).map(treatment => [
     formatDate(treatment.date),
     treatment.visualId || '-',
     treatment.type,
@@ -281,7 +281,7 @@ export function exportVaccinationsReport(
     t('reports.columns.nextDueDate'),
   ];
 
-  const rows = data.details.map(vaccination => [
+  const rows = (data?.details || []).map(vaccination => [
     formatDate(vaccination.date),
     vaccination.visualId || '-',
     vaccination.productName,
@@ -328,7 +328,7 @@ export function exportGrowthReport(
     t('reports.columns.gmqStatus'),
   ];
 
-  const rows = data.byLot.map(lot => [
+  const rows = (data?.byLot || []).map(lot => [
     lot.lotName,
     lot.animalCount,
     `${lot.avgWeight.toFixed(1)} kg`,
@@ -374,7 +374,7 @@ export function exportMovementsReport(
     t('reports.columns.reason'),
   ];
 
-  const rows = data.details.map(movement => [
+  const rows = (data?.details || []).map(movement => [
     formatDate(movement.date),
     movement.type,
     movement.visualId || '-',
