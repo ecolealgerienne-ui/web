@@ -2387,25 +2387,33 @@
     "subtitle": "Générez des rapports détaillés pour votre exploitation",
     "settings": {
       "title": "Paramètres généraux",
-      "description": "Définissez la période par défaut pour tous les rapports",
-      "customPeriod": "Période personnalisée",
-      "applyToAll": "Appliquer à tous"
+      "description": "Définissez la période et les filtres pour tous les rapports"
     },
     "period": {
       "label": "Période",
       "week": "Semaine",
       "month": "Mois",
       "quarter": "Trimestre",
-      "year": "Année"
+      "year": "Année",
+      "custom": "Personnalisée"
+    },
+    "filters": {
+      "fromDate": "Date début",
+      "toDate": "Date fin",
+      "animalStatus": "Statut animal"
+    },
+    "animalStatus": {
+      "all": "Tous les statuts",
+      "alive": "Vivant",
+      "sold": "Vendu",
+      "dead": "Mort",
+      "slaughtered": "Abattu",
+      "draft": "Brouillon"
     },
     "categoryTitles": {
       "health": "Rapports Sanitaires",
       "production": "Rapports de Production",
-      "financial": "Rapports Financiers & Réglementaires"
-    },
-    "buttons": {
-      "generate": "Générer",
-      "exportPdf": "Exporter en PDF"
+      "regulatory": "Rapports Réglementaires"
     },
     "definitions": {
       "herd-inventory": {
@@ -2427,15 +2435,44 @@
       "growth-report": {
         "name": "Croissance et Performance",
         "description": "Évolution des poids et gains moyens quotidiens"
-      },
-      "health-report": {
-        "name": "Bilan Sanitaire",
-        "description": "Taux de morbidité, mortalité et incidents sanitaires"
-      },
-      "financial-report": {
-        "name": "Rapport Financier",
-        "description": "Coûts des soins vétérinaires et revenus"
       }
+    },
+    "columns": {
+      "visualId": "N° Visuel",
+      "officialNumber": "N° Officiel",
+      "species": "Espèce",
+      "breed": "Race",
+      "sex": "Sexe",
+      "birthDate": "Date de naissance",
+      "age": "Âge",
+      "status": "Statut",
+      "lot": "Lot",
+      "weight": "Poids",
+      "date": "Date",
+      "type": "Type",
+      "product": "Produit",
+      "dosage": "Dosage",
+      "veterinarian": "Vétérinaire",
+      "withdrawalDate": "Fin délai d'attente",
+      "batchNumber": "N° Lot",
+      "nextDueDate": "Prochaine échéance",
+      "animalCount": "Nb animaux",
+      "avgWeight": "Poids moyen",
+      "avgDailyGain": "GMQ moyen",
+      "gmqStatus": "Statut GMQ",
+      "source": "Origine",
+      "destination": "Destination",
+      "reason": "Motif"
+    },
+    "gmqStatus": {
+      "excellent": "Excellent",
+      "good": "Bon",
+      "warning": "Attention",
+      "critical": "Critique"
+    },
+    "messages": {
+      "exportSuccess": "Rapport exporté avec succès",
+      "exportError": "Erreur lors de l'export du rapport"
     }
   },
   "onboarding": {
