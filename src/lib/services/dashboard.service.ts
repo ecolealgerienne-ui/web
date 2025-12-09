@@ -256,14 +256,14 @@ class DashboardService {
       // Get real data from multiple endpoints
       const { fromDate, toDate } = this.getThisMonthDates();
 
-      const [animals, movementStats, treatments] = await Promise.all([
+      const [animalsResponse, movementStats, treatments] = await Promise.all([
         animalsService.getAll(),
         movementsService.getStatistics(fromDate, toDate),
         treatmentsService.getAll({ type: 'vaccination' }),
       ]);
 
       // Calculate real stats
-      const totalAnimals = animals.length;
+      const totalAnimals = animalsResponse.meta.total;
 
       // Extract count from birth/death data (API might return object or number)
       const birthData = movementStats.byType.birth;

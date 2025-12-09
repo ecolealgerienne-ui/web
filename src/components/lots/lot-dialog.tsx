@@ -156,9 +156,9 @@ export function LotDialog({
     setSearchResult(null);
 
     try {
-      const animals = await animalsService.getAll({ search: officialId, limit: 10 });
+      const response = await animalsService.getAll({ search: officialId, limit: 10 });
 
-      const exactMatch = animals.find(a =>
+      const exactMatch = response.data.find(a =>
         a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
         a.visualId?.toLowerCase() === officialId.toLowerCase() ||
         a.currentEid?.toLowerCase() === officialId.toLowerCase()
@@ -171,8 +171,8 @@ export function LotDialog({
         } else {
           setSearchResult(exactMatch);
         }
-      } else if (animals.length > 0) {
-        const firstResult = animals[0];
+      } else if (response.data.length > 0) {
+        const firstResult = response.data[0];
         const alreadyInList = lotAnimals.some(la => la.id === firstResult.id);
         if (alreadyInList) {
           setSearchError(t('messages.animalAlreadyInList'));
