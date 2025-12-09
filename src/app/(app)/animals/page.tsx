@@ -106,19 +106,19 @@ export default function AnimalsPage() {
     }
   }, [animalToDelete, refetch, toast, tc, t]);
 
-  // Variant du badge selon le statut (règle 6.5 - utiliser uniquement les variants existants)
-  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'success' | 'warning' => {
+  // Variant du badge selon le statut
+  const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'success' | 'warning' => {
     switch (status) {
       case 'alive':
         return 'success';
       case 'sold':
         return 'warning';
       case 'slaughtered':
-        return 'default'; // Gris pour abattu (opération normale)
+        return 'secondary'; // Gris pour abattu (opération normale)
       case 'dead':
         return 'destructive';
       default:
-        return 'default';
+        return 'secondary';
     }
   };
 
