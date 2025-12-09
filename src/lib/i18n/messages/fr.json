@@ -14,7 +14,8 @@
       "refresh": "Rafraîchir",
       "loading": "Chargement...",
       "saving": "Enregistrement...",
-      "deleting": "Suppression..."
+      "deleting": "Suppression...",
+      "export": "Exporter"
     },
     "status": {
       "active": "Actif",
@@ -1921,7 +1922,10 @@
       "notes": "Notes",
       "isActive": "Actif",
       "createdAt": "Créé le",
-      "updatedAt": "Modifié le"
+      "updatedAt": "Modifié le",
+      "species": "Espèce",
+      "breed": "Race",
+      "age": "Âge"
     },
     "sections": {
       "general": "Informations générales",

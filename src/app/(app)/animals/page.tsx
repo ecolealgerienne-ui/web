@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import { Plus, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useAnimals } from '@/lib/hooks/useAnimals';
+import { useSpecies } from '@/lib/hooks/useSpecies';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { animalsService } from '@/lib/services/animals.service';
 import { AnimalDialog } from '@/components/animals/animal-dialog';
@@ -13,6 +14,77 @@ import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { handleApiError } from '@/lib/utils/api-error-handler';
+
+/**
+ * Calcule l'âge d'un animal à partir de sa date de naissance
+ * @param birthDate - Date de naissance ISO
+ * @returns Âge formaté (ex: "2 ans 3 mois" ou "45 jours")
+ */
+function calculateAge(birthDate: string | null): string {
+  if (!birthDate) return '-';
+
+  const birth = new Date(birthDate);
+  const now = new Date();
+
+  const diffMs = now.getTime() - birth.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 30) {
+    return `${diffDays} j`;
+  }
+
+  const months = Math.floor(diffDays / 30);
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+
+  if (years === 0) {
+    return `${months} mois`;
+  }
+
+  if (remainingMonths === 0) {
+    return `${years} an${years > 1 ? 's' : ''}`;
+  }
+
+  return `${years} an${years > 1 ? 's' : ''} ${remainingMonths} mois`;
+}
+
+/**
+ * Exporte les animaux en CSV
+ */
+function exportToCSV(animals: Animal[], t: (key: string) => string): void {
+  const headers = [
+    t('fields.identification'),
+    t('fields.species'),
+    t('fields.breed'),
+    t('fields.sex'),
+    t('fields.birthDate'),
+    t('fields.age'),
+    t('fields.status'),
+  ];
+
+  const rows = animals.map(animal => [
+    animal.officialNumber || animal.visualId || animal.currentEid || animal.id.substring(0, 8),
+    animal.species?.name || '-',
+    animal.breed?.name || '-',
+    t(`sex.${animal.sex}`),
+    animal.birthDate ? new Date(animal.birthDate).toLocaleDateString() : '-',
+    calculateAge(animal.birthDate),
+    t(`status.${animal.status}`),
+  ]);
+
+  const csvContent = [
+    headers.join(';'),
+    ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
+  ].join('\n');
+
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `animaux_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +103,9 @@ export default function AnimalsPage() {
 
   // Hook avec params/setParams pour la pagination (règle 7.7)
   const { animals, total, loading, error, params, setParams, refetch } = useAnimals();
+
+  // Hook pour récupérer les espèces (pour le filtre)
+  const { species } = useSpecies();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
@@ -141,16 +216,22 @@ export default function AnimalsPage() {
       },
     },
     {
+      key: 'species',
+      header: t('fields.species'),
+      sortable: true,
+      render: (animal) => animal.species?.name || '-',
+    },
+    {
       key: 'sex',
       header: t('fields.sex'),
       sortable: true,
       render: (animal) => t(`sex.${animal.sex}`),
     },
     {
-      key: 'birthDate',
-      header: t('fields.birthDate'),
-      sortable: true,
-      render: (animal) => animal.birthDate ? new Date(animal.birthDate).toLocaleDateString() : '-',
+      key: 'age',
+      header: t('fields.age'),
+      sortable: false,
+      render: (animal) => calculateAge(animal.birthDate),
     },
     {
       key: 'status',
@@ -181,42 +262,76 @@ export default function AnimalsPage() {
     setParams(prev => ({ ...prev, status, page: 1 }));
   }, [setParams]);
 
+  const handleSpeciesChange = useCallback((speciesId: string) => {
+    setParams(prev => ({ ...prev, speciesId: speciesId === 'all' ? undefined : speciesId, page: 1 }));
+  }, [setParams]);
+
+  // Fonction d'export
+  const handleExport = useCallback(() => {
+    exportToCSV(animals, t);
+  }, [animals, t]);
+
   // Note: Le tri n'est pas encore supporté par le backend
   // const handleSortChange = useCallback((sortBy: string, sortOrder: 'asc' | 'desc') => {
   //   setParams(prev => ({ ...prev, sortBy, sortOrder }));
   // }, [setParams]);
 
-  // Filtre personnalisé pour le statut
-  const statusFilterComponent = (
-    <Select
-      value={params.status || 'all'}
-      onValueChange={handleStatusChange}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder={t('filters.allStatus')} />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
-        <SelectItem value="alive">{t('status.alive')}</SelectItem>
-        <SelectItem value="sold">{t('status.sold')}</SelectItem>
-        <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
-        <SelectItem value="dead">{t('status.dead')}</SelectItem>
-      </SelectContent>
-    </Select>
+  // Filtres personnalisés (statut + espèce)
+  const filtersComponent = (
+    <div className="flex gap-2">
+      {/* Filtre par espèce */}
+      <Select
+        value={params.speciesId || 'all'}
+        onValueChange={handleSpeciesChange}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder={t('filters.allSpecies')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allSpecies')}</SelectItem>
+          {species.map((sp) => (
+            <SelectItem key={sp.id} value={sp.id}>{sp.name}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Filtre par statut */}
+      <Select
+        value={params.status || 'all'}
+        onValueChange={handleStatusChange}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder={t('filters.allStatus')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
+          <SelectItem value="alive">{t('status.alive')}</SelectItem>
+          <SelectItem value="sold">{t('status.sold')}</SelectItem>
+          <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
+          <SelectItem value="dead">{t('status.dead')}</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   );
 
   return (
     <div className="space-y-6">
-      {/* Header avec bouton d'ajout */}
+      {/* Header avec boutons d'actions */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
-        <Button onClick={handleAdd}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('newAnimal')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExport} disabled={animals.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            {tc('actions.export')}
+          </Button>
+          <Button onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newAnimal')}
+          </Button>
+        </div>
       </div>
 
       {/* DataTable avec pagination serveur (règle 7.7) */}
@@ -237,7 +352,7 @@ export default function AnimalsPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         emptyMessage={t('noAnimals')}
-        filters={statusFilterComponent}
+        filters={filtersComponent}
       />
 
       {/* Dialog unifié (consultation/modification/création) */}
