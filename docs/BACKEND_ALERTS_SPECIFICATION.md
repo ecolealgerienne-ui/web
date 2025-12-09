@@ -54,11 +54,20 @@ interface AlertTemplate {
   descriptionFr?: string
   descriptionEn?: string
   descriptionAr?: string
+  defaultReminderDays?: number    // 🆕 Valeur par défaut définie par l'admin
   isActive: boolean
   createdAt: string
   updatedAt: string
 }
 ```
+
+> **⚠️ IMPORTANT : Logique reminderDays**
+> ```
+> Priorité de la valeur reminderDays utilisée:
+> 1. Fermier (alert_template_preferences.reminderDays) - si défini
+> 2. Admin (alert_templates.defaultReminderDays) - si défini
+> 3. Fallback système - 7 jours par défaut
+> ```
 
 ### 2.2 AlertPreference (Fermier)
 ```typescript
@@ -458,6 +467,32 @@ class AlertEngine {
 
 ### 5.2 Générateurs par Catégorie
 
+#### 5.2.0 Helper : Calcul reminderDays
+```typescript
+/**
+ * Calcule la valeur reminderDays selon la priorité:
+ * 1. Valeur fermier (préférence)
+ * 2. Valeur admin (template)
+ * 3. Fallback système
+ */
+function getReminderDays(
+  pref: AlertPreference,
+  systemDefault: number = 7
+): number {
+  // 1. Priorité: valeur du fermier
+  if (pref.reminderDays !== null && pref.reminderDays !== undefined) {
+    return pref.reminderDays
+  }
+  // 2. Sinon: valeur par défaut de l'admin
+  if (pref.alertTemplate?.defaultReminderDays !== null &&
+      pref.alertTemplate?.defaultReminderDays !== undefined) {
+    return pref.alertTemplate.defaultReminderDays
+  }
+  // 3. Sinon: fallback système
+  return systemDefault
+}
+```
+
 #### 5.2.1 Vaccination
 ```typescript
 class VaccinationAlertGenerator implements AlertGenerator {
@@ -467,7 +502,8 @@ class VaccinationAlertGenerator implements AlertGenerator {
     const alerts: GeneratedAlert[] = []
 
     for (const pref of preferences) {
-      const reminderDays = pref.reminderDays ?? 7
+      // Utilise: fermier → admin → 7 jours par défaut
+      const reminderDays = getReminderDays(pref, 7)
 
       // Récupérer les animaux avec vaccinations à venir
       const animals = await this.getAnimalsNeedingVaccination(
@@ -507,7 +543,8 @@ class TreatmentAlertGenerator implements AlertGenerator {
     const alerts: GeneratedAlert[] = []
 
     for (const pref of preferences) {
-      const reminderDays = pref.reminderDays ?? 3
+      // Utilise: fermier → admin → 3 jours par défaut
+      const reminderDays = getReminderDays(pref, 3)
 
       // Alertes possibles:
       // - TREATMENT_EXPIRING: Traitements qui se terminent bientôt
@@ -555,11 +592,14 @@ class NutritionAlertGenerator implements AlertGenerator {
       // - GMQ_LOW: GMQ en dessous du seuil
       // - WEIGHT_LOSS: Perte de poids détectée
 
+      // Utilise: fermier → admin → 30 jours par défaut (intervalle pesée)
+      const reminderDays = getReminderDays(pref, 30)
+
       switch (pref.alertTemplate.code) {
         case 'WEIGHING_DUE':
           const animalsToWeigh = await this.getAnimalsNeedingWeighing(
             farmId,
-            pref.reminderDays ?? 30  // Intervalle de pesée recommandé
+            reminderDays
           )
           for (const animal of animalsToWeigh) {
             alerts.push({
