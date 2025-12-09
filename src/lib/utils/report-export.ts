@@ -167,16 +167,16 @@ export function exportHerdInventory(
   options: Partial<ExportOptions> = {}
 ): void {
   const headers = [
-    t('reports.columns.visualId'),
-    t('reports.columns.officialNumber'),
-    t('reports.columns.species'),
-    t('reports.columns.breed'),
-    t('reports.columns.sex'),
-    t('reports.columns.birthDate'),
-    t('reports.columns.age'),
-    t('reports.columns.status'),
-    t('reports.columns.lot'),
-    t('reports.columns.weight'),
+    t('columns.visualId'),
+    t('columns.officialNumber'),
+    t('columns.species'),
+    t('columns.breed'),
+    t('columns.sex'),
+    t('columns.birthDate'),
+    t('columns.age'),
+    t('columns.status'),
+    t('columns.lot'),
+    t('columns.weight'),
   ];
 
   const rows = (data?.details || []).map(animal => [
@@ -194,7 +194,7 @@ export function exportHerdInventory(
 
   const exportOptions: ExportOptions = {
     filename: options.filename || `inventaire_cheptel_${getDateSuffix()}`,
-    title: t('reports.definitions.herd-inventory.name'),
+    title: t('definitions.herd-inventory.name'),
     period: options.period,
     farmName: options.farmName,
   };
@@ -222,14 +222,14 @@ export function exportTreatmentsReport(
   options: Partial<ExportOptions> = {}
 ): void {
   const headers = [
-    t('reports.columns.date'),
-    t('reports.columns.visualId'),
-    t('reports.columns.type'),
-    t('reports.columns.product'),
-    t('reports.columns.dosage'),
-    t('reports.columns.veterinarian'),
-    t('reports.columns.withdrawalDate'),
-    t('reports.columns.status'),
+    t('columns.date'),
+    t('columns.visualId'),
+    t('columns.type'),
+    t('columns.product'),
+    t('columns.dosage'),
+    t('columns.veterinarian'),
+    t('columns.withdrawalDate'),
+    t('columns.status'),
   ];
 
   const rows = (data?.details || []).map(treatment => [
@@ -245,7 +245,7 @@ export function exportTreatmentsReport(
 
   const exportOptions: ExportOptions = {
     filename: options.filename || `traitements_${getDateSuffix()}`,
-    title: t('reports.definitions.treatments-report.name'),
+    title: t('definitions.treatments-report.name'),
     period: options.period,
     farmName: options.farmName,
   };
@@ -273,12 +273,12 @@ export function exportVaccinationsReport(
   options: Partial<ExportOptions> = {}
 ): void {
   const headers = [
-    t('reports.columns.date'),
-    t('reports.columns.visualId'),
-    t('reports.columns.product'),
-    t('reports.columns.batchNumber'),
-    t('reports.columns.veterinarian'),
-    t('reports.columns.nextDueDate'),
+    t('columns.date'),
+    t('columns.visualId'),
+    t('columns.product'),
+    t('columns.batchNumber'),
+    t('columns.veterinarian'),
+    t('columns.nextDueDate'),
   ];
 
   const rows = (data?.details || []).map(vaccination => [
@@ -292,7 +292,7 @@ export function exportVaccinationsReport(
 
   const exportOptions: ExportOptions = {
     filename: options.filename || `vaccinations_${getDateSuffix()}`,
-    title: t('reports.definitions.vaccinations-report.name'),
+    title: t('definitions.vaccinations-report.name'),
     period: options.period,
     farmName: options.farmName,
   };
@@ -321,11 +321,11 @@ export function exportGrowthReport(
 ): void {
   // Export des données par lot
   const headers = [
-    t('reports.columns.lot'),
-    t('reports.columns.animalCount'),
-    t('reports.columns.avgWeight'),
-    t('reports.columns.avgDailyGain'),
-    t('reports.columns.gmqStatus'),
+    t('columns.lot'),
+    t('columns.animalCount'),
+    t('columns.avgWeight'),
+    t('columns.avgDailyGain'),
+    t('columns.gmqStatus'),
   ];
 
   const rows = (data?.byLot || []).map(lot => [
@@ -333,12 +333,12 @@ export function exportGrowthReport(
     lot.animalCount,
     `${lot.avgWeight.toFixed(1)} kg`,
     `${lot.avgDailyGain.toFixed(2)} kg/j`,
-    t(`reports.gmqStatus.${lot.gmqStatus}`),
+    t(`gmqStatus.${lot.gmqStatus}`),
   ]);
 
   const exportOptions: ExportOptions = {
     filename: options.filename || `croissance_${getDateSuffix()}`,
-    title: t('reports.definitions.growth-report.name'),
+    title: t('definitions.growth-report.name'),
     period: options.period,
     farmName: options.farmName,
   };
@@ -366,12 +366,12 @@ export function exportMovementsReport(
   options: Partial<ExportOptions> = {}
 ): void {
   const headers = [
-    t('reports.columns.date'),
-    t('reports.columns.type'),
-    t('reports.columns.visualId'),
-    t('reports.columns.source'),
-    t('reports.columns.destination'),
-    t('reports.columns.reason'),
+    t('columns.date'),
+    t('columns.type'),
+    t('columns.visualId'),
+    t('columns.source'),
+    t('columns.destination'),
+    t('columns.reason'),
   ];
 
   const rows = (data?.details || []).map(movement => [
@@ -385,7 +385,7 @@ export function exportMovementsReport(
 
   const exportOptions: ExportOptions = {
     filename: options.filename || `mouvements_${getDateSuffix()}`,
-    title: t('reports.definitions.movements-report.name'),
+    title: t('definitions.movements-report.name'),
     period: options.period,
     farmName: options.farmName,
   };
