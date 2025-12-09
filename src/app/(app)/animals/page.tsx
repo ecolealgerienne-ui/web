@@ -114,7 +114,7 @@ export default function AnimalsPage() {
       case 'sold':
         return 'warning';
       case 'slaughtered':
-        return 'destructive'; // Rouge pour abattu
+        return 'default'; // Gris pour abattu (opération normale)
       case 'dead':
         return 'destructive';
       default:
