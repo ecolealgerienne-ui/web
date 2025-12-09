@@ -114,11 +114,9 @@ export default function AnimalsPage() {
       case 'sold':
         return 'warning';
       case 'slaughtered':
-        return 'default'; // Gris neutre pour abattu
+        return 'destructive'; // Rouge pour abattu
       case 'dead':
         return 'destructive';
-      case 'missing':
-        return 'warning';
       default:
         return 'default';
     }
@@ -203,7 +201,6 @@ export default function AnimalsPage() {
         <SelectItem value="sold">{t('status.sold')}</SelectItem>
         <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
         <SelectItem value="dead">{t('status.dead')}</SelectItem>
-        <SelectItem value="missing">{t('status.missing')}</SelectItem>
       </SelectContent>
     </Select>
   );
