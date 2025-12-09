@@ -69,7 +69,7 @@ function exportToCSV(
     new Date(event.movementDate).toLocaleDateString(),
     t(`types.${event.movementType}`),
     event.reason || t(`types.${event.movementType}`),
-    (event.animalIds?.length || 0).toString(),
+    (event.animalCount ?? event.animalIds?.length ?? 0).toString(),
     event.status ? t(`statuses.${event.status}`) : '-',
     event.notes || '-',
   ]);
@@ -213,7 +213,7 @@ export default function AnimalEventsPage() {
       render: (event) => (
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-muted-foreground" />
-          <span>{event.animalIds?.length || 0}</span>
+          <span>{event.animalCount ?? event.animalIds?.length ?? 0}</span>
         </div>
       ),
     },

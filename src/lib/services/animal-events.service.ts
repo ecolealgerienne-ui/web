@@ -77,14 +77,37 @@ interface BackendMovement {
   // Metadata
   createdAt?: string;
   updatedAt?: string;
+
+  // Relations from backend
+  movementAnimals?: Array<{
+    id: string;
+    movementId: string;
+    animalId: string;
+    animal?: {
+      id: string;
+      visualId?: string;
+      currentEid?: string;
+      officialNumber?: string;
+      sex?: string;
+    };
+  }>;
+  _count?: {
+    movementAnimals: number;
+  };
 }
 
 // Mapping backend movement -> frontend AnimalEvent
 function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
+  // Extract animal IDs from movementAnimals relation or use animalIds if available
+  const animalIds = movement.movementAnimals
+    ? movement.movementAnimals.map(ma => ma.animalId)
+    : (movement.animalIds || []);
+
   return {
     id: movement.id,
     farmId: movement.farmId,
-    animalIds: movement.animalIds || [],
+    animalIds,
+    animalCount: movement._count?.movementAnimals ?? animalIds.length,
     movementType: movement.movementType as AnimalEventType,
     movementDate: movement.movementDate,
     lotId: movement.lotId,
