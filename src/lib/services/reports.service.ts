@@ -180,9 +180,15 @@ class ReportsService {
       if (filters.speciesId) params.append('speciesId', filters.speciesId);
 
       const url = `${this.getBasePath()}/data?${params.toString()}`;
-      const response = await apiClient.get<T>(url);
+      const response = await apiClient.get<any>(url);
 
-      return response;
+      // Le backend peut double-wrapper la réponse: { success, data: { type, details } }
+      // apiClient unwrap déjà un niveau, mais si on a encore { success, data }, unwrap à nouveau
+      if (response && typeof response === 'object' && 'success' in response && 'data' in response) {
+        return response.data as T;
+      }
+
+      return response as T;
     } catch (error: any) {
       logger.error('Failed to fetch report data', { error, filters });
       throw error;
