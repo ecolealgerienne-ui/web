@@ -2305,6 +2305,7 @@
     "editWeighing": "Modifier la pesée",
     "stats": {
       "total": "Total pesées",
+      "thisMonth": "Ce mois",
       "uniqueAnimals": "Animaux pesés",
       "latestAvgWeight": "Poids moyen actuel",
       "avgDailyGain": "GMQ moyen"
