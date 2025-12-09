@@ -56,11 +56,12 @@ class AnimalsService {
         queryParams.append('search', params.search);
       }
 
-      // Tri
-      if (params.sortBy) {
-        queryParams.append('sortBy', params.sortBy);
-        queryParams.append('sortOrder', params.sortOrder || 'asc');
-      }
+      // Note: Le tri n'est pas encore supporté par le backend
+      // TODO: Activer quand le backend le supportera
+      // if (params.sortBy) {
+      //   queryParams.append('sortBy', params.sortBy);
+      //   queryParams.append('sortOrder', params.sortOrder || 'asc');
+      // }
 
       const url = `${this.getBasePath()}?${queryParams.toString()}`;
       const response = await apiClient.get<PaginatedResponse<Animal>>(url);

@@ -183,9 +183,10 @@ export default function AnimalsPage() {
     setParams(prev => ({ ...prev, status, page: 1 }));
   }, [setParams]);
 
-  const handleSortChange = useCallback((sortBy: string, sortOrder: 'asc' | 'desc') => {
-    setParams(prev => ({ ...prev, sortBy, sortOrder }));
-  }, [setParams]);
+  // Note: Le tri n'est pas encore supporté par le backend
+  // const handleSortChange = useCallback((sortBy: string, sortOrder: 'asc' | 'desc') => {
+  //   setParams(prev => ({ ...prev, sortBy, sortOrder }));
+  // }, [setParams]);
 
   // Filtre personnalisé pour le statut
   const statusFilterComponent = (
@@ -235,9 +236,6 @@ export default function AnimalsPage() {
         searchValue={params.search || ''}
         onSearchChange={handleSearchChange}
         searchPlaceholder={t('filters.search')}
-        sortBy={params.sortBy}
-        sortOrder={params.sortOrder}
-        onSortChange={handleSortChange}
         onRowClick={handleViewDetail}
         onEdit={handleEdit}
         onDelete={handleDelete}

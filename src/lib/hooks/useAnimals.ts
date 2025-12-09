@@ -33,8 +33,9 @@ const DEFAULT_PARAMS: AnimalFilterParams = {
   limit: 25,
   status: 'all',
   search: '',
-  sortBy: 'createdAt',
-  sortOrder: 'desc',
+  // Note: Le tri n'est pas encore supporté par le backend
+  // sortBy: 'createdAt',
+  // sortOrder: 'desc',
 }
 
 export function useAnimals(initialParams?: Partial<AnimalFilterParams>): UseAnimalsResult {
