@@ -2175,7 +2175,9 @@
     "eventCount_plural": "{count} événements",
     "filters": {
       "allTypes": "Tous les types",
-      "search": "Rechercher..."
+      "search": "Rechercher...",
+      "fromDate": "Date début",
+      "toDate": "Date fin"
     },
     "types": {
       "undefined": "Non défini",
@@ -2194,6 +2196,7 @@
       "vaccination": "Vaccination",
       "treatment": "Traitement",
       "weighing": "Pesée",
+      "slaughter": "Abattage",
       "other": "Autre"
     },
     "fields": {
@@ -2215,6 +2218,7 @@
       "animalsInMovement": "Animaux dans ce mouvement",
       "reason": "Motif",
       "status": "Statut",
+      "animalsCount": "Nb d'animaux",
       "buyerName": "Nom de l'acheteur",
       "buyerType": "Type d'acheteur",
       "buyerContact": "Contact de l'acheteur",
