@@ -23,6 +23,7 @@ class WeighingsService {
       const params = new URLSearchParams();
 
       if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.animalStatus) params.append('animalStatus', filters.animalStatus);
       if (filters?.source) params.append('source', filters.source);
       if (filters?.fromDate) params.append('fromDate', filters.fromDate);
       if (filters?.toDate) params.append('toDate', filters.toDate);
@@ -79,11 +80,12 @@ class WeighingsService {
     return response.data;
   }
 
-  async getStats(filters?: { fromDate?: string; toDate?: string }): Promise<WeightStats> {
+  async getStats(filters?: { fromDate?: string; toDate?: string; animalStatus?: string }): Promise<WeightStats> {
     try {
       const params = new URLSearchParams();
       if (filters?.fromDate) params.append('fromDate', filters.fromDate);
       if (filters?.toDate) params.append('toDate', filters.toDate);
+      if (filters?.animalStatus) params.append('animalStatus', filters.animalStatus);
 
       const url = params.toString()
         ? `${this.getBasePath()}/stats?${params.toString()}`

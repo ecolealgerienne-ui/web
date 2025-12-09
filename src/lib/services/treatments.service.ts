@@ -7,6 +7,23 @@ import { apiClient } from '@/lib/api/client';
 import { Treatment, TreatmentFilters, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
+import type { PaginatedResponse } from '@/lib/types/common/api';
+
+/**
+ * Paramètres de filtre pour la liste des traitements
+ */
+export interface TreatmentFilterParams {
+  page?: number;
+  limit?: number;
+  type?: string;
+  status?: string;
+  animalId?: string;
+  productId?: string;
+  lotId?: string;
+  fromDate?: string;
+  toDate?: string;
+  search?: string;
+}
 
 class TreatmentsService {
   private getBasePath(): string {
@@ -18,31 +35,78 @@ class TreatmentsService {
   }
 
   /**
-   * Récupère tous les traitements avec filtres API
-   * @see GET /api/v1/farms/{farmId}/treatments
+   * Récupère la liste paginée des traitements
    */
-  async getAll(filters?: Partial<TreatmentFilters>): Promise<Treatment[]> {
+  async getAll(params: TreatmentFilterParams = {}): Promise<PaginatedResponse<Treatment>> {
     try {
-      const params = new URLSearchParams();
+      const queryParams = new URLSearchParams();
 
-      // Filtres API
-      if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
-      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
-      if (filters?.animalId) params.append('animalId', filters.animalId);
-      if (filters?.productId) params.append('productId', filters.productId);
-      if (filters?.lotId) params.append('lotId', filters.lotId);
-      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
-      if (filters?.toDate) params.append('toDate', filters.toDate);
+      // Pagination
+      const page = params.page || 1;
+      const limit = Math.min(params.limit || 25, 100);
+      queryParams.append('page', String(page));
+      queryParams.append('limit', String(limit));
 
-      const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<Treatment[]>(url);
-      logger.info('Treatments fetched', { count: (response || []).length });
-      return response || [];
+      // Filtres
+      if (params.type && params.type !== 'all') queryParams.append('type', params.type);
+      if (params.status && params.status !== 'all') queryParams.append('status', params.status);
+      if (params.animalId) queryParams.append('animalId', params.animalId);
+      if (params.productId) queryParams.append('productId', params.productId);
+      if (params.lotId) queryParams.append('lotId', params.lotId);
+      if (params.fromDate) queryParams.append('fromDate', params.fromDate);
+      if (params.toDate) queryParams.append('toDate', params.toDate);
+
+      const url = `${this.getBasePath()}?${queryParams.toString()}`;
+      const response = await apiClient.get<PaginatedResponse<Treatment> | Treatment[]>(url);
+
+      // Handle both paginated and non-paginated responses from backend
+      let treatments: Treatment[];
+      let meta: { total: number; page: number; limit: number; totalPages: number };
+
+      if (Array.isArray(response)) {
+        // Backend returns array (non-paginated fallback)
+        treatments = response;
+        meta = {
+          total: treatments.length,
+          page,
+          limit,
+          totalPages: Math.ceil(treatments.length / limit)
+        };
+      } else if (response && 'data' in response && Array.isArray(response.data)) {
+        // Backend returns paginated response
+        treatments = response.data;
+        meta = response.meta || {
+          total: treatments.length,
+          page,
+          limit,
+          totalPages: Math.ceil(treatments.length / limit)
+        };
+      } else {
+        // Fallback for unexpected format
+        treatments = [];
+        meta = { total: 0, page, limit, totalPages: 0 };
+      }
+
+      logger.info('Treatments fetched', {
+        total: meta.total,
+        page: meta.page,
+        limit: meta.limit
+      });
+
+      return { data: treatments, meta };
     } catch (error: unknown) {
       const err = error as { status?: number };
       if (err.status === 404) {
         logger.info('No treatments found (404)');
-        return [];
+        return {
+          data: [],
+          meta: {
+            total: 0,
+            page: params.page || 1,
+            limit: params.limit || 25,
+            totalPages: 0
+          }
+        };
       }
       logger.error('Failed to fetch treatments', { error });
       throw error;

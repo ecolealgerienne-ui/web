@@ -123,9 +123,9 @@ export function TreatmentDialog({
     setSearchError(null);
 
     try {
-      const animals = await animalsService.getAll({ search: officialId, limit: 10 });
+      const response = await animalsService.getAll({ search: officialId, limit: 10 });
 
-      const exactMatch = animals.find(a =>
+      const exactMatch = response.data.find(a =>
         a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
         a.visualId?.toLowerCase() === officialId.toLowerCase() ||
         a.currentEid?.toLowerCase() === officialId.toLowerCase()
@@ -134,9 +134,9 @@ export function TreatmentDialog({
       if (exactMatch) {
         setSelectedAnimal(exactMatch);
         setFormData(prev => ({ ...prev, animalId: exactMatch.id }));
-      } else if (animals.length > 0) {
-        setSelectedAnimal(animals[0]);
-        setFormData(prev => ({ ...prev, animalId: animals[0].id }));
+      } else if (response.data.length > 0) {
+        setSelectedAnimal(response.data[0]);
+        setFormData(prev => ({ ...prev, animalId: response.data[0].id }));
       } else {
         setSearchError(t('messages.animalNotFound'));
       }

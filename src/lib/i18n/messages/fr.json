@@ -14,7 +14,8 @@
       "refresh": "Rafraîchir",
       "loading": "Chargement...",
       "saving": "Enregistrement...",
-      "deleting": "Suppression..."
+      "deleting": "Suppression...",
+      "export": "Exporter"
     },
     "status": {
       "active": "Actif",
@@ -1921,7 +1922,10 @@
       "notes": "Notes",
       "isActive": "Actif",
       "createdAt": "Créé le",
-      "updatedAt": "Modifié le"
+      "updatedAt": "Modifié le",
+      "species": "Espèce",
+      "breed": "Race",
+      "age": "Âge"
     },
     "sections": {
       "general": "Informations générales",
@@ -2031,7 +2035,11 @@
       "priceTotal": "Montant total",
       "animals": "Animaux",
       "animalsInLot": "Animaux dans ce lot",
-      "createdAt": "Date de création"
+      "createdAt": "Date de création",
+      "avgWeight": "Poids moy.",
+      "gmq": "GMQ",
+      "progress": "Progression",
+      "daysToTarget": "Jours restants"
     },
     "placeholders": {
       "name": "Ex: Traitement antiparasitaire Mars 2025",
@@ -2108,7 +2116,8 @@
       "total": "Total des traitements",
       "inProgress": "En cours",
       "completed": "Terminés",
-      "totalCost": "Coût total"
+      "totalCost": "Coût total",
+      "activeWithdrawals": "Délais d'attente actifs"
     },
     "sections": {
       "animal": "Animal",
@@ -2171,7 +2180,9 @@
     "eventCount_plural": "{count} événements",
     "filters": {
       "allTypes": "Tous les types",
-      "search": "Rechercher..."
+      "search": "Rechercher...",
+      "fromDate": "Date début",
+      "toDate": "Date fin"
     },
     "types": {
       "undefined": "Non défini",
@@ -2190,6 +2201,7 @@
       "vaccination": "Vaccination",
       "treatment": "Traitement",
       "weighing": "Pesée",
+      "slaughter": "Abattage",
       "other": "Autre"
     },
     "fields": {
@@ -2211,6 +2223,7 @@
       "animalsInMovement": "Animaux dans ce mouvement",
       "reason": "Motif",
       "status": "Statut",
+      "animalsCount": "Nb d'animaux",
       "buyerName": "Nom de l'acheteur",
       "buyerType": "Type d'acheteur",
       "buyerContact": "Contact de l'acheteur",
@@ -2292,6 +2305,7 @@
     "editWeighing": "Modifier la pesée",
     "stats": {
       "total": "Total pesées",
+      "thisMonth": "Ce mois",
       "uniqueAnimals": "Animaux pesés",
       "latestAvgWeight": "Poids moyen actuel",
       "avgDailyGain": "GMQ moyen"
@@ -2300,9 +2314,17 @@
       "title": "Filtres",
       "search": "Recherche",
       "fromDate": "Date début",
-      "toDate": "Date fin"
+      "toDate": "Date fin",
+      "allStatuses": "Tous les statuts"
     },
     "searchPlaceholder": "Rechercher un animal...",
+    "animalStatus": {
+      "alive": "Vivant",
+      "sold": "Vendu",
+      "dead": "Mort",
+      "slaughtered": "Abattu",
+      "draft": "Brouillon"
+    },
     "source": {
       "all": "Toutes les sources",
       "manual": "Manuel",
@@ -2365,25 +2387,40 @@
     "subtitle": "Générez des rapports détaillés pour votre exploitation",
     "settings": {
       "title": "Paramètres généraux",
-      "description": "Définissez la période par défaut pour tous les rapports",
-      "customPeriod": "Période personnalisée",
-      "applyToAll": "Appliquer à tous"
+      "description": "Définissez la période et les filtres pour tous les rapports"
     },
     "period": {
       "label": "Période",
       "week": "Semaine",
       "month": "Mois",
       "quarter": "Trimestre",
-      "year": "Année"
+      "year": "Année",
+      "custom": "Personnalisée"
+    },
+    "filters": {
+      "fromDate": "Date début",
+      "toDate": "Date fin",
+      "animalStatus": "Statut animal",
+      "species": "Espèce",
+      "lot": "Lot",
+      "active": "Filtres actifs"
+    },
+    "preview": {
+      "title": "Aperçu du rapport",
+      "description": "Premiers 50 enregistrements. Exportez pour voir toutes les données."
+    },
+    "animalStatus": {
+      "all": "Tous les statuts",
+      "alive": "Vivant",
+      "sold": "Vendu",
+      "dead": "Mort",
+      "slaughtered": "Abattu",
+      "draft": "Brouillon"
     },
     "categoryTitles": {
       "health": "Rapports Sanitaires",
       "production": "Rapports de Production",
-      "financial": "Rapports Financiers & Réglementaires"
-    },
-    "buttons": {
-      "generate": "Générer",
-      "exportPdf": "Exporter en PDF"
+      "regulatory": "Rapports Réglementaires"
     },
     "definitions": {
       "herd-inventory": {
@@ -2405,15 +2442,44 @@
       "growth-report": {
         "name": "Croissance et Performance",
         "description": "Évolution des poids et gains moyens quotidiens"
-      },
-      "health-report": {
-        "name": "Bilan Sanitaire",
-        "description": "Taux de morbidité, mortalité et incidents sanitaires"
-      },
-      "financial-report": {
-        "name": "Rapport Financier",
-        "description": "Coûts des soins vétérinaires et revenus"
       }
+    },
+    "columns": {
+      "visualId": "N° Visuel",
+      "officialNumber": "N° Officiel",
+      "species": "Espèce",
+      "breed": "Race",
+      "sex": "Sexe",
+      "birthDate": "Date de naissance",
+      "age": "Âge",
+      "status": "Statut",
+      "lot": "Lot",
+      "weight": "Poids",
+      "date": "Date",
+      "type": "Type",
+      "product": "Produit",
+      "dosage": "Dosage",
+      "veterinarian": "Vétérinaire",
+      "withdrawalDate": "Fin délai d'attente",
+      "batchNumber": "N° Lot",
+      "nextDueDate": "Prochaine échéance",
+      "animalCount": "Nb animaux",
+      "avgWeight": "Poids moyen",
+      "avgDailyGain": "GMQ moyen",
+      "gmqStatus": "Statut GMQ",
+      "source": "Origine",
+      "destination": "Destination",
+      "reason": "Motif"
+    },
+    "gmqStatus": {
+      "excellent": "Excellent",
+      "good": "Bon",
+      "warning": "Attention",
+      "critical": "Critique"
+    },
+    "messages": {
+      "exportSuccess": "Rapport exporté avec succès",
+      "exportError": "Erreur lors de l'export du rapport"
     }
   },
   "onboarding": {
@@ -3061,7 +3127,69 @@
     "login": "Se connecter",
     "getStarted": "Commencer",
     "accessDashboard": "Accéder au tableau de bord",
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "login": "Connexion",
+      "getStarted": "Commencer",
+      "dashboard": "Tableau de bord"
+    },
+    "hero": {
+      "badge": "Nouvelle génération de gestion d'élevage",
+      "titleHighlight": "Gérez votre élevage",
+      "titleRest": "avec intelligence",
+      "subtitle": "La plateforme tout-en-un qui simplifie la gestion de votre cheptel. Suivi sanitaire, traçabilité, rapports — tout ce dont vous avez besoin pour une exploitation moderne.",
+      "cta": {
+        "primary": "Commencer gratuitement",
+        "secondary": "Voir la démo"
+      },
+      "trust": {
+        "noCard": "Sans carte bancaire",
+        "freeTrial": "14 jours d'essai gratuit",
+        "cancel": "Annulation à tout moment"
+      },
+      "preview": {
+        "title": "Tableau de bord intelligent",
+        "subtitle": "Visualisez toutes vos données en un coup d'œil"
+      }
+    },
+    "stats": {
+      "animals": "Animaux gérés",
+      "farms": "Exploitations",
+      "uptime": "Disponibilité",
+      "rating": "Note moyenne"
+    },
     "features": {
+      "badge": "Fonctionnalités",
+      "title": "Tout ce dont vous avez besoin",
+      "subtitle": "Une suite complète d'outils pour gérer votre élevage de manière professionnelle",
+      "items": {
+        "tracking": {
+          "title": "Suivi des animaux",
+          "description": "Gérez vos animaux avec traçabilité complète de la naissance à la sortie du troupeau"
+        },
+        "health": {
+          "title": "Santé & Traitements",
+          "description": "Planifiez vaccinations, traitements et suivez l'historique sanitaire complet"
+        },
+        "reports": {
+          "title": "Rapports avancés",
+          "description": "Analysez vos données avec des rapports détaillés et des graphiques interactifs"
+        },
+        "lots": {
+          "title": "Gestion des lots",
+          "description": "Organisez vos animaux en lots pour optimiser l'alimentation et le suivi"
+        },
+        "compliance": {
+          "title": "Conformité réglementaire",
+          "description": "Respectez les normes avec un historique détaillé et des exports officiels"
+        },
+        "team": {
+          "title": "Travail en équipe",
+          "description": "Collaborez avec votre équipe grâce aux rôles et permissions personnalisés"
+        }
+      },
       "animalTracking": {
         "title": "Suivi des animaux",
         "description": "Gérez vos animaux avec traçabilité complète de la naissance à la sortie"
@@ -3087,6 +3215,97 @@
         "description": "Collaborez avec votre équipe avec des rôles et permissions adaptés"
       }
     },
+    "howItWorks": {
+      "badge": "Comment ça marche",
+      "title": "Démarrez en 3 étapes simples",
+      "subtitle": "Commencez à gérer votre élevage en quelques minutes seulement",
+      "steps": {
+        "signup": {
+          "title": "Créez votre compte",
+          "description": "Inscription gratuite en moins de 2 minutes. Aucune carte bancaire requise."
+        },
+        "configure": {
+          "title": "Configurez votre ferme",
+          "description": "Ajoutez vos animaux, définissez vos lots et personnalisez vos paramètres."
+        },
+        "manage": {
+          "title": "Gérez efficacement",
+          "description": "Suivez vos animaux, enregistrez les événements et analysez vos performances."
+        }
+      }
+    },
+    "testimonials": {
+      "badge": "Témoignages",
+      "title": "Ils nous font confiance",
+      "items": {
+        "farmer1": {
+          "quote": "AniTra a révolutionné la gestion de mon exploitation. Je gagne un temps précieux chaque jour.",
+          "author": "Ahmed B.",
+          "role": "Éleveur bovin, Sétif"
+        },
+        "farmer2": {
+          "quote": "Interface intuitive et support réactif. Je recommande vivement à tous les éleveurs.",
+          "author": "Karim M.",
+          "role": "Éleveur ovin, Djelfa"
+        },
+        "farmer3": {
+          "quote": "Enfin une solution adaptée à nos besoins locaux. La traçabilité n'a jamais été aussi simple.",
+          "author": "Fatima Z.",
+          "role": "Gérante d'exploitation, Tiaret"
+        }
+      }
+    },
+    "pricing": {
+      "badge": "Tarifs",
+      "title": "Des offres adaptées à votre exploitation",
+      "subtitle": "Choisissez le plan qui correspond à vos besoins. Évoluez à tout moment.",
+      "plans": {
+        "starter": {
+          "name": "Débutant",
+          "price": "Gratuit",
+          "period": "mois",
+          "description": "Parfait pour les petites exploitations",
+          "features": {
+            "animals": "Jusqu'à 50 animaux",
+            "users": "1 utilisateur",
+            "reports": "Rapports de base",
+            "support": "Support par email"
+          }
+        },
+        "professional": {
+          "name": "Professionnel",
+          "price": "4 900 DA",
+          "period": "mois",
+          "description": "Pour les exploitations en croissance",
+          "features": {
+            "animals": "Jusqu'à 500 animaux",
+            "users": "5 utilisateurs",
+            "reports": "Rapports avancés",
+            "support": "Support prioritaire",
+            "api": "Accès API"
+          }
+        },
+        "enterprise": {
+          "name": "Entreprise",
+          "price": "Sur devis",
+          "period": "mois",
+          "description": "Pour les grandes exploitations",
+          "features": {
+            "animals": "Animaux illimités",
+            "users": "Utilisateurs illimités",
+            "reports": "Rapports personnalisés",
+            "support": "Support dédié 24/7",
+            "api": "API complète",
+            "sla": "SLA garanti"
+          }
+        }
+      }
+    },
+    "cta": {
+      "title": "Prêt à transformer votre élevage ?",
+      "subtitle": "Rejoignez des centaines d'éleveurs qui ont déjà modernisé leur gestion avec AniTra",
+      "button": "Commencer maintenant"
+    },
     "benefits": {
       "title": "Pourquoi choisir notre solution ?",
       "modernInterface": "Interface moderne et intuitive pour une prise en main facile",
@@ -3096,6 +3315,25 @@
       "regularUpdates": "Mises à jour régulières avec de nouvelles fonctionnalités"
     },
     "footer": {
+      "description": "La solution complète pour la gestion moderne de votre élevage",
+      "product": {
+        "title": "Produit",
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "demo": "Démonstration"
+      },
+      "company": {
+        "title": "Entreprise",
+        "about": "À propos",
+        "contact": "Contact",
+        "blog": "Blog"
+      },
+      "legal": {
+        "title": "Légal",
+        "privacy": "Confidentialité",
+        "terms": "Conditions d'utilisation",
+        "cookies": "Politique de cookies"
+      },
       "copyright": "© 2024 École Algérienne. Tous droits réservés."
     }
   }

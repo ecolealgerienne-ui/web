@@ -1,45 +1,53 @@
 /**
  * Hook React pour la gestion des traitements
+ * Conforme aux normes DEVELOPMENT_STANDARDS.md (règle 7.7)
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Treatment, TreatmentFilters, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
-import { treatmentsService } from '@/lib/services/treatments.service';
+import { Treatment, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
+import { treatmentsService, TreatmentFilterParams } from '@/lib/services/treatments.service';
 import { logger } from '@/lib/utils/logger';
 
-export function useTreatments(filters?: Partial<TreatmentFilters>) {
+interface UseTreatmentsResult {
+  treatments: Treatment[];
+  total: number;
+  loading: boolean;
+  error: Error | null;
+  params: TreatmentFilterParams;
+  setParams: React.Dispatch<React.SetStateAction<TreatmentFilterParams>>;
+  refetch: () => Promise<void>;
+  createTreatment: (data: CreateTreatmentDto) => Promise<Treatment>;
+  updateTreatment: (id: string, data: UpdateTreatmentDto) => Promise<Treatment>;
+  deleteTreatment: (id: string) => Promise<void>;
+}
+
+const DEFAULT_PARAMS: TreatmentFilterParams = {
+  page: 1,
+  limit: 25,
+};
+
+export function useTreatments(initialParams?: Partial<TreatmentFilterParams>): UseTreatmentsResult {
   const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
-  const filterSearch = filters?.search;
-  const filterStatus = filters?.status;
-  const filterType = filters?.type;
-  const filterAnimalId = filters?.animalId;
-  const filterProductId = filters?.productId;
-  const filterLotId = filters?.lotId;
-  const filterFromDate = filters?.fromDate;
-  const filterToDate = filters?.toDate;
-
-  // Filtres envoyés à l'API (sans search qui est client-side)
-  const apiFilters = useMemo(() => ({
-    status: filterStatus,
-    type: filterType,
-    animalId: filterAnimalId,
-    productId: filterProductId,
-    lotId: filterLotId,
-    fromDate: filterFromDate,
-    toDate: filterToDate,
-  }), [filterStatus, filterType, filterAnimalId, filterProductId, filterLotId, filterFromDate, filterToDate]);
+  const [params, setParams] = useState<TreatmentFilterParams>({
+    ...DEFAULT_PARAMS,
+    ...initialParams,
+  });
 
   const fetchTreatments = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await treatmentsService.getAll(apiFilters);
-      setAllTreatments(data);
+      // Filtres envoyés à l'API (sans search qui est client-side)
+      const apiParams = { ...params };
+      delete apiParams.search;
+
+      const response = await treatmentsService.getAll(apiParams);
+      setAllTreatments(response.data);
+      setTotal(response.meta.total);
     } catch (err) {
       const error = err as Error;
       setError(error);
@@ -47,13 +55,14 @@ export function useTreatments(filters?: Partial<TreatmentFilters>) {
     } finally {
       setLoading(false);
     }
-  }, [apiFilters]);
+  }, [params]);
 
   // Filtrage client-side pour la recherche
   const treatments = useMemo(() => {
-    if (!filterSearch) return allTreatments;
+    const search = params.search;
+    if (!search) return allTreatments;
 
-    const searchLower = filterSearch.toLowerCase();
+    const searchLower = search.toLowerCase();
     return allTreatments.filter((treatment) => {
       const animalMatch =
         treatment.animal?.officialNumber?.toLowerCase().includes(searchLower) ||
@@ -67,7 +76,7 @@ export function useTreatments(filters?: Partial<TreatmentFilters>) {
 
       return animalMatch || productMatch || vetMatch || diagnosisMatch;
     });
-  }, [allTreatments, filterSearch]);
+  }, [allTreatments, params.search]);
 
   useEffect(() => {
     fetchTreatments();
@@ -92,9 +101,12 @@ export function useTreatments(filters?: Partial<TreatmentFilters>) {
 
   return {
     treatments,
+    total,
     loading,
     error,
-    refresh: fetchTreatments,
+    params,
+    setParams,
+    refetch: fetchTreatments,
     createTreatment,
     updateTreatment,
     deleteTreatment,
