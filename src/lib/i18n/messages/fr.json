@@ -2400,7 +2400,14 @@
     "filters": {
       "fromDate": "Date début",
       "toDate": "Date fin",
-      "animalStatus": "Statut animal"
+      "animalStatus": "Statut animal",
+      "species": "Espèce",
+      "lot": "Lot",
+      "active": "Filtres actifs"
+    },
+    "preview": {
+      "title": "Aperçu du rapport",
+      "description": "Premiers 50 enregistrements. Exportez pour voir toutes les données."
     },
     "animalStatus": {
       "all": "Tous les statuts",

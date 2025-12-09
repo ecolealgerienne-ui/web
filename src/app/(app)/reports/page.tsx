@@ -6,6 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import {
   REPORT_DEFINITIONS,
   ReportPeriod,
@@ -32,6 +48,8 @@ import {
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { useToast } from '@/contexts/toast-context';
 import { handleApiError } from '@/lib/utils/api-error-handler';
+import { useLots } from '@/lib/hooks/useLots';
+import { useSpecies } from '@/lib/hooks/useSpecies';
 import {
   Beef,
   Syringe,
@@ -42,6 +60,8 @@ import {
   FileText,
   FileSpreadsheet,
   Loader2,
+  Eye,
+  X,
 } from 'lucide-react';
 
 const iconMap = {
@@ -54,19 +74,35 @@ const iconMap = {
 
 const ANIMAL_STATUSES = ['all', 'alive', 'sold', 'dead', 'slaughtered', 'draft'] as const;
 
+type PreviewData = {
+  type: string;
+  data: HerdInventoryReport | TreatmentsReport | VaccinationsReport | GrowthReport | MovementsReport;
+} | null;
+
 export default function ReportsPage() {
   const t = useTranslations('reports');
   const tc = useCommonTranslations();
   const toast = useToast();
+
+  // Hooks pour lots et espèces
+  const { lots, loading: lotsLoading } = useLots({ limit: 100 });
+  const { species, loading: speciesLoading } = useSpecies();
 
   // Filtres globaux
   const [period, setPeriod] = useState<ReportPeriod>('month');
   const [customFromDate, setCustomFromDate] = useState('');
   const [customToDate, setCustomToDate] = useState('');
   const [animalStatus, setAnimalStatus] = useState<string>('all');
+  const [selectedLotIds, setSelectedLotIds] = useState<string[]>([]);
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('all');
 
   // État de chargement par rapport
   const [loadingReport, setLoadingReport] = useState<string | null>(null);
+
+  // État pour l'aperçu
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<PreviewData>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   // Obtenir les dates selon la période sélectionnée
   const getSelectedDates = useCallback(() => {
@@ -79,6 +115,57 @@ export default function ReportsPage() {
     return getPeriodDates(period);
   }, [period, customFromDate, customToDate]);
 
+  // Construire les filtres communs
+  const buildFilters = useCallback(() => {
+    const dates = getSelectedDates();
+    return {
+      fromDate: dates.fromDate,
+      toDate: dates.toDate,
+      animalStatus: animalStatus as any,
+      lotIds: selectedLotIds.length > 0 ? selectedLotIds : undefined,
+      speciesId: selectedSpeciesId !== 'all' ? selectedSpeciesId : undefined,
+    };
+  }, [getSelectedDates, animalStatus, selectedLotIds, selectedSpeciesId]);
+
+  // Aperçu d'un rapport
+  const handlePreview = useCallback(
+    async (report: ReportDefinition) => {
+      setPreviewLoading(true);
+      setPreviewOpen(true);
+
+      try {
+        const filters = buildFilters();
+        let data: any;
+
+        switch (report.type) {
+          case 'herd_inventory':
+            data = await reportsService.getHerdInventory(filters);
+            break;
+          case 'treatments':
+            data = await reportsService.getTreatmentsReport(filters);
+            break;
+          case 'vaccinations':
+            data = await reportsService.getVaccinationsReport(filters);
+            break;
+          case 'growth':
+            data = await reportsService.getGrowthReport(filters);
+            break;
+          case 'movements':
+            data = await reportsService.getMovementsReport(filters);
+            break;
+        }
+
+        setPreviewData({ type: report.type, data });
+      } catch (error) {
+        handleApiError(error, 'reports.preview', toast);
+        setPreviewOpen(false);
+      } finally {
+        setPreviewLoading(false);
+      }
+    },
+    [buildFilters, toast]
+  );
+
   // Générer et exporter un rapport
   const handleGenerateReport = useCallback(
     async (report: ReportDefinition, format: ExportFormat) => {
@@ -86,15 +173,10 @@ export default function ReportsPage() {
       setLoadingReport(reportKey);
 
       try {
-        const dates = getSelectedDates();
-        const filters = {
-          fromDate: dates.fromDate,
-          toDate: dates.toDate,
-          animalStatus: animalStatus as any,
-        };
+        const filters = buildFilters();
 
         const exportOptions = {
-          period: dates.fromDate && dates.toDate ? { from: dates.fromDate, to: dates.toDate } : undefined,
+          period: filters.fromDate && filters.toDate ? { from: filters.fromDate, to: filters.toDate } : undefined,
         };
 
         switch (report.type) {
@@ -132,7 +214,7 @@ export default function ReportsPage() {
         setLoadingReport(null);
       }
     },
-    [getSelectedDates, animalStatus, t, tc, toast]
+    [buildFilters, t, tc, toast]
   );
 
   // Couleur de catégorie
@@ -188,6 +270,14 @@ export default function ReportsPage() {
                 </CardDescription>
               </div>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handlePreview(report)}
+              title={t('preview.title')}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -257,8 +347,8 @@ export default function ReportsPage() {
           <CardTitle>{t('settings.title')}</CardTitle>
           <CardDescription>{t('settings.description')}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Période */}
             <div className="space-y-2">
               <Label htmlFor="period">{t('period.label')}</Label>
@@ -314,7 +404,94 @@ export default function ReportsPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Espèce */}
+            <div className="space-y-2">
+              <Label>{t('filters.species')}</Label>
+              <Select
+                value={selectedSpeciesId}
+                onValueChange={setSelectedSpeciesId}
+                disabled={speciesLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={speciesLoading ? tc('loading') : undefined} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{tc('all')}</SelectItem>
+                  {species.map((sp) => (
+                    <SelectItem key={sp.id} value={sp.id}>
+                      {sp.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Lot */}
+            <div className="space-y-2">
+              <Label>{t('filters.lot')}</Label>
+              <Select
+                value={selectedLotIds.length === 1 ? selectedLotIds[0] : selectedLotIds.length > 1 ? 'multiple' : 'all'}
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    setSelectedLotIds([]);
+                  } else if (value !== 'multiple') {
+                    setSelectedLotIds([value]);
+                  }
+                }}
+                disabled={lotsLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={lotsLoading ? tc('loading') : undefined} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{tc('all')}</SelectItem>
+                  {lots.map((lot) => (
+                    <SelectItem key={lot.id} value={lot.id}>
+                      {lot.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          {/* Filtres actifs */}
+          {(selectedLotIds.length > 0 || selectedSpeciesId !== 'all' || animalStatus !== 'all') && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t">
+              <span className="text-sm text-muted-foreground">{t('filters.active')}:</span>
+              {animalStatus !== 'all' && (
+                <Badge variant="secondary" className="gap-1">
+                  {t(`animalStatus.${animalStatus}`)}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => setAnimalStatus('all')}
+                  />
+                </Badge>
+              )}
+              {selectedSpeciesId !== 'all' && (
+                <Badge variant="secondary" className="gap-1">
+                  {species.find(s => s.id === selectedSpeciesId)?.name}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => setSelectedSpeciesId('all')}
+                  />
+                </Badge>
+              )}
+              {selectedLotIds.map(lotId => {
+                const lot = lots.find(l => l.id === lotId);
+                return (
+                  <Badge key={lotId} variant="secondary" className="gap-1">
+                    {lot?.name}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => setSelectedLotIds(prev => prev.filter(id => id !== lotId))}
+                    />
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -353,6 +530,208 @@ export default function ReportsPage() {
           </div>
         </div>
       )}
+
+      {/* Dialog Aperçu */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{t('preview.title')}</DialogTitle>
+            <DialogDescription>{t('preview.description')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-auto">
+            {previewLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : previewData ? (
+              <PreviewTable data={previewData} t={t} />
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+// Composant pour afficher l'aperçu des données
+function PreviewTable({ data, t }: { data: PreviewData; t: (key: string) => string }) {
+  if (!data) return null;
+
+  const formatDate = (date: string) => {
+    if (!date) return '-';
+    return new Date(date).toLocaleDateString('fr-FR');
+  };
+
+  switch (data.type) {
+    case 'herd_inventory': {
+      const report = data.data as HerdInventoryReport;
+      const details = report?.details || [];
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('columns.visualId')}</TableHead>
+              <TableHead>{t('columns.species')}</TableHead>
+              <TableHead>{t('columns.breed')}</TableHead>
+              <TableHead>{t('columns.sex')}</TableHead>
+              <TableHead>{t('columns.birthDate')}</TableHead>
+              <TableHead>{t('columns.status')}</TableHead>
+              <TableHead>{t('columns.lot')}</TableHead>
+              <TableHead className="text-right">{t('columns.weight')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {details.slice(0, 50).map((animal, idx) => (
+              <TableRow key={idx}>
+                <TableCell className="font-medium">{animal.visualId}</TableCell>
+                <TableCell>{animal.species}</TableCell>
+                <TableCell>{animal.breed}</TableCell>
+                <TableCell>{animal.sex}</TableCell>
+                <TableCell>{formatDate(animal.birthDate)}</TableCell>
+                <TableCell>{animal.status}</TableCell>
+                <TableCell>{animal.lotName || '-'}</TableCell>
+                <TableCell className="text-right">
+                  {animal.currentWeight ? `${animal.currentWeight} kg` : '-'}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
+
+    case 'treatments': {
+      const report = data.data as TreatmentsReport;
+      const details = report?.details || [];
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('columns.date')}</TableHead>
+              <TableHead>{t('columns.visualId')}</TableHead>
+              <TableHead>{t('columns.type')}</TableHead>
+              <TableHead>{t('columns.product')}</TableHead>
+              <TableHead>{t('columns.veterinarian')}</TableHead>
+              <TableHead>{t('columns.status')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {details.slice(0, 50).map((item, idx) => (
+              <TableRow key={idx}>
+                <TableCell>{formatDate(item.date)}</TableCell>
+                <TableCell className="font-medium">{item.visualId}</TableCell>
+                <TableCell>{item.type || '-'}</TableCell>
+                <TableCell>{item.productName || '-'}</TableCell>
+                <TableCell>{item.veterinarian || '-'}</TableCell>
+                <TableCell>{item.status || '-'}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
+
+    case 'vaccinations': {
+      const report = data.data as VaccinationsReport;
+      const details = report?.details || [];
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('columns.date')}</TableHead>
+              <TableHead>{t('columns.visualId')}</TableHead>
+              <TableHead>{t('columns.product')}</TableHead>
+              <TableHead>{t('columns.batchNumber')}</TableHead>
+              <TableHead>{t('columns.veterinarian')}</TableHead>
+              <TableHead>{t('columns.nextDueDate')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {details.slice(0, 50).map((item, idx) => (
+              <TableRow key={idx}>
+                <TableCell>{formatDate(item.date)}</TableCell>
+                <TableCell className="font-medium">{item.visualId}</TableCell>
+                <TableCell>{item.productName || '-'}</TableCell>
+                <TableCell>{item.batchNumber || '-'}</TableCell>
+                <TableCell>{item.veterinarian || '-'}</TableCell>
+                <TableCell>{item.nextDueDate ? formatDate(item.nextDueDate) : '-'}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
+
+    case 'growth': {
+      const report = data.data as GrowthReport;
+      const byLot = report?.byLot || [];
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('columns.lot')}</TableHead>
+              <TableHead className="text-right">{t('columns.animalCount')}</TableHead>
+              <TableHead className="text-right">{t('columns.avgWeight')}</TableHead>
+              <TableHead className="text-right">{t('columns.avgDailyGain')}</TableHead>
+              <TableHead>{t('columns.gmqStatus')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {byLot.map((lot, idx) => (
+              <TableRow key={idx}>
+                <TableCell className="font-medium">{lot.lotName}</TableCell>
+                <TableCell className="text-right">{lot.animalCount}</TableCell>
+                <TableCell className="text-right">{lot.avgWeight?.toFixed(1)} kg</TableCell>
+                <TableCell className="text-right">{lot.avgDailyGain?.toFixed(2)} kg/j</TableCell>
+                <TableCell>
+                  <Badge variant={
+                    lot.gmqStatus === 'excellent' ? 'default' :
+                    lot.gmqStatus === 'good' ? 'secondary' :
+                    lot.gmqStatus === 'warning' ? 'warning' : 'destructive'
+                  }>
+                    {t(`gmqStatus.${lot.gmqStatus}`)}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
+
+    case 'movements': {
+      const report = data.data as MovementsReport;
+      const details = report?.details || [];
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('columns.date')}</TableHead>
+              <TableHead>{t('columns.type')}</TableHead>
+              <TableHead>{t('columns.visualId')}</TableHead>
+              <TableHead>{t('columns.source')}</TableHead>
+              <TableHead>{t('columns.destination')}</TableHead>
+              <TableHead>{t('columns.reason')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {details.slice(0, 50).map((item, idx) => (
+              <TableRow key={idx}>
+                <TableCell>{formatDate(item.date)}</TableCell>
+                <TableCell>{item.type || '-'}</TableCell>
+                <TableCell className="font-medium">{item.visualId}</TableCell>
+                <TableCell>{item.source || '-'}</TableCell>
+                <TableCell>{item.destination || '-'}</TableCell>
+                <TableCell>{item.reason || '-'}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
+
+    default:
+      return null;
+  }
 }
