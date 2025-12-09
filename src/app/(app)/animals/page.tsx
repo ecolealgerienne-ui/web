@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { AnimalDialog } from '@/components/animals/animal-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
+import { handleApiError } from '@/lib/utils/api-error-handler';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,9 +28,10 @@ export default function AnimalsPage() {
   const t = useTranslations('animals');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
+
+  // Hook avec params/setParams pour la pagination (règle 7.7)
+  const { animals, total, loading, error, params, setParams, refetch } = useAnimals();
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -71,7 +73,7 @@ export default function AnimalsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (data: CreateAnimalDto | UpdateAnimalDto) => {
+  const handleSubmit = useCallback(async (data: CreateAnimalDto | UpdateAnimalDto) => {
     setIsSubmitting(true);
     try {
       if (selectedAnimal) {
@@ -84,13 +86,13 @@ export default function AnimalsPage() {
       setDialogOpen(false);
       refetch();
     } catch (error) {
-      toast.error(tc('messages.error'), t('messages.createError'));
+      handleApiError(error, 'animals.submit', toast);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [selectedAnimal, refetch, toast, tc, t]);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!animalToDelete) return;
 
     try {
@@ -100,18 +102,19 @@ export default function AnimalsPage() {
       setAnimalToDelete(null);
       refetch();
     } catch (error) {
-      toast.error(tc('messages.error'), t('messages.deleteError'));
+      handleApiError(error, 'animals.delete', toast);
     }
-  };
+  }, [animalToDelete, refetch, toast, tc, t]);
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'success' | 'warning' | 'secondary' => {
+  // Variant du badge selon le statut (règle 6.5 - utiliser uniquement les variants existants)
+  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'success' | 'warning' => {
     switch (status) {
       case 'alive':
         return 'success';
       case 'sold':
         return 'warning';
       case 'slaughtered':
-        return 'secondary';
+        return 'default'; // Gris neutre pour abattu
       case 'dead':
         return 'destructive';
       case 'missing':
@@ -163,11 +166,32 @@ export default function AnimalsPage() {
     },
   ];
 
+  // Handlers pour la pagination et les filtres (règle 7.7)
+  const handlePageChange = useCallback((page: number) => {
+    setParams(prev => ({ ...prev, page }));
+  }, [setParams]);
+
+  const handleLimitChange = useCallback((limit: number) => {
+    setParams(prev => ({ ...prev, limit, page: 1 }));
+  }, [setParams]);
+
+  const handleSearchChange = useCallback((search: string) => {
+    setParams(prev => ({ ...prev, search, page: 1 }));
+  }, [setParams]);
+
+  const handleStatusChange = useCallback((status: string) => {
+    setParams(prev => ({ ...prev, status, page: 1 }));
+  }, [setParams]);
+
+  const handleSortChange = useCallback((sortBy: string, sortOrder: 'asc' | 'desc') => {
+    setParams(prev => ({ ...prev, sortBy, sortOrder }));
+  }, [setParams]);
+
   // Filtre personnalisé pour le statut
   const statusFilterComponent = (
     <Select
-      value={statusFilter}
-      onValueChange={(value) => setStatusFilter(value)}
+      value={params.status || 'all'}
+      onValueChange={handleStatusChange}
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder={t('filters.allStatus')} />
@@ -178,6 +202,7 @@ export default function AnimalsPage() {
         <SelectItem value="sold">{t('status.sold')}</SelectItem>
         <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
         <SelectItem value="dead">{t('status.dead')}</SelectItem>
+        <SelectItem value="missing">{t('status.missing')}</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -196,16 +221,23 @@ export default function AnimalsPage() {
         </Button>
       </div>
 
-      {/* DataTable avec filtres intégrés */}
+      {/* DataTable avec pagination serveur (règle 7.7) */}
       <DataTable<Animal>
         data={animals}
         columns={columns}
-        totalItems={animals.length}
+        totalItems={total}
+        page={params.page || 1}
+        limit={params.limit || 25}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
         loading={loading}
         error={error}
-        searchValue={search}
-        onSearchChange={setSearch}
+        searchValue={params.search || ''}
+        onSearchChange={handleSearchChange}
         searchPlaceholder={t('filters.search')}
+        sortBy={params.sortBy}
+        sortOrder={params.sortOrder}
+        onSortChange={handleSortChange}
         onRowClick={handleViewDetail}
         onEdit={handleEdit}
         onDelete={handleDelete}
