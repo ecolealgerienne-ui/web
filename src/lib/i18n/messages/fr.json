@@ -2314,16 +2314,20 @@
       "title": "Filtres",
       "search": "Recherche",
       "fromDate": "Date début",
-      "toDate": "Date fin"
+      "toDate": "Date fin",
+      "allStatuses": "Tous les statuts"
     },
     "searchPlaceholder": "Rechercher un animal...",
+    "animalStatus": {
+      "alive": "Vivant",
+      "sold": "Vendu",
+      "dead": "Mort"
+    },
     "source": {
       "all": "Toutes les sources",
       "manual": "Manuel",
       "scale": "Balance",
       "estimated": "Estimé",
-      "automatic": "Automatique",
-      "weighbridge": "Pont-bascule",
       "undefined": "Non défini"
     },
     "list": "Liste des pesées",

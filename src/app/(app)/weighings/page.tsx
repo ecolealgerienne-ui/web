@@ -27,7 +27,9 @@ import { dashboardService } from '@/lib/services/dashboard.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { handleApiError } from '@/lib/utils/api-error-handler';
 
-const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
+const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
+const ANIMAL_STATUSES = ['alive', 'sold', 'dead'] as const;
+type AnimalStatus = typeof ANIMAL_STATUSES[number];
 
 /**
  * Retourne la variante de badge selon la source
@@ -35,8 +37,6 @@ const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automat
 function getSourceVariant(source?: WeightSource): 'default' | 'secondary' | 'destructive' | 'warning' | 'success' {
   switch (source) {
     case 'scale': return 'success';
-    case 'automatic': return 'success';
-    case 'weighbridge': return 'default';
     case 'manual': return 'secondary';
     case 'estimated': return 'warning';
     default: return 'secondary';
@@ -116,7 +116,7 @@ export default function WeighingsPage() {
   // Dashboard stats for additional info
   const [dashboardStats, setDashboardStats] = useState<DashboardWeightStats | null>(null);
 
-  // Fetch stats
+  // Fetch stats (recalculées selon les filtres incluant animalStatus)
   const fetchStats = useCallback(async () => {
     setStatsLoading(true);
     try {
@@ -124,6 +124,7 @@ export default function WeighingsPage() {
         weighingsService.getStats({
           fromDate: params.fromDate,
           toDate: params.toDate,
+          animalStatus: params.animalStatus,
         }),
         dashboardService.getStatsV2(),
       ]);
@@ -144,7 +145,7 @@ export default function WeighingsPage() {
     } finally {
       setStatsLoading(false);
     }
-  }, [params.fromDate, params.toDate, toast]);
+  }, [params.fromDate, params.toDate, params.animalStatus, toast]);
 
   useEffect(() => {
     fetchStats();
@@ -259,6 +260,10 @@ export default function WeighingsPage() {
     setParams(prev => ({ ...prev, toDate: toDate || undefined, page: 1 }));
   }, [setParams]);
 
+  const handleAnimalStatusChange = useCallback((status: string) => {
+    setParams(prev => ({ ...prev, animalStatus: status === 'all' ? undefined : status as AnimalStatus, page: 1 }));
+  }, [setParams]);
+
   // Export function
   const handleExport = useCallback(() => {
     exportToCSV(weighings, t);
@@ -336,6 +341,21 @@ export default function WeighingsPage() {
   // Filtres personnalisés
   const filtersComponent = (
     <div className="flex flex-wrap gap-2 items-end">
+      {/* Filtre par statut animal */}
+      <Select value={params.animalStatus || 'all'} onValueChange={handleAnimalStatusChange}>
+        <SelectTrigger className="w-[150px]">
+          <SelectValue placeholder={t('filters.allStatuses')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
+          {ANIMAL_STATUSES.map((status) => (
+            <SelectItem key={status} value={status}>
+              {t(`animalStatus.${status}`)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
       {/* Filtre par source */}
       <Select value={params.source || 'all'} onValueChange={handleSourceChange}>
         <SelectTrigger className="w-[150px]">
