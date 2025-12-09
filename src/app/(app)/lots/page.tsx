@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Package, Calendar } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Plus, Package, Users, Download, TrendingUp, TrendingDown, Minus, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useLots } from '@/lib/hooks/useLots';
-import { Lot, CreateLotDto, UpdateLotDto, LotFilters } from '@/lib/types/lot';
+import { Lot, CreateLotDto, UpdateLotDto } from '@/lib/types/lot';
 import { lotsService } from '@/lib/services/lots.service';
 import { LotDialog } from '@/components/lots/lot-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
+import { handleApiError } from '@/lib/utils/api-error-handler';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,21 +25,87 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+/**
+ * Retourne la variante de badge selon le type de lot
+ */
+function getLotTypeBadgeVariant(type: string): 'default' | 'secondary' | 'destructive' | 'success' | 'warning' {
+  switch (type) {
+    case 'fattening':
+    case 'production':
+      return 'default'; // Bleu - production
+    case 'sale':
+    case 'slaughter':
+      return 'warning'; // Orange - sortie
+    case 'purchase':
+    case 'breeding':
+    case 'reproduction':
+      return 'success'; // Vert - entrée/reproduction
+    case 'quarantine':
+    case 'treatment':
+    case 'vaccination':
+      return 'destructive'; // Rouge - santé
+    default:
+      return 'secondary'; // Gris
+  }
+}
+
+/**
+ * Retourne l'icône de tendance GMQ
+ */
+function getGmqTrendIcon(gmq: number | undefined) {
+  if (!gmq) return <Minus className="h-3 w-3 text-muted-foreground" />;
+  if (gmq >= 1.0) return <TrendingUp className="h-3 w-3 text-green-600" />;
+  if (gmq >= 0.5) return <Minus className="h-3 w-3 text-orange-500" />;
+  return <TrendingDown className="h-3 w-3 text-red-600" />;
+}
+
+/**
+ * Exporte les lots en CSV
+ */
+function exportToCSV(lots: Lot[], t: (key: string) => string, tc: (key: string) => string): void {
+  const headers = [
+    t('fields.name'),
+    t('fields.type'),
+    t('fields.status'),
+    tc('labels.animals'),
+    t('fields.avgWeight'),
+    t('fields.gmq'),
+    t('fields.progress'),
+    t('fields.daysToTarget'),
+  ];
+
+  const rows = lots.map(lot => [
+    lot.name,
+    t(`type.${lot.type}`),
+    t(`status.${lot.status}`),
+    (lot._count?.lotAnimals || 0).toString(),
+    lot.stats?.avgWeight ? `${lot.stats.avgWeight.toFixed(1)} kg` : '-',
+    lot.stats?.avgDailyGain ? `${lot.stats.avgDailyGain.toFixed(2)} kg/j` : '-',
+    lot.stats?.progress ? `${lot.stats.progress.toFixed(0)}%` : '-',
+    lot.stats?.estimatedDaysToTarget ? `${lot.stats.estimatedDaysToTarget}j` : '-',
+  ]);
+
+  const csvContent = [
+    headers.join(';'),
+    ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
+  ].join('\n');
+
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `lots_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function LotsPage() {
   const t = useTranslations('lots');
   const tc = useCommonTranslations();
   const toast = useToast();
-  const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filters: Partial<LotFilters> = {
-    search: search || undefined,
-    type: typeFilter !== 'all' ? typeFilter as LotFilters['type'] : undefined,
-    status: statusFilter !== 'all' ? statusFilter as LotFilters['status'] : undefined,
-  };
-
-  const { lots, loading, error, refresh } = useLots(filters);
+  // Hook avec params/setParams pour la pagination (règle 7.7)
+  const { lots, total, loading, error, params, setParams, refetch } = useLots();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
@@ -80,7 +148,7 @@ export default function LotsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (data: CreateLotDto | UpdateLotDto) => {
+  const handleSubmit = useCallback(async (data: CreateLotDto | UpdateLotDto) => {
     setIsSubmitting(true);
     try {
       if (selectedLot) {
@@ -91,28 +159,29 @@ export default function LotsPage() {
         toast.success(tc('messages.success'), t('messages.created'));
       }
       setDialogOpen(false);
-      refresh();
-    } catch (err) {
-      toast.error(tc('messages.error'), t('messages.createError'));
+      refetch();
+    } catch (error) {
+      handleApiError(error, 'lots.submit', toast);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [selectedLot, refetch, toast, tc, t]);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!lotToDelete) return;
+
     try {
       await lotsService.delete(lotToDelete.id);
       toast.success(tc('messages.success'), t('messages.deleted'));
       setIsDeleteDialogOpen(false);
       setLotToDelete(null);
-      refresh();
-    } catch (err) {
-      toast.error(tc('messages.error'), t('messages.deleteError'));
+      refetch();
+    } catch (error) {
+      handleApiError(error, 'lots.delete', toast);
     }
-  };
+  }, [lotToDelete, refetch, toast, tc, t]);
 
-  // Table columns
+  // Table columns with stats
   const columns: ColumnDef<Lot>[] = [
     {
       key: 'name',
@@ -130,7 +199,9 @@ export default function LotsPage() {
       header: t('fields.type'),
       sortable: true,
       render: (lot) => (
-        <Badge>{t(`type.${lot.type}`)}</Badge>
+        <Badge variant={getLotTypeBadgeVariant(lot.type)}>
+          {t(`type.${lot.type}`)}
+        </Badge>
       ),
     },
     {
@@ -145,50 +216,122 @@ export default function LotsPage() {
     },
     {
       key: 'animals',
-      header: t('fields.animals'),
+      header: tc('labels.animals'),
+      sortable: false,
+      render: (lot) => (
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <span>{lot._count?.lotAnimals || 0}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'avgWeight',
+      header: t('fields.avgWeight'),
+      sortable: false,
       render: (lot) => (
         <span className="text-muted-foreground">
-          {lot._count?.lotAnimals || 0} {tc('labels.animals')}
+          {lot.stats?.avgWeight ? `${lot.stats.avgWeight.toFixed(1)} kg` : '-'}
         </span>
       ),
     },
     {
-      key: 'createdAt',
-      header: t('fields.createdAt'),
-      sortable: true,
+      key: 'gmq',
+      header: t('fields.gmq'),
+      sortable: false,
       render: (lot) => (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span>{lot.createdAt ? new Date(lot.createdAt).toLocaleDateString() : '-'}</span>
+        <div className="flex items-center gap-1">
+          {getGmqTrendIcon(lot.stats?.avgDailyGain)}
+          <span className={
+            lot.stats?.avgDailyGain && lot.stats.avgDailyGain >= 1.0
+              ? 'text-green-600 font-medium'
+              : lot.stats?.avgDailyGain && lot.stats.avgDailyGain >= 0.5
+                ? 'text-orange-500'
+                : 'text-muted-foreground'
+          }>
+            {lot.stats?.avgDailyGain ? `${lot.stats.avgDailyGain.toFixed(2)} kg/j` : '-'}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'progress',
+      header: t('fields.progress'),
+      sortable: false,
+      render: (lot) => {
+        const progress = lot.stats?.progress;
+        if (!progress) return <span className="text-muted-foreground">-</span>;
+        return (
+          <div className="flex items-center gap-2 min-w-[100px]">
+            <Progress value={Math.min(progress, 100)} className="h-2 flex-1" />
+            <span className="text-xs text-muted-foreground w-10">{progress.toFixed(0)}%</span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'daysToTarget',
+      header: t('fields.daysToTarget'),
+      sortable: false,
+      render: (lot) => (
+        <div className="flex items-center gap-1">
+          {lot.stats?.estimatedDaysToTarget ? (
+            <>
+              <Target className="h-4 w-4 text-muted-foreground" />
+              <span>{lot.stats.estimatedDaysToTarget}j</span>
+            </>
+          ) : (
+            <span className="text-muted-foreground">-</span>
+          )}
         </div>
       ),
     },
   ];
 
+  // Handlers pour la pagination et les filtres (règle 7.7)
+  const handlePageChange = useCallback((page: number) => {
+    setParams(prev => ({ ...prev, page }));
+  }, [setParams]);
+
+  const handleLimitChange = useCallback((limit: number) => {
+    setParams(prev => ({ ...prev, limit, page: 1 }));
+  }, [setParams]);
+
+  const handleSearchChange = useCallback((search: string) => {
+    setParams(prev => ({ ...prev, search: search || undefined, page: 1 }));
+  }, [setParams]);
+
+  const handleTypeChange = useCallback((type: string) => {
+    setParams(prev => ({ ...prev, type: type === 'all' ? undefined : type, page: 1 }));
+  }, [setParams]);
+
+  const handleStatusChange = useCallback((status: string) => {
+    setParams(prev => ({ ...prev, status: status === 'all' ? undefined : status, page: 1 }));
+  }, [setParams]);
+
+  // Fonction d'export
+  const handleExport = useCallback(() => {
+    exportToCSV(lots, t, tc);
+  }, [lots, t, tc]);
+
   // Type filter component
-  const typeFilterComponent = (
+  const filtersComponent = (
     <div className="flex gap-2">
-      <Select value={typeFilter} onValueChange={setTypeFilter}>
+      <Select value={params.type || 'all'} onValueChange={handleTypeChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder={t('filters.allTypes')} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
-          <SelectItem value="treatment">{t('type.treatment')}</SelectItem>
-          <SelectItem value="vaccination">{t('type.vaccination')}</SelectItem>
           <SelectItem value="fattening">{t('type.fattening')}</SelectItem>
-          <SelectItem value="quarantine">{t('type.quarantine')}</SelectItem>
+          <SelectItem value="reproduction">{t('type.reproduction')}</SelectItem>
           <SelectItem value="weaning">{t('type.weaning')}</SelectItem>
-          <SelectItem value="gestation">{t('type.gestation')}</SelectItem>
-          <SelectItem value="lactation">{t('type.lactation')}</SelectItem>
+          <SelectItem value="quarantine">{t('type.quarantine')}</SelectItem>
           <SelectItem value="sale">{t('type.sale')}</SelectItem>
-          <SelectItem value="slaughter">{t('type.slaughter')}</SelectItem>
-          <SelectItem value="purchase">{t('type.purchase')}</SelectItem>
-          <SelectItem value="breeding">{t('type.breeding')}</SelectItem>
           <SelectItem value="other">{t('type.other')}</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={statusFilter} onValueChange={setStatusFilter}>
+      <Select value={params.status || 'all'} onValueChange={handleStatusChange}>
         <SelectTrigger className="w-[150px]">
           <SelectValue placeholder={t('filters.allStatuses')} />
         </SelectTrigger>
@@ -210,27 +353,37 @@ export default function LotsPage() {
           <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
-        <Button onClick={handleAdd}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('newLot')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExport} disabled={lots.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            {tc('actions.export')}
+          </Button>
+          <Button onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newLot')}
+          </Button>
+        </div>
       </div>
 
-      {/* DataTable */}
+      {/* DataTable avec pagination serveur (règle 7.7) */}
       <DataTable<Lot>
         data={lots}
         columns={columns}
-        totalItems={lots.length}
+        totalItems={total}
+        page={params.page || 1}
+        limit={params.limit || 25}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
         loading={loading}
         error={error}
-        searchValue={search}
-        onSearchChange={setSearch}
+        searchValue={params.search || ''}
+        onSearchChange={handleSearchChange}
         searchPlaceholder={t('filters.searchPlaceholder')}
         onRowClick={handleViewDetail}
         onEdit={handleEdit}
         onDelete={handleDelete}
         emptyMessage={t('noLots')}
-        filters={typeFilterComponent}
+        filters={filtersComponent}
       />
 
       {/* Unified Dialog (view/edit/create) */}

@@ -1,32 +1,51 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { lotsService, CreateLotDto, UpdateLotDto } from '@/lib/services/lots.service';
-import { Lot, LotFilters, LotAnimal } from '@/lib/types/lot';
+/**
+ * Hook React pour la gestion des lots
+ * Conforme aux normes DEVELOPMENT_STANDARDS.md (règle 7.7)
+ */
+
+import { useState, useEffect, useCallback } from 'react';
+import { lotsService, LotFilterParams, CreateLotDto, UpdateLotDto } from '@/lib/services/lots.service';
+import { Lot, LotAnimal } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
 
-export function useLots(filters?: Partial<LotFilters>) {
+interface UseLotsResult {
+  lots: Lot[];
+  total: number;
+  loading: boolean;
+  error: Error | null;
+  params: LotFilterParams;
+  setParams: React.Dispatch<React.SetStateAction<LotFilterParams>>;
+  refetch: () => Promise<void>;
+  createLot: (data: CreateLotDto) => Promise<Lot>;
+  updateLot: (id: string, data: UpdateLotDto) => Promise<Lot>;
+  deleteLot: (id: string) => Promise<void>;
+  addAnimal: (lotId: string, animalId: string) => Promise<void>;
+  removeAnimal: (lotId: string, animalId: string) => Promise<void>;
+}
+
+const DEFAULT_PARAMS: LotFilterParams = {
+  page: 1,
+  limit: 25,
+  includeStats: true, // Par défaut, inclure les stats pour afficher GMQ, poids, etc.
+};
+
+export function useLots(initialParams?: Partial<LotFilterParams>): UseLotsResult {
   const [lots, setLots] = useState<Lot[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
-  const filterSearch = filters?.search;
-  const filterType = filters?.type;
-  const filterStatus = filters?.status;
-  const filterIsActive = filters?.isActive;
-
-  const memoizedFilters = useMemo(() => ({
-    search: filterSearch,
-    type: filterType,
-    status: filterStatus,
-    isActive: filterIsActive,
-  }), [filterSearch, filterType, filterStatus, filterIsActive]);
+  const [params, setParams] = useState<LotFilterParams>({
+    ...DEFAULT_PARAMS,
+    ...initialParams,
+  });
 
   const fetchLots = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await lotsService.getAll(memoizedFilters);
-      setLots(data);
+      const response = await lotsService.getAll(params);
+      setLots(response.data);
+      setTotal(response.meta.total);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch lots');
       setError(error);
@@ -34,7 +53,7 @@ export function useLots(filters?: Partial<LotFilters>) {
     } finally {
       setLoading(false);
     }
-  }, [memoizedFilters]);
+  }, [params]);
 
   useEffect(() => {
     fetchLots();
@@ -69,9 +88,12 @@ export function useLots(filters?: Partial<LotFilters>) {
 
   return {
     lots,
+    total,
     loading,
     error,
-    refresh: fetchLots,
+    params,
+    setParams,
+    refetch: fetchLots,
     createLot,
     updateLot,
     deleteLot,

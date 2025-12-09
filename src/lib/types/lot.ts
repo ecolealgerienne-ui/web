@@ -40,6 +40,12 @@ export interface Lot {
     lotAnimals: number;
   };
 
+  // Stats de performance (retournées avec includeStats=true)
+  stats?: LotStats;
+
+  // Poids cible du lot
+  targetWeight?: number | null;
+
   // Traitement/Vaccination
   productId?: string | null;
   productName?: string | null;
@@ -143,4 +149,20 @@ export interface LotFilters {
   type?: LotType | 'all';
   status?: LotStatus | 'all';
   isActive?: boolean;
+  page?: number;
+  limit?: number;
+  includeStats?: boolean;
+}
+
+/**
+ * Stats de performance d'un lot (retournées par le backend avec includeStats=true)
+ */
+export interface LotStats {
+  avgWeight?: number;
+  avgDailyGain?: number;
+  minWeight?: number;
+  maxWeight?: number;
+  progress?: number;
+  estimatedDaysToTarget?: number;
+  targetWeight?: number;
 }

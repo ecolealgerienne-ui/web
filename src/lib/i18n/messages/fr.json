@@ -2035,7 +2035,11 @@
       "priceTotal": "Montant total",
       "animals": "Animaux",
       "animalsInLot": "Animaux dans ce lot",
-      "createdAt": "Date de création"
+      "createdAt": "Date de création",
+      "avgWeight": "Poids moy.",
+      "gmq": "GMQ",
+      "progress": "Progression",
+      "daysToTarget": "Jours restants"
     },
     "placeholders": {
       "name": "Ex: Traitement antiparasitaire Mars 2025",
