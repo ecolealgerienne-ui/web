@@ -51,7 +51,11 @@ function calculateAge(birthDate: string | null): string {
 /**
  * Exporte les animaux en CSV
  */
-function exportToCSV(animals: Animal[], t: (key: string) => string): void {
+function exportToCSV(
+  animals: Animal[],
+  t: (key: string) => string,
+  getSpeciesName: (id: string | null) => string
+): void {
   const headers = [
     t('fields.identification'),
     t('fields.species'),
@@ -64,7 +68,7 @@ function exportToCSV(animals: Animal[], t: (key: string) => string): void {
 
   const rows = animals.map(animal => [
     animal.officialNumber || animal.visualId || animal.currentEid || animal.id.substring(0, 8),
-    animal.species?.name || '-',
+    getSpeciesName(animal.speciesId),
     animal.breed?.name || '-',
     t(`sex.${animal.sex}`),
     animal.birthDate ? new Date(animal.birthDate).toLocaleDateString() : '-',
@@ -104,8 +108,15 @@ export default function AnimalsPage() {
   // Hook avec params/setParams pour la pagination (règle 7.7)
   const { animals, total, loading, error, params, setParams, refetch } = useAnimals();
 
-  // Hook pour récupérer les espèces (pour le filtre)
+  // Hook pour récupérer les espèces (pour le filtre et l'affichage)
   const { species } = useSpecies();
+
+  // Fonction helper pour obtenir le nom de l'espèce par ID
+  const getSpeciesName = useCallback((speciesId: string | null): string => {
+    if (!speciesId) return '-';
+    const found = species.find(s => s.id === speciesId);
+    return found?.name || '-';
+  }, [species]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
@@ -218,8 +229,8 @@ export default function AnimalsPage() {
     {
       key: 'species',
       header: t('fields.species'),
-      sortable: true,
-      render: (animal) => animal.species?.name || '-',
+      sortable: false,
+      render: (animal) => getSpeciesName(animal.speciesId),
     },
     {
       key: 'sex',
@@ -268,8 +279,8 @@ export default function AnimalsPage() {
 
   // Fonction d'export
   const handleExport = useCallback(() => {
-    exportToCSV(animals, t);
-  }, [animals, t]);
+    exportToCSV(animals, t, getSpeciesName);
+  }, [animals, t, getSpeciesName]);
 
   // Note: Le tri n'est pas encore supporté par le backend
   // const handleSortChange = useCallback((sortBy: string, sortOrder: 'asc' | 'desc') => {

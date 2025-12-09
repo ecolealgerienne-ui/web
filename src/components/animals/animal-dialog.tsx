@@ -18,11 +18,13 @@ import {
 } from '@/components/ui/dialog';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { Treatment } from '@/lib/types/treatment';
+import { WeightHistory } from '@/lib/types/weighing';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { useBreeds } from '@/lib/hooks/useBreeds';
 import { useSpecies } from '@/lib/hooks/useSpecies';
 import { treatmentsService } from '@/lib/services/treatments.service';
-import { Pill, Syringe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { weighingsService } from '@/lib/services/weighings.service';
+import { Pill, Syringe, Scale, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -72,6 +74,10 @@ export function AnimalDialog({
   // Care data
   const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
   const [loadingCare, setLoadingCare] = useState(false);
+
+  // Weight history data
+  const [weightHistory, setWeightHistory] = useState<WeightHistory[]>([]);
+  const [loadingWeights, setLoadingWeights] = useState(false);
 
   const treatments = allTreatments.filter(t => t.type !== 'vaccination');
   const vaccinations = allTreatments.filter(t => t.type === 'vaccination');
@@ -129,11 +135,27 @@ export function AnimalDialog({
     }
   }, [animal]);
 
+  const loadWeightHistory = React.useCallback(async () => {
+    if (!animal) return;
+    setLoadingWeights(true);
+    try {
+      const history = await weighingsService.getAnimalHistory(animal.id);
+      setWeightHistory(history);
+    } catch (error) {
+      console.error('Failed to load weight history:', error);
+    } finally {
+      setLoadingWeights(false);
+    }
+  }, [animal]);
+
   useEffect(() => {
     if (animal && activeTab === 'care') {
       loadCareData();
     }
-  }, [animal, activeTab, loadCareData]);
+    if (animal && activeTab === 'weights') {
+      loadWeightHistory();
+    }
+  }, [animal, activeTab, loadCareData, loadWeightHistory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -591,6 +613,74 @@ export function AnimalDialog({
     </div>
   );
 
+  // Fonction pour afficher l'indicateur de gain
+  const getGainIndicator = (dailyGain: number | undefined) => {
+    if (dailyGain === undefined || dailyGain === null) return null;
+    if (dailyGain > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
+    if (dailyGain < 0) return <TrendingDown className="h-4 w-4 text-red-500" />;
+    return <Minus className="h-4 w-4 text-gray-400" />;
+  };
+
+  const WeightsContent = () => (
+    <div className="space-y-6 py-4">
+      {loadingWeights ? (
+        <div className="text-center py-8 text-muted-foreground">Chargement...</div>
+      ) : (
+        <>
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Scale className="h-5 w-5" />
+              <h3 className="text-sm font-semibold">Historique des pesées</h3>
+              <Badge variant="default" className="ml-auto">
+                {weightHistory.length}
+              </Badge>
+            </div>
+            {weightHistory.length === 0 ? (
+              <div className="text-sm text-muted-foreground border rounded-lg p-4 text-center">
+                Aucune pesée enregistrée
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {weightHistory.map((weight) => (
+                  <div key={weight.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl font-bold">{weight.weight} kg</div>
+                        {weight.dailyGain !== undefined && weight.dailyGain !== null && (
+                          <div className="flex items-center gap-1 text-sm">
+                            {getGainIndicator(weight.dailyGain)}
+                            <span className={weight.dailyGain > 0 ? 'text-green-600' : weight.dailyGain < 0 ? 'text-red-600' : 'text-gray-500'}>
+                              {weight.dailyGain > 0 ? '+' : ''}{(weight.dailyGain * 1000).toFixed(0)} g/j
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{new Date(weight.weightDate).toLocaleDateString()}</p>
+                        {weight.source && (
+                          <p className="text-xs text-muted-foreground capitalize">{weight.source}</p>
+                        )}
+                      </div>
+                    </div>
+                    {weight.notes && (
+                      <p className="text-sm text-muted-foreground mt-2 italic">{weight.notes}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {isEditable && (
+            <div className="text-sm text-muted-foreground text-center pt-4 border-t">
+              Pour ajouter des pesées, utilisez l'écran dédié.
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -626,8 +716,16 @@ export function AnimalDialog({
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="info">Informations</TabsTrigger>
+            <TabsTrigger value="weights" disabled={mode === 'create'}>
+              Pesées
+              {weightHistory.length > 0 && (
+                <span className="ml-2 bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+                  {weightHistory.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="care" disabled={mode === 'create'}>
               Soins
               {(treatments.length > 0 || vaccinations.length > 0) && (
@@ -654,6 +752,10 @@ export function AnimalDialog({
             ) : (
               <FormContent />
             )}
+          </TabsContent>
+
+          <TabsContent value="weights">
+            <WeightsContent />
           </TabsContent>
 
           <TabsContent value="care">
