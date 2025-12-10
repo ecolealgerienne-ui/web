@@ -57,14 +57,13 @@ class FarmAlertsService {
         ? `${this.getBasePath(farmId)}?${queryParams}`
         : this.getBasePath(farmId)
 
-      // API returns { data: [...], meta: { total, page, limit, pages } }
-      // We need to map 'pages' to 'totalPages' for frontend consistency
+      // API may return 'pages' or 'totalPages' depending on version
       const response = await apiClient.get<{
         data: FarmAlert[]
-        meta: { total: number; page: number; limit: number; pages: number }
+        meta: { total: number; page: number; limit: number; pages?: number; totalPages?: number }
       }>(url)
 
-      logger.info('Farm alerts fetched', { farmId, count: response.data?.length || 0 })
+      logger.info('Farm alerts fetched', { farmId, count: response.data?.length || 0, meta: response.meta })
 
       return {
         data: response.data || [],
@@ -72,7 +71,7 @@ class FarmAlertsService {
           total: response.meta?.total ?? 0,
           page: response.meta?.page ?? 1,
           limit: response.meta?.limit ?? 20,
-          totalPages: response.meta?.pages ?? 0,
+          totalPages: response.meta?.totalPages ?? response.meta?.pages ?? 0,
         },
       }
     } catch (error: unknown) {
