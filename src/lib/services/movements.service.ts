@@ -34,15 +34,12 @@ class MovementsService {
       logger.info('Movement statistics fetched', { fromDate, toDate, total: response.totalMovements });
       return response;
     } catch (error: any) {
-      if (error.status === 404) {
-        logger.info('No movements found (404)');
-        return {
-          totalMovements: 0,
-          byType: {},
-        };
-      }
-      logger.error('Failed to fetch movement statistics', { error });
-      throw error;
+      // Return default stats for any error to avoid breaking UI
+      logger.warn('Failed to fetch movement statistics, returning defaults', { status: error.status });
+      return {
+        totalMovements: 0,
+        byType: {},
+      };
     }
   }
 }

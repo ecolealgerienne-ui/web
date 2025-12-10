@@ -199,12 +199,13 @@ class AnimalEventsService {
       return events;
     } catch (error: unknown) {
       const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No movements found (404)');
+      if (err.status === 404 || err.status === 500) {
+        logger.info('No movements found or endpoint unavailable', { status: err.status });
         return [];
       }
-      logger.error('Failed to fetch movements', { error });
-      throw error;
+      // Return empty array instead of throwing to avoid breaking UI
+      logger.warn('Failed to fetch movements, returning empty array', { error });
+      return [];
     }
   }
 
