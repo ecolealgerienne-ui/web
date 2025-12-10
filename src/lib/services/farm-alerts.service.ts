@@ -78,15 +78,45 @@ class FarmAlertsService {
    * Récupère le résumé des alertes (pour dashboard)
    */
   async getSummary(farmId: string): Promise<FarmAlertsSummary> {
+    const defaultSummary: FarmAlertsSummary = {
+      total: 0,
+      unread: 0,
+      byStatus: { pending: 0, read: 0, dismissed: 0, resolved: 0 },
+      byPriority: { urgent: 0, high: 0, medium: 0, low: 0 },
+      byCategory: {
+        health: 0,
+        vaccination: 0,
+        treatment: 0,
+        reproduction: 0,
+        nutrition: 0,
+        administrative: 0,
+        other: 0,
+      },
+    }
+
     try {
       const response = await apiClient.get<FarmAlertsSummary>(
         `${this.getBasePath(farmId)}/summary`
       )
+
+      // Si la réponse est vide ou incomplète, retourner les valeurs par défaut
+      if (!response || typeof response.total !== 'number') {
+        logger.info('Empty summary response, returning defaults', { farmId })
+        return defaultSummary
+      }
+
       logger.info('Farm alerts summary fetched', { farmId, total: response.total })
       return response
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as { status?: number }
+      // En cas de 404, retourner un summary vide
+      if (err.status === 404) {
+        logger.info('No alerts summary found (404), returning defaults', { farmId })
+        return defaultSummary
+      }
       logger.error('Failed to fetch farm alerts summary', { error, farmId })
-      throw error
+      // En cas d'autre erreur, retourner aussi les valeurs par défaut pour ne pas bloquer le dashboard
+      return defaultSummary
     }
   }
 
@@ -99,10 +129,16 @@ class FarmAlertsService {
       const response = await apiClient.get<{ count: number }>(
         `${this.getBasePath(farmId)}/unread-count`
       )
-      return response.count
-    } catch (error) {
+      return response.count ?? 0
+    } catch (error: unknown) {
+      const err = error as { status?: number }
+      // En cas de 404, retourner 0
+      if (err.status === 404) {
+        return 0
+      }
       logger.error('Failed to fetch unread alerts count', { error, farmId })
-      throw error
+      // Retourner 0 en cas d'erreur pour ne pas bloquer l'UI
+      return 0
     }
   }
 
