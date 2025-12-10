@@ -105,6 +105,11 @@ const sanitizeActionUrl = (url: string): string => {
       if (value) params.set(param, value);
     });
 
+    // For minWeight filter (ready for sale), automatically add status=alive if not specified
+    if (params.has('minWeight') && !params.has('status')) {
+      params.set('status', 'alive');
+    }
+
     return params.toString() ? `/animals?${params.toString()}` : '/animals';
   }
 
