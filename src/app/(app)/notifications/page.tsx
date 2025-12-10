@@ -66,7 +66,7 @@ export default function NotificationsPage() {
       page: 1,
       limit: 20,
       orderBy: 'triggeredAt',
-      order: 'DESC',
+      order: 'desc',
     },
   })
 
