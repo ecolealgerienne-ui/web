@@ -187,11 +187,15 @@ class AnimalEventsService {
       const url = params.toString()
         ? `${this.getBasePath()}?${params}`
         : this.getBasePath();
-      // Le client API déballe automatiquement { success, data } -> data
-      const movements = await apiClient.get<BackendMovement[]>(url);
+      // API returns paginated response: { data: [...], meta: {...} }
+      // apiClient unwraps { success, data } -> { data: [...], meta }
+      const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(url);
+
+      // Extract movements array from paginated response
+      const movements = response?.data || [];
 
       // Map backend movements to frontend AnimalEvent format
-      const events = (movements || []).map(mapMovementToEvent);
+      const events = movements.map(mapMovementToEvent);
 
       logger.info('Animal events (movements) fetched', {
         count: events.length,
@@ -229,10 +233,11 @@ class AnimalEventsService {
 
   async getByAnimalId(animalId: string): Promise<AnimalEvent[]> {
     try {
-      const movements = await apiClient.get<BackendMovement[]>(
+      const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(
         `${this.getBasePath()}?animalId=${animalId}`
       );
-      const events = (movements || []).map(mapMovementToEvent);
+      const movements = response?.data || [];
+      const events = movements.map(mapMovementToEvent);
       logger.info('Movements fetched for animal', {
         animalId,
         count: events.length,
@@ -240,12 +245,9 @@ class AnimalEventsService {
       return events;
     } catch (error: unknown) {
       const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No movements found for animal (404)', { animalId });
-        return [];
-      }
-      logger.error('Failed to fetch movements for animal', { error, animalId });
-      throw error;
+      // Return empty array for any error to avoid breaking UI
+      logger.warn('Failed to fetch movements for animal, returning empty', { animalId, status: err.status });
+      return [];
     }
   }
 
