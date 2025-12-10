@@ -121,7 +121,7 @@ export function AlertItem({ alert, onMarkAsRead, onDismiss }: AlertItemProps) {
             {alert.animal && (
               <span className="flex items-center gap-1">
                 <Eye className="h-3 w-3" />
-                {alert.animal.visualId || alert.animal.officialNumber}
+                {alert.animal.officialNumber || alert.animal.visualId}
               </span>
             )}
             {alert.lot && (
