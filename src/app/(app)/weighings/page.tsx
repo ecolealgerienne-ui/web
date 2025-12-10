@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -60,7 +60,7 @@ export default function WeighingsPage() {
   });
 
   // Fetch stats
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setStatsLoading(true);
     try {
       const data = await weighingsService.getStats({
@@ -73,11 +73,11 @@ export default function WeighingsPage() {
     } finally {
       setStatsLoading(false);
     }
-  };
+  }, [filters.fromDate, filters.toDate]);
 
   useEffect(() => {
     fetchStats();
-  }, [filters.fromDate, filters.toDate]);
+  }, [fetchStats]);
 
   // Refresh stats after CRUD operations
   const refreshAll = async () => {
