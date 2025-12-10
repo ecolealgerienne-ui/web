@@ -35,17 +35,15 @@ class TreatmentsService {
       if (filters?.toDate) params.append('toDate', filters.toDate);
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<Treatment[]>(url);
-      logger.info('Treatments fetched', { count: (response || []).length });
-      return response || [];
+      // API returns paginated response: { data: [...], meta: {...} }
+      const response = await apiClient.get<{ data: Treatment[]; meta?: any }>(url);
+      const treatments = response?.data || [];
+      logger.info('Treatments fetched', { count: treatments.length });
+      return treatments;
     } catch (error: unknown) {
-      const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No treatments found (404)');
-        return [];
-      }
-      logger.error('Failed to fetch treatments', { error });
-      throw error;
+      // Return empty array for any error to avoid breaking UI
+      logger.warn('Failed to fetch treatments, returning empty array', { error });
+      return [];
     }
   }
 
@@ -55,17 +53,15 @@ class TreatmentsService {
   async getByAnimalId(animalId: string): Promise<Treatment[]> {
     try {
       const url = this.getAnimalTreatmentsPath(animalId);
-      const response = await apiClient.get<Treatment[]>(url);
-      logger.info('Animal treatments fetched', { animalId, count: (response || []).length });
-      return response || [];
+      // API returns paginated response: { data: [...], meta: {...} }
+      const response = await apiClient.get<{ data: Treatment[]; meta?: any }>(url);
+      const treatments = response?.data || [];
+      logger.info('Animal treatments fetched', { animalId, count: treatments.length });
+      return treatments;
     } catch (error: unknown) {
-      const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No treatments found for animal (404)', { animalId });
-        return [];
-      }
-      logger.error('Failed to fetch animal treatments', { error, animalId });
-      throw error;
+      // Return empty array for any error to avoid breaking UI
+      logger.warn('Failed to fetch animal treatments, returning empty', { animalId, error });
+      return [];
     }
   }
 
