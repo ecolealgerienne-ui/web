@@ -74,7 +74,7 @@ import { AlertKpiCard } from '@/components/dashboard/alert-kpi-card';
 const sanitizeActionUrl = (url: string): string => {
   // Map non-existent routes to existing ones
   const urlMappings: Record<string, string> = {
-    '/weights/new': '/animals?notWeighedDays=30', // Animals that need weighing
+    '/weights/new': '/animals?notWeighedDays=30&status=alive', // Animals that need weighing (only alive)
     '/weights': '/weighings',
   };
 
