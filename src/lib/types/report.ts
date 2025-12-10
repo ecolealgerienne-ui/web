@@ -5,92 +5,86 @@ export type ReportType =
   | 'vaccinations'
   | 'treatments'
   | 'movements'
-  | 'growth';
+  | 'growth'
+  | 'health'
+  | 'financial';
 
 export type ReportPeriod = 'week' | 'month' | 'quarter' | 'year' | 'custom';
-export type ReportFormat = 'pdf' | 'xlsx' | 'csv';
-export type ReportCategory = 'health' | 'production' | 'regulatory';
+export type ReportFormat = 'pdf' | 'excel' | 'csv';
 
 export interface ReportDefinition {
   id: string;
   type: ReportType;
+  name: string;
+  description: string;
   icon: string;
-  category: ReportCategory;
+  category: 'health' | 'production' | 'financial' | 'regulatory';
 }
 
 export interface ReportFilters {
   period: ReportPeriod;
-  fromDate?: string;
-  toDate?: string;
-  animalStatus?: 'all' | 'alive' | 'sold' | 'dead' | 'slaughtered' | 'draft';
+  startDate?: string;
+  endDate?: string;
+  animalIds?: string[];
   lotIds?: string[];
   speciesId?: string;
 }
 
-// Définitions des rapports disponibles (textes via i18n)
 export const REPORT_DEFINITIONS: ReportDefinition[] = [
   {
     id: 'herd-inventory',
     type: 'herd_inventory',
+    name: 'Inventaire du Cheptel',
+    description: 'État complet du cheptel par espèce, âge et statut',
     icon: 'Beef',
     category: 'production',
   },
   {
     id: 'vaccinations-report',
     type: 'vaccinations',
+    name: 'Registre de Vaccinations',
+    description: 'Historique des vaccinations et calendrier à venir',
     icon: 'Syringe',
     category: 'health',
   },
   {
     id: 'treatments-report',
     type: 'treatments',
+    name: 'Registre des Traitements',
+    description: 'Historique des traitements et délais d\'attente',
     icon: 'Pill',
     category: 'health',
   },
   {
     id: 'movements-report',
     type: 'movements',
+    name: 'Mouvements d\'Animaux',
+    description: 'Entrées, sorties, naissances et décès',
     icon: 'ArrowLeftRight',
     category: 'regulatory',
   },
   {
     id: 'growth-report',
     type: 'growth',
+    name: 'Croissance et Performance',
+    description: 'Évolution des poids et gains moyens quotidiens',
     icon: 'TrendingUp',
     category: 'production',
   },
+  {
+    id: 'health-report',
+    type: 'health',
+    name: 'Bilan Sanitaire',
+    description: 'Taux de morbidité, mortalité et incidents sanitaires',
+    icon: 'Activity',
+    category: 'health',
+  },
+  {
+    id: 'financial-report',
+    type: 'financial',
+    name: 'Rapport Financier',
+    description: 'Coûts des soins vétérinaires et revenus',
+    icon: 'DollarSign',
+    category: 'financial',
+  },
 ];
-
-// Helper pour obtenir les dates selon la période
-export function getPeriodDates(period: ReportPeriod): { fromDate: string; toDate: string } {
-  const now = new Date();
-  const toDate = now.toISOString().split('T')[0];
-  let fromDate: string;
-
-  switch (period) {
-    case 'week':
-      const weekAgo = new Date(now);
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      fromDate = weekAgo.toISOString().split('T')[0];
-      break;
-    case 'month':
-      const monthAgo = new Date(now);
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-      fromDate = monthAgo.toISOString().split('T')[0];
-      break;
-    case 'quarter':
-      const quarterAgo = new Date(now);
-      quarterAgo.setMonth(quarterAgo.getMonth() - 3);
-      fromDate = quarterAgo.toISOString().split('T')[0];
-      break;
-    case 'year':
-      const yearAgo = new Date(now);
-      yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-      fromDate = yearAgo.toISOString().split('T')[0];
-      break;
-    default:
-      fromDate = toDate;
-  }
-
-  return { fromDate, toDate };
-}

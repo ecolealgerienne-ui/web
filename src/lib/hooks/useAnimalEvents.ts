@@ -1,46 +1,44 @@
 /**
  * Hook React pour la gestion des événements d'animaux
- * Conforme aux normes DEVELOPMENT_STANDARDS.md (règle 7.7)
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { AnimalEvent } from '@/lib/types/animal-event'
-import { animalEventsService, AnimalEventFilterParams } from '@/lib/services/animal-events.service'
+import { animalEventsService } from '@/lib/services/animal-events.service'
 import { logger } from '@/lib/utils/logger'
 
 interface UseAnimalEventsResult {
   events: AnimalEvent[]
-  total: number
   loading: boolean
   error: Error | null
-  params: AnimalEventFilterParams
-  setParams: React.Dispatch<React.SetStateAction<AnimalEventFilterParams>>
   refetch: () => Promise<void>
 }
 
-const DEFAULT_PARAMS: AnimalEventFilterParams = {
-  page: 1,
-  limit: 25,
-}
-
-export function useAnimalEvents(initialParams?: Partial<AnimalEventFilterParams>): UseAnimalEventsResult {
+export function useAnimalEvents(filters?: { animalId?: string; eventType?: string; fromDate?: string; toDate?: string }): UseAnimalEventsResult {
   const [events, setEvents] = useState<AnimalEvent[]>([])
-  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-  const [params, setParams] = useState<AnimalEventFilterParams>({
-    ...DEFAULT_PARAMS,
-    ...initialParams,
-  })
+
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterAnimalId = filters?.animalId
+  const filterEventType = filters?.eventType
+  const filterFromDate = filters?.fromDate
+  const filterToDate = filters?.toDate
+
+  const memoizedFilters = useMemo(() => ({
+    animalId: filterAnimalId,
+    eventType: filterEventType,
+    fromDate: filterFromDate,
+    toDate: filterToDate,
+  }), [filterAnimalId, filterEventType, filterFromDate, filterToDate])
 
   const fetchEvents = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const response = await animalEventsService.getAll(params)
-      setEvents(response.data)
-      setTotal(response.meta.total)
+      const data = await animalEventsService.getAll(memoizedFilters)
+      setEvents(data)
     } catch (err) {
       const error = err as Error
       setError(error)
@@ -48,7 +46,7 @@ export function useAnimalEvents(initialParams?: Partial<AnimalEventFilterParams>
     } finally {
       setLoading(false)
     }
-  }, [params])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchEvents()
@@ -56,11 +54,8 @@ export function useAnimalEvents(initialParams?: Partial<AnimalEventFilterParams>
 
   return {
     events,
-    total,
     loading,
     error,
-    params,
-    setParams,
     refetch: fetchEvents,
   }
 }

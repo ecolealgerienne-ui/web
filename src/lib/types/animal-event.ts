@@ -26,8 +26,6 @@ export interface AnimalEvent {
   farmId: string;
   // API uses animalIds (array) not animalId (single)
   animalIds: string[];
-  // Count from backend _count.movementAnimals
-  animalCount?: number;
   movementType: AnimalEventType;
   movementDate: string;
   lotId?: string;

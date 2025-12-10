@@ -256,14 +256,14 @@ class DashboardService {
       // Get real data from multiple endpoints
       const { fromDate, toDate } = this.getThisMonthDates();
 
-      const [animalsResponse, movementStats, treatments] = await Promise.all([
+      const [animals, movementStats, treatments] = await Promise.all([
         animalsService.getAll(),
         movementsService.getStatistics(fromDate, toDate),
         treatmentsService.getAll({ type: 'vaccination' }),
       ]);
 
       // Calculate real stats
-      const totalAnimals = animalsResponse.meta.total;
+      const totalAnimals = animals.length;
 
       // Extract count from birth/death data (API might return object or number)
       const birthData = movementStats.byType.birth;
@@ -283,7 +283,7 @@ class DashboardService {
       const futureDate = new Date();
       futureDate.setDate(now.getDate() + upcomingDays);
 
-      const upcomingVaccinations = treatments.data.filter((treatment) => {
+      const upcomingVaccinations = treatments.filter((treatment) => {
         if (!treatment.nextDueDate) return false;
         const dueDate = new Date(treatment.nextDueDate);
         return dueDate >= now && dueDate <= futureDate;
