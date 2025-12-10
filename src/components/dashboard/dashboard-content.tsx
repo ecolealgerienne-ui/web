@@ -5,6 +5,8 @@ import { Beef, Plus, X, Syringe, FileSpreadsheet } from 'lucide-react'
 import { KpiCard } from './kpi-card'
 import { ChartEvolution } from './chart-evolution'
 import { AlertsCard } from './alerts-card'
+import { AlertBanner } from './alert-banner'
+import { AlertKpiCard } from './alert-kpi-card'
 import { ActivitiesCard } from './activities-card'
 import { EmptyState, EmptyStateIllustration, ConfigWarningCard } from '@/components/ui/empty-state'
 
@@ -18,7 +20,6 @@ const mockDashboardStats = {
 
 const mockChartData: Array<{ month: string; animals: number }> = []
 
-const mockAlerts: any[] = []
 const mockRecentActivities: any[] = []
 
 interface DashboardStats {
@@ -88,8 +89,11 @@ export function DashboardContent({ stats }: DashboardContentProps) {
         />
       )}
 
+      {/* Urgent Alerts Banner */}
+      <AlertBanner />
+
       {/* KPI Cards Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <KpiCard
           icon={Beef}
           value={stats?.totalAnimals?.toLocaleString('fr-FR') ?? mockDashboardStats.totalAnimals.toLocaleString('fr-FR')}
@@ -117,6 +121,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
           subtitle={mockDashboardStats.vaccinations.label}
           iconColor="text-blue-600"
         />
+        <AlertKpiCard />
       </div>
 
       {/* Chart */}
@@ -124,7 +129,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
 
       {/* Bottom Grid - Alerts & Activities */}
       <div className="grid gap-4 md:grid-cols-2">
-        <AlertsCard alerts={mockAlerts} />
+        <AlertsCard />
         <ActivitiesCard activities={mockRecentActivities} />
       </div>
     </div>
