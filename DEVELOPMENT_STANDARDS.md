@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.8
-**Date:** 2025-12-01
-**Dernière mise à jour:** Ajout règle 5.5 suite implémentation Breeds - Messages d'erreur Zod avec clés relatives (sans préfixe entité) pour éviter duplication avec useTranslations()
+**Version:** 1.9
+**Date:** 2025-12-10
+**Dernière mise à jour:** Ajout règle 8.3.25 - Contrat API Pagination : Backend DOIT utiliser `totalPages` (pas `pages`) pour cohérence avec `PaginationMeta`
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -4896,6 +4896,78 @@ Property 'total' does not exist on type 'PaginatedResponse<Breed>'.
 - [ ] Dans les hooks : `setTotal(response.meta.total)`
 - [ ] Dans les logs : `total: response.meta.total`
 - [ ] Vérifier avec `npx tsc --noEmit` avant commit
+
+#### 8.3.25 Contrat API Pagination - Backend DOIT utiliser `totalPages` ⚠️ RÈGLE CRITIQUE
+
+✅ **RÈGLE OBLIGATOIRE** : Le backend DOIT retourner `totalPages` (pas `pages`) dans les métadonnées de pagination.
+
+**Problème :**
+Le frontend utilise l'interface `PaginationMeta` qui définit `totalPages`. Si le backend retourne `pages`, il y a incohérence et la pagination ne fonctionne pas.
+
+**Contrat API Standard :**
+
+```json
+// ✅ CORRECT : Backend retourne totalPages
+{
+  "data": [...],
+  "meta": {
+    "total": 36,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 2  // ✅ Nom standard
+  }
+}
+
+// ❌ INCORRECT : Backend retourne pages
+{
+  "data": [...],
+  "meta": {
+    "total": 36,
+    "page": 1,
+    "limit": 20,
+    "pages": 2  // ❌ Non conforme au contrat
+  }
+}
+```
+
+**Interface Frontend de référence :**
+
+```typescript
+// /src/lib/types/common/api.ts - RÉFÉRENCE UNIQUE
+export interface PaginationMeta {
+  total: number      // Nombre total d'éléments
+  page: number       // Page actuelle (1-indexed)
+  limit: number      // Éléments par page
+  totalPages: number // ✅ OBLIGATOIRE - Nombre total de pages
+}
+```
+
+**Impact violation :**
+- ❌ Pagination frontend cassée (condition `totalPages > 1` jamais vraie)
+- ❌ Mapping supplémentaire nécessaire côté frontend (dette technique)
+- ❌ Incohérence entre endpoints
+
+**Checklist Backend :**
+- [ ] Tous les endpoints paginés retournent `totalPages` (pas `pages`)
+- [ ] Vérifier cohérence avec `/src/lib/types/common/api.ts`
+- [ ] Tester la pagination frontend après modification backend
+
+**Si le backend retourne `pages` (non conforme) :**
+
+```typescript
+// Mapping temporaire côté frontend (À ÉVITER)
+return {
+  data: response.data || [],
+  meta: {
+    total: response.meta?.total ?? 0,
+    page: response.meta?.page ?? 1,
+    limit: response.meta?.limit ?? 20,
+    totalPages: response.meta?.pages ?? 0, // ⚠️ Mapping pages → totalPages
+  },
+}
+```
+
+**Action requise :** Corriger le backend pour retourner `totalPages` et supprimer le mapping frontend.
 
 ---
 
