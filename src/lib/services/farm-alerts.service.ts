@@ -58,9 +58,17 @@ class FarmAlertsService {
         : this.getBasePath(farmId)
 
       const response = await apiClient.get<FarmAlertsResponse>(url)
-      logger.info('Farm alerts fetched', { farmId, count: response.data.length })
-      return response
-    } catch (error) {
+      logger.info('Farm alerts fetched', { farmId, count: response.data?.length || 0 })
+      return {
+        data: response.data || [],
+        meta: response.meta || { total: 0, page: 1, limit: 20, totalPages: 0 },
+      }
+    } catch (error: unknown) {
+      const err = error as { status?: number }
+      if (err.status === 404) {
+        logger.info('No alerts found (404)', { farmId })
+        return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+      }
       logger.error('Failed to fetch farm alerts', { error, farmId, params })
       throw error
     }
