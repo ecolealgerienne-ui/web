@@ -18,7 +18,6 @@ const mockDashboardStats = {
 
 const mockChartData: Array<{ month: string; animals: number }> = []
 
-const mockAlerts: any[] = []
 const mockRecentActivities: any[] = []
 
 interface DashboardStats {
@@ -124,7 +123,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
 
       {/* Bottom Grid - Alerts & Activities */}
       <div className="grid gap-4 md:grid-cols-2">
-        <AlertsCard alerts={mockAlerts} />
+        <AlertsCard />
         <ActivitiesCard activities={mockRecentActivities} />
       </div>
     </div>
