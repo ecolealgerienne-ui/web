@@ -783,8 +783,6 @@ export default function DashboardPage() {
                   return (
                     <TableRow
                       key={lot.lotId}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => router.push('/lots')}
                     >
                       <TableCell>
                         <div>
@@ -842,15 +840,14 @@ export default function DashboardPage() {
                 {(rankings?.top || []).map((animal, index) => (
                   <div
                     key={animal.animalId}
-                    className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
-                    onClick={() => router.push('/animals')}
+                    className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-sm font-medium">{animal.officialNumber || animal.visualId}</p>
                         <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
                       </div>
                     </div>
@@ -880,15 +877,14 @@ export default function DashboardPage() {
                 {(rankings?.bottom || []).map((animal, index) => (
                   <div
                     key={animal.animalId}
-                    className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors"
-                    onClick={() => router.push('/animals')}
+                    className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white font-bold text-sm">
                         {(rankings?.bottom?.length || 0) - index}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-sm font-medium">{animal.officialNumber || animal.visualId}</p>
                         <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
                       </div>
                     </div>
