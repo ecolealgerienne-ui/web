@@ -64,6 +64,8 @@ import {
 } from '@/lib/services/dashboard.service';
 import { logger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
+import { AlertBanner } from '@/components/dashboard/alert-banner';
+import { AlertKpiCard } from '@/components/dashboard/alert-kpi-card';
 
 interface DashboardData {
   stats: DashboardStatsV2;
@@ -380,8 +382,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Urgent Alerts Banner */}
+      <AlertBanner />
+
       {/* KPI Cards - Row 1: Herd & Movements */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
         {/* Total Animals */}
         <Card>
           <CardContent className="p-6">
@@ -539,6 +544,9 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Alerts KPI */}
+        <AlertKpiCard />
       </div>
 
       {/* Row 2: Actions Center + GMQ Trends Chart */}
