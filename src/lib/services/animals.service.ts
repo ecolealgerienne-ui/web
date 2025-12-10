@@ -1,27 +1,26 @@
 /**
  * Service pour la gestion des animaux
- *
- * Conforme aux normes DEVELOPMENT_STANDARDS.md
  */
 
 import { apiClient } from '@/lib/api/client';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
-import type { PaginatedResponse } from '@/lib/types/common/api';
+
 
 /**
- * Paramètres de filtre pour la liste des animaux
+ * Filter parameters for animals list
  */
-export interface AnimalFilterParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: string;
-  speciesId?: string;
-  breedId?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+export interface AnimalsFilterParams {
+  status?: string
+  speciesId?: string
+  search?: string
+  limit?: number
+  page?: number
+  // Filters for dashboard actions
+  notWeighedDays?: number  // Animals not weighed for X days
+  minWeight?: number       // Minimum weight (kg)
+  maxWeight?: number       // Maximum weight (kg)
 }
 
 class AnimalsService {
@@ -29,76 +28,31 @@ class AnimalsService {
     return `/api/v1/farms/${TEMP_FARM_ID}/animals`;
   }
 
-  /**
-   * Récupère la liste paginée des animaux
-   */
-  async getAll(params: AnimalFilterParams = {}): Promise<PaginatedResponse<Animal>> {
+  async getAll(filters?: AnimalsFilterParams): Promise<Animal[]> {
     try {
-      const queryParams = new URLSearchParams();
+      const params = new URLSearchParams();
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.speciesId) params.append('speciesId', filters.speciesId);
+      if (filters?.search) params.append('search', filters.search);
 
-      // Pagination
-      const page = params.page || 1;
-      const limit = Math.min(params.limit || 25, 100); // Max 100
-      queryParams.append('page', String(page));
-      queryParams.append('limit', String(limit));
+      // Filters for dashboard actions
+      if (filters?.notWeighedDays) params.append('notWeighedDays', String(filters.notWeighedDays));
+      if (filters?.minWeight) params.append('minWeight', String(filters.minWeight));
+      if (filters?.maxWeight) params.append('maxWeight', String(filters.maxWeight));
 
-      // Filtres
-      if (params.status && params.status !== 'all') {
-        queryParams.append('status', params.status);
-      }
-      if (params.speciesId && params.speciesId !== '__all__') {
-        queryParams.append('speciesId', params.speciesId);
-      }
-      if (params.breedId && params.breedId !== '__all__') {
-        queryParams.append('breedId', params.breedId);
-      }
-      if (params.search) {
-        queryParams.append('search', params.search);
-      }
+      // L'API backend a une limite maximale de 100 et utilise 'page' pour la pagination
+      const limit = Math.min(filters?.limit || 100, 100); // Max 100
+      params.append('limit', String(limit));
+      if (filters?.page) params.append('page', String(filters.page));
 
-      // Note: Le tri n'est pas encore supporté par le backend
-      // TODO: Activer quand le backend le supportera
-      // if (params.sortBy) {
-      //   queryParams.append('sortBy', params.sortBy);
-      //   queryParams.append('sortOrder', params.sortOrder || 'asc');
-      // }
-
-      const url = `${this.getBasePath()}?${queryParams.toString()}`;
-      const response = await apiClient.get<PaginatedResponse<Animal>>(url);
-
-      logger.info('Animals fetched', {
-        total: response.meta?.total || response.data?.length || 0,
-        page: response.meta?.page || page,
-        limit: response.meta?.limit || limit
-      });
-
-      // Si l'API ne retourne pas de meta, on construit une réponse compatible
-      if (!response.meta) {
-        const data = (response as any).data || [];
-        return {
-          data,
-          meta: {
-            total: data.length,
-            page,
-            limit,
-            totalPages: Math.ceil(data.length / limit)
-          }
-        };
-      }
-
-      return response;
+      const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      const response = await apiClient.get<{ data: Animal[] }>(url);
+      logger.info('Animals fetched', { count: response.data?.length || 0 });
+      return response.data || [];
     } catch (error: any) {
       if (error.status === 404) {
         logger.info('No animals found (404)');
-        return {
-          data: [],
-          meta: {
-            total: 0,
-            page: params.page || 1,
-            limit: params.limit || 25,
-            totalPages: 0
-          }
-        };
+        return [];
       }
       logger.error('Failed to fetch animals', { error });
       throw error;

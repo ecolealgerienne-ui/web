@@ -94,10 +94,9 @@ const sanitizeActionUrl = (url: string): string => {
     return '/lots';
   }
 
-  // Remove unsupported query params
-  // /animals?minWeight=500 → /animals (filter not supported)
+  // Filter to only supported query params for /animals
   if (url.startsWith('/animals?')) {
-    const supportedParams = ['action', 'search', 'status'];
+    const supportedParams = ['action', 'search', 'status', 'notWeighedDays', 'minWeight', 'maxWeight'];
     const urlObj = new URL(url, 'http://localhost');
     const params = new URLSearchParams();
 
