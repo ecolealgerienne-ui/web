@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { authConfig } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { NotificationBell } from "@/components/layout/notification-bell";
 import { useTranslations } from "@/lib/i18n";
 import Link from "next/link";
 
@@ -44,6 +45,9 @@ export function Header() {
               </div>
             </div>
           )}
+
+          {/* Notification Bell */}
+          {isAuthenticated && <NotificationBell />}
 
           {/* Language Switcher */}
           <LanguageSwitcher />
