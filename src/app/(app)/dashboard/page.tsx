@@ -916,7 +916,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950">
                 <p className="text-2xl font-bold text-green-600">{stats.health.vaccinationsUpToDatePercentage.toFixed(0)}%</p>
                 <p className="text-sm text-muted-foreground">{t('health.vaccinationsUpToDate')}</p>
@@ -928,10 +928,6 @@ export default function DashboardPage() {
               <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950">
                 <p className="text-2xl font-bold text-blue-600">{stats.health.treatmentsThisMonth}</p>
                 <p className="text-sm text-muted-foreground">{t('health.treatmentsThisMonth')}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold">{stats.health.treatmentsCost.toLocaleString('fr-FR')} DA</p>
-                <p className="text-sm text-muted-foreground">{t('health.treatmentsCost')}</p>
               </div>
             </div>
           </CardContent>
