@@ -847,7 +847,7 @@ export default function DashboardPage() {
                         {index + 1}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-sm font-medium">{animal.officialNumber || animal.visualId}</p>
                         <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
                       </div>
                     </div>
@@ -884,7 +884,7 @@ export default function DashboardPage() {
                         {(rankings?.bottom?.length || 0) - index}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-sm font-medium">{animal.officialNumber || animal.visualId}</p>
                         <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
                       </div>
                     </div>
