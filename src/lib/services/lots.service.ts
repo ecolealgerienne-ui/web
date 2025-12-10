@@ -22,17 +22,15 @@ class LotsService {
       if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
-      const response = await apiClient.get<Lot[]>(url);
-      logger.info('Lots fetched', { count: (response || []).length });
-      return response || [];
+      // API returns paginated response: { data: [...], meta: {...} }
+      const response = await apiClient.get<{ data: Lot[]; meta?: any }>(url);
+      const lots = response?.data || [];
+      logger.info('Lots fetched', { count: lots.length });
+      return lots;
     } catch (error: unknown) {
-      const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No lots found (404)');
-        return [];
-      }
-      logger.error('Failed to fetch lots', { error });
-      throw error;
+      // Return empty array for any error to avoid breaking UI
+      logger.warn('Failed to fetch lots, returning empty array', { error });
+      return [];
     }
   }
 
