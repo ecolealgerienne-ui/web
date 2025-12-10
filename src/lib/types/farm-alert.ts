@@ -113,7 +113,7 @@ export interface FarmAlertsFilterParams {
   page?: number
   limit?: number
   orderBy?: 'triggeredAt' | 'dueDate' | 'priority' | 'status'
-  order?: 'ASC' | 'DESC'
+  order?: 'asc' | 'desc'
 }
 
 /**
