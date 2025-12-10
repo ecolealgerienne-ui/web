@@ -162,10 +162,10 @@ export function AnimalEventDialog({
 
     try {
       // Rechercher par numéro officiel
-      const response = await animalsService.getAll({ search: officialId, limit: 10 });
+      const animals = await animalsService.getAll({ search: officialId, limit: 10 });
 
       // Trouver l'animal avec le numéro officiel exact ou le plus proche
-      const exactMatch = response.data.find(a =>
+      const exactMatch = animals.find(a =>
         a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
         a.visualId?.toLowerCase() === officialId.toLowerCase() ||
         a.currentEid?.toLowerCase() === officialId.toLowerCase()
@@ -179,9 +179,9 @@ export function AnimalEventDialog({
         } else {
           setSearchResult(exactMatch);
         }
-      } else if (response.data.length > 0) {
+      } else if (animals.length > 0) {
         // Prendre le premier résultat si pas de correspondance exacte
-        const firstResult = response.data[0];
+        const firstResult = animals[0];
         const alreadyInList = movementAnimals.some(a => a.id === firstResult.id);
         if (alreadyInList) {
           setSearchError(t('messages.animalAlreadyInList'));
