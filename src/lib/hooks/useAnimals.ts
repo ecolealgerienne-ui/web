@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Animal } from '@/lib/types/animal'
-import { animalsService } from '@/lib/services/animals.service'
+import { animalsService, AnimalsFilterParams } from '@/lib/services/animals.service'
 import { logger } from '@/lib/utils/logger'
 
 interface UseAnimalsResult {
@@ -14,7 +14,7 @@ interface UseAnimalsResult {
   refetch: () => Promise<void>
 }
 
-export function useAnimals(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; page?: number }): UseAnimalsResult {
+export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
   const [animals, setAnimals] = useState<Animal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -25,6 +25,9 @@ export function useAnimals(filters?: { status?: string; speciesId?: string; sear
   const filterSearch = filters?.search
   const filterLimit = filters?.limit
   const filterPage = filters?.page
+  const filterNotWeighedDays = filters?.notWeighedDays
+  const filterMinWeight = filters?.minWeight
+  const filterMaxWeight = filters?.maxWeight
 
   const memoizedFilters = useMemo(() => ({
     status: filterStatus,
@@ -32,7 +35,10 @@ export function useAnimals(filters?: { status?: string; speciesId?: string; sear
     search: filterSearch,
     limit: filterLimit,
     page: filterPage,
-  }), [filterStatus, filterSpeciesId, filterSearch, filterLimit, filterPage])
+    notWeighedDays: filterNotWeighedDays,
+    minWeight: filterMinWeight,
+    maxWeight: filterMaxWeight,
+  }), [filterStatus, filterSpeciesId, filterSearch, filterLimit, filterPage, filterNotWeighedDays, filterMinWeight, filterMaxWeight])
 
   const fetchAnimals = useCallback(async () => {
     setLoading(true)

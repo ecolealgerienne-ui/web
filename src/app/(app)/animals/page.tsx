@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Plus, X, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -27,9 +28,44 @@ export default function AnimalsPage() {
   const t = useTranslations('animals');
   const tc = useCommonTranslations();
   const toast = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read filter params from URL (from dashboard actions)
+  const notWeighedDays = searchParams.get('notWeighedDays');
+  const minWeight = searchParams.get('minWeight');
+  const maxWeight = searchParams.get('maxWeight');
+
+  // Check if dashboard filters are active
+  const hasDashboardFilters = !!(notWeighedDays || minWeight || maxWeight);
+
+  // Build filter description for display
+  const filterDescription = useMemo(() => {
+    const parts: string[] = [];
+    if (notWeighedDays) parts.push(t('filters.notWeighedDays', { days: notWeighedDays }));
+    if (minWeight) parts.push(t('filters.minWeight', { weight: minWeight }));
+    if (maxWeight) parts.push(t('filters.maxWeight', { weight: maxWeight }));
+    return parts.join(' • ');
+  }, [notWeighedDays, minWeight, maxWeight, t]);
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const { animals, loading, error, refetch } = useAnimals({ status: statusFilter, search });
+
+  // Build filters including URL params
+  const filters = useMemo(() => ({
+    status: statusFilter,
+    search,
+    notWeighedDays: notWeighedDays ? parseInt(notWeighedDays, 10) : undefined,
+    minWeight: minWeight ? parseInt(minWeight, 10) : undefined,
+    maxWeight: maxWeight ? parseInt(maxWeight, 10) : undefined,
+  }), [statusFilter, search, notWeighedDays, minWeight, maxWeight]);
+
+  const { animals, loading, error, refetch } = useAnimals(filters);
+
+  // Clear dashboard filters
+  const clearDashboardFilters = () => {
+    router.push('/animals');
+  };
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -195,6 +231,32 @@ export default function AnimalsPage() {
           {t('newAnimal')}
         </Button>
       </div>
+
+      {/* Dashboard filter banner */}
+      {hasDashboardFilters && (
+        <div className="flex items-center justify-between p-4 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+          <div className="flex items-center gap-3">
+            <Filter className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div>
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                {t('filters.dashboardFilterActive')}
+              </p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                {filterDescription}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearDashboardFilters}
+            className="border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-300"
+          >
+            <X className="h-4 w-4 mr-1" />
+            {t('filters.clearFilters')}
+          </Button>
+        </div>
+      )}
 
       {/* DataTable avec filtres intégrés */}
       <DataTable<Animal>

@@ -8,17 +8,37 @@ import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
 
 
+/**
+ * Filter parameters for animals list
+ */
+export interface AnimalsFilterParams {
+  status?: string
+  speciesId?: string
+  search?: string
+  limit?: number
+  page?: number
+  // Filters for dashboard actions
+  notWeighedDays?: number  // Animals not weighed for X days
+  minWeight?: number       // Minimum weight (kg)
+  maxWeight?: number       // Maximum weight (kg)
+}
+
 class AnimalsService {
   private getBasePath(): string {
     return `/api/v1/farms/${TEMP_FARM_ID}/animals`;
   }
 
-  async getAll(filters?: { status?: string; speciesId?: string; search?: string; limit?: number; page?: number }): Promise<Animal[]> {
+  async getAll(filters?: AnimalsFilterParams): Promise<Animal[]> {
     try {
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
       if (filters?.search) params.append('search', filters.search);
+
+      // Filters for dashboard actions
+      if (filters?.notWeighedDays) params.append('notWeighedDays', String(filters.notWeighedDays));
+      if (filters?.minWeight) params.append('minWeight', String(filters.minWeight));
+      if (filters?.maxWeight) params.append('maxWeight', String(filters.maxWeight));
 
       // L'API backend a une limite maximale de 100 et utilise 'page' pour la pagination
       const limit = Math.min(filters?.limit || 100, 100); // Max 100

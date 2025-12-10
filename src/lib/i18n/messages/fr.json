@@ -1886,7 +1886,12 @@
     "filters": {
       "allStatus": "Tous les statuts",
       "allSpecies": "Toutes les espèces",
-      "search": "Rechercher..."
+      "search": "Rechercher...",
+      "dashboardFilterActive": "Filtre du tableau de bord actif",
+      "clearFilters": "Effacer les filtres",
+      "notWeighedDays": "Non pesés depuis {days} jours",
+      "minWeight": "Poids min. {weight} kg",
+      "maxWeight": "Poids max. {weight} kg"
     },
     "sex": {
       "male": "Mâle",
