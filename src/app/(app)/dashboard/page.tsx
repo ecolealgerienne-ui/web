@@ -67,6 +67,51 @@ import { cn } from '@/lib/utils';
 import { AlertBanner } from '@/components/dashboard/alert-banner';
 import { AlertKpiCard } from '@/components/dashboard/alert-kpi-card';
 
+/**
+ * Sanitize action URLs from backend to match existing frontend routes
+ * Some backend URLs may not have corresponding frontend pages yet
+ */
+const sanitizeActionUrl = (url: string): string => {
+  // Map non-existent routes to existing ones
+  const urlMappings: Record<string, string> = {
+    '/weights/new': '/weighings',
+    '/weights': '/weighings',
+  };
+
+  // Check for exact match first
+  if (urlMappings[url]) {
+    return urlMappings[url];
+  }
+
+  // Handle dynamic routes that don't exist
+  // /animals/{id} → /animals (no detail page)
+  if (url.match(/^\/animals\/[a-f0-9-]+$/i)) {
+    return '/animals';
+  }
+
+  // /lots/{id} → /lots (no detail page)
+  if (url.match(/^\/lots\/[a-f0-9-]+$/i)) {
+    return '/lots';
+  }
+
+  // Remove unsupported query params
+  // /animals?minWeight=500 → /animals (filter not supported)
+  if (url.startsWith('/animals?')) {
+    const supportedParams = ['action', 'search', 'status'];
+    const urlObj = new URL(url, 'http://localhost');
+    const params = new URLSearchParams();
+
+    supportedParams.forEach(param => {
+      const value = urlObj.searchParams.get(param);
+      if (value) params.set(param, value);
+    });
+
+    return params.toString() ? `/animals?${params.toString()}` : '/animals';
+  }
+
+  return url;
+};
+
 interface DashboardData {
   stats: DashboardStatsV2;
   actions: DashboardActionsResponse;
@@ -331,7 +376,7 @@ export default function DashboardPage() {
           colors.bg,
           colors.border
         )}
-        onClick={() => router.push(action.actionUrl)}
+        onClick={() => router.push(sanitizeActionUrl(action.actionUrl))}
       >
         <div className="flex items-center gap-3">
           <Icon className="h-5 w-5" />
@@ -735,7 +780,7 @@ export default function DashboardPage() {
                     <TableRow
                       key={lot.lotId}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => router.push(`/lots/${lot.lotId}`)}
+                      onClick={() => router.push('/lots')}
                     >
                       <TableCell>
                         <div>
@@ -794,7 +839,7 @@ export default function DashboardPage() {
                   <div
                     key={animal.animalId}
                     className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
-                    onClick={() => router.push(`/animals/${animal.animalId}`)}
+                    onClick={() => router.push('/animals')}
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white font-bold text-sm">
@@ -832,7 +877,7 @@ export default function DashboardPage() {
                   <div
                     key={animal.animalId}
                     className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors"
-                    onClick={() => router.push(`/animals/${animal.animalId}`)}
+                    onClick={() => router.push('/animals')}
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white font-bold text-sm">
