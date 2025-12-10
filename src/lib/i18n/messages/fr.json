@@ -2639,6 +2639,19 @@
         "other": "Autre"
       }
     },
+    "alertBanner": {
+      "urgent": "{count, plural, one {# alerte urgente} other {# alertes urgentes}} nécessite votre attention",
+      "high": "{count, plural, one {# alerte prioritaire} other {# alertes prioritaires}} nécessite votre attention",
+      "urgentAndHigh": "{urgent} urgente(s) et {high} prioritaire(s) nécessitent votre attention",
+      "actionRequired": "Action requise",
+      "viewAlerts": "Voir les alertes",
+      "dismiss": "Fermer"
+    },
+    "alertKpi": {
+      "title": "Alertes",
+      "urgent": "urgent",
+      "unread": "{count} non lue(s)"
+    },
     "activities": {
       "title": "Activités récentes"
     }
