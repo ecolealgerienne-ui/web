@@ -2617,10 +2617,91 @@
       "manageLots": "Gérer les lots"
     },
     "alerts": {
-      "title": "Alertes"
+      "title": "Alertes",
+      "unread": "non lues",
+      "viewAll": "Voir tout",
+      "noAlerts": "Aucune alerte active",
+      "loadError": "Erreur de chargement",
+      "byCategory": "Par catégorie",
+      "priorities": {
+        "urgent": "Urgent",
+        "high": "Priorité haute",
+        "medium": "Priorité moyenne",
+        "low": "Priorité basse"
+      },
+      "categories": {
+        "health": "Santé",
+        "vaccination": "Vaccination",
+        "treatment": "Traitement",
+        "reproduction": "Reproduction",
+        "nutrition": "Nutrition",
+        "administrative": "Administratif",
+        "other": "Autre"
+      }
     },
     "activities": {
       "title": "Activités récentes"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "{total} alertes dont {unread} non lues",
+    "subtitleLoading": "Chargement des alertes...",
+    "loading": "Chargement...",
+    "noNotifications": "Aucune notification",
+    "viewAll": "Voir tout",
+    "markAllRead": "Tout marquer comme lu",
+    "unknownAlert": "Alerte inconnue",
+    "dueDate": "Échéance",
+    "filters": {
+      "title": "Filtres",
+      "status": "Statut",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "all": "Tous",
+      "apply": "Appliquer"
+    },
+    "status": {
+      "pending": "En attente",
+      "read": "Lu",
+      "dismissed": "Ignoré",
+      "resolved": "Résolu"
+    },
+    "categories": {
+      "health": "Santé",
+      "vaccination": "Vaccination",
+      "treatment": "Traitement",
+      "reproduction": "Reproduction",
+      "nutrition": "Nutrition",
+      "administrative": "Administratif",
+      "other": "Autre"
+    },
+    "priorities": {
+      "urgent": "Urgent",
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible"
+    },
+    "actions": {
+      "markAsRead": "Marquer comme lu",
+      "dismiss": "Ignorer",
+      "markAllRead": "Tout marquer comme lu",
+      "viewDetails": "Voir les détails"
+    },
+    "messages": {
+      "markedAsRead": "Alerte marquée comme lue",
+      "dismissed": "Alerte ignorée",
+      "allMarkedAsRead": "Toutes les alertes marquées comme lues",
+      "markReadError": "Erreur lors du marquage",
+      "dismissError": "Erreur lors de l'ignorement",
+      "markAllReadError": "Erreur lors du marquage",
+      "loadError": "Erreur lors du chargement des alertes",
+      "noAlerts": "Aucune alerte à afficher"
+    },
+    "time": {
+      "minutesAgo": "Il y a {count} min",
+      "hoursAgo": "Il y a {count} h",
+      "daysAgo": "Il y a {count} j"
     }
   },
   "settings": {
