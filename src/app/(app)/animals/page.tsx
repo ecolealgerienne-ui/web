@@ -35,9 +35,10 @@ export default function AnimalsPage() {
   const notWeighedDays = searchParams.get('notWeighedDays');
   const minWeight = searchParams.get('minWeight');
   const maxWeight = searchParams.get('maxWeight');
+  const urlStatus = searchParams.get('status');
 
   // Check if dashboard filters are active
-  const hasDashboardFilters = !!(notWeighedDays || minWeight || maxWeight);
+  const hasDashboardFilters = !!(notWeighedDays || minWeight || maxWeight || urlStatus);
 
   // Build filter description for display
   const filterDescription = useMemo(() => {
@@ -45,20 +46,24 @@ export default function AnimalsPage() {
     if (notWeighedDays) parts.push(t('filters.notWeighedDays', { days: notWeighedDays }));
     if (minWeight) parts.push(t('filters.minWeight', { weight: minWeight }));
     if (maxWeight) parts.push(t('filters.maxWeight', { weight: maxWeight }));
+    if (urlStatus) parts.push(t(`status.${urlStatus}`));
     return parts.join(' • ');
-  }, [notWeighedDays, minWeight, maxWeight, t]);
+  }, [notWeighedDays, minWeight, maxWeight, urlStatus, t]);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
+  // Effective status: URL param takes priority over local filter
+  const effectiveStatus = urlStatus || statusFilter;
+
   // Build filters including URL params
   const filters = useMemo(() => ({
-    status: statusFilter,
+    status: effectiveStatus,
     search,
     notWeighedDays: notWeighedDays ? parseInt(notWeighedDays, 10) : undefined,
     minWeight: minWeight ? parseInt(minWeight, 10) : undefined,
     maxWeight: maxWeight ? parseInt(maxWeight, 10) : undefined,
-  }), [statusFilter, search, notWeighedDays, minWeight, maxWeight]);
+  }), [effectiveStatus, search, notWeighedDays, minWeight, maxWeight]);
 
   const { animals, loading, error, refetch } = useAnimals(filters);
 
