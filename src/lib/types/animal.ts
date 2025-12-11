@@ -23,23 +23,18 @@ export interface Animal {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
+  // Weight data (from backend)
+  currentWeight?: number | null;    // Last recorded weight in kg
+  lastWeighDate?: string | null;    // Date of last weighing
   // Relations (when included)
   species?: { id: string; nameFr: string; nameEn?: string; nameAr?: string };
   breed?: { id: string; nameFr: string; nameEn?: string; nameAr?: string };
   mother?: Animal | null;
   father?: Animal | null;
   children?: Animal[];
-  // Deprecated fields (for backward compatibility, will be removed)
-  identificationNumber?: string;
-  name?: string;
-  motherIdentificationNumber?: string;
-  fatherIdentificationNumber?: string;
+  // Legacy/optional fields
   acquisitionDate?: string;
   acquisitionPrice?: number;
-  currentWeight?: number;
-  currentLocation?: string;
-  healthStatus?: string;
-  isActive?: boolean;
 }
 
 export interface CreateAnimalDto {

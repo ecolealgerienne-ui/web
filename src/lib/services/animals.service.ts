@@ -14,6 +14,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 export interface AnimalsFilterParams {
   status?: string
   speciesId?: string
+  breedId?: string
   sex?: 'male' | 'female'
   search?: string
   limit?: number
@@ -22,6 +23,27 @@ export interface AnimalsFilterParams {
   notWeighedDays?: number  // Animals not weighed for X days
   minWeight?: number       // Minimum weight (kg)
   maxWeight?: number       // Maximum weight (kg)
+}
+
+/**
+ * Animals statistics response
+ */
+export interface AnimalStats {
+  total: number
+  byStatus: {
+    draft?: number
+    alive?: number
+    sold?: number
+    dead?: number
+    slaughtered?: number
+    onTemporaryMovement?: number
+  }
+  bySex: {
+    male: number
+    female: number
+  }
+  notWeighedCount: number
+  notWeighedDays: number
 }
 
 /**
@@ -63,6 +85,7 @@ class AnimalsService {
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
+      if (filters?.breedId) params.append('breedId', filters.breedId);
       if (filters?.sex) params.append('sex', filters.sex);
       if (filters?.search) params.append('search', filters.search);
 
@@ -136,6 +159,34 @@ class AnimalsService {
   async delete(id: string): Promise<void> {
     await apiClient.delete(`${this.getBasePath()}/${id}`);
     logger.info('Animal deleted', { id });
+  }
+
+  /**
+   * Get animals statistics
+   */
+  async getStats(notWeighedDays?: number): Promise<AnimalStats> {
+    try {
+      const params = new URLSearchParams();
+      if (notWeighedDays) params.append('notWeighedDays', String(notWeighedDays));
+
+      const url = params.toString()
+        ? `${this.getBasePath()}/stats?${params}`
+        : `${this.getBasePath()}/stats`;
+
+      const response = await apiClient.get<AnimalStats>(url);
+      logger.info('Animals stats fetched', { total: response.total });
+      return response;
+    } catch (error: any) {
+      logger.error('Failed to fetch animals stats', { error });
+      // Return default stats on error
+      return {
+        total: 0,
+        byStatus: {},
+        bySex: { male: 0, female: 0 },
+        notWeighedCount: 0,
+        notWeighedDays: notWeighedDays || 30,
+      };
+    }
   }
 }
 

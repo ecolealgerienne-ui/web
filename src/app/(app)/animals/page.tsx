@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Plus, X, Filter } from 'lucide-react';
+import { Plus, X, Filter, Beef, Scale, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useAnimals } from '@/lib/hooks/useAnimals';
+import { useSpecies } from '@/lib/hooks/useSpecies';
+import { useBreeds } from '@/lib/hooks/useBreeds';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
-import { animalsService } from '@/lib/services/animals.service';
+import { animalsService, AnimalStats } from '@/lib/services/animals.service';
 import { AnimalDialog } from '@/components/animals/animal-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
@@ -23,6 +26,37 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+// Helper function to calculate age from birthDate
+function calculateAge(birthDate: string): string {
+  const birth = new Date(birthDate);
+  const now = new Date();
+  const diffMs = now.getTime() - birth.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 30) {
+    return `${diffDays}j`;
+  } else if (diffDays < 365) {
+    const months = Math.floor(diffDays / 30);
+    return `${months} mois`;
+  } else {
+    const years = Math.floor(diffDays / 365);
+    const remainingMonths = Math.floor((diffDays % 365) / 30);
+    if (remainingMonths > 0) {
+      return `${years}a ${remainingMonths}m`;
+    }
+    return `${years} an${years > 1 ? 's' : ''}`;
+  }
+}
+
+// Helper to check if weighing is overdue (>30 days)
+function isWeighingOverdue(lastWeighDate: string | null | undefined, days = 30): boolean {
+  if (!lastWeighDate) return true;
+  const lastWeigh = new Date(lastWeighDate);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - lastWeigh.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays > days;
+}
 
 export default function AnimalsPage() {
   const t = useTranslations('animals');
@@ -50,12 +84,40 @@ export default function AnimalsPage() {
     return parts.join(' • ');
   }, [notWeighedDays, minWeight, maxWeight, urlStatus, t]);
 
+  // Filter states
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [speciesFilter, setSpeciesFilter] = useState<string>('all');
+  const [sexFilter, setSexFilter] = useState<string>('all');
+  const [breedFilter, setBreedFilter] = useState<string>('all');
 
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+
+  // Stats state
+  const [stats, setStats] = useState<AnimalStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Load species and breeds for filters
+  const { species } = useSpecies();
+  const { breeds } = useBreeds(speciesFilter !== 'all' ? speciesFilter : undefined);
+
+  // Fetch stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      try {
+        const result = await animalsService.getStats(30);
+        setStats(result);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
 
   // Effective status: URL param takes priority over local filter
   const effectiveStatus = urlStatus || statusFilter;
@@ -63,13 +125,16 @@ export default function AnimalsPage() {
   // Build filters including URL params and pagination
   const filters = useMemo(() => ({
     status: effectiveStatus,
+    speciesId: speciesFilter !== 'all' ? speciesFilter : undefined,
+    breedId: breedFilter !== 'all' ? breedFilter : undefined,
+    sex: sexFilter !== 'all' ? sexFilter as 'male' | 'female' : undefined,
     search,
     page,
     limit,
     notWeighedDays: notWeighedDays ? parseInt(notWeighedDays, 10) : undefined,
     minWeight: minWeight ? parseInt(minWeight, 10) : undefined,
     maxWeight: maxWeight ? parseInt(maxWeight, 10) : undefined,
-  }), [effectiveStatus, search, page, limit, notWeighedDays, minWeight, maxWeight]);
+  }), [effectiveStatus, speciesFilter, breedFilter, sexFilter, search, page, limit, notWeighedDays, minWeight, maxWeight]);
 
   const { animals, meta, loading, error, refetch } = useAnimals(filters);
 
@@ -77,6 +142,12 @@ export default function AnimalsPage() {
   const clearDashboardFilters = () => {
     router.push('/animals');
   };
+
+  // Reset breed filter when species changes
+  useEffect(() => {
+    setBreedFilter('all');
+  }, [speciesFilter]);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -130,6 +201,9 @@ export default function AnimalsPage() {
       }
       setDialogOpen(false);
       refetch();
+      // Refresh stats after create/update
+      const newStats = await animalsService.getStats(30);
+      setStats(newStats);
     } catch (error) {
       toast.error(tc('messages.error'), t('messages.createError'));
     } finally {
@@ -146,6 +220,9 @@ export default function AnimalsPage() {
       setIsDeleteDialogOpen(false);
       setAnimalToDelete(null);
       refetch();
+      // Refresh stats after delete
+      const newStats = await animalsService.getStats(30);
+      setStats(newStats);
     } catch (error) {
       toast.error(tc('messages.error'), t('messages.deleteError'));
     }
@@ -168,7 +245,7 @@ export default function AnimalsPage() {
     }
   };
 
-  // Définition des colonnes du tableau
+  // Column definitions
   const columns: ColumnDef<Animal>[] = [
     {
       key: 'identification',
@@ -179,8 +256,11 @@ export default function AnimalsPage() {
         return (
           <div>
             <div className="font-medium">{displayId}</div>
-            {animal.breed && (
-              <div className="text-sm text-muted-foreground">{animal.breed.nameFr}</div>
+            {animal.species && (
+              <div className="text-xs text-muted-foreground">
+                {animal.species.nameFr}
+                {animal.breed && ` • ${animal.breed.nameFr}`}
+              </div>
             )}
           </div>
         );
@@ -190,13 +270,52 @@ export default function AnimalsPage() {
       key: 'sex',
       header: t('fields.sex'),
       sortable: true,
-      render: (animal) => t(`sex.${animal.sex}`),
+      render: (animal) => (
+        <span className={animal.sex === 'male' ? 'text-blue-600' : 'text-pink-600'}>
+          {t(`sex.${animal.sex}`)}
+        </span>
+      ),
     },
     {
-      key: 'birthDate',
-      header: t('fields.birthDate'),
+      key: 'age',
+      header: t('fields.age'),
       sortable: true,
-      render: (animal) => animal.birthDate ? new Date(animal.birthDate).toLocaleDateString() : '-',
+      render: (animal) => animal.birthDate ? calculateAge(animal.birthDate) : '-',
+    },
+    {
+      key: 'currentWeight',
+      header: t('fields.weight'),
+      sortable: true,
+      render: (animal) => {
+        if (!animal.currentWeight) return <span className="text-muted-foreground">-</span>;
+        return (
+          <span className="font-medium">{animal.currentWeight.toFixed(0)} kg</span>
+        );
+      },
+    },
+    {
+      key: 'lastWeighDate',
+      header: t('fields.lastWeighDate'),
+      sortable: true,
+      render: (animal) => {
+        if (!animal.lastWeighDate) {
+          return (
+            <div className="flex items-center gap-1 text-orange-600">
+              <AlertCircle className="h-3 w-3" />
+              <span className="text-xs">{t('fields.neverWeighed')}</span>
+            </div>
+          );
+        }
+        const isOverdue = isWeighingOverdue(animal.lastWeighDate);
+        return (
+          <div className={isOverdue ? 'text-orange-600' : ''}>
+            <div className="flex items-center gap-1">
+              {isOverdue && <AlertCircle className="h-3 w-3" />}
+              <span className="text-sm">{new Date(animal.lastWeighDate).toLocaleDateString('fr-FR')}</span>
+            </div>
+          </div>
+        );
+      },
     },
     {
       key: 'status',
@@ -210,31 +329,92 @@ export default function AnimalsPage() {
     },
   ];
 
-  // Filtre personnalisé pour le statut
-  const statusFilterComponent = (
-    <Select
-      value={statusFilter}
-      onValueChange={(value) => {
-        setStatusFilter(value);
-        setPage(1); // Reset page on filter change
-      }}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder={t('filters.allStatus')} />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
-        <SelectItem value="alive">{t('status.alive')}</SelectItem>
-        <SelectItem value="sold">{t('status.sold')}</SelectItem>
-        <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
-        <SelectItem value="dead">{t('status.dead')}</SelectItem>
-      </SelectContent>
-    </Select>
+  // Filter component
+  const filtersComponent = (
+    <div className="flex flex-wrap gap-2">
+      {/* Status filter */}
+      <Select
+        value={statusFilter}
+        onValueChange={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+        }}
+      >
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder={t('filters.allStatus')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allStatus')}</SelectItem>
+          <SelectItem value="alive">{t('status.alive')}</SelectItem>
+          <SelectItem value="sold">{t('status.sold')}</SelectItem>
+          <SelectItem value="slaughtered">{t('status.slaughtered')}</SelectItem>
+          <SelectItem value="dead">{t('status.dead')}</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {/* Species filter */}
+      <Select
+        value={speciesFilter}
+        onValueChange={(value) => {
+          setSpeciesFilter(value);
+          setPage(1);
+        }}
+      >
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder={t('filters.allSpecies')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allSpecies')}</SelectItem>
+          {species.map((s) => (
+            <SelectItem key={s.id} value={s.id}>{s.nameFr}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Breed filter - only show if species is selected */}
+      {speciesFilter !== 'all' && breeds.length > 0 && (
+        <Select
+          value={breedFilter}
+          onValueChange={(value) => {
+            setBreedFilter(value);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder={t('filters.allBreeds')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('filters.allBreeds')}</SelectItem>
+            {breeds.map((b) => (
+              <SelectItem key={b.id} value={b.id}>{b.nameFr}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {/* Sex filter */}
+      <Select
+        value={sexFilter}
+        onValueChange={(value) => {
+          setSexFilter(value);
+          setPage(1);
+        }}
+      >
+        <SelectTrigger className="w-[120px]">
+          <SelectValue placeholder={t('filters.allSex')} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('filters.allSex')}</SelectItem>
+          <SelectItem value="male">{t('sex.male')}</SelectItem>
+          <SelectItem value="female">{t('sex.female')}</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   );
 
   return (
     <div className="space-y-6">
-      {/* Header avec bouton d'ajout */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t('title')}</h1>
@@ -244,6 +424,75 @@ export default function AnimalsPage() {
           <Plus className="mr-2 h-4 w-4" />
           {t('newAnimal')}
         </Button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        {/* Total Animals */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Beef className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{statsLoading ? '-' : stats?.total || 0}</p>
+                <p className="text-xs text-muted-foreground">{t('kpis.totalAnimals')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Males */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900">
+                <span className="text-lg">♂</span>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-blue-600">
+                  {statsLoading ? '-' : stats?.bySex.male || 0}
+                </p>
+                <p className="text-xs text-muted-foreground">{t('sex.male')}s</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Females */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-pink-100 dark:bg-pink-900">
+                <span className="text-lg">♀</span>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-pink-600">
+                  {statsLoading ? '-' : stats?.bySex.female || 0}
+                </p>
+                <p className="text-xs text-muted-foreground">{t('sex.female')}s</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Need Weighing */}
+        <Card className={stats?.notWeighedCount && stats.notWeighedCount > 0 ? 'border-orange-300 dark:border-orange-700' : ''}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${stats?.notWeighedCount && stats.notWeighedCount > 0 ? 'bg-orange-100 dark:bg-orange-900' : 'bg-green-100 dark:bg-green-900'}`}>
+                <Scale className={`h-5 w-5 ${stats?.notWeighedCount && stats.notWeighedCount > 0 ? 'text-orange-600' : 'text-green-600'}`} />
+              </div>
+              <div>
+                <p className={`text-2xl font-bold ${stats?.notWeighedCount && stats.notWeighedCount > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                  {statsLoading ? '-' : stats?.notWeighedCount || 0}
+                </p>
+                <p className="text-xs text-muted-foreground">{t('kpis.needWeighing')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Dashboard filter banner */}
@@ -272,7 +521,7 @@ export default function AnimalsPage() {
         </div>
       )}
 
-      {/* DataTable avec filtres intégrés */}
+      {/* DataTable */}
       <DataTable<Animal>
         data={animals}
         columns={columns}
@@ -289,17 +538,17 @@ export default function AnimalsPage() {
         searchValue={search}
         onSearchChange={(value) => {
           setSearch(value);
-          setPage(1); // Reset page on search
+          setPage(1);
         }}
         searchPlaceholder={t('filters.search')}
         onRowClick={handleViewDetail}
         onEdit={handleEdit}
         onDelete={handleDelete}
         emptyMessage={t('noAnimals')}
-        filters={statusFilterComponent}
+        filters={filtersComponent}
       />
 
-      {/* Dialog unifié (consultation/modification/création) */}
+      {/* Animal Dialog */}
       <AnimalDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -311,7 +560,7 @@ export default function AnimalsPage() {
         onNavigate={handleNavigate}
       />
 
-      {/* Dialog confirmation suppression */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
