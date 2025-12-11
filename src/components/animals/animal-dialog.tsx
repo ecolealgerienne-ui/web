@@ -266,6 +266,7 @@ export function AnimalDialog({
       if (formData.fatherId) cleanedData.fatherId = formData.fatherId;
       if (formData.notes) cleanedData.notes = formData.notes;
 
+      console.log('Submitting animal data:', JSON.stringify(cleanedData, null, 2));
       await onSubmit(cleanedData as CreateAnimalDto);
       onOpenChange(false);
     } catch (error) {
