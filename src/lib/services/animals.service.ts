@@ -121,6 +121,7 @@ class AnimalsService {
   }
 
   async create(data: CreateAnimalDto): Promise<Animal> {
+    console.log('animals.service.create - sending data:', JSON.stringify(data, null, 2));
     const response = await apiClient.post<Animal>(this.getBasePath(), data);
     logger.info('Animal created', { id: response.id });
     return response;

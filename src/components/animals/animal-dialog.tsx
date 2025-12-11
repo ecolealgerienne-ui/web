@@ -24,6 +24,7 @@ import { useSpecies } from '@/lib/hooks/useSpecies';
 import { treatmentsService } from '@/lib/services/treatments.service';
 import { AnimalSearchDialog } from './animal-search-dialog';
 import { Pill, Syringe, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -257,6 +258,11 @@ export function AnimalDialog({
         status: formData.status,
       };
 
+      // Generate UUID for new animals (create mode)
+      if (mode === 'create') {
+        cleanedData.id = uuidv4();
+      }
+
       // Only include optional fields if they have values
       if (formData.currentEid) cleanedData.currentEid = formData.currentEid;
       if (formData.officialNumber) cleanedData.officialNumber = formData.officialNumber;
@@ -266,6 +272,7 @@ export function AnimalDialog({
       if (formData.fatherId) cleanedData.fatherId = formData.fatherId;
       if (formData.notes) cleanedData.notes = formData.notes;
 
+      console.log('Submitting animal data:', JSON.stringify(cleanedData, null, 2));
       await onSubmit(cleanedData as CreateAnimalDto);
       onOpenChange(false);
     } catch (error) {
