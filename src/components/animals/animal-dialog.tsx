@@ -27,6 +27,102 @@ import { Pill, Syringe, ChevronLeft, ChevronRight, Search, X } from 'lucide-reac
 
 type DialogMode = 'view' | 'edit' | 'create';
 
+// Field component defined outside to prevent re-creation on every render
+interface FieldProps {
+  label: string;
+  value: string;
+  type?: 'text' | 'date' | 'select' | 'textarea';
+  placeholder?: string;
+  onChange?: (value: string) => void;
+  required?: boolean;
+  maxLength?: number;
+  options?: { value: string; label: string }[];
+  disabled?: boolean;
+  isEditable: boolean;
+}
+
+const Field = React.memo(function Field({
+  label,
+  value,
+  type = 'text',
+  placeholder,
+  onChange,
+  required,
+  maxLength,
+  options,
+  disabled,
+  isEditable,
+}: FieldProps) {
+  if (!isEditable) {
+    // Mode lecture
+    if (type === 'select' && options) {
+      const selectedOption = options.find(o => o.value === value);
+      return (
+        <div className="space-y-1">
+          <span className="text-sm text-muted-foreground">{label}</span>
+          <p className="font-medium">{selectedOption?.label || value || '-'}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-1">
+        <span className="text-sm text-muted-foreground">{label}</span>
+        <p className="font-medium">{value || '-'}</p>
+      </div>
+    );
+  }
+
+  // Mode édition
+  if (type === 'select' && options) {
+    return (
+      <div className="space-y-2">
+        <Label>{label}{required && ' *'}</Label>
+        <Select value={value} onValueChange={onChange || (() => {})} disabled={disabled}>
+          <SelectTrigger>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  if (type === 'textarea') {
+    return (
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <Textarea
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder={placeholder}
+          rows={3}
+          maxLength={maxLength}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}{required && ' *'}</Label>
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        placeholder={placeholder}
+        required={required}
+        maxLength={maxLength}
+      />
+    </div>
+  );
+});
+
 interface AnimalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -209,98 +305,6 @@ export function AnimalDialog({
     return animal?.breed?.nameFr || '';
   };
 
-  // Composant pour afficher un champ (lecture ou édition)
-  const Field = ({
-    label,
-    value,
-    type = 'text',
-    placeholder,
-    onChange,
-    required,
-    maxLength,
-    options,
-    disabled,
-  }: {
-    label: string;
-    value: string;
-    type?: 'text' | 'date' | 'select' | 'textarea';
-    placeholder?: string;
-    onChange?: (value: string) => void;
-    required?: boolean;
-    maxLength?: number;
-    options?: { value: string; label: string }[];
-    disabled?: boolean;
-  }) => {
-    if (!isEditable) {
-      // Mode lecture
-      if (type === 'select' && options) {
-        const selectedOption = options.find(o => o.value === value);
-        return (
-          <div className="space-y-1">
-            <span className="text-sm text-muted-foreground">{label}</span>
-            <p className="font-medium">{selectedOption?.label || value || '-'}</p>
-          </div>
-        );
-      }
-      return (
-        <div className="space-y-1">
-          <span className="text-sm text-muted-foreground">{label}</span>
-          <p className="font-medium">{value || '-'}</p>
-        </div>
-      );
-    }
-
-    // Mode édition
-    if (type === 'select' && options) {
-      return (
-        <div className="space-y-2">
-          <Label>{label}{required && ' *'}</Label>
-          <Select value={value} onValueChange={onChange || (() => {})} disabled={disabled}>
-            <SelectTrigger>
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      );
-    }
-
-    if (type === 'textarea') {
-      return (
-        <div className="space-y-2">
-          <Label>{label}</Label>
-          <Textarea
-            value={value}
-            onChange={(e) => onChange?.(e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-            maxLength={maxLength}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        <Label>{label}{required && ' *'}</Label>
-        <Input
-          type={type}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-          placeholder={placeholder}
-          required={required}
-          maxLength={maxLength}
-        />
-      </div>
-    );
-  };
-
   // Composant pour afficher le statut
   const StatusField = () => {
     if (!isEditable) {
@@ -350,18 +354,21 @@ export function AnimalDialog({
             placeholder="Ex: 250268001234567"
             maxLength={15}
             onChange={(v) => setFormData({ ...formData, currentEid: v })}
+            isEditable={isEditable}
           />
           <Field
             label={t('fields.officialNumber')}
             value={isEditable ? (formData.officialNumber || '') : (animal?.officialNumber || '')}
             placeholder="Ex: DZ-2024-001"
             onChange={(v) => setFormData({ ...formData, officialNumber: v })}
+            isEditable={isEditable}
           />
           <Field
             label={t('fields.visualId')}
             value={isEditable ? (formData.visualId || '') : (animal?.visualId || '')}
             placeholder="Ex: A-001"
             onChange={(v) => setFormData({ ...formData, visualId: v })}
+            isEditable={isEditable}
           />
         </div>
       </div>
@@ -380,6 +387,7 @@ export function AnimalDialog({
               { value: 'male', label: t('sex.male') },
             ]}
             onChange={(v) => setFormData({ ...formData, sex: v as 'male' | 'female' })}
+            isEditable={isEditable}
           />
           {isEditable ? (
             <Field
@@ -388,6 +396,7 @@ export function AnimalDialog({
               type="date"
               required
               onChange={(v) => setFormData({ ...formData, birthDate: v })}
+              isEditable={isEditable}
             />
           ) : (
             <div className="space-y-1">
