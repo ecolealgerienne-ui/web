@@ -140,11 +140,14 @@ export function AnimalDialog({
     }
   }, [animal]);
 
+  // Load care data when animal changes (not when tab changes)
   useEffect(() => {
-    if (animal && activeTab === 'care') {
+    if (animal) {
       loadCareData();
+    } else {
+      setAllTreatments([]);
     }
-  }, [animal, activeTab, loadCareData]);
+  }, [animal, loadCareData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
