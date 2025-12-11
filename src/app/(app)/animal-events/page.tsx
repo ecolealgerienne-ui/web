@@ -92,7 +92,13 @@ export default function AnimalEventsPage() {
     const fetchStats = async () => {
       setStatsLoading(true);
       try {
-        const result = await dashboardService.getStatsV2({ period: dateRange.statsPeriod });
+        // When period is 'all', don't pass period param to get all-time stats
+        const statsParams = dateRange.statsPeriod === 'all'
+          ? undefined
+          : { period: dateRange.statsPeriod };
+        console.log('[animal-events] Fetching stats with params:', statsParams);
+        const result = await dashboardService.getStatsV2(statsParams);
+        console.log('[animal-events] Stats result:', result);
         setStats(result);
       } catch (error) {
         console.error('Failed to fetch stats:', error);
