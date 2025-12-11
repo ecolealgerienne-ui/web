@@ -2190,6 +2190,9 @@
       "allTypes": "Tous les types",
       "search": "Rechercher..."
     },
+    "kpis": {
+      "animals": "Animaux"
+    },
     "types": {
       "undefined": "Non défini",
       "entry": "Entrée",
