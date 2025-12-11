@@ -1,8 +1,8 @@
 # Standards de Développement - AniTra Web
 
-**Version:** 1.9
-**Date:** 2025-12-10
-**Dernière mise à jour:** Ajout règle 8.3.25 - Contrat API Pagination : Backend DOIT utiliser `totalPages` (pas `pages`) pour cohérence avec `PaginationMeta`
+**Version:** 1.10
+**Date:** 2025-12-11
+**Dernière mise à jour:** Ajout règle 7.13 - Composants Imbriqués : NE JAMAIS définir de composants à l'intérieur d'autres composants (cause perte de focus)
 **Application:** Tous les développements de fonctionnalités
 
 ---
@@ -63,6 +63,12 @@
   - **TOUJOURS** implémenter `CrudService<T, CreateDto, UpdateDto>` pour les services
   - Ces types sont dans `/src/lib/types/common/api.ts` et `/src/lib/constants/http-status.ts`
   - Voir section 6 pour documentation complète
+
+- ❌ **Ne jamais définir de composants à l'intérieur d'autres composants**
+  - Cause des re-créations à chaque rendu → perte de focus, performance dégradée
+  - Déplacer les sous-composants à l'extérieur du composant parent
+  - Ou utiliser des variables JSX au lieu de fonctions composant
+  - Voir section 7.13 pour documentation complète et exemples
 
 - ❌ **Aucun commit sans build réussi** ⚠️ **RÈGLE NON NÉGOCIABLE**
   - **AVANT CHAQUE COMMIT** : exécuter `npm run build`
@@ -2559,6 +2565,149 @@ interface CreateMovementDto {
 - `PUT /api/v1/farms/{farmId}/movements/{id}` → `animalIds: string[]`
 - `POST /api/v1/farms/{farmId}/lots` → `animalIds: string[]`
 - `PUT /api/v1/farms/{farmId}/lots/{id}` → `animalIds: string[]`
+
+### 7.13 Composants Imbriqués - Anti-Pattern à Éviter ⚠️ RÈGLE CRITIQUE
+
+**❌ NE JAMAIS définir des composants à l'intérieur d'autres composants**
+
+**Problème** : Définir une fonction composant à l'intérieur d'un autre composant cause sa re-création à chaque rendu du parent. Cela provoque :
+- Perte de focus sur les champs de formulaire
+- Re-montage complet du sous-composant à chaque frappe
+- Performance dégradée
+- Perte d'état local du sous-composant
+
+**❌ MAUVAIS - Composant défini à l'intérieur :**
+
+```typescript
+function ParentComponent() {
+  const [data, setData] = useState('')
+
+  // ❌ MAUVAIS : Ce composant est re-créé à chaque rendu de ParentComponent
+  const FormField = () => (
+    <Input
+      value={data}
+      onChange={(e) => setData(e.target.value)}
+    />
+  )
+
+  // ❌ MAUVAIS aussi : Même problème avec une fonction fléchée
+  const ContentSection = () => {
+    return (
+      <div>
+        <h2>Titre</h2>
+        <p>{data}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <FormField />      {/* Perd le focus à chaque frappe */}
+      <ContentSection /> {/* Re-monté à chaque rendu */}
+    </div>
+  )
+}
+```
+
+**✅ SOLUTION 1 - Déplacer le composant à l'extérieur :**
+
+```typescript
+// ✅ BON : Composant défini à l'extérieur, stable
+interface FormFieldProps {
+  value: string
+  onChange: (value: string) => void
+}
+
+const FormField = React.memo(function FormField({ value, onChange }: FormFieldProps) {
+  return (
+    <Input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  )
+})
+
+function ParentComponent() {
+  const [data, setData] = useState('')
+
+  return (
+    <div>
+      <FormField value={data} onChange={setData} />
+    </div>
+  )
+}
+```
+
+**✅ SOLUTION 2 - Utiliser des variables JSX (pour du contenu simple) :**
+
+```typescript
+function ParentComponent() {
+  const [data, setData] = useState('')
+
+  // ✅ BON : Variable JSX, pas une fonction composant
+  // Pas de re-création, juste une valeur JSX évaluée
+  const formContent = (
+    <Input
+      value={data}
+      onChange={(e) => setData(e.target.value)}
+    />
+  )
+
+  const contentSection = (
+    <div>
+      <h2>Titre</h2>
+      <p>{data}</p>
+    </div>
+  )
+
+  return (
+    <div>
+      {formContent}
+      {contentSection}
+    </div>
+  )
+}
+```
+
+**✅ SOLUTION 3 - Inline JSX (le plus simple) :**
+
+```typescript
+function ParentComponent() {
+  const [data, setData] = useState('')
+
+  return (
+    <div>
+      {/* ✅ BON : JSX directement inline */}
+      <Input
+        value={data}
+        onChange={(e) => setData(e.target.value)}
+      />
+      <div>
+        <h2>Titre</h2>
+        <p>{data}</p>
+      </div>
+    </div>
+  )
+}
+```
+
+**Quand utiliser chaque solution :**
+
+| Solution | Cas d'usage |
+|----------|-------------|
+| Composant externe + `React.memo` | Composant réutilisable, logique complexe, optimisation perf |
+| Variable JSX | Contenu conditionnel ou répété, mais simple |
+| Inline JSX | Contenu simple utilisé une seule fois |
+
+**Détection du problème :**
+- L'utilisateur signale que le curseur "saute" ou que le focus est perdu
+- Un champ de formulaire se réinitialise visuellement après chaque frappe
+- DevTools React montre des re-montages fréquents (highlight updates)
+
+**Checklist avant validation :**
+1. Aucune fonction `const X = () => (...)` ou `function X() {...}` définie dans le corps du composant
+2. Les sous-composants qui ont besoin de props du parent utilisent des props explicites
+3. Utiliser `React.memo()` pour les composants externes qui reçoivent des props stables
 
 ### 7.3 Composants Génériques Transactionnels (farm-scoped)
 
