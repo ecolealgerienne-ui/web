@@ -145,18 +145,24 @@ export function AnimalDialog({
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      // Clean up form data - convert empty strings to undefined for optional fields
-      const cleanedData = {
-        ...formData,
-        currentEid: formData.currentEid || undefined,
-        officialNumber: formData.officialNumber || undefined,
-        visualId: formData.visualId || undefined,
-        breedId: formData.breedId || undefined,
-        motherId: formData.motherId || undefined,
-        fatherId: formData.fatherId || undefined,
-        notes: formData.notes || undefined,
+      // Clean up form data - remove empty optional fields to avoid validation errors
+      const cleanedData: Record<string, any> = {
+        birthDate: formData.birthDate,
+        sex: formData.sex,
+        speciesId: formData.speciesId,
+        status: formData.status,
       };
-      await onSubmit(cleanedData);
+
+      // Only include optional fields if they have values
+      if (formData.currentEid) cleanedData.currentEid = formData.currentEid;
+      if (formData.officialNumber) cleanedData.officialNumber = formData.officialNumber;
+      if (formData.visualId) cleanedData.visualId = formData.visualId;
+      if (formData.breedId) cleanedData.breedId = formData.breedId;
+      if (formData.motherId) cleanedData.motherId = formData.motherId;
+      if (formData.fatherId) cleanedData.fatherId = formData.fatherId;
+      if (formData.notes) cleanedData.notes = formData.notes;
+
+      await onSubmit(cleanedData as CreateAnimalDto);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
