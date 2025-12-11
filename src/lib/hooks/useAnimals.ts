@@ -31,6 +31,8 @@ export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
   // Extraire les valeurs des filtres pour éviter les re-renders inutiles
   const filterStatus = filters?.status
   const filterSpeciesId = filters?.speciesId
+  const filterBreedId = filters?.breedId
+  const filterSex = filters?.sex
   const filterSearch = filters?.search
   const filterLimit = filters?.limit
   const filterPage = filters?.page
@@ -41,13 +43,15 @@ export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
   const memoizedFilters = useMemo(() => ({
     status: filterStatus,
     speciesId: filterSpeciesId,
+    breedId: filterBreedId,
+    sex: filterSex,
     search: filterSearch,
     limit: filterLimit,
     page: filterPage,
     notWeighedDays: filterNotWeighedDays,
     minWeight: filterMinWeight,
     maxWeight: filterMaxWeight,
-  }), [filterStatus, filterSpeciesId, filterSearch, filterLimit, filterPage, filterNotWeighedDays, filterMinWeight, filterMaxWeight])
+  }), [filterStatus, filterSpeciesId, filterBreedId, filterSex, filterSearch, filterLimit, filterPage, filterNotWeighedDays, filterMinWeight, filterMaxWeight])
 
   const fetchAnimals = useCallback(async () => {
     setLoading(true)

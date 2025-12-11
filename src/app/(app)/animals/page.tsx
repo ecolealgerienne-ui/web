@@ -11,7 +11,7 @@ import { useAnimals } from '@/lib/hooks/useAnimals';
 import { useSpecies } from '@/lib/hooks/useSpecies';
 import { useBreeds } from '@/lib/hooks/useBreeds';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
-import { animalsService, AnimalStats } from '@/lib/services/animals.service';
+import { animalsService, AnimalStats, StatsFilterParams } from '@/lib/services/animals.service';
 import { AnimalDialog } from '@/components/animals/animal-dialog';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
@@ -103,24 +103,20 @@ export default function AnimalsPage() {
   const { species } = useSpecies();
   const { breeds } = useBreeds(speciesFilter !== 'all' ? speciesFilter : undefined);
 
-  // Fetch stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      setStatsLoading(true);
-      try {
-        const result = await animalsService.getStats(30);
-        setStats(result);
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
-    fetchStats();
-  }, []);
-
   // Effective status: URL param takes priority over local filter
   const effectiveStatus = urlStatus || statusFilter;
+
+  // Build stats filters (without pagination) - for KPIs
+  const statsFilters = useMemo<StatsFilterParams>(() => ({
+    status: effectiveStatus !== 'all' ? effectiveStatus : undefined,
+    speciesId: speciesFilter !== 'all' ? speciesFilter : undefined,
+    breedId: breedFilter !== 'all' ? breedFilter : undefined,
+    sex: sexFilter !== 'all' ? sexFilter as 'male' | 'female' : undefined,
+    search: search || undefined,
+    notWeighedDays: notWeighedDays ? parseInt(notWeighedDays, 10) : 30,
+    minWeight: minWeight ? parseInt(minWeight, 10) : undefined,
+    maxWeight: maxWeight ? parseInt(maxWeight, 10) : undefined,
+  }), [effectiveStatus, speciesFilter, breedFilter, sexFilter, search, notWeighedDays, minWeight, maxWeight]);
 
   // Build filters including URL params and pagination
   const filters = useMemo(() => ({
@@ -135,6 +131,22 @@ export default function AnimalsPage() {
     minWeight: minWeight ? parseInt(minWeight, 10) : undefined,
     maxWeight: maxWeight ? parseInt(maxWeight, 10) : undefined,
   }), [effectiveStatus, speciesFilter, breedFilter, sexFilter, search, page, limit, notWeighedDays, minWeight, maxWeight]);
+
+  // Fetch stats - re-fetch when filters change
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      try {
+        const result = await animalsService.getStats(statsFilters);
+        setStats(result);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchStats();
+  }, [statsFilters]);
 
   const { animals, meta, loading, error, refetch } = useAnimals(filters);
 
@@ -201,8 +213,8 @@ export default function AnimalsPage() {
       }
       setDialogOpen(false);
       refetch();
-      // Refresh stats after create/update
-      const newStats = await animalsService.getStats(30);
+      // Refresh stats after create/update (with current filters)
+      const newStats = await animalsService.getStats(statsFilters);
       setStats(newStats);
     } catch (error) {
       toast.error(tc('messages.error'), t('messages.createError'));
@@ -220,8 +232,8 @@ export default function AnimalsPage() {
       setIsDeleteDialogOpen(false);
       setAnimalToDelete(null);
       refetch();
-      // Refresh stats after delete
-      const newStats = await animalsService.getStats(30);
+      // Refresh stats after delete (with current filters)
+      const newStats = await animalsService.getStats(statsFilters);
       setStats(newStats);
     } catch (error) {
       toast.error(tc('messages.error'), t('messages.deleteError'));
