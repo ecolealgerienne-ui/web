@@ -14,6 +14,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config';
 export interface AnimalsFilterParams {
   status?: string
   speciesId?: string
+  sex?: 'male' | 'female'
   search?: string
   limit?: number
   page?: number
@@ -62,6 +63,7 @@ class AnimalsService {
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters?.speciesId) params.append('speciesId', filters.speciesId);
+      if (filters?.sex) params.append('sex', filters.sex);
       if (filters?.search) params.append('search', filters.search);
 
       // Filters for dashboard actions
