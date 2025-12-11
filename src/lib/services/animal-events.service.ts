@@ -266,7 +266,9 @@ class AnimalEventsService {
       params.append('page', String(page));
 
       const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      console.log('[animal-events] Fetching movements:', url);
       const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(url);
+      console.log('[animal-events] Backend response:', JSON.stringify(response, null, 2));
 
       const movements = response?.data || [];
       const meta = response?.meta || {};
