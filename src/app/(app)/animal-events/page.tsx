@@ -103,13 +103,31 @@ export default function AnimalEventsPage() {
   }, [dateRange.statsPeriod]);
 
   // Build filters for the hook
-  const filters = useMemo(() => ({
-    movementType: typeFilter !== 'all' ? typeFilter : undefined,
-    fromDate: dateRange.fromDate,
-    toDate: dateRange.toDate,
-    page,
-    limit,
-  }), [typeFilter, dateRange.fromDate, dateRange.toDate, page, limit]);
+  const filters = useMemo(() => {
+    const f: {
+      movementType?: string;
+      fromDate?: string;
+      toDate?: string;
+      page: number;
+      limit: number;
+    } = {
+      page,
+      limit,
+    };
+
+    if (typeFilter !== 'all') {
+      f.movementType = typeFilter;
+    }
+
+    // Only add date filters if not 'all' period
+    if (dateRange.fromDate && dateRange.toDate) {
+      f.fromDate = dateRange.fromDate;
+      f.toDate = dateRange.toDate;
+    }
+
+    console.log('[animal-events page] filters:', f, 'period:', selectedPeriod);
+    return f;
+  }, [typeFilter, dateRange.fromDate, dateRange.toDate, page, limit, selectedPeriod]);
 
   const { events, meta, loading, error, refetch } = useAnimalEvents(filters);
 
