@@ -2270,8 +2270,8 @@
     },
     "statuses": {
       "ongoing": "En cours",
-      "completed": "Terminé",
-      "cancelled": "Annulé"
+      "closed": "Clôturé",
+      "archived": "Archivé"
     },
     "temporaryTypes": {
       "veterinary": "Vétérinaire",
@@ -2597,7 +2597,8 @@
       "3months": "3 mois",
       "6months": "6 mois",
       "1year": "1 an",
-      "2years": "2 ans"
+      "2years": "2 ans",
+      "all": "> 1 an"
     },
     "lots": {
       "title": "Performance des lots",

@@ -15,7 +15,7 @@ export type AnimalEventType =
   | 'temporary_out'
   | 'temporary_return';
 
-export type MovementStatus = 'ongoing' | 'completed' | 'cancelled';
+export type MovementStatus = 'ongoing' | 'closed' | 'archived';
 
 export type BuyerType = 'individual' | 'professional' | 'farm' | 'slaughterhouse';
 
@@ -26,6 +26,7 @@ export interface AnimalEvent {
   farmId: string;
   // API uses animalIds (array) not animalId (single)
   animalIds: string[];
+  animalCount?: number;
   movementType: AnimalEventType;
   movementDate: string;
   lotId?: string;

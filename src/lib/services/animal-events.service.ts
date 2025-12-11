@@ -52,6 +52,7 @@ interface BackendMovement {
   id: string;
   farmId: string;
   animalIds?: string[];
+  animalCount?: number;
   lotId?: string;
   movementType: string;
   movementDate: string;
@@ -98,10 +99,12 @@ interface BackendMovement {
 
 // Mapping backend movement -> frontend AnimalEvent
 function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
+  const animalIds = movement.animalIds || [];
   return {
     id: movement.id,
     farmId: movement.farmId,
-    animalIds: movement.animalIds || [],
+    animalIds,
+    animalCount: movement.animalCount ?? animalIds.length,
     movementType: movement.movementType as AnimalEventType,
     movementDate: movement.movementDate,
     lotId: movement.lotId,
