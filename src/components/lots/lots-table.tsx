@@ -45,21 +45,19 @@ export function LotsTable({ lots }: LotsTableProps) {
 
   const getTypeColor = (type: Lot['type']) => {
     switch (type) {
-      case 'treatment':
-        return 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400 border-blue-200 dark:border-blue-800';
-      case 'vaccination':
-        return 'text-purple-600 bg-purple-50 dark:bg-purple-950 dark:text-purple-400 border-purple-200 dark:border-purple-800';
-      case 'sale':
-        return 'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 border-green-200 dark:border-green-800';
-      case 'slaughter':
-        return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400 border-red-200 dark:border-red-800';
-      case 'purchase':
-        return 'text-orange-600 bg-orange-50 dark:bg-orange-950 dark:text-orange-400 border-orange-200 dark:border-orange-800';
-      case 'breeding':
       case 'reproduction':
         return 'text-pink-600 bg-pink-50 dark:bg-pink-950 dark:text-pink-400 border-pink-200 dark:border-pink-800';
+      case 'fattening':
+        return 'text-orange-600 bg-orange-50 dark:bg-orange-950 dark:text-orange-400 border-orange-200 dark:border-orange-800';
+      case 'weaning':
+        return 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400 border-blue-200 dark:border-blue-800';
+      case 'quarantine':
+        return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800';
+      case 'sale':
+        return 'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 border-green-200 dark:border-green-800';
+      case 'other':
       default:
-        return '';
+        return 'text-gray-600 bg-gray-50 dark:bg-gray-950 dark:text-gray-400 border-gray-200 dark:border-gray-800';
     }
   };
 

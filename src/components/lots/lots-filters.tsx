@@ -13,7 +13,7 @@ import { LotFilters, LotType, LotStatus } from '@/lib/types/lot';
 import { Search } from 'lucide-react';
 import { useTranslations } from '@/lib/i18n';
 
-const LOT_TYPES: LotType[] = ['treatment', 'vaccination', 'fattening', 'quarantine', 'weaning', 'gestation', 'lactation', 'birth', 'production', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction', 'other'];
+const LOT_TYPES: LotType[] = ['reproduction', 'fattening', 'weaning', 'quarantine', 'sale', 'other'];
 const LOT_STATUSES: LotStatus[] = ['open', 'closed', 'archived', 'completed'];
 
 interface LotsFiltersProps {
