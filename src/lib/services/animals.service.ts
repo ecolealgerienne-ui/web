@@ -26,6 +26,21 @@ export interface AnimalsFilterParams {
 }
 
 /**
+ * Filter parameters for stats (same as AnimalsFilterParams but without pagination)
+ * Ready for backend implementation
+ */
+export interface StatsFilterParams {
+  status?: string
+  speciesId?: string
+  breedId?: string
+  sex?: 'male' | 'female'
+  search?: string
+  notWeighedDays?: number
+  minWeight?: number
+  maxWeight?: number
+}
+
+/**
  * Animals statistics response
  */
 export interface AnimalStats {
@@ -163,18 +178,31 @@ class AnimalsService {
 
   /**
    * Get animals statistics
+   * Accepts filters to get stats for a filtered subset of animals
+   * Note: Backend must support these filters on /stats endpoint
    */
-  async getStats(notWeighedDays?: number): Promise<AnimalStats> {
+  async getStats(filters?: StatsFilterParams): Promise<AnimalStats> {
     try {
       const params = new URLSearchParams();
-      if (notWeighedDays) params.append('notWeighedDays', String(notWeighedDays));
+
+      // Standard filters (ready for backend support)
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.speciesId) params.append('speciesId', filters.speciesId);
+      if (filters?.breedId) params.append('breedId', filters.breedId);
+      if (filters?.sex) params.append('sex', filters.sex);
+      if (filters?.search) params.append('search', filters.search);
+
+      // Dashboard filters
+      if (filters?.notWeighedDays) params.append('notWeighedDays', String(filters.notWeighedDays));
+      if (filters?.minWeight) params.append('minWeight', String(filters.minWeight));
+      if (filters?.maxWeight) params.append('maxWeight', String(filters.maxWeight));
 
       const url = params.toString()
         ? `${this.getBasePath()}/stats?${params}`
         : `${this.getBasePath()}/stats`;
 
       const response = await apiClient.get<AnimalStats>(url);
-      logger.info('Animals stats fetched', { total: response.total });
+      logger.info('Animals stats fetched', { total: response.total, filters });
       return response;
     } catch (error: any) {
       logger.error('Failed to fetch animals stats', { error });
@@ -184,7 +212,7 @@ class AnimalsService {
         byStatus: {},
         bySex: { male: 0, female: 0 },
         notWeighedCount: 0,
-        notWeighedDays: notWeighedDays || 30,
+        notWeighedDays: filters?.notWeighedDays || 30,
       };
     }
   }
