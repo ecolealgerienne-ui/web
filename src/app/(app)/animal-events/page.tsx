@@ -39,6 +39,7 @@ const PERIOD_OPTIONS: PeriodOption[] = [
   { value: '3months', labelKey: 'period.3months', statsPeriod: '3months', days: 90 },
   { value: '6months', labelKey: 'period.6months', statsPeriod: '6months', days: 180 },
   { value: '1year', labelKey: 'period.1year', statsPeriod: '12months', days: 365 },
+  { value: '2years', labelKey: 'period.2years', statsPeriod: '24months', days: 730 },
   { value: 'all', labelKey: 'period.all', statsPeriod: 'all', days: 0 },
 ];
 
