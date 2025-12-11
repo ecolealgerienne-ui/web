@@ -670,7 +670,9 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg">{t('trends.title')}</CardTitle>
-                <CardDescription>{t('trends.subtitle')}</CardDescription>
+                <CardDescription>
+                  {t('trends.subtitlePrefix')} {t(`period.${selectedPeriod}`)}
+                </CardDescription>
               </div>
               {trends.summary && (
                 <Badge variant={
