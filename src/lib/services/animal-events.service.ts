@@ -48,9 +48,25 @@ export interface PaginatedMovementsResponse {
 }
 
 // Type pour la réponse du backend (movements)
+interface BackendMovementAnimal {
+  animal: {
+    id: string;
+    visualId?: string;
+    currentEid?: string;
+    officialNumber?: string;
+    sex?: string;
+  };
+}
+
 interface BackendMovement {
   id: string;
   farmId: string;
+  // Backend returns movementAnimals array and _count
+  movementAnimals?: BackendMovementAnimal[];
+  _count?: {
+    movementAnimals: number;
+  };
+  // Legacy fields (keep for compatibility)
   animalIds?: string[];
   animalCount?: number;
   lotId?: string;
@@ -99,12 +115,22 @@ interface BackendMovement {
 
 // Mapping backend movement -> frontend AnimalEvent
 function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
-  const animalIds = movement.animalIds || [];
+  // Extract animal IDs from movementAnimals or use legacy animalIds
+  const animalIds = movement.movementAnimals
+    ? movement.movementAnimals.map(ma => ma.animal.id)
+    : (movement.animalIds || []);
+
+  // Get count from _count or movementAnimals length or legacy animalCount
+  const animalCount = movement._count?.movementAnimals
+    ?? movement.movementAnimals?.length
+    ?? movement.animalCount
+    ?? animalIds.length;
+
   return {
     id: movement.id,
     farmId: movement.farmId,
     animalIds,
-    animalCount: movement.animalCount ?? animalIds.length,
+    animalCount,
     movementType: movement.movementType as AnimalEventType,
     movementDate: movement.movementDate,
     lotId: movement.lotId,
