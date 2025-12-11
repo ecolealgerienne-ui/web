@@ -17,6 +17,36 @@ import {
 import { Animal } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
 
+/**
+ * Filter parameters for movements list
+ */
+export interface MovementsFilterParams {
+  animalId?: string
+  movementType?: string
+  fromDate?: string
+  toDate?: string
+  limit?: number
+  page?: number
+}
+
+/**
+ * Pagination metadata
+ */
+export interface PaginationMeta {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+/**
+ * Paginated response
+ */
+export interface PaginatedMovementsResponse {
+  events: AnimalEvent[]
+  meta: PaginationMeta
+}
+
 // Type pour la réponse du backend (movements)
 interface BackendMovement {
   id: string;
@@ -210,6 +240,55 @@ class AnimalEventsService {
       // Return empty array instead of throwing to avoid breaking UI
       logger.warn('Failed to fetch movements, returning empty array', { error });
       return [];
+    }
+  }
+
+  /**
+   * Get all movements with pagination metadata
+   */
+  async getAllPaginated(filters?: MovementsFilterParams): Promise<PaginatedMovementsResponse> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.animalId) params.append('animalId', filters.animalId);
+      // Map eventType to movementType for API compatibility
+      if (filters?.movementType && filters.movementType !== 'all')
+        params.append('movementType', filters.movementType);
+      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters?.toDate) params.append('toDate', filters.toDate);
+
+      // Pagination
+      const limit = filters?.limit || 10;
+      const page = filters?.page || 1;
+      params.append('limit', String(limit));
+      params.append('page', String(page));
+
+      const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(url);
+
+      const movements = response?.data || [];
+      const meta = response?.meta || {};
+
+      const events = movements.map(mapMovementToEvent);
+
+      logger.info('Movements fetched (paginated)', { count: events.length, page, total: meta.total });
+
+      return {
+        events,
+        meta: {
+          total: meta.total || events.length,
+          page: meta.page || page,
+          limit: meta.limit || limit,
+          totalPages: meta.totalPages || Math.ceil((meta.total || events.length) / limit),
+        },
+      };
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404 || err.status === 500) {
+        logger.info('No movements found (paginated)', { status: err.status });
+        return { events: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+      }
+      logger.warn('Failed to fetch movements (paginated)', { error });
+      return { events: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
     }
   }
 
