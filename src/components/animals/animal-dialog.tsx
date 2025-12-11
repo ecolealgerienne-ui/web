@@ -337,7 +337,8 @@ export function AnimalDialog({
     );
   };
 
-  const FormContent = () => (
+  // Use JSX variable instead of component function to prevent focus loss on re-render
+  const formContent = (
     <div className="space-y-6 py-4">
       {/* Section: Identification */}
       <div className="space-y-4">
@@ -619,7 +620,8 @@ export function AnimalDialog({
     </div>
   );
 
-  const CareContent = () => (
+  // Use JSX variable instead of component function to prevent focus loss on re-render
+  const careContent = (
     <div className="space-y-6 py-4">
       {loadingCare ? (
         <div className="text-center py-8 text-muted-foreground">Chargement...</div>
@@ -778,7 +780,7 @@ export function AnimalDialog({
           <TabsContent value="info">
             {isEditable ? (
               <form onSubmit={handleSubmit}>
-                <FormContent />
+                {formContent}
                 <DialogFooter className="mt-6">
                   <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
                     {tc('actions.cancel')}
@@ -789,12 +791,12 @@ export function AnimalDialog({
                 </DialogFooter>
               </form>
             ) : (
-              <FormContent />
+              formContent
             )}
           </TabsContent>
 
           <TabsContent value="care">
-            <CareContent />
+            {careContent}
           </TabsContent>
         </Tabs>
       </DialogContent>
