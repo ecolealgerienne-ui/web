@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useTranslations } from '@/lib/i18n'
 import { useFarmAlerts } from '@/lib/hooks/useFarmAlerts'
 import { useAuth } from '@/contexts/auth-context'
+import { TEMP_FARM_ID } from '@/lib/auth/config'
 
 /**
  * Alert KPI Card Component
@@ -16,7 +17,10 @@ export function AlertKpiCard() {
   const t = useTranslations('dashboard')
   const { user } = useAuth()
 
-  const { summary, loading } = useFarmAlerts(user?.farmId, {
+  // Use user's farmId or fallback to TEMP_FARM_ID for dev mode
+  const farmId = user?.farmId || TEMP_FARM_ID
+
+  const { summary, loading } = useFarmAlerts(farmId, {
     pollingInterval: 60000,
   })
 
