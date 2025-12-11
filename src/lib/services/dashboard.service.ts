@@ -411,8 +411,8 @@ class DashboardService {
         movements: {
           thisMonth: {
             births: inPeriodMovements.birth ?? 0,
-            deaths: inPeriodMovements.exit ?? 0, // Backend uses 'exit' for outgoing
-            sales: 0,
+            deaths: inPeriodMovements.death ?? inPeriodMovements.exit ?? 0,
+            sales: inPeriodMovements.sale ?? 0,
             purchases: inPeriodMovements.purchase ?? 0,
           },
           previousMonth: {

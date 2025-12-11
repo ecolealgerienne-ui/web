@@ -39,6 +39,7 @@ const PERIOD_OPTIONS: PeriodOption[] = [
   { value: '3months', labelKey: 'period.3months', statsPeriod: '3months', days: 90 },
   { value: '6months', labelKey: 'period.6months', statsPeriod: '6months', days: 180 },
   { value: '1year', labelKey: 'period.1year', statsPeriod: '12months', days: 365 },
+  { value: 'all', labelKey: 'period.all', statsPeriod: 'all', days: 0 },
 ];
 
 export default function AnimalEventsPage() {
@@ -65,6 +66,16 @@ export default function AnimalEventsPage() {
   // Calculate date range based on period
   const dateRange = useMemo(() => {
     const periodConfig = PERIOD_OPTIONS.find(p => p.value === selectedPeriod) || PERIOD_OPTIONS[0];
+
+    // 'all' option = no date filter
+    if (periodConfig.days === 0) {
+      return {
+        fromDate: undefined,
+        toDate: undefined,
+        statsPeriod: periodConfig.statsPeriod,
+      };
+    }
+
     const toDate = new Date();
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - periodConfig.days);
@@ -211,6 +222,10 @@ export default function AnimalEventsPage() {
           death: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
           entry: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
           exit: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+          transfer_in: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
+          transfer_out: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+          temporary_out: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+          temporary_return: 'bg-lime-100 text-lime-800 dark:bg-lime-900 dark:text-lime-200',
         };
         return (
           <Badge className={cn('font-medium', typeColors[event.movementType] || '')}>
@@ -223,11 +238,14 @@ export default function AnimalEventsPage() {
       key: 'animalCount',
       header: t('kpis.animals'),
       sortable: false,
-      render: (event) => (
-        <span className="text-sm">
-          {event.animalIds?.length || 0} {event.animalIds?.length === 1 ? 'animal' : 'animaux'}
-        </span>
-      ),
+      render: (event) => {
+        const count = event.animalCount ?? event.animalIds?.length ?? 0;
+        return (
+          <span className="text-sm">
+            {count} {count === 1 ? 'animal' : 'animaux'}
+          </span>
+        );
+      },
     },
     {
       key: 'reason',
@@ -266,14 +284,16 @@ export default function AnimalEventsPage() {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
-        <SelectItem value="birth">{t('types.birth')}</SelectItem>
-        <SelectItem value="sale">{t('types.sale')}</SelectItem>
-        <SelectItem value="purchase">{t('types.purchase')}</SelectItem>
-        <SelectItem value="death">{t('types.death')}</SelectItem>
         <SelectItem value="entry">{t('types.entry')}</SelectItem>
         <SelectItem value="exit">{t('types.exit')}</SelectItem>
+        <SelectItem value="birth">{t('types.birth')}</SelectItem>
+        <SelectItem value="death">{t('types.death')}</SelectItem>
+        <SelectItem value="sale">{t('types.sale')}</SelectItem>
+        <SelectItem value="purchase">{t('types.purchase')}</SelectItem>
         <SelectItem value="transfer_in">{t('types.transfer_in')}</SelectItem>
         <SelectItem value="transfer_out">{t('types.transfer_out')}</SelectItem>
+        <SelectItem value="temporary_out">{t('types.temporary_out')}</SelectItem>
+        <SelectItem value="temporary_return">{t('types.temporary_return')}</SelectItem>
       </SelectContent>
     </Select>
   );
