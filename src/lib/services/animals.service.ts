@@ -201,6 +201,9 @@ class AnimalsService {
         ? `${this.getBasePath()}/stats?${params}`
         : `${this.getBasePath()}/stats`;
 
+      // Debug: voir l'URL appelée
+      console.log('[getStats] URL:', url, 'filters:', filters);
+
       const response = await apiClient.get<AnimalStats>(url);
       logger.info('Animals stats fetched', { total: response.total, filters });
       return response;
