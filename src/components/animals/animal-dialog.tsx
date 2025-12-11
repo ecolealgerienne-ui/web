@@ -807,6 +807,7 @@ export function AnimalDialog({
       }}
       title="Sélectionner la mère"
       filterSex="female"
+      filterSpeciesId={formData.speciesId || animal?.speciesId || undefined}
       excludeId={animal?.id}
       selectedId={formData.motherId || null}
     />
@@ -821,6 +822,7 @@ export function AnimalDialog({
       }}
       title="Sélectionner le père"
       filterSex="male"
+      filterSpeciesId={formData.speciesId || animal?.speciesId || undefined}
       excludeId={animal?.id}
       selectedId={formData.fatherId || null}
     />
