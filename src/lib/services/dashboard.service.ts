@@ -378,9 +378,9 @@ class DashboardService {
       const raw = response?.data || response;
 
       // Backend uses: { birth, purchase, exit, entry, transfer } in movements
-      // thisMonth might be empty {} if no movements this month
-      const thisMonthMovements = raw.movements?.thisMonth || {};
-      const thisMonthTotal = raw.movements?.thisMonthTotal ?? 0;
+      // inPeriod contains movements for the selected period
+      const inPeriodMovements = raw.movements?.inPeriod || {};
+      const inPeriodTotal = raw.movements?.inPeriodTotal ?? 0;
 
       // All-time movements for reference
       const allTimeMovements = raw.movements?.allTime || {};
@@ -389,11 +389,8 @@ class DashboardService {
       const totalAnimals = raw.herd?.alive ?? raw.herd?.total ?? 0;
       const totalRegistered = raw.herd?.total ?? totalAnimals;
 
-      // Monthly change based on thisMonthTotal or calculate from movements
-      const monthlyChange = thisMonthTotal > 0
-        ? (thisMonthMovements.birth ?? 0) + (thisMonthMovements.purchase ?? 0) + (thisMonthMovements.entry ?? 0)
-          - (thisMonthMovements.exit ?? 0)
-        : 0;
+      // Monthly change based on inPeriodTotal or calculate from movements
+      const monthlyChange = raw.herd?.monthlyChange ?? inPeriodTotal;
 
       const changePercentage = totalAnimals > 0 && monthlyChange !== 0
         ? (monthlyChange / (totalAnimals - monthlyChange)) * 100
@@ -413,10 +410,10 @@ class DashboardService {
         },
         movements: {
           thisMonth: {
-            births: thisMonthMovements.birth ?? 0,
-            deaths: thisMonthMovements.exit ?? 0, // Backend uses 'exit' for outgoing
+            births: inPeriodMovements.birth ?? 0,
+            deaths: inPeriodMovements.exit ?? 0, // Backend uses 'exit' for outgoing
             sales: 0,
-            purchases: thisMonthMovements.purchase ?? 0,
+            purchases: inPeriodMovements.purchase ?? 0,
           },
           previousMonth: {
             births: 0, // Backend doesn't provide previousMonth
@@ -431,7 +428,7 @@ class DashboardService {
           avgDailyGainChange: 0,
           avgWeight: raw.weights?.avgWeight ?? 0,
           totalWeighings: raw.weights?.totalWeights ?? raw.weights?.totalWeighings ?? 0,
-          weighingsThisMonth: raw.weights?.weighingsLast30Days ?? 0,
+          weighingsThisMonth: raw.weights?.weighingsInPeriod ?? raw.weights?.weighingsLast30Days ?? 0,
         },
         health: {
           vaccinationsUpToDate: raw.health?.vaccinatedAnimals ?? 0,
