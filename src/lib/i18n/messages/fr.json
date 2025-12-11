@@ -2573,6 +2573,7 @@
     "trends": {
       "title": "Évolution du GMQ",
       "subtitle": "Gain moyen quotidien sur 6 mois",
+      "subtitlePrefix": "Gain moyen quotidien sur",
       "gmq": "GMQ",
       "target": "Objectif"
     },

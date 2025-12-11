@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useTranslations } from '@/lib/i18n'
 import { useFarmAlerts } from '@/lib/hooks/useFarmAlerts'
 import { useAuth } from '@/contexts/auth-context'
-import Link from 'next/link'
 
 /**
  * Alert KPI Card Component
@@ -61,37 +60,35 @@ export function AlertKpiCard() {
       : 'text-primary'
 
   return (
-    <Link href="/notifications">
-      <Card className="cursor-pointer hover:shadow-md transition-shadow">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            {/* Icon */}
-            <div className={`p-3 rounded-lg ${iconBgColor}`}>
-              <Bell className={`h-6 w-6 ${iconColor}`} />
-            </div>
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center gap-4">
+          {/* Icon */}
+          <div className={`p-3 rounded-lg ${iconBgColor}`}>
+            <Bell className={`h-6 w-6 ${iconColor}`} />
+          </div>
 
-            {/* Content */}
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-3xl font-bold">{total}</p>
-                {criticalCount > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    {criticalCount} {t('alertKpi.urgent')}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm font-medium text-foreground">
-                {t('alertKpi.title')}
-              </p>
-              {unread > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  {t('alertKpi.unread', { count: unread })}
-                </p>
+          {/* Content */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="text-3xl font-bold">{total}</p>
+              {criticalCount > 0 && (
+                <Badge variant="destructive" className="text-xs">
+                  {criticalCount} {t('alertKpi.urgent')}
+                </Badge>
               )}
             </div>
+            <p className="text-sm font-medium text-foreground">
+              {t('alertKpi.title')}
+            </p>
+            {unread > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {t('alertKpi.unread', { count: unread })}
+              </p>
+            )}
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
