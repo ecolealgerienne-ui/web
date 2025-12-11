@@ -13,10 +13,6 @@ class TreatmentsService {
     return `/api/v1/farms/${TEMP_FARM_ID}/treatments`;
   }
 
-  private getAnimalTreatmentsPath(animalId: string): string {
-    return `/api/v1/farms/${TEMP_FARM_ID}/animals/${animalId}/treatments`;
-  }
-
   /**
    * Récupère tous les traitements avec filtres API
    * @see GET /api/v1/farms/{farmId}/treatments
@@ -49,10 +45,12 @@ class TreatmentsService {
 
   /**
    * Récupère les traitements d'un animal spécifique
+   * Utilise l'endpoint principal avec filtre animalId
    */
   async getByAnimalId(animalId: string): Promise<Treatment[]> {
     try {
-      const url = this.getAnimalTreatmentsPath(animalId);
+      // Utiliser l'endpoint principal avec filtre animalId (plus fiable)
+      const url = `${this.getBasePath()}?animalId=${animalId}`;
       // API returns paginated response: { data: [...], meta: {...} }
       const response = await apiClient.get<{ data: Treatment[]; meta?: any }>(url);
       const treatments = response?.data || [];

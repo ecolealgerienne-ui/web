@@ -22,7 +22,8 @@ import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { useBreeds } from '@/lib/hooks/useBreeds';
 import { useSpecies } from '@/lib/hooks/useSpecies';
 import { treatmentsService } from '@/lib/services/treatments.service';
-import { Pill, Syringe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AnimalSearchDialog } from './animal-search-dialog';
+import { Pill, Syringe, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 
 type DialogMode = 'view' | 'edit' | 'create';
 
@@ -74,6 +75,10 @@ export function AnimalDialog({
   // Care data
   const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
   const [loadingCare, setLoadingCare] = useState(false);
+
+  // Parent search dialogs
+  const [motherSearchOpen, setMotherSearchOpen] = useState(false);
+  const [fatherSearchOpen, setFatherSearchOpen] = useState(false);
 
   const treatments = allTreatments.filter(t => t.type !== 'vaccination');
   const vaccinations = allTreatments.filter(t => t.type === 'vaccination');
@@ -473,47 +478,70 @@ export function AnimalDialog({
         <div className="grid grid-cols-2 gap-4">
           {isEditable ? (
             <>
+              {/* Mother selection */}
               <div className="space-y-2">
                 <Label>{t('fields.motherId')}</Label>
-                <Select
-                  value={formData.motherId || 'none'}
-                  onValueChange={(value) => setFormData({ ...formData, motherId: value === 'none' ? '' : value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner la mère" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Aucune</SelectItem>
-                    {animals
-                      .filter(a => a.sex === 'female' && a.id !== animal?.id)
-                      .map((a) => (
-                        <SelectItem key={a.id} value={a.id}>
-                          {a.officialNumber || a.visualId || a.currentEid || a.id.substring(0, 8)}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 justify-start font-normal"
+                    onClick={() => setMotherSearchOpen(true)}
+                  >
+                    <Search className="h-4 w-4 mr-2 text-muted-foreground" />
+                    {formData.motherId ? (
+                      (() => {
+                        const mother = animals.find(a => a.id === formData.motherId);
+                        return mother?.officialNumber || mother?.visualId || mother?.currentEid || formData.motherId.substring(0, 8);
+                      })()
+                    ) : (
+                      <span className="text-muted-foreground">Rechercher la mère...</span>
+                    )}
+                  </Button>
+                  {formData.motherId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, motherId: '' })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
+
+              {/* Father selection */}
               <div className="space-y-2">
                 <Label>{t('fields.fatherId')}</Label>
-                <Select
-                  value={formData.fatherId || 'none'}
-                  onValueChange={(value) => setFormData({ ...formData, fatherId: value === 'none' ? '' : value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner le père" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Aucun</SelectItem>
-                    {animals
-                      .filter(a => a.sex === 'male' && a.id !== animal?.id)
-                      .map((a) => (
-                        <SelectItem key={a.id} value={a.id}>
-                          {a.officialNumber || a.visualId || a.currentEid || a.id.substring(0, 8)}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 justify-start font-normal"
+                    onClick={() => setFatherSearchOpen(true)}
+                  >
+                    <Search className="h-4 w-4 mr-2 text-muted-foreground" />
+                    {formData.fatherId ? (
+                      (() => {
+                        const father = animals.find(a => a.id === formData.fatherId);
+                        return father?.officialNumber || father?.visualId || father?.currentEid || formData.fatherId.substring(0, 8);
+                      })()
+                    ) : (
+                      <span className="text-muted-foreground">Rechercher le père...</span>
+                    )}
+                  </Button>
+                  {formData.fatherId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, fatherId: '' })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </>
           ) : (
@@ -697,6 +725,7 @@ export function AnimalDialog({
   );
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -767,5 +796,34 @@ export function AnimalDialog({
         </Tabs>
       </DialogContent>
     </Dialog>
+
+    {/* Mother search dialog */}
+    <AnimalSearchDialog
+      open={motherSearchOpen}
+      onOpenChange={setMotherSearchOpen}
+      animals={animals}
+      onSelect={(selectedAnimal) => {
+        setFormData({ ...formData, motherId: selectedAnimal?.id || '' });
+      }}
+      title="Sélectionner la mère"
+      filterSex="female"
+      excludeId={animal?.id}
+      selectedId={formData.motherId || null}
+    />
+
+    {/* Father search dialog */}
+    <AnimalSearchDialog
+      open={fatherSearchOpen}
+      onOpenChange={setFatherSearchOpen}
+      animals={animals}
+      onSelect={(selectedAnimal) => {
+        setFormData({ ...formData, fatherId: selectedAnimal?.id || '' });
+      }}
+      title="Sélectionner le père"
+      filterSex="male"
+      excludeId={animal?.id}
+      selectedId={formData.fatherId || null}
+    />
+    </>
   );
 }
