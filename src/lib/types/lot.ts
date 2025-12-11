@@ -3,21 +3,13 @@
  * Endpoint: POST/PUT /api/v1/farms/{farmId}/lots
  */
 
+// Types acceptés par le backend
 export type LotType =
-  | 'treatment'
-  | 'vaccination'
-  | 'sale'
-  | 'slaughter'
-  | 'purchase'
-  | 'breeding'
   | 'reproduction'
   | 'fattening'    // Engraissement
-  | 'quarantine'   // Quarantaine
   | 'weaning'      // Sevrage
-  | 'gestation'    // Gestation
-  | 'lactation'    // Lactation
-  | 'birth'        // Naissance
-  | 'production'   // Production
+  | 'quarantine'   // Quarantaine
+  | 'sale'         // Vente
   | 'other';       // Autre
 
 export type LotStatus = 'open' | 'closed' | 'archived' | 'completed';
