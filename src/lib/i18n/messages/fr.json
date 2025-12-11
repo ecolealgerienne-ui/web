@@ -1915,6 +1915,8 @@
       "status": "Statut",
       "motherIdentificationNumber": "N° mère",
       "fatherIdentificationNumber": "N° père",
+      "motherId": "Mère",
+      "fatherId": "Père",
       "acquisitionDate": "Date d'acquisition",
       "acquisitionPrice": "Prix d'acquisition",
       "currentWeight": "Poids actuel",

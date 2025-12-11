@@ -11,6 +11,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config'
 interface Species {
   id: string
   name: string
+  nameFr?: string
 }
 
 interface UseSpeciesResult {
@@ -37,6 +38,7 @@ export function useSpecies(): UseSpeciesResult {
         .map(p => ({
           id: p.speciesId,
           name: p.species?.nameFr || p.species?.nameEn || p.speciesId,
+          nameFr: p.species?.nameFr,
         }))
       setSpecies(speciesList)
     } catch (err) {

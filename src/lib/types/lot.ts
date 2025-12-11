@@ -75,11 +75,15 @@ export interface LotAnimal {
   status: string;
   breed?: {
     id: string;
-    name: string;
+    nameFr: string;
+    nameEn?: string;
+    nameAr?: string;
   } | null;
   species?: {
     id: string;
-    name: string;
+    nameFr: string;
+    nameEn?: string;
+    nameAr?: string;
   } | null;
   joinedAt: string;
 }

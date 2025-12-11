@@ -4,18 +4,27 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Animal } from '@/lib/types/animal'
-import { animalsService, AnimalsFilterParams } from '@/lib/services/animals.service'
+import { animalsService, AnimalsFilterParams, PaginationMeta } from '@/lib/services/animals.service'
 import { logger } from '@/lib/utils/logger'
 
 interface UseAnimalsResult {
   animals: Animal[]
+  meta: PaginationMeta
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
 }
 
+const defaultMeta: PaginationMeta = {
+  total: 0,
+  page: 1,
+  limit: 10,
+  totalPages: 0,
+}
+
 export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
   const [animals, setAnimals] = useState<Animal[]>([])
+  const [meta, setMeta] = useState<PaginationMeta>(defaultMeta)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -45,8 +54,9 @@ export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
     setError(null)
 
     try {
-      const data = await animalsService.getAll(memoizedFilters)
-      setAnimals(data)
+      const result = await animalsService.getAllPaginated(memoizedFilters)
+      setAnimals(result.animals)
+      setMeta(result.meta)
     } catch (err) {
       const error = err as Error
       setError(error)
@@ -62,6 +72,7 @@ export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
 
   return {
     animals,
+    meta,
     loading,
     error,
     refetch: fetchAnimals,

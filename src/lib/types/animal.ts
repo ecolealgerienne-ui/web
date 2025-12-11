@@ -3,7 +3,7 @@
  */
 
 export type AnimalSex = 'male' | 'female';
-export type AnimalStatus = 'alive' | 'sold' | 'dead'; // 'missing' not supported by backend API
+export type AnimalStatus = 'alive' | 'sold' | 'dead' | 'slaughtered'; // Added slaughtered
 
 export interface Animal {
   id: string;
@@ -17,15 +17,18 @@ export interface Animal {
   birthDate: string;
   status: AnimalStatus;
   motherId?: string | null;
+  fatherId?: string | null;
   photoUrl?: string | null;
   notes?: string | null;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
   // Relations (when included)
-  species?: { id: string; name: string };
-  breed?: { id: string; name: string };
-  mother?: Animal;
+  species?: { id: string; nameFr: string; nameEn?: string; nameAr?: string };
+  breed?: { id: string; nameFr: string; nameEn?: string; nameAr?: string };
+  mother?: Animal | null;
+  father?: Animal | null;
+  children?: Animal[];
   // Deprecated fields (for backward compatibility, will be removed)
   identificationNumber?: string;
   name?: string;
@@ -48,6 +51,7 @@ export interface CreateAnimalDto {
   speciesId?: string;
   breedId?: string;
   motherId?: string;
+  fatherId?: string;
   status?: AnimalStatus;
   photoUrl?: string;
   notes?: string;
@@ -62,6 +66,7 @@ export interface UpdateAnimalDto {
   speciesId?: string;
   breedId?: string;
   motherId?: string;
+  fatherId?: string;
   status?: AnimalStatus;
   photoUrl?: string;
   notes?: string;

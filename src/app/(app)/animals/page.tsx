@@ -53,19 +53,25 @@ export default function AnimalsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   // Effective status: URL param takes priority over local filter
   const effectiveStatus = urlStatus || statusFilter;
 
-  // Build filters including URL params
+  // Build filters including URL params and pagination
   const filters = useMemo(() => ({
     status: effectiveStatus,
     search,
+    page,
+    limit,
     notWeighedDays: notWeighedDays ? parseInt(notWeighedDays, 10) : undefined,
     minWeight: minWeight ? parseInt(minWeight, 10) : undefined,
     maxWeight: maxWeight ? parseInt(maxWeight, 10) : undefined,
-  }), [effectiveStatus, search, notWeighedDays, minWeight, maxWeight]);
+  }), [effectiveStatus, search, page, limit, notWeighedDays, minWeight, maxWeight]);
 
-  const { animals, loading, error, refetch } = useAnimals(filters);
+  const { animals, meta, loading, error, refetch } = useAnimals(filters);
 
   // Clear dashboard filters
   const clearDashboardFilters = () => {
@@ -174,7 +180,7 @@ export default function AnimalsPage() {
           <div>
             <div className="font-medium">{displayId}</div>
             {animal.breed && (
-              <div className="text-sm text-muted-foreground">{animal.breed.name}</div>
+              <div className="text-sm text-muted-foreground">{animal.breed.nameFr}</div>
             )}
           </div>
         );
@@ -208,7 +214,10 @@ export default function AnimalsPage() {
   const statusFilterComponent = (
     <Select
       value={statusFilter}
-      onValueChange={(value) => setStatusFilter(value)}
+      onValueChange={(value) => {
+        setStatusFilter(value);
+        setPage(1); // Reset page on filter change
+      }}
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder={t('filters.allStatus')} />
@@ -267,11 +276,21 @@ export default function AnimalsPage() {
       <DataTable<Animal>
         data={animals}
         columns={columns}
-        totalItems={animals.length}
+        totalItems={meta.total}
+        page={page}
+        limit={limit}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
         loading={loading}
         error={error}
         searchValue={search}
-        onSearchChange={setSearch}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1); // Reset page on search
+        }}
         searchPlaceholder={t('filters.search')}
         onRowClick={handleViewDetail}
         onEdit={handleEdit}
