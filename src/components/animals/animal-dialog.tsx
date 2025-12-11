@@ -801,7 +801,6 @@ export function AnimalDialog({
     <AnimalSearchDialog
       open={motherSearchOpen}
       onOpenChange={setMotherSearchOpen}
-      animals={animals}
       onSelect={(selectedAnimal) => {
         setFormData({ ...formData, motherId: selectedAnimal?.id || '' });
       }}
@@ -816,7 +815,6 @@ export function AnimalDialog({
     <AnimalSearchDialog
       open={fatherSearchOpen}
       onOpenChange={setFatherSearchOpen}
-      animals={animals}
       onSelect={(selectedAnimal) => {
         setFormData({ ...formData, fatherId: selectedAnimal?.id || '' });
       }}

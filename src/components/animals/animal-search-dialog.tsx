@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,12 +11,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Animal, AnimalStatus } from '@/lib/types/animal';
+import { animalsService } from '@/lib/services/animals.service';
 import { cn } from '@/lib/utils';
 
 interface AnimalSearchDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  animals: Animal[];
   onSelect: (animal: Animal | null) => void;
   title: string;
   filterSex?: 'male' | 'female';
@@ -29,16 +29,43 @@ interface AnimalSearchDialogProps {
 export function AnimalSearchDialog({
   open,
   onOpenChange,
-  animals,
   onSelect,
   title,
   filterSex,
   filterSpeciesId,
-  filterStatus = 'alive', // Par défaut, filtrer sur les animaux vivants
+  filterStatus = 'alive',
   excludeId,
   selectedId,
 }: AnimalSearchDialogProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch animals when dialog opens or filters change
+  useEffect(() => {
+    if (!open) return;
+
+    const fetchAnimals = async () => {
+      setLoading(true);
+      try {
+        // Fetch animals with server-side filtering
+        const result = await animalsService.getAllPaginated({
+          status: filterStatus,
+          speciesId: filterSpeciesId,
+          sex: filterSex,
+          limit: 100, // Get more animals for selection
+        });
+        setAnimals(result.animals);
+      } catch (error) {
+        console.error('Failed to fetch animals for parent search:', error);
+        setAnimals([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnimals();
+  }, [open, filterStatus, filterSpeciesId, filterSex]);
 
   // Reset search when dialog opens
   useEffect(() => {
@@ -47,24 +74,9 @@ export function AnimalSearchDialog({
     }
   }, [open]);
 
-  // Filter animals
+  // Filter animals locally by search query and excludeId
   const filteredAnimals = useMemo(() => {
     let result = animals;
-
-    // Filter by status (default: alive)
-    if (filterStatus) {
-      result = result.filter(a => a.status === filterStatus);
-    }
-
-    // Filter by species if specified
-    if (filterSpeciesId) {
-      result = result.filter(a => a.speciesId === filterSpeciesId);
-    }
-
-    // Filter by sex if specified
-    if (filterSex) {
-      result = result.filter(a => a.sex === filterSex);
-    }
 
     // Exclude specific animal (e.g., the current animal being edited)
     if (excludeId) {
@@ -84,7 +96,7 @@ export function AnimalSearchDialog({
     }
 
     return result;
-  }, [animals, filterStatus, filterSpeciesId, filterSex, excludeId, searchQuery]);
+  }, [animals, excludeId, searchQuery]);
 
   const handleSelect = useCallback((animal: Animal) => {
     onSelect(animal);
@@ -134,7 +146,12 @@ export function AnimalSearchDialog({
 
         {/* Results list */}
         <div className="flex-1 overflow-y-auto min-h-[200px] max-h-[400px] border rounded-md">
-          {filteredAnimals.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center h-full text-muted-foreground text-sm p-4">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Chargement...
+            </div>
+          ) : filteredAnimals.length === 0 ? (
             <div className="flex items-center justify-center h-full text-muted-foreground text-sm p-4">
               {searchQuery ? 'Aucun animal trouvé' : 'Aucun animal disponible'}
             </div>
@@ -175,7 +192,7 @@ export function AnimalSearchDialog({
 
         {/* Footer info */}
         <div className="text-xs text-muted-foreground text-center pt-2">
-          {filteredAnimals.length} animal{filteredAnimals.length !== 1 ? 'x' : ''} trouvé{filteredAnimals.length !== 1 ? 's' : ''}
+          {loading ? 'Chargement...' : `${filteredAnimals.length} animal${filteredAnimals.length !== 1 ? 'x' : ''} trouvé${filteredAnimals.length !== 1 ? 's' : ''}`}
         </div>
       </DialogContent>
     </Dialog>
