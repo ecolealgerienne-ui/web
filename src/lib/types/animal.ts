@@ -26,6 +26,9 @@ export interface Animal {
   // Weight data (from backend)
   currentWeight?: number | null;    // Last recorded weight in kg
   lastWeighDate?: string | null;    // Date of last weighing
+  previousWeight?: number | null;   // Previous weight for trend calculation
+  weightTrend?: 'up' | 'down' | 'stable' | null;  // Weight trend indicator
+  weightDelta?: number | null;      // Weight difference in kg
   // Relations (when included)
   species?: { id: string; nameFr: string; nameEn?: string; nameAr?: string };
   breed?: { id: string; nameFr: string; nameEn?: string; nameAr?: string };

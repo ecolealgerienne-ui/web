@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Plus, X, Filter, Beef, Scale, AlertCircle } from 'lucide-react';
+import { Plus, X, Filter, Beef, Scale, AlertCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -300,8 +300,33 @@ export default function AnimalsPage() {
       sortable: true,
       render: (animal) => {
         if (!animal.currentWeight) return <span className="text-muted-foreground">-</span>;
+
+        // Trend indicator
+        const TrendIcon = animal.weightTrend === 'up' ? TrendingUp
+          : animal.weightTrend === 'down' ? TrendingDown
+          : animal.weightTrend === 'stable' ? Minus
+          : null;
+
+        const trendColor = animal.weightTrend === 'up' ? 'text-green-600'
+          : animal.weightTrend === 'down' ? 'text-red-600'
+          : 'text-muted-foreground';
+
+        const deltaText = animal.weightDelta != null
+          ? `${animal.weightDelta > 0 ? '+' : ''}${animal.weightDelta.toFixed(1)} kg`
+          : null;
+
         return (
-          <span className="font-medium">{animal.currentWeight.toFixed(0)} kg</span>
+          <div className="flex items-center gap-1">
+            <span className="font-medium">{animal.currentWeight.toFixed(0)} kg</span>
+            {TrendIcon && (
+              <span className={`flex items-center gap-0.5 ${trendColor}`} title={deltaText || undefined}>
+                <TrendIcon className="h-3 w-3" />
+                {animal.weightDelta != null && (
+                  <span className="text-xs">{animal.weightDelta > 0 ? '+' : ''}{animal.weightDelta.toFixed(1)}</span>
+                )}
+              </span>
+            )}
+          </div>
         );
       },
     },
