@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Animal } from '@/lib/types/animal';
+import { Animal, AnimalStatus } from '@/lib/types/animal';
 import { cn } from '@/lib/utils';
 
 interface AnimalSearchDialogProps {
@@ -20,6 +20,8 @@ interface AnimalSearchDialogProps {
   onSelect: (animal: Animal | null) => void;
   title: string;
   filterSex?: 'male' | 'female';
+  filterSpeciesId?: string;
+  filterStatus?: AnimalStatus;
   excludeId?: string;
   selectedId?: string | null;
 }
@@ -31,6 +33,8 @@ export function AnimalSearchDialog({
   onSelect,
   title,
   filterSex,
+  filterSpeciesId,
+  filterStatus = 'alive', // Par défaut, filtrer sur les animaux vivants
   excludeId,
   selectedId,
 }: AnimalSearchDialogProps) {
@@ -46,6 +50,16 @@ export function AnimalSearchDialog({
   // Filter animals
   const filteredAnimals = useMemo(() => {
     let result = animals;
+
+    // Filter by status (default: alive)
+    if (filterStatus) {
+      result = result.filter(a => a.status === filterStatus);
+    }
+
+    // Filter by species if specified
+    if (filterSpeciesId) {
+      result = result.filter(a => a.speciesId === filterSpeciesId);
+    }
 
     // Filter by sex if specified
     if (filterSex) {
@@ -70,7 +84,7 @@ export function AnimalSearchDialog({
     }
 
     return result;
-  }, [animals, filterSex, excludeId, searchQuery]);
+  }, [animals, filterStatus, filterSpeciesId, filterSex, excludeId, searchQuery]);
 
   const handleSelect = useCallback((animal: Animal) => {
     onSelect(animal);
