@@ -70,17 +70,17 @@ export function AnimalsTable({ animals }: AnimalsTableProps) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {animal.breed?.name || (
+                    {animal.breed?.nameFr || (
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
                   <TableCell>
-                    {animal.speciesId ? (animal.species?.name || speciesLabels[animal.speciesId] || animal.speciesId) : (
+                    {animal.speciesId ? (animal.species?.nameFr || speciesLabels[animal.speciesId] || animal.speciesId) : (
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
                   <TableCell>
-                    {animal.breed?.name || (
+                    {animal.breed?.nameFr || (
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>

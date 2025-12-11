@@ -332,11 +332,11 @@ export function AnimalEventDialog({
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">{animal.officialNumber || animal.visualId || animal.currentEid || animal.id}</span>
-                            {animal.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                            {animal.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {animal.species.nameFr}</span>
                             )}
-                            {animal.breed?.name && (
-                              <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                            {animal.breed?.nameFr && (
+                              <span className="text-muted-foreground"> ({animal.breed.nameFr})</span>
                             )}
                           </div>
                           <Badge variant="secondary" className="flex-shrink-0">
@@ -389,8 +389,8 @@ export function AnimalEventDialog({
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">{searchResult.officialNumber || searchResult.visualId || searchResult.currentEid}</span>
-                            {searchResult.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {searchResult.species.name}</span>
+                            {searchResult.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {searchResult.species.nameFr}</span>
                             )}
                           </div>
                           <Button type="button" size="sm" onClick={handleAddAnimal}>
@@ -640,11 +640,11 @@ export function AnimalEventDialog({
                         <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <span className="font-medium">{animal.officialNumber || animal.visualId || animal.currentEid || animal.id}</span>
-                          {animal.species?.name && (
-                            <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                          {animal.species?.nameFr && (
+                            <span className="text-muted-foreground ml-2">• {animal.species.nameFr}</span>
                           )}
-                          {animal.breed?.name && (
-                            <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                          {animal.breed?.nameFr && (
+                            <span className="text-muted-foreground"> ({animal.breed.nameFr})</span>
                           )}
                         </div>
                         <Badge variant="secondary" className="flex-shrink-0">

@@ -530,8 +530,8 @@ export function LotDialog({
                             {la.visualId && (
                               <span className="text-muted-foreground ml-2">({la.visualId})</span>
                             )}
-                            {la.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {la.species.name}</span>
+                            {la.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {la.species.nameFr}</span>
                             )}
                           </div>
                           <Badge variant="secondary" className="flex-shrink-0">
@@ -586,8 +586,8 @@ export function LotDialog({
                             <span className="font-medium">
                               {searchResult.officialNumber || searchResult.visualId || searchResult.currentEid}
                             </span>
-                            {searchResult.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {searchResult.species.name}</span>
+                            {searchResult.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {searchResult.species.nameFr}</span>
                             )}
                           </div>
                           <Button type="button" size="sm" onClick={handleAddAnimal}>
@@ -767,8 +767,8 @@ export function LotDialog({
                           {la.visualId && (
                             <span className="text-muted-foreground ml-2">({la.visualId})</span>
                           )}
-                          {la.species?.name && (
-                            <span className="text-muted-foreground ml-2">• {la.species.name}</span>
+                          {la.species?.nameFr && (
+                            <span className="text-muted-foreground ml-2">• {la.species.nameFr}</span>
                           )}
                         </div>
                         <Badge variant="secondary" className="flex-shrink-0">

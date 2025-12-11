@@ -61,6 +61,8 @@ export function AnimalDialog({
     visualId: '',
     speciesId: '',
     breedId: '',
+    motherId: '',
+    fatherId: '',
     status: 'alive',
     notes: '',
   });
@@ -95,6 +97,8 @@ export function AnimalDialog({
         visualId: animal.visualId || '',
         speciesId: animal.speciesId || '',
         breedId: animal.breedId || '',
+        motherId: animal.motherId || '',
+        fatherId: animal.fatherId || '',
         status: animal.status,
         notes: animal.notes || '',
       });
@@ -108,6 +112,8 @@ export function AnimalDialog({
         visualId: '',
         speciesId: '',
         breedId: '',
+        motherId: '',
+        fatherId: '',
         status: 'alive',
         notes: '',
       });
@@ -175,7 +181,7 @@ export function AnimalDialog({
   const getDialogDescription = () => {
     if (mode === 'create') return t('messages.addDescription');
     if (mode === 'edit') return t('messages.editDescription');
-    return animal?.breed?.name || '';
+    return animal?.breed?.nameFr || '';
   };
 
   // Composant pour afficher un champ (lecture ou édition)
@@ -391,7 +397,7 @@ export function AnimalDialog({
                   <SelectContent>
                     {species.map((sp) => (
                       <SelectItem key={sp.id} value={sp.id}>
-                        {sp.name}
+                        {sp.nameFr || sp.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -418,7 +424,7 @@ export function AnimalDialog({
                   <SelectContent>
                     {breeds.map((breed) => (
                       <SelectItem key={breed.id} value={breed.id}>
-                        {breed.name}
+                        {breed.nameFr || breed.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -430,13 +436,95 @@ export function AnimalDialog({
               <div className="space-y-1">
                 <span className="text-sm text-muted-foreground">{t('fields.speciesId')}</span>
                 <p className="font-medium">
-                  {animal?.species?.name || species.find(s => s.id === animal?.speciesId)?.name || '-'}
+                  {animal?.species?.nameFr || '-'}
                 </p>
               </div>
               <div className="space-y-1">
                 <span className="text-sm text-muted-foreground">{t('fields.breedId')}</span>
                 <p className="font-medium">
-                  {animal?.breed?.name || breeds.find(b => b.id === animal?.breedId)?.name || '-'}
+                  {animal?.breed?.nameFr || '-'}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Section: Parents */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium border-b pb-2">Parents</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {isEditable ? (
+            <>
+              <div className="space-y-2">
+                <Label>{t('fields.motherId')}</Label>
+                <Select
+                  value={formData.motherId || 'none'}
+                  onValueChange={(value) => setFormData({ ...formData, motherId: value === 'none' ? '' : value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner la mère" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Aucune</SelectItem>
+                    {animals
+                      .filter(a => a.sex === 'female' && a.id !== animal?.id)
+                      .map((a) => (
+                        <SelectItem key={a.id} value={a.id}>
+                          {a.officialNumber || a.visualId || a.currentEid || a.id.substring(0, 8)}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>{t('fields.fatherId')}</Label>
+                <Select
+                  value={formData.fatherId || 'none'}
+                  onValueChange={(value) => setFormData({ ...formData, fatherId: value === 'none' ? '' : value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner le père" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Aucun</SelectItem>
+                    {animals
+                      .filter(a => a.sex === 'male' && a.id !== animal?.id)
+                      .map((a) => (
+                        <SelectItem key={a.id} value={a.id}>
+                          {a.officialNumber || a.visualId || a.currentEid || a.id.substring(0, 8)}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1">
+                <span className="text-sm text-muted-foreground">{t('fields.motherId')}</span>
+                <p className="font-medium">
+                  {animal?.mother
+                    ? (animal.mother.officialNumber || animal.mother.visualId || animal.mother.currentEid || '-')
+                    : animal?.motherId
+                      ? animals.find(a => a.id === animal.motherId)?.officialNumber ||
+                        animals.find(a => a.id === animal.motherId)?.visualId ||
+                        animal.motherId.substring(0, 8)
+                      : '-'
+                  }
+                </p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-sm text-muted-foreground">{t('fields.fatherId')}</span>
+                <p className="font-medium">
+                  {animal?.father
+                    ? (animal.father.officialNumber || animal.father.visualId || animal.father.currentEid || '-')
+                    : animal?.fatherId
+                      ? animals.find(a => a.id === animal.fatherId)?.officialNumber ||
+                        animals.find(a => a.id === animal.fatherId)?.visualId ||
+                        animal.fatherId.substring(0, 8)
+                      : '-'
+                  }
                 </p>
               </div>
             </>
