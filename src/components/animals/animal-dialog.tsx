@@ -145,7 +145,18 @@ export function AnimalDialog({
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      await onSubmit(formData);
+      // Clean up form data - convert empty strings to undefined for optional fields
+      const cleanedData = {
+        ...formData,
+        currentEid: formData.currentEid || undefined,
+        officialNumber: formData.officialNumber || undefined,
+        visualId: formData.visualId || undefined,
+        breedId: formData.breedId || undefined,
+        motherId: formData.motherId || undefined,
+        fatherId: formData.fatherId || undefined,
+        notes: formData.notes || undefined,
+      };
+      await onSubmit(cleanedData);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
