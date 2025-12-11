@@ -106,7 +106,8 @@ class FarmAlertsService {
     }
 
     try {
-      const response = await apiClient.get<FarmAlertsSummary>(
+      // API may return unreadCount instead of unread
+      const response = await apiClient.get<FarmAlertsSummary & { unreadCount?: number }>(
         `${this.getBasePath(farmId)}/summary`
       )
 
@@ -117,7 +118,15 @@ class FarmAlertsService {
       }
 
       logger.info('Farm alerts summary fetched', { farmId, total: response.total })
-      return response
+
+      // Map API response to expected format
+      return {
+        total: response.total,
+        unread: response.unread ?? response.unreadCount ?? 0,
+        byStatus: { ...defaultSummary.byStatus, ...response.byStatus },
+        byPriority: { ...defaultSummary.byPriority, ...response.byPriority },
+        byCategory: { ...defaultSummary.byCategory, ...response.byCategory },
+      }
     } catch (error: unknown) {
       const err = error as { status?: number }
       // En cas de 404, retourner un summary vide
