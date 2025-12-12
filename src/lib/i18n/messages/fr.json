@@ -2400,7 +2400,8 @@
       "title": "Filtres",
       "search": "Recherche",
       "fromDate": "Date début",
-      "toDate": "Date fin"
+      "toDate": "Date fin",
+      "allLots": "Tous les lots"
     },
     "searchPlaceholder": "Rechercher un animal...",
     "source": {

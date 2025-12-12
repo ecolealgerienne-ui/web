@@ -19,6 +19,7 @@ import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, Trending
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
+import { useLots } from '@/lib/hooks/useLots';
 import { useToast } from '@/contexts/toast-context';
 import type { Weighing, WeightStats, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { weighingsService } from '@/lib/services/weighings.service';
@@ -28,8 +29,12 @@ const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
 
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
+  const tl = useTranslations('lots');
   const tc = useCommonTranslations();
   const toast = useToast();
+
+  // Fetch lots for filter
+  const { lots } = useLots();
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -180,6 +185,7 @@ export default function WeighingsPage() {
     try {
       // Fetch all data without pagination
       const allWeighings = await weighingsService.getAllForExport({
+        lotId: filters.lotId,
         source: filters.source,
         fromDate: filters.fromDate,
         toDate: filters.toDate,
@@ -368,7 +374,7 @@ export default function WeighingsPage() {
 
       {/* Filters */}
       <div className="rounded-lg border bg-card p-6 space-y-4">
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-5">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('filters.title')}</label>
             <div className="relative">
@@ -380,6 +386,29 @@ export default function WeighingsPage() {
                 className="pl-10"
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{tl('title')}</label>
+            <Select
+              value={filters.lotId || 'all'}
+              onValueChange={(value) => handleFilterChange({
+                ...filters,
+                lotId: value === 'all' ? undefined : value
+              })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('filters.allLots')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('filters.allLots')}</SelectItem>
+                {lots.map((lot) => (
+                  <SelectItem key={lot.id} value={lot.id}>
+                    {lot.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

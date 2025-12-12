@@ -23,6 +23,7 @@ class WeighingsService {
       const params = new URLSearchParams();
 
       if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.lotId) params.append('lotId', filters.lotId);
       if (filters?.source) params.append('source', filters.source);
       if (filters?.fromDate) params.append('fromDate', filters.fromDate);
       if (filters?.toDate) params.append('toDate', filters.toDate);
@@ -116,6 +117,7 @@ class WeighingsService {
       const params = new URLSearchParams();
 
       if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.lotId) params.append('lotId', filters.lotId);
       if (filters?.source) params.append('source', filters.source);
       if (filters?.fromDate) params.append('fromDate', filters.fromDate);
       if (filters?.toDate) params.append('toDate', filters.toDate);
