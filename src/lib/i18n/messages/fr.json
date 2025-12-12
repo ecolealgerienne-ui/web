@@ -14,7 +14,8 @@
       "refresh": "Rafraîchir",
       "loading": "Chargement...",
       "saving": "Enregistrement...",
-      "deleting": "Suppression..."
+      "deleting": "Suppression...",
+      "view": "Voir"
     },
     "status": {
       "active": "Actif",
@@ -2048,7 +2049,24 @@
       "priceTotal": "Montant total",
       "animals": "Animaux",
       "animalsInLot": "Animaux dans ce lot",
-      "createdAt": "Date de création"
+      "createdAt": "Date de création",
+      "avgWeight": "Poids moyen",
+      "gmq": "GMQ",
+      "progress": "Progression",
+      "daysToTarget": "Jours restants",
+      "targetWeight": "Poids cible"
+    },
+    "summary": {
+      "activeLots": "Lots actifs",
+      "totalAnimals": "Animaux en lots",
+      "avgGmq": "GMQ moyen",
+      "readyForSale": "Prêts pour vente"
+    },
+    "gmqStatus": {
+      "excellent": "Excellent",
+      "good": "Bon",
+      "warning": "À surveiller",
+      "critical": "Critique"
     },
     "placeholders": {
       "name": "Ex: Traitement antiparasitaire Mars 2025",
@@ -2087,6 +2105,64 @@
       "removeAnimalError": "Erreur lors du retrait de l'animal du lot",
       "animalAdded": "Animal ajouté au lot",
       "animalRemoved": "Animal retiré du lot"
+    },
+    "detail": {
+      "backToList": "Retour aux lots",
+      "weightEvolution": "Évolution du poids",
+      "animalsInLot": "Animaux du lot",
+      "addAnimal": "Ajouter un animal",
+      "removeAnimal": "Retirer du lot",
+      "noWeightData": "Pas de données de pesée",
+      "kpis": {
+        "animals": "Animaux",
+        "avgWeight": "Poids moyen",
+        "gmq": "GMQ",
+        "progress": "Progression",
+        "daysToTarget": "Jours restants",
+        "targetWeight": "Poids cible"
+      },
+      "chart": {
+        "weight": "Poids",
+        "date": "Date",
+        "noData": "Aucune donnée disponible"
+      },
+      "table": {
+        "animal": "Animal",
+        "weight": "Poids actuel",
+        "gmq": "GMQ",
+        "lastWeighing": "Dernière pesée",
+        "status": "Statut"
+      },
+      "actions": {
+        "edit": "Modifier le lot",
+        "close": "Clôturer",
+        "archive": "Archiver",
+        "delete": "Supprimer"
+      },
+      "timeline": {
+        "title": "Historique",
+        "noEvents": "Aucun événement",
+        "eventTypes": {
+          "animal_joined": "Animaux ajoutés",
+          "animal_left": "Animaux retirés",
+          "weighing": "Pesée",
+          "treatment": "Traitement",
+          "status_change": "Changement de statut",
+          "note": "Note"
+        },
+        "animalsAdded": "animal(s) ajouté(s)",
+        "animalsRemoved": "animal(s) retiré(s)",
+        "animalsWeighed": "animal(s) pesé(s)"
+      },
+      "distribution": {
+        "title": "Distribution GMQ",
+        "excellent": "Excellent",
+        "good": "Bon",
+        "warning": "À surveiller",
+        "critical": "Critique"
+      },
+      "notFound": "Lot non trouvé",
+      "loadError": "Erreur lors du chargement du lot"
     }
   },
   "treatments": {
@@ -2324,7 +2400,8 @@
       "title": "Filtres",
       "search": "Recherche",
       "fromDate": "Date début",
-      "toDate": "Date fin"
+      "toDate": "Date fin",
+      "allLots": "Tous les lots"
     },
     "searchPlaceholder": "Rechercher un animal...",
     "source": {
@@ -2358,7 +2435,13 @@
       "deleteConfirmTitle": "Confirmer la suppression",
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
       "addDescription": "Enregistrez une nouvelle pesée",
-      "editDescription": "Modifiez les informations de la pesée"
+      "editDescription": "Modifiez les informations de la pesée",
+      "noDataToExport": "Aucune donnée à exporter",
+      "exportSuccess": "{count} pesées exportées",
+      "exportError": "Erreur lors de l'export"
+    },
+    "export": {
+      "csv": "Exporter CSV"
     },
     "cancel": "Annuler",
     "delete": "Supprimer",

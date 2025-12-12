@@ -64,6 +64,7 @@ export interface WeightStats {
 
 export interface QueryWeightDto {
   animalId?: string;
+  lotId?: string;
   source?: WeightSource;
   fromDate?: string;
   toDate?: string;

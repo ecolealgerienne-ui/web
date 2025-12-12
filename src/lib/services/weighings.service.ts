@@ -23,6 +23,7 @@ class WeighingsService {
       const params = new URLSearchParams();
 
       if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.lotId) params.append('lotId', filters.lotId);
       if (filters?.source) params.append('source', filters.source);
       if (filters?.fromDate) params.append('fromDate', filters.fromDate);
       if (filters?.toDate) params.append('toDate', filters.toDate);
@@ -106,6 +107,36 @@ class WeighingsService {
 
   async delete(id: string): Promise<void> {
     await apiClient.delete(`${this.getBasePath()}/${id}`);
+  }
+
+  /**
+   * Get all weighings without pagination (for export)
+   */
+  async getAllForExport(filters?: Omit<QueryWeightDto, 'page' | 'limit'>): Promise<Weighing[]> {
+    try {
+      const params = new URLSearchParams();
+
+      if (filters?.animalId) params.append('animalId', filters.animalId);
+      if (filters?.lotId) params.append('lotId', filters.lotId);
+      if (filters?.source) params.append('source', filters.source);
+      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters?.toDate) params.append('toDate', filters.toDate);
+      if (filters?.sort) params.append('sort', filters.sort);
+      if (filters?.order) params.append('order', filters.order);
+      // Request a large limit to get all data
+      params.append('limit', '10000');
+
+      const url = params.toString() ? `${this.getBasePath()}?${params.toString()}` : this.getBasePath();
+      const response = await apiClient.get<PaginatedResponse<Weighing>>(url);
+      return response.data || [];
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('No weights found for export (404)');
+        return [];
+      }
+      logger.error('Failed to fetch weights for export', error);
+      throw error;
+    }
   }
 }
 

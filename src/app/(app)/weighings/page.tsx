@@ -15,21 +15,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
+import { Sparkline, SparklineDataPoint } from '@/components/ui/charts/sparkline';
 import { useWeighings } from '@/lib/hooks/useWeighings';
+import { useLots } from '@/lib/hooks/useLots';
 import { useToast } from '@/contexts/toast-context';
 import type { Weighing, WeightStats, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { weighingsService } from '@/lib/services/weighings.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
-const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
+const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
+
+// Period options for filtering
+interface PeriodOption {
+  value: string;
+  labelKey: string;
+  days: number;
+}
+
+const PERIOD_OPTIONS: PeriodOption[] = [
+  { value: '1month', labelKey: 'period.1month', days: 30 },
+  { value: '3months', labelKey: 'period.3months', days: 90 },
+  { value: '6months', labelKey: 'period.6months', days: 180 },
+  { value: '1year', labelKey: 'period.1year', days: 365 },
+  { value: '2years', labelKey: 'period.2years', days: 730 },
+  { value: 'all', labelKey: 'period.all', days: 0 },
+];
 
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
+  const td = useTranslations('dashboard');
+  const tl = useTranslations('lots');
   const tc = useCommonTranslations();
   const toast = useToast();
+
+  // Fetch lots for filter
+  const { lots } = useLots();
+
+  // Period state
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('1month');
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -37,6 +64,27 @@ export default function WeighingsPage() {
 
   // Filters state (includes pagination for server-side)
   const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({});
+
+  // Calculate date range based on period
+  const dateRange = useMemo(() => {
+    const periodConfig = PERIOD_OPTIONS.find(p => p.value === selectedPeriod) || PERIOD_OPTIONS[0];
+
+    // 'all' option = no date filter
+    if (periodConfig.days === 0) {
+      return {
+        fromDate: undefined,
+        toDate: undefined,
+      };
+    }
+
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - periodConfig.days);
+    return {
+      fromDate: fromDate.toISOString().split('T')[0],
+      toDate: toDate.toISOString().split('T')[0],
+    };
+  }, [selectedPeriod]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -52,20 +100,36 @@ export default function WeighingsPage() {
   const [stats, setStats] = useState<WeightStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  // Fetch weighings with server-side pagination
+  // Export state
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Sparkline data state
+  const [sparklineData, setSparklineData] = useState<{
+    weighingsPerWeek: SparklineDataPoint[];
+    avgWeightPerWeek: SparklineDataPoint[];
+    avgGmqPerWeek: SparklineDataPoint[];
+  }>({
+    weighingsPerWeek: [],
+    avgWeightPerWeek: [],
+    avgGmqPerWeek: [],
+  });
+
+  // Fetch weighings with server-side pagination (using dateRange for dates)
   const { weighings, meta, loading, refresh } = useWeighings({
     ...filters,
+    fromDate: dateRange.fromDate,
+    toDate: dateRange.toDate,
     page,
     limit,
   });
 
-  // Fetch stats
-  const fetchStats = useCallback(async () => {
+  // Fetch stats based on date range
+  const fetchStats = useCallback(async (fromDate?: string, toDate?: string) => {
     setStatsLoading(true);
     try {
       const data = await weighingsService.getStats({
-        fromDate: filters.fromDate,
-        toDate: filters.toDate,
+        fromDate,
+        toDate,
       });
       setStats(data);
     } catch (error) {
@@ -73,15 +137,102 @@ export default function WeighingsPage() {
     } finally {
       setStatsLoading(false);
     }
-  }, [filters.fromDate, filters.toDate]);
+  }, []);
 
+  // Re-fetch stats when date range changes
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    fetchStats(dateRange.fromDate, dateRange.toDate);
+  }, [dateRange.fromDate, dateRange.toDate, fetchStats]);
+
+  // Fetch sparkline data (all weighings for the period)
+  const fetchSparklineData = useCallback(async (fromDate?: string, toDate?: string) => {
+    try {
+      const allWeighings = await weighingsService.getAllForExport({
+        fromDate,
+        toDate,
+      });
+
+      if (allWeighings.length === 0) {
+        setSparklineData({
+          weighingsPerWeek: [],
+          avgWeightPerWeek: [],
+          avgGmqPerWeek: [],
+        });
+        return;
+      }
+
+      // Group weighings by week
+      const weeklyData = new Map<string, { weighings: Weighing[]; weekStart: Date }>();
+
+      allWeighings.forEach((w) => {
+        const date = new Date(w.weightDate);
+        // Get week start (Monday)
+        const weekStart = new Date(date);
+        const day = weekStart.getDay();
+        const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+        weekStart.setDate(diff);
+        weekStart.setHours(0, 0, 0, 0);
+
+        const weekKey = weekStart.toISOString().split('T')[0];
+
+        if (!weeklyData.has(weekKey)) {
+          weeklyData.set(weekKey, { weighings: [], weekStart });
+        }
+        weeklyData.get(weekKey)!.weighings.push(w);
+      });
+
+      // Sort weeks chronologically
+      const sortedWeeks = Array.from(weeklyData.entries())
+        .sort(([a], [b]) => a.localeCompare(b));
+
+      // Calculate sparkline data
+      const weighingsPerWeek: SparklineDataPoint[] = sortedWeeks.map(([, data]) => ({
+        value: data.weighings.length,
+        label: data.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+      }));
+
+      const avgWeightPerWeek: SparklineDataPoint[] = sortedWeeks.map(([, data]) => {
+        const totalWeight = data.weighings.reduce((sum, w) => sum + w.weight, 0);
+        return {
+          value: totalWeight / data.weighings.length,
+          label: data.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+        };
+      });
+
+      const avgGmqPerWeek: SparklineDataPoint[] = sortedWeeks
+        .map(([, data]) => {
+          const weighingsWithGmq = data.weighings.filter(w => w.dailyGain !== null && w.dailyGain !== undefined);
+          if (weighingsWithGmq.length === 0) return null;
+          const totalGmq = weighingsWithGmq.reduce((sum, w) => sum + (w.dailyGain || 0), 0);
+          return {
+            value: totalGmq / weighingsWithGmq.length,
+            label: data.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+          } as SparklineDataPoint;
+        })
+        .filter((d): d is SparklineDataPoint => d !== null);
+
+      setSparklineData({
+        weighingsPerWeek,
+        avgWeightPerWeek,
+        avgGmqPerWeek,
+      });
+    } catch (error) {
+      console.error('Error fetching sparkline data:', error);
+    }
+  }, []);
+
+  // Re-fetch sparkline data when date range changes
+  useEffect(() => {
+    fetchSparklineData(dateRange.fromDate, dateRange.toDate);
+  }, [dateRange.fromDate, dateRange.toDate, fetchSparklineData]);
 
   // Refresh stats after CRUD operations
   const refreshAll = async () => {
-    await Promise.all([refresh(), fetchStats()]);
+    await Promise.all([
+      refresh(),
+      fetchStats(dateRange.fromDate, dateRange.toDate),
+      fetchSparklineData(dateRange.fromDate, dateRange.toDate),
+    ]);
   };
 
   // Client-side search filtering (filters current page only)
@@ -171,6 +322,71 @@ export default function WeighingsPage() {
     }
   };
 
+  // Export to CSV
+  const handleExportCSV = async () => {
+    setIsExporting(true);
+    try {
+      // Fetch all data without pagination (using dateRange for dates)
+      const allWeighings = await weighingsService.getAllForExport({
+        lotId: filters.lotId,
+        source: filters.source,
+        fromDate: dateRange.fromDate,
+        toDate: dateRange.toDate,
+      });
+
+      if (allWeighings.length === 0) {
+        toast.error(t('messages.noDataToExport'));
+        return;
+      }
+
+      // CSV headers
+      const headers = [
+        t('labels.animal'),
+        t('fields.weight'),
+        t('fields.weightDate'),
+        t('fields.source'),
+        t('labels.rate'),
+      ];
+
+      // CSV rows
+      const rows = allWeighings.map((w) => [
+        w.animal?.officialNumber || w.animal?.visualId || w.animalId,
+        w.weight.toString(),
+        new Date(w.weightDate).toLocaleDateString('fr-FR'),
+        t(`source.${w.source || 'undefined'}`),
+        w.dailyGain !== null && w.dailyGain !== undefined ? w.dailyGain.toFixed(2) : '',
+      ]);
+
+      // Build CSV content
+      const csvContent = [
+        headers.join(';'),
+        ...rows.map((row) => row.map((cell) => `"${cell}"`).join(';')),
+      ].join('\n');
+
+      // Add BOM for Excel compatibility with French characters
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      link.download = `pesees_${dateStr}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(t('messages.exportSuccess', { count: allWeighings.length }));
+    } catch (error) {
+      console.error('Error exporting weighings:', error);
+      toast.error(t('messages.exportError'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Table columns
   const columns: ColumnDef<Weighing>[] = [
     {
@@ -240,58 +456,131 @@ export default function WeighingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header with period selector */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('newWeighing')}
-        </Button>
+        <div className="flex items-center gap-4">
+          {/* Period Selector */}
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+            {PERIOD_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                variant={selectedPeriod === option.value ? 'default' : 'ghost'}
+                size="sm"
+                className={cn(
+                  'text-xs h-8 px-3',
+                  selectedPeriod === option.value && 'shadow-sm'
+                )}
+                onClick={() => {
+                  setSelectedPeriod(option.value);
+                  setPage(1); // Reset page when period changes
+                }}
+              >
+                {td(option.labelKey)}
+              </Button>
+            ))}
+          </div>
+          <Button variant="outline" onClick={handleExportCSV} disabled={isExporting || meta.total === 0}>
+            {isExporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {t('export.csv')}
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newWeighing')}
+          </Button>
+        </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats with Sparklines */}
       <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <Scale className="h-5 w-5 text-muted-foreground" />
-            <span className="text-2xl font-bold">
-              {statsLoading ? '-' : stats?.totalWeighings ?? 0}
-            </span>
+        {/* Total Weighings */}
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Scale className="h-4 w-4 text-muted-foreground" />
+                <span className="text-2xl font-bold">
+                  {statsLoading ? '-' : stats?.totalWeighings ?? 0}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t('stats.total')}</p>
+            </div>
+            {sparklineData.weighingsPerWeek.length >= 2 && (
+              <Sparkline
+                data={sparklineData.weighingsPerWeek}
+                color="hsl(var(--primary))"
+                height={40}
+                width={80}
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
         </div>
-        <div className="rounded-lg border bg-card p-6">
+
+        {/* Unique Animals */}
+        <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-muted-foreground" />
+            <Users className="h-4 w-4 text-muted-foreground" />
             <span className="text-2xl font-bold">
               {statsLoading ? '-' : stats?.uniqueAnimals ?? 0}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.uniqueAnimals')}</p>
+          <p className="text-xs text-muted-foreground mt-1">{t('stats.uniqueAnimals')}</p>
         </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold">
-            {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
+
+        {/* Average Weight */}
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-2xl font-bold">
+                {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t('stats.latestAvgWeight')}</p>
+            </div>
+            {sparklineData.avgWeightPerWeek.length >= 2 && (
+              <Sparkline
+                data={sparklineData.avgWeightPerWeek}
+                color="hsl(var(--chart-2))"
+                height={40}
+                width={80}
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.latestAvgWeight')}</p>
         </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-green-600" />
-            <span className="text-2xl font-bold text-green-600">
-              {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
-            </span>
+
+        {/* Average Daily Gain */}
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-green-600" />
+                <span className="text-2xl font-bold text-green-600">
+                  {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t('stats.avgDailyGain')}</p>
+            </div>
+            {sparklineData.avgGmqPerWeek.length >= 2 && (
+              <Sparkline
+                data={sparklineData.avgGmqPerWeek}
+                color="hsl(142.1 76.2% 36.3%)"
+                height={40}
+                width={80}
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.avgDailyGain')}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="rounded-lg border bg-card p-6 space-y-4">
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('filters.title')}</label>
             <div className="relative">
@@ -303,6 +592,29 @@ export default function WeighingsPage() {
                 className="pl-10"
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{tl('title')}</label>
+            <Select
+              value={filters.lotId || 'all'}
+              onValueChange={(value) => handleFilterChange({
+                ...filters,
+                lotId: value === 'all' ? undefined : value
+              })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('filters.allLots')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('filters.allLots')}</SelectItem>
+                {lots.map((lot) => (
+                  <SelectItem key={lot.id} value={lot.id}>
+                    {lot.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -326,24 +638,6 @@ export default function WeighingsPage() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
-            <Input
-              type="date"
-              value={filters.fromDate || ''}
-              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters.toDate')}</label>
-            <Input
-              type="date"
-              value={filters.toDate || ''}
-              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
-            />
           </div>
         </div>
       </div>
