@@ -24,11 +24,29 @@ import { useToast } from '@/contexts/toast-context';
 import type { Weighing, WeightStats, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { weighingsService } from '@/lib/services/weighings.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
 
+// Period options for filtering
+interface PeriodOption {
+  value: string;
+  labelKey: string;
+  days: number;
+}
+
+const PERIOD_OPTIONS: PeriodOption[] = [
+  { value: '1month', labelKey: 'period.1month', days: 30 },
+  { value: '3months', labelKey: 'period.3months', days: 90 },
+  { value: '6months', labelKey: 'period.6months', days: 180 },
+  { value: '1year', labelKey: 'period.1year', days: 365 },
+  { value: '2years', labelKey: 'period.2years', days: 730 },
+  { value: 'all', labelKey: 'period.all', days: 0 },
+];
+
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
+  const td = useTranslations('dashboard');
   const tl = useTranslations('lots');
   const tc = useCommonTranslations();
   const toast = useToast();
@@ -36,12 +54,36 @@ export default function WeighingsPage() {
   // Fetch lots for filter
   const { lots } = useLots();
 
+  // Period state
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('1month');
+
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   // Filters state (includes pagination for server-side)
   const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({});
+
+  // Calculate date range based on period
+  const dateRange = useMemo(() => {
+    const periodConfig = PERIOD_OPTIONS.find(p => p.value === selectedPeriod) || PERIOD_OPTIONS[0];
+
+    // 'all' option = no date filter
+    if (periodConfig.days === 0) {
+      return {
+        fromDate: undefined,
+        toDate: undefined,
+      };
+    }
+
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - periodConfig.days);
+    return {
+      fromDate: fromDate.toISOString().split('T')[0],
+      toDate: toDate.toISOString().split('T')[0],
+    };
+  }, [selectedPeriod]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -60,20 +102,22 @@ export default function WeighingsPage() {
   // Export state
   const [isExporting, setIsExporting] = useState(false);
 
-  // Fetch weighings with server-side pagination
+  // Fetch weighings with server-side pagination (using dateRange for dates)
   const { weighings, meta, loading, refresh } = useWeighings({
     ...filters,
+    fromDate: dateRange.fromDate,
+    toDate: dateRange.toDate,
     page,
     limit,
   });
 
-  // Fetch stats
+  // Fetch stats based on period
   const fetchStats = useCallback(async () => {
     setStatsLoading(true);
     try {
       const data = await weighingsService.getStats({
-        fromDate: filters.fromDate,
-        toDate: filters.toDate,
+        fromDate: dateRange.fromDate,
+        toDate: dateRange.toDate,
       });
       setStats(data);
     } catch (error) {
@@ -81,7 +125,7 @@ export default function WeighingsPage() {
     } finally {
       setStatsLoading(false);
     }
-  }, [filters.fromDate, filters.toDate]);
+  }, [dateRange.fromDate, dateRange.toDate]);
 
   useEffect(() => {
     fetchStats();
@@ -183,12 +227,12 @@ export default function WeighingsPage() {
   const handleExportCSV = async () => {
     setIsExporting(true);
     try {
-      // Fetch all data without pagination
+      // Fetch all data without pagination (using dateRange for dates)
       const allWeighings = await weighingsService.getAllForExport({
         lotId: filters.lotId,
         source: filters.source,
-        fromDate: filters.fromDate,
-        toDate: filters.toDate,
+        fromDate: dateRange.fromDate,
+        toDate: dateRange.toDate,
       });
 
       if (allWeighings.length === 0) {
@@ -313,13 +357,33 @@ export default function WeighingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header with period selector */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {/* Period Selector */}
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+            {PERIOD_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                variant={selectedPeriod === option.value ? 'default' : 'ghost'}
+                size="sm"
+                className={cn(
+                  'text-xs h-8 px-3',
+                  selectedPeriod === option.value && 'shadow-sm'
+                )}
+                onClick={() => {
+                  setSelectedPeriod(option.value);
+                  setPage(1); // Reset page when period changes
+                }}
+              >
+                {td(option.labelKey)}
+              </Button>
+            ))}
+          </div>
           <Button variant="outline" onClick={handleExportCSV} disabled={isExporting || meta.total === 0}>
             {isExporting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -374,7 +438,7 @@ export default function WeighingsPage() {
 
       {/* Filters */}
       <div className="rounded-lg border bg-card p-6 space-y-4">
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('filters.title')}</label>
             <div className="relative">
@@ -432,24 +496,6 @@ export default function WeighingsPage() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
-            <Input
-              type="date"
-              value={filters.fromDate || ''}
-              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('filters.toDate')}</label>
-            <Input
-              type="date"
-              value={filters.toDate || ''}
-              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
-            />
           </div>
         </div>
       </div>
