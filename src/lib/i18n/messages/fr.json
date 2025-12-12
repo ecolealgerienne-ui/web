@@ -2100,6 +2100,42 @@
       "animalNotFound": "Animal non trouvé",
       "animalAlreadyInList": "Cet animal est déjà dans le lot",
       "searchError": "Erreur lors de la recherche"
+    },
+    "detail": {
+      "backToList": "Retour aux lots",
+      "weightEvolution": "Évolution du poids",
+      "animalsInLot": "Animaux du lot",
+      "addAnimal": "Ajouter un animal",
+      "removeAnimal": "Retirer du lot",
+      "noWeightData": "Pas de données de pesée",
+      "kpis": {
+        "animals": "Animaux",
+        "avgWeight": "Poids moyen",
+        "gmq": "GMQ",
+        "progress": "Progression",
+        "daysToTarget": "Jours restants",
+        "targetWeight": "Poids cible"
+      },
+      "chart": {
+        "weight": "Poids",
+        "date": "Date",
+        "noData": "Aucune donnée disponible"
+      },
+      "table": {
+        "animal": "Animal",
+        "weight": "Poids actuel",
+        "gmq": "GMQ",
+        "lastWeighing": "Dernière pesée",
+        "status": "Statut"
+      },
+      "actions": {
+        "edit": "Modifier le lot",
+        "close": "Clôturer",
+        "archive": "Archiver",
+        "delete": "Supprimer"
+      },
+      "notFound": "Lot non trouvé",
+      "loadError": "Erreur lors du chargement du lot"
     }
   },
   "treatments": {

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Package, Calendar, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Package, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -35,6 +36,7 @@ const gmqBadgeVariants: Record<string, 'success' | 'default' | 'warning' | 'dest
 };
 
 export default function LotsPage() {
+  const router = useRouter();
   const t = useTranslations('lots');
   const tc = useCommonTranslations();
   const toast = useToast();
@@ -67,9 +69,8 @@ export default function LotsPage() {
   };
 
   const handleViewDetail = (lot: Lot) => {
-    setSelectedLot(lot);
-    setDialogMode('view');
-    setDialogOpen(true);
+    // Navigate to detail page instead of opening dialog
+    router.push(`/lots/${lot.id}`);
   };
 
   const handleNavigate = (direction: 'prev' | 'next') => {
