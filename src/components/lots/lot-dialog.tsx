@@ -34,6 +34,8 @@ interface LotDialogProps {
   // Navigation pour le mode view
   lots?: Lot[];
   onNavigate?: (direction: 'prev' | 'next') => void;
+  // Callback pour rafraîchir après ajout/suppression d'animal en mode view
+  onRefresh?: () => void;
 }
 
 const LOT_TYPES: LotType[] = [
@@ -51,6 +53,7 @@ export function LotDialog({
   isLoading,
   lots = [],
   onNavigate,
+  onRefresh,
 }: LotDialogProps) {
   const t = useTranslations('lots');
   const tc = useCommonTranslations();
@@ -71,6 +74,10 @@ export function LotDialog({
   const [searchingAnimal, setSearchingAnimal] = useState(false);
   const [searchResult, setSearchResult] = useState<Animal | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+
+  // State for view mode animal operations
+  const [addingAnimalToLot, setAddingAnimalToLot] = useState(false);
+  const [removingAnimalId, setRemovingAnimalId] = useState<string | null>(null);
 
   // Form data
   const [formData, setFormData] = useState<CreateLotDto>({
@@ -226,13 +233,55 @@ export function LotDialog({
     }
   };
 
-  // Remove animal from list
+  // Remove animal from list (edit/create mode - local state only)
   const handleRemoveAnimal = (animalId: string) => {
     setLotAnimals(lotAnimals.filter(la => la.id !== animalId));
     setFormData(prev => ({
       ...prev,
       animalIds: (prev.animalIds || []).filter(id => id !== animalId)
     }));
+  };
+
+  // Add animal via API in view mode
+  const handleAddAnimalToLotApi = async () => {
+    if (!searchResult || !lot?.id) return;
+
+    setAddingAnimalToLot(true);
+    try {
+      await lotsService.addAnimal(lot.id, searchResult.id);
+      // Refresh the animals list
+      const animals = await lotsService.getLotAnimals(lot.id);
+      setLotAnimals(animals);
+      // Reset search state
+      setSearchOfficialId('');
+      setSearchResult(null);
+      setShowAddAnimal(false);
+      // Trigger parent refresh if needed
+      onRefresh?.();
+    } catch (error) {
+      console.error('Failed to add animal to lot:', error);
+      setSearchError(t('messages.addAnimalError'));
+    } finally {
+      setAddingAnimalToLot(false);
+    }
+  };
+
+  // Remove animal via API in view mode
+  const handleRemoveAnimalFromLotApi = async (animalId: string) => {
+    if (!lot?.id) return;
+
+    setRemovingAnimalId(animalId);
+    try {
+      await lotsService.removeAnimal(lot.id, animalId);
+      // Update local state
+      setLotAnimals(lotAnimals.filter(la => la.id !== animalId));
+      // Trigger parent refresh if needed
+      onRefresh?.();
+    } catch (error) {
+      console.error('Failed to remove animal from lot:', error);
+    } finally {
+      setRemovingAnimalId(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -656,12 +705,106 @@ export function LotDialog({
                         <Badge variant="secondary" className="flex-shrink-0">
                           {la.sex === 'male' ? 'M' : la.sex === 'female' ? 'F' : '-'}
                         </Badge>
+                        {/* Remove button in view mode */}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => handleRemoveAnimalFromLotApi(la.id)}
+                          disabled={removingAnimalId === la.id}
+                        >
+                          {removingAnimalId === la.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <X className="h-3 w-3" />
+                          )}
+                        </Button>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground py-2">{t('messages.noAnimalsInLot')}</p>
+              )}
+
+              {/* Animal search in view mode */}
+              {showAddAnimal && (
+                <div className="space-y-3 p-3 border rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">{t('actions.searchAnimal')}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder={t('placeholders.officialId')}
+                      value={searchOfficialId}
+                      onChange={(e) => setSearchOfficialId(e.target.value)}
+                      autoFocus
+                    />
+                    {searchingAnimal && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {t('messages.searching')}
+                      </div>
+                    )}
+                    {searchError && (
+                      <p className="text-sm text-destructive">{searchError}</p>
+                    )}
+                    {searchResult && (
+                      <div className="flex items-center gap-3 p-2 border rounded-lg bg-background">
+                        <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium">
+                            {searchResult.officialNumber || searchResult.visualId || searchResult.currentEid}
+                          </span>
+                          {searchResult.species?.nameFr && (
+                            <span className="text-muted-foreground ml-2">• {searchResult.species.nameFr}</span>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleAddAnimalToLotApi}
+                          disabled={addingAnimalToLot}
+                        >
+                          {addingAnimalToLot ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                          ) : null}
+                          {t('actions.add')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowAddAnimal(false);
+                      setSearchOfficialId('');
+                      setSearchResult(null);
+                      setSearchError(null);
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    {tc('actions.cancel')}
+                  </Button>
+                </div>
+              )}
+
+              {/* Add animal button in view mode */}
+              {!showAddAnimal && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setShowAddAnimal(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('actions.addAnimal')}
+                </Button>
               )}
             </div>
 

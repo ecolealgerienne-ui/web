@@ -2082,7 +2082,11 @@
       "searching": "Recherche en cours...",
       "animalNotFound": "Animal non trouvé",
       "animalAlreadyInList": "Cet animal est déjà dans le lot",
-      "searchError": "Erreur lors de la recherche"
+      "searchError": "Erreur lors de la recherche",
+      "addAnimalError": "Erreur lors de l'ajout de l'animal au lot",
+      "removeAnimalError": "Erreur lors du retrait de l'animal du lot",
+      "animalAdded": "Animal ajouté au lot",
+      "animalRemoved": "Animal retiré du lot"
     }
   },
   "treatments": {
