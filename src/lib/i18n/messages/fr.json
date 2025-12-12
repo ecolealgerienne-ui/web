@@ -14,7 +14,8 @@
       "refresh": "Rafraîchir",
       "loading": "Chargement...",
       "saving": "Enregistrement...",
-      "deleting": "Suppression..."
+      "deleting": "Suppression...",
+      "view": "Voir"
     },
     "status": {
       "active": "Actif",
