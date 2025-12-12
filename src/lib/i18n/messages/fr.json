@@ -2134,6 +2134,28 @@
         "archive": "Archiver",
         "delete": "Supprimer"
       },
+      "timeline": {
+        "title": "Historique",
+        "noEvents": "Aucun événement",
+        "eventTypes": {
+          "animal_joined": "Animaux ajoutés",
+          "animal_left": "Animaux retirés",
+          "weighing": "Pesée",
+          "treatment": "Traitement",
+          "status_change": "Changement de statut",
+          "note": "Note"
+        },
+        "animalsAdded": "animal(s) ajouté(s)",
+        "animalsRemoved": "animal(s) retiré(s)",
+        "animalsWeighed": "animal(s) pesé(s)"
+      },
+      "distribution": {
+        "title": "Distribution GMQ",
+        "excellent": "Excellent",
+        "good": "Bon",
+        "warning": "À surveiller",
+        "critical": "Critique"
+      },
       "notFound": "Lot non trouvé",
       "loadError": "Erreur lors du chargement du lot"
     }

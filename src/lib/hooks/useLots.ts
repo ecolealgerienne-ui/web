@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { lotsService, CreateLotDto, UpdateLotDto } from '@/lib/services/lots.service';
-import { dashboardService, LotStats, LotsStatsResponse } from '@/lib/services/dashboard.service';
+import {
+  dashboardService,
+  LotStats,
+  LotsStatsResponse,
+  LotDetailStats,
+  LotEvent,
+  LotEventsResponse,
+} from '@/lib/services/dashboard.service';
 import { Lot, LotFilters, LotAnimal } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
 
@@ -110,22 +117,59 @@ export function useLots(filters?: Partial<LotFilters>, options?: { includeStats?
   };
 }
 
-export function useLot(id: string) {
+export function useLot(id: string, options?: { includeStats?: boolean; includeEvents?: boolean }) {
   const [lot, setLot] = useState<Lot | null>(null);
   const [animals, setAnimals] = useState<LotAnimal[]>([]);
+  const [stats, setStats] = useState<LotDetailStats | null>(null);
+  const [events, setEvents] = useState<LotEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  const includeStats = options?.includeStats ?? true;
+  const includeEvents = options?.includeEvents ?? true;
 
   const fetchLot = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const [lotData, animalsData] = await Promise.all([
+
+      // Build list of promises based on options
+      const promises: Promise<any>[] = [
         lotsService.getById(id),
         lotsService.getLotAnimals(id),
-      ]);
-      setLot(lotData);
-      setAnimals(animalsData);
+      ];
+
+      if (includeStats) {
+        promises.push(
+          dashboardService.getLotDetailStats(id).catch((err) => {
+            logger.warn('Failed to fetch lot stats', { error: err, lotId: id });
+            return null;
+          })
+        );
+      }
+
+      if (includeEvents) {
+        promises.push(
+          dashboardService.getLotEvents(id, { limit: 50 }).catch((err) => {
+            logger.warn('Failed to fetch lot events', { error: err, lotId: id });
+            return { events: [], meta: { total: 0, page: 1, limit: 50, totalPages: 0 } };
+          })
+        );
+      }
+
+      const results = await Promise.all(promises);
+
+      setLot(results[0]);
+      setAnimals(results[1] || []);
+
+      if (includeStats && results[2]) {
+        setStats(results[2]);
+      }
+
+      if (includeEvents && results[includeStats ? 3 : 2]) {
+        const eventsResult = results[includeStats ? 3 : 2] as LotEventsResponse;
+        setEvents(eventsResult.events || []);
+      }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch lot');
       setError(error);
@@ -133,7 +177,7 @@ export function useLot(id: string) {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, includeStats, includeEvents]);
 
   useEffect(() => {
     if (id) {
@@ -144,6 +188,8 @@ export function useLot(id: string) {
   return {
     lot,
     animals,
+    stats,
+    events,
     loading,
     error,
     refresh: fetchLot,

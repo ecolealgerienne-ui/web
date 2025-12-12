@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowLeft,
   Package,
@@ -37,7 +37,8 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useLot } from '@/lib/hooks/useLots';
-import { dashboardService, LotStats, WeightTrendsResponse } from '@/lib/services/dashboard.service';
+import { dashboardService, WeightTrendsResponse } from '@/lib/services/dashboard.service';
+import { LotTimeline } from '@/components/lots/LotTimeline';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
@@ -57,39 +58,29 @@ export default function LotDetailPage() {
   const t = useTranslations('lots');
   const tc = useCommonTranslations();
 
-  const { lot, animals, loading, error } = useLot(lotId);
-  const [lotStats, setLotStats] = useState<LotStats | null>(null);
+  // Hook now includes stats and events
+  const { lot, animals, stats, events, loading, error } = useLot(lotId);
   const [weightTrends, setWeightTrends] = useState<WeightTrendsResponse | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
 
-  // Fetch lot stats and weight trends
+  // Fetch weight trends for chart
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchTrends() {
       if (!lotId) return;
-
       try {
-        setStatsLoading(true);
-        const [statsData, trendsData] = await Promise.all([
-          dashboardService.getLotsStats({ isActive: true }).catch(() => null),
-          dashboardService.getWeightTrends({ lotId, period: '6months', groupBy: 'week' }).catch(() => null),
-        ]);
-
-        if (statsData) {
-          const currentLotStats = statsData.lots.find((s) => s.lotId === lotId);
-          setLotStats(currentLotStats || null);
-        }
+        const trendsData = await dashboardService.getWeightTrends({
+          lotId,
+          period: '6months',
+          groupBy: 'week',
+        });
         setWeightTrends(trendsData);
       } catch (err) {
-        logger.error('Error fetching lot stats', { error: err });
-      } finally {
-        setStatsLoading(false);
+        logger.warn('Error fetching weight trends', { error: err });
       }
     }
-
-    fetchStats();
+    fetchTrends();
   }, [lotId]);
 
-  if (loading || statsLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -118,12 +109,12 @@ export default function LotDetailPage() {
   })) || [];
 
   // Get GMQ status
-  const gmqStatus = lotStats?.growth.status || 'good';
+  const gmqStatus = stats?.growth.status || 'good';
   const statusColors = gmqStatusColors[gmqStatus];
 
   // Calculate progress
-  const progress = lotStats?.weights.targetWeight
-    ? Math.min(100, (lotStats.weights.avgWeight / lotStats.weights.targetWeight) * 100)
+  const progress = stats?.weights.targetWeight
+    ? Math.min(100, (stats.weights.avgWeight / stats.weights.targetWeight) * 100)
     : 0;
 
   return (
@@ -177,7 +168,7 @@ export default function LotDetailPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {lotStats?.weights.avgWeight?.toFixed(0) || '-'} kg
+                  {stats?.weights.avgWeight?.toFixed(0) || '-'} kg
                 </p>
                 <p className="text-xs text-muted-foreground">{t('detail.kpis.avgWeight')}</p>
               </div>
@@ -197,7 +188,7 @@ export default function LotDetailPage() {
               </div>
               <div>
                 <p className={cn('text-2xl font-bold', statusColors?.text)}>
-                  {lotStats?.growth.avgDailyGain?.toFixed(2) || '-'} kg/j
+                  {stats?.growth.avgDailyGain?.toFixed(2) || '-'} kg/j
                 </p>
                 <p className="text-xs text-muted-foreground">{t('detail.kpis.gmq')}</p>
               </div>
@@ -216,7 +207,7 @@ export default function LotDetailPage() {
                   <p className="text-2xl font-bold">{progress.toFixed(0)}%</p>
                 </div>
                 <p className="text-xs text-muted-foreground">{t('detail.kpis.progress')}</p>
-                {lotStats?.weights.targetWeight && (
+                {stats?.weights.targetWeight && (
                   <Progress value={progress} className="h-1.5 mt-1" />
                 )}
               </div>
@@ -232,8 +223,8 @@ export default function LotDetailPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {lotStats?.predictions.estimatedDaysToTarget || '-'}
-                  {lotStats?.predictions.estimatedDaysToTarget && 'j'}
+                  {stats?.predictions.estimatedDaysToTarget || '-'}
+                  {stats?.predictions.estimatedDaysToTarget && 'j'}
                 </p>
                 <p className="text-xs text-muted-foreground">{t('detail.kpis.daysToTarget')}</p>
               </div>
@@ -382,6 +373,11 @@ export default function LotDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Timeline */}
+      {events.length > 0 && (
+        <LotTimeline events={events} />
+      )}
     </div>
   );
 }

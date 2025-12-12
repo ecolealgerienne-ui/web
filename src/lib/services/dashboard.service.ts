@@ -235,6 +235,121 @@ export interface DashboardActionsResponse {
   opportunities: ActionItem[];
 }
 
+// GET /lots/{id}/stats - Stats détaillées d'un lot
+export interface LotDetailStats {
+  lot: {
+    id: string;
+    name: string;
+    type: string;
+    status: string;
+    createdAt: string;
+    description?: string;
+    product?: {
+      id: string;
+      nameFr: string;
+      nameEn?: string;
+    };
+  };
+  animals: {
+    total: number;
+    byStatus: Record<string, number>;
+    bySex: Record<string, number>;
+  };
+  weights: {
+    avgWeight: number;
+    minWeight: number;
+    maxWeight: number;
+    totalWeightGain: number;
+    targetWeight: number | null;
+    lastWeighingDate: string | null;
+  };
+  growth: {
+    avgDailyGain: number;
+    minDailyGain: number;
+    maxDailyGain: number;
+    status: GmqStatus;
+    distribution: {
+      excellent: number;
+      good: number;
+      warning: number;
+      critical: number;
+    };
+  };
+  predictions: {
+    estimatedDaysToTarget: number | null;
+    estimatedTargetDate: string | null;
+    readyForSaleCount: number;
+    readyForSalePercent: number;
+  };
+  financial?: {
+    estimatedValue: number;
+    pricePerKg: number;
+    totalWeight: number;
+  };
+}
+
+// GET /lots/{id}/events - Timeline événements
+export type LotEventType = 'animal_joined' | 'animal_left' | 'weighing' | 'treatment' | 'status_change' | 'note';
+
+export interface LotEvent {
+  id: string;
+  type: LotEventType;
+  date: string;
+  details: {
+    // animal_joined / animal_left
+    animals?: Array<{ id: string; officialNumber: string; reason?: string }>;
+    count?: number;
+    // weighing
+    animalCount?: number;
+    avgWeight?: number;
+    // treatment
+    productName?: string;
+    treatmentType?: string;
+    veterinarian?: string;
+    // status_change
+    fromStatus?: string;
+    toStatus?: string;
+    reason?: string;
+  };
+  createdBy?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface LotEventsResponse {
+  events: LotEvent[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+// POST /lots/transfer - Transfert d'animaux
+export interface TransferAnimalsRequest {
+  fromLotId: string;
+  toLotId: string;
+  animalIds: string[];
+  reason?: string;
+}
+
+export interface TransferAnimalsResponse {
+  success: boolean;
+  transferred: number;
+  fromLot: {
+    id: string;
+    name: string;
+    remainingAnimals: number;
+  };
+  toLot: {
+    id: string;
+    name: string;
+    newAnimalCount: number;
+  };
+}
+
 class DashboardService {
   private getThisMonthDates() {
     const now = new Date();
@@ -706,6 +821,155 @@ class DashboardService {
       logger.error('Failed to fetch weight trends', { error });
       throw error;
     }
+  }
+
+  /**
+   * GET /api/v1/farms/{farmId}/lots/{lotId}/stats
+   * Stats détaillées d'un lot spécifique
+   */
+  async getLotDetailStats(lotId: string, filters?: { period?: string }): Promise<LotDetailStats> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.period) params.append('period', filters.period);
+
+      const url = params.toString()
+        ? `/api/v1/farms/${TEMP_FARM_ID}/lots/${lotId}/stats?${params}`
+        : `/api/v1/farms/${TEMP_FARM_ID}/lots/${lotId}/stats`;
+
+      const response = await apiClient.get<any>(url);
+      const raw = response?.data || response;
+
+      return {
+        lot: {
+          id: raw.lot?.id || lotId,
+          name: raw.lot?.name || '',
+          type: raw.lot?.type || '',
+          status: raw.lot?.status || 'open',
+          createdAt: raw.lot?.createdAt || '',
+          description: raw.lot?.description,
+          product: raw.lot?.product,
+        },
+        animals: {
+          total: raw.animals?.total ?? 0,
+          byStatus: raw.animals?.byStatus ?? {},
+          bySex: raw.animals?.bySex ?? {},
+        },
+        weights: {
+          avgWeight: raw.weights?.avgWeight ?? 0,
+          minWeight: raw.weights?.minWeight ?? 0,
+          maxWeight: raw.weights?.maxWeight ?? 0,
+          totalWeightGain: raw.weights?.totalWeightGain ?? 0,
+          targetWeight: raw.weights?.targetWeight ?? null,
+          lastWeighingDate: raw.weights?.lastWeighingDate ?? null,
+        },
+        growth: {
+          avgDailyGain: raw.growth?.avgDailyGain ?? 0,
+          minDailyGain: raw.growth?.minDailyGain ?? 0,
+          maxDailyGain: raw.growth?.maxDailyGain ?? 0,
+          status: raw.growth?.status || this.getGmqStatus(raw.growth?.avgDailyGain ?? 0),
+          distribution: {
+            excellent: raw.growth?.distribution?.excellent ?? 0,
+            good: raw.growth?.distribution?.good ?? 0,
+            warning: raw.growth?.distribution?.warning ?? 0,
+            critical: raw.growth?.distribution?.critical ?? 0,
+          },
+        },
+        predictions: {
+          estimatedDaysToTarget: raw.predictions?.estimatedDaysToTarget ?? null,
+          estimatedTargetDate: raw.predictions?.estimatedTargetDate ?? null,
+          readyForSaleCount: raw.predictions?.readyForSaleCount ?? 0,
+          readyForSalePercent: raw.predictions?.readyForSalePercent ?? 0,
+        },
+        financial: raw.financial ? {
+          estimatedValue: raw.financial.estimatedValue ?? 0,
+          pricePerKg: raw.financial.pricePerKg ?? 0,
+          totalWeight: raw.financial.totalWeight ?? 0,
+        } : undefined,
+      };
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('Lot stats not found (404)', { lotId });
+        throw error;
+      }
+      logger.error('Failed to fetch lot detail stats', { error, lotId });
+      throw error;
+    }
+  }
+
+  /**
+   * GET /api/v1/farms/{farmId}/lots/{lotId}/events
+   * Timeline d'événements du lot
+   */
+  async getLotEvents(
+    lotId: string,
+    filters?: { page?: number; limit?: number; types?: LotEventType[] }
+  ): Promise<LotEventsResponse> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.page) params.append('page', String(filters.page));
+      if (filters?.limit) params.append('limit', String(filters.limit));
+      if (filters?.types?.length) params.append('types', filters.types.join(','));
+
+      const url = params.toString()
+        ? `/api/v1/farms/${TEMP_FARM_ID}/lots/${lotId}/events?${params}`
+        : `/api/v1/farms/${TEMP_FARM_ID}/lots/${lotId}/events`;
+
+      const response = await apiClient.get<any>(url);
+      const raw = response?.data || response;
+
+      return {
+        events: (raw.events || []).map((event: any) => ({
+          id: event.id,
+          type: event.type,
+          date: event.date,
+          details: event.details || {},
+          createdBy: event.createdBy,
+        })),
+        meta: {
+          total: raw.meta?.total ?? raw.events?.length ?? 0,
+          page: raw.meta?.page ?? 1,
+          limit: raw.meta?.limit ?? 50,
+          totalPages: raw.meta?.totalPages ?? 1,
+        },
+      };
+    } catch (error: any) {
+      if (error.status === 404) {
+        logger.info('No lot events found (404)', { lotId });
+        return {
+          events: [],
+          meta: { total: 0, page: 1, limit: 50, totalPages: 0 },
+        };
+      }
+      logger.error('Failed to fetch lot events', { error, lotId });
+      throw error;
+    }
+  }
+
+  /**
+   * POST /api/v1/farms/{farmId}/lots/transfer
+   * Transfert d'animaux entre lots
+   */
+  async transferAnimals(request: TransferAnimalsRequest): Promise<TransferAnimalsResponse> {
+    const response = await apiClient.post<any>(
+      `/api/v1/farms/${TEMP_FARM_ID}/lots/transfer`,
+      request
+    );
+    const raw = response?.data || response;
+
+    return {
+      success: raw.success ?? true,
+      transferred: raw.transferred ?? 0,
+      fromLot: {
+        id: raw.fromLot?.id || request.fromLotId,
+        name: raw.fromLot?.name || '',
+        remainingAnimals: raw.fromLot?.remainingAnimals ?? 0,
+      },
+      toLot: {
+        id: raw.toLot?.id || request.toLotId,
+        name: raw.toLot?.name || '',
+        newAnimalCount: raw.toLot?.newAnimalCount ?? 0,
+      },
+    };
   }
 
   /**
