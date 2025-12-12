@@ -1,5 +1,7 @@
 'use client';
 
+// LotDialog - Gestion des lots avec ajout/suppression d'animaux en mode view
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
