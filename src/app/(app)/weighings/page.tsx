@@ -18,6 +18,7 @@ import {
 import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
+import { Sparkline, SparklineDataPoint } from '@/components/ui/charts/sparkline';
 import { useWeighings } from '@/lib/hooks/useWeighings';
 import { useLots } from '@/lib/hooks/useLots';
 import { useToast } from '@/contexts/toast-context';
@@ -102,6 +103,17 @@ export default function WeighingsPage() {
   // Export state
   const [isExporting, setIsExporting] = useState(false);
 
+  // Sparkline data state
+  const [sparklineData, setSparklineData] = useState<{
+    weighingsPerWeek: SparklineDataPoint[];
+    avgWeightPerWeek: SparklineDataPoint[];
+    avgGmqPerWeek: SparklineDataPoint[];
+  }>({
+    weighingsPerWeek: [],
+    avgWeightPerWeek: [],
+    avgGmqPerWeek: [],
+  });
+
   // Fetch weighings with server-side pagination (using dateRange for dates)
   const { weighings, meta, loading, refresh } = useWeighings({
     ...filters,
@@ -132,9 +144,95 @@ export default function WeighingsPage() {
     fetchStats(dateRange.fromDate, dateRange.toDate);
   }, [dateRange.fromDate, dateRange.toDate, fetchStats]);
 
+  // Fetch sparkline data (all weighings for the period)
+  const fetchSparklineData = useCallback(async (fromDate?: string, toDate?: string) => {
+    try {
+      const allWeighings = await weighingsService.getAllForExport({
+        fromDate,
+        toDate,
+      });
+
+      if (allWeighings.length === 0) {
+        setSparklineData({
+          weighingsPerWeek: [],
+          avgWeightPerWeek: [],
+          avgGmqPerWeek: [],
+        });
+        return;
+      }
+
+      // Group weighings by week
+      const weeklyData = new Map<string, { weighings: Weighing[]; weekStart: Date }>();
+
+      allWeighings.forEach((w) => {
+        const date = new Date(w.weightDate);
+        // Get week start (Monday)
+        const weekStart = new Date(date);
+        const day = weekStart.getDay();
+        const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+        weekStart.setDate(diff);
+        weekStart.setHours(0, 0, 0, 0);
+
+        const weekKey = weekStart.toISOString().split('T')[0];
+
+        if (!weeklyData.has(weekKey)) {
+          weeklyData.set(weekKey, { weighings: [], weekStart });
+        }
+        weeklyData.get(weekKey)!.weighings.push(w);
+      });
+
+      // Sort weeks chronologically
+      const sortedWeeks = Array.from(weeklyData.entries())
+        .sort(([a], [b]) => a.localeCompare(b));
+
+      // Calculate sparkline data
+      const weighingsPerWeek: SparklineDataPoint[] = sortedWeeks.map(([, data]) => ({
+        value: data.weighings.length,
+        label: data.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+      }));
+
+      const avgWeightPerWeek: SparklineDataPoint[] = sortedWeeks.map(([, data]) => {
+        const totalWeight = data.weighings.reduce((sum, w) => sum + w.weight, 0);
+        return {
+          value: totalWeight / data.weighings.length,
+          label: data.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+        };
+      });
+
+      const avgGmqPerWeek: SparklineDataPoint[] = sortedWeeks
+        .map(([, data]) => {
+          const weighingsWithGmq = data.weighings.filter(w => w.dailyGain !== null && w.dailyGain !== undefined);
+          if (weighingsWithGmq.length === 0) return null;
+          const totalGmq = weighingsWithGmq.reduce((sum, w) => sum + (w.dailyGain || 0), 0);
+          return {
+            value: totalGmq / weighingsWithGmq.length,
+            label: data.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+          } as SparklineDataPoint;
+        })
+        .filter((d): d is SparklineDataPoint => d !== null);
+
+      setSparklineData({
+        weighingsPerWeek,
+        avgWeightPerWeek,
+        avgGmqPerWeek,
+      });
+    } catch (error) {
+      console.error('Error fetching sparkline data:', error);
+    }
+  }, []);
+
+  // Re-fetch sparkline data when date range changes
+  useEffect(() => {
+    fetchSparklineData(dateRange.fromDate, dateRange.toDate);
+  }, [dateRange.fromDate, dateRange.toDate, fetchSparklineData]);
+
   // Refresh stats after CRUD operations
   const refreshAll = async () => {
-    await Promise.all([refresh(), fetchStats(dateRange.fromDate, dateRange.toDate)]);
+    await Promise.all([
+      refresh(),
+      fetchStats(dateRange.fromDate, dateRange.toDate),
+      fetchSparklineData(dateRange.fromDate, dateRange.toDate),
+    ]);
   };
 
   // Client-side search filtering (filters current page only)
@@ -400,40 +498,83 @@ export default function WeighingsPage() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats with Sparklines */}
       <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <Scale className="h-5 w-5 text-muted-foreground" />
-            <span className="text-2xl font-bold">
-              {statsLoading ? '-' : stats?.totalWeighings ?? 0}
-            </span>
+        {/* Total Weighings */}
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Scale className="h-4 w-4 text-muted-foreground" />
+                <span className="text-2xl font-bold">
+                  {statsLoading ? '-' : stats?.totalWeighings ?? 0}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t('stats.total')}</p>
+            </div>
+            {sparklineData.weighingsPerWeek.length >= 2 && (
+              <Sparkline
+                data={sparklineData.weighingsPerWeek}
+                color="hsl(var(--primary))"
+                height={40}
+                width={80}
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
         </div>
-        <div className="rounded-lg border bg-card p-6">
+
+        {/* Unique Animals */}
+        <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-muted-foreground" />
+            <Users className="h-4 w-4 text-muted-foreground" />
             <span className="text-2xl font-bold">
               {statsLoading ? '-' : stats?.uniqueAnimals ?? 0}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.uniqueAnimals')}</p>
+          <p className="text-xs text-muted-foreground mt-1">{t('stats.uniqueAnimals')}</p>
         </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="text-2xl font-bold">
-            {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
+
+        {/* Average Weight */}
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-2xl font-bold">
+                {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t('stats.latestAvgWeight')}</p>
+            </div>
+            {sparklineData.avgWeightPerWeek.length >= 2 && (
+              <Sparkline
+                data={sparklineData.avgWeightPerWeek}
+                color="hsl(var(--chart-2))"
+                height={40}
+                width={80}
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.latestAvgWeight')}</p>
         </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-green-600" />
-            <span className="text-2xl font-bold text-green-600">
-              {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
-            </span>
+
+        {/* Average Daily Gain */}
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-green-600" />
+                <span className="text-2xl font-bold text-green-600">
+                  {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t('stats.avgDailyGain')}</p>
+            </div>
+            {sparklineData.avgGmqPerWeek.length >= 2 && (
+              <Sparkline
+                data={sparklineData.avgGmqPerWeek}
+                color="hsl(142.1 76.2% 36.3%)"
+                height={40}
+                width={80}
+              />
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">{t('stats.avgDailyGain')}</p>
         </div>
       </div>
 
