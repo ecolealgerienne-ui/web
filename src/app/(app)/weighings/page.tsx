@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
@@ -51,6 +51,9 @@ export default function WeighingsPage() {
   // Stats state
   const [stats, setStats] = useState<WeightStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+
+  // Export state
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch weighings with server-side pagination
   const { weighings, meta, loading, refresh } = useWeighings({
@@ -171,6 +174,70 @@ export default function WeighingsPage() {
     }
   };
 
+  // Export to CSV
+  const handleExportCSV = async () => {
+    setIsExporting(true);
+    try {
+      // Fetch all data without pagination
+      const allWeighings = await weighingsService.getAllForExport({
+        source: filters.source,
+        fromDate: filters.fromDate,
+        toDate: filters.toDate,
+      });
+
+      if (allWeighings.length === 0) {
+        toast.error(t('messages.noDataToExport'));
+        return;
+      }
+
+      // CSV headers
+      const headers = [
+        t('labels.animal'),
+        t('fields.weight'),
+        t('fields.weightDate'),
+        t('fields.source'),
+        t('labels.rate'),
+      ];
+
+      // CSV rows
+      const rows = allWeighings.map((w) => [
+        w.animal?.officialNumber || w.animal?.visualId || w.animalId,
+        w.weight.toString(),
+        new Date(w.weightDate).toLocaleDateString('fr-FR'),
+        t(`source.${w.source || 'undefined'}`),
+        w.dailyGain !== null && w.dailyGain !== undefined ? w.dailyGain.toFixed(2) : '',
+      ]);
+
+      // Build CSV content
+      const csvContent = [
+        headers.join(';'),
+        ...rows.map((row) => row.map((cell) => `"${cell}"`).join(';')),
+      ].join('\n');
+
+      // Add BOM for Excel compatibility with French characters
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      link.download = `pesees_${dateStr}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(t('messages.exportSuccess', { count: allWeighings.length }));
+    } catch (error) {
+      console.error('Error exporting weighings:', error);
+      toast.error(t('messages.exportError'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Table columns
   const columns: ColumnDef<Weighing>[] = [
     {
@@ -246,10 +313,20 @@ export default function WeighingsPage() {
           <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('newWeighing')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleExportCSV} disabled={isExporting || meta.total === 0}>
+            {isExporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {t('export.csv')}
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newWeighing')}
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}

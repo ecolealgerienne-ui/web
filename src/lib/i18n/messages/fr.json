@@ -2434,7 +2434,13 @@
       "deleteConfirmTitle": "Confirmer la suppression",
       "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer cette pesée ?",
       "addDescription": "Enregistrez une nouvelle pesée",
-      "editDescription": "Modifiez les informations de la pesée"
+      "editDescription": "Modifiez les informations de la pesée",
+      "noDataToExport": "Aucune donnée à exporter",
+      "exportSuccess": "{count} pesées exportées",
+      "exportError": "Erreur lors de l'export"
+    },
+    "export": {
+      "csv": "Exporter CSV"
     },
     "cancel": "Annuler",
     "delete": "Supprimer",
