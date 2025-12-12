@@ -139,14 +139,9 @@ class ApiClient {
     try {
       const json = await response.json()
 
-      // Le backend NestJS retourne: { success, data, timestamp, meta? }
+      // Le backend NestJS retourne: { success, data, timestamp }
       // Déballer automatiquement pour simplifier les services
-      // Si meta est présent (pagination), retourner { data, meta } au lieu de juste data
       if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
-        if ('meta' in json && json.meta) {
-          // Réponse paginée : préserver data et meta
-          return { data: json.data, meta: json.meta } as T
-        }
         return json.data as T
       }
 

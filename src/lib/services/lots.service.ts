@@ -7,100 +7,30 @@ import { apiClient } from '@/lib/api/client';
 import { Lot, LotFilters, LotAnimal, CreateLotDto, UpdateLotDto } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
 import { TEMP_FARM_ID } from '@/lib/auth/config';
-import type { PaginatedResponse } from '@/lib/types/common/api';
-
-/**
- * Paramètres de filtre pour la liste des lots
- */
-export interface LotFilterParams {
-  page?: number;
-  limit?: number;
-  type?: string;
-  status?: string;
-  isActive?: boolean;
-  search?: string;
-  includeStats?: boolean;
-}
 
 class LotsService {
   private getBasePath(): string {
     return `/api/v1/farms/${TEMP_FARM_ID}/lots`;
   }
 
-  /**
-   * Récupère la liste paginée des lots
-   */
-  async getAll(params: LotFilterParams = {}): Promise<PaginatedResponse<Lot>> {
+  async getAll(filters?: Partial<LotFilters>): Promise<Lot[]> {
     try {
-      const queryParams = new URLSearchParams();
+      const params = new URLSearchParams();
+      if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.search) params.append('search', filters.search);
+      if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
 
-      // Pagination
-      const page = params.page || 1;
-      const limit = Math.min(params.limit || 25, 100);
-      queryParams.append('page', String(page));
-      queryParams.append('limit', String(limit));
-
-      // Filtres
-      if (params.type && params.type !== 'all') queryParams.append('type', params.type);
-      if (params.status && params.status !== 'all') queryParams.append('status', params.status);
-      if (params.isActive !== undefined) queryParams.append('isActive', params.isActive.toString());
-      if (params.search) queryParams.append('search', params.search);
-      if (params.includeStats) queryParams.append('includeStats', 'true');
-
-      const url = `${this.getBasePath()}?${queryParams.toString()}`;
-      const response = await apiClient.get<PaginatedResponse<Lot> | Lot[]>(url);
-
-      // Handle both paginated and non-paginated responses from backend
-      let lots: Lot[];
-      let meta: { total: number; page: number; limit: number; totalPages: number };
-
-      if (Array.isArray(response)) {
-        // Backend returns array (non-paginated fallback)
-        lots = response;
-        meta = {
-          total: lots.length,
-          page,
-          limit,
-          totalPages: Math.ceil(lots.length / limit)
-        };
-      } else if (response && 'data' in response && Array.isArray(response.data)) {
-        // Backend returns paginated response
-        lots = response.data;
-        meta = response.meta || {
-          total: lots.length,
-          page,
-          limit,
-          totalPages: Math.ceil(lots.length / limit)
-        };
-      } else {
-        // Fallback for unexpected format
-        lots = [];
-        meta = { total: 0, page, limit, totalPages: 0 };
-      }
-
-      logger.info('Lots fetched', {
-        total: meta.total,
-        page: meta.page,
-        limit: meta.limit
-      });
-
-      return { data: lots, meta };
+      const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      // API returns paginated response: { data: [...], meta: {...} }
+      const response = await apiClient.get<{ data: Lot[]; meta?: any }>(url);
+      const lots = response?.data || [];
+      logger.info('Lots fetched', { count: lots.length });
+      return lots;
     } catch (error: unknown) {
-      const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No lots found (404)');
-        return {
-          data: [],
-          meta: {
-            total: 0,
-            page: params.page || 1,
-            limit: params.limit || 25,
-            totalPages: 0
-          }
-        };
-      }
-      logger.error('Failed to fetch lots', { error });
-      throw error;
+      // Return empty array for any error to avoid breaking UI
+      logger.warn('Failed to fetch lots, returning empty array', { error });
+      return [];
     }
   }
 

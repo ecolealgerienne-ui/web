@@ -109,7 +109,7 @@ export function LotAnimalsCard({ lotId }: LotAnimalsCardProps) {
                     </TableCell>
                     <TableCell>
                       <Badge className="border border-border bg-background">
-                        {lotAnimal.species?.name || '-'}
+                        {lotAnimal.species?.nameFr || '-'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">

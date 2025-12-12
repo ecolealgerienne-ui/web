@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { weighingsService } from '@/lib/services/weighings.service';
-import type { Weighing, QueryWeightDto } from '@/lib/types/weighing';
+import type { Weighing, QueryWeightDto, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { logger } from '@/lib/utils/logger';
 
 interface PaginationMeta {
@@ -10,51 +10,51 @@ interface PaginationMeta {
   totalPages: number;
 }
 
-// Params pour le hook (règle 7.7)
-export interface WeighingFilterParams extends QueryWeightDto {
-  search?: string;
-}
-
-const DEFAULT_PARAMS: WeighingFilterParams = {
-  page: 1,
-  limit: 25,
-};
-
 interface UseWeighingsResult {
   weighings: Weighing[];
-  total: number;
+  meta: PaginationMeta;
   loading: boolean;
   error: Error | null;
-  params: WeighingFilterParams;
-  setParams: React.Dispatch<React.SetStateAction<WeighingFilterParams>>;
-  refetch: () => Promise<void>;
+  refresh: () => Promise<void>;
+  createWeighing: (data: CreateWeightDto) => Promise<Weighing>;
+  updateWeighing: (id: string, data: UpdateWeightDto) => Promise<Weighing>;
+  deleteWeighing: (id: string) => Promise<void>;
 }
 
-/**
- * Hook pour gérer les pesées avec pagination serveur
- * Utilise le pattern params/setParams (règle 7.7)
- */
-export function useWeighings(initialParams?: Partial<WeighingFilterParams>): UseWeighingsResult {
-  const [params, setParams] = useState<WeighingFilterParams>({
-    ...DEFAULT_PARAMS,
-    ...initialParams,
-  });
+export function useWeighings(filters?: QueryWeightDto & { search?: string }): UseWeighingsResult {
   const [weighings, setWeighings] = useState<Weighing[]>([]);
-  const [total, setTotal] = useState(0);
+  const [meta, setMeta] = useState<PaginationMeta>({ total: 0, page: 1, limit: 10, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  // Extract filter values to avoid unnecessary re-renders
+  const filterAnimalId = filters?.animalId;
+  const filterSource = filters?.source;
+  const filterFromDate = filters?.fromDate;
+  const filterToDate = filters?.toDate;
+  const filterPage = filters?.page;
+  const filterLimit = filters?.limit;
+  const filterSort = filters?.sort;
+  const filterOrder = filters?.order;
+
+  const memoizedFilters = useMemo(() => ({
+    animalId: filterAnimalId,
+    source: filterSource,
+    fromDate: filterFromDate,
+    toDate: filterToDate,
+    page: filterPage,
+    limit: filterLimit,
+    sort: filterSort,
+    order: filterOrder,
+  }), [filterAnimalId, filterSource, filterFromDate, filterToDate, filterPage, filterLimit, filterSort, filterOrder]);
 
   const fetchWeighings = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Extraire les params pour l'API (sans search qui est client-side)
-      const { search, ...apiParams } = params;
-
-      const response = await weighingsService.getAll(apiParams);
+      const response = await weighingsService.getAll(memoizedFilters);
       setWeighings(response.data);
-      setTotal(response.meta.total);
+      setMeta(response.meta);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch weighings');
       setError(error);
@@ -62,19 +62,37 @@ export function useWeighings(initialParams?: Partial<WeighingFilterParams>): Use
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  }, [memoizedFilters]);
 
   useEffect(() => {
     fetchWeighings();
   }, [fetchWeighings]);
 
+  const createWeighing = useCallback(async (data: CreateWeightDto) => {
+    const weighing = await weighingsService.create(data);
+    await fetchWeighings();
+    return weighing;
+  }, [fetchWeighings]);
+
+  const updateWeighing = useCallback(async (id: string, data: UpdateWeightDto) => {
+    const weighing = await weighingsService.update(id, data);
+    await fetchWeighings();
+    return weighing;
+  }, [fetchWeighings]);
+
+  const deleteWeighing = useCallback(async (id: string) => {
+    await weighingsService.delete(id);
+    await fetchWeighings();
+  }, [fetchWeighings]);
+
   return {
     weighings,
-    total,
+    meta,
     loading,
     error,
-    params,
-    setParams,
-    refetch: fetchWeighings,
+    refresh: fetchWeighings,
+    createWeighing,
+    updateWeighing,
+    deleteWeighing,
   };
 }

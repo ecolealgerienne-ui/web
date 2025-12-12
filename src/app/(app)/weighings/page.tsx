@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
@@ -16,83 +15,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Scale, Users, TrendingUp, TrendingDown, Minus, Download, Calendar } from 'lucide-react';
+import { Plus, Search, Loader2, Edit, Trash2, Scale, Users, TrendingUp, TrendingDown } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { WeightDialog } from '@/components/weighings/weight-dialog';
 import { useWeighings } from '@/lib/hooks/useWeighings';
 import { useToast } from '@/contexts/toast-context';
-import type { Weighing, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
+import type { Weighing, WeightStats, QueryWeightDto, WeightSource, CreateWeightDto, UpdateWeightDto } from '@/lib/types/weighing';
 import { weighingsService } from '@/lib/services/weighings.service';
-import { dashboardService } from '@/lib/services/dashboard.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { handleApiError } from '@/lib/utils/api-error-handler';
 
-const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
-const ANIMAL_STATUSES = ['alive', 'sold', 'dead', 'slaughtered', 'draft'] as const;
-type AnimalStatus = typeof ANIMAL_STATUSES[number];
-
-/**
- * Retourne la variante de badge selon la source
- */
-function getSourceVariant(source?: WeightSource): 'default' | 'secondary' | 'destructive' | 'warning' | 'success' {
-  switch (source) {
-    case 'scale': return 'success';
-    case 'manual': return 'secondary';
-    case 'estimated': return 'warning';
-    default: return 'secondary';
-  }
-}
-
-/**
- * Exporte les pesées en CSV
- */
-function exportToCSV(weighings: Weighing[], t: (key: string) => string): void {
-  const headers = [
-    t('labels.animal'),
-    t('fields.weight'),
-    t('fields.weightDate'),
-    t('fields.source'),
-    t('labels.rate'),
-    t('fields.notes'),
-  ];
-
-  const rows = weighings.map(weighing => [
-    weighing.animal?.officialNumber || weighing.animal?.visualId || weighing.animalId,
-    `${weighing.weight} kg`,
-    new Date(weighing.weightDate).toLocaleDateString('fr-FR'),
-    weighing.source ? t(`source.${weighing.source}`) : '-',
-    weighing.dailyGain !== null && weighing.dailyGain !== undefined
-      ? `${weighing.dailyGain.toFixed(2)} kg/j`
-      : '-',
-    weighing.notes || '-',
-  ]);
-
-  const csvContent = [
-    headers.join(';'),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
-  ].join('\n');
-
-  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `pesees_${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-interface DashboardWeightStats {
-  weighingsThisMonth: number;
-  avgDailyGainTrend: 'up' | 'down' | 'stable';
-}
+const WEIGHT_SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
 
 export default function WeighingsPage() {
   const t = useTranslations('weighings');
   const tc = useCommonTranslations();
   const toast = useToast();
 
-  // Hook avec params/setParams pour la pagination (règle 7.7)
-  const { weighings, total, loading, error, params, setParams, refetch } = useWeighings();
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  // Filters state (includes pagination for server-side)
+  const [filters, setFilters] = useState<QueryWeightDto & { search?: string }>({});
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -104,62 +48,46 @@ export default function WeighingsPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [weighingToDelete, setWeighingToDelete] = useState<Weighing | null>(null);
 
-  // Stats from weighings service
-  const [stats, setStats] = useState<{
-    totalWeighings: number;
-    uniqueAnimals: number;
-    latestAvgWeight: number;
-    avgDailyGain: number;
-  } | null>(null);
+  // Stats state
+  const [stats, setStats] = useState<WeightStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  // Dashboard stats for additional info
-  const [dashboardStats, setDashboardStats] = useState<DashboardWeightStats | null>(null);
+  // Fetch weighings with server-side pagination
+  const { weighings, meta, loading, refresh } = useWeighings({
+    ...filters,
+    page,
+    limit,
+  });
 
-  // Fetch stats (recalculées selon les filtres incluant animalStatus)
+  // Fetch stats
   const fetchStats = useCallback(async () => {
     setStatsLoading(true);
     try {
-      const [weightStats, dashboard] = await Promise.all([
-        weighingsService.getStats({
-          fromDate: params.fromDate,
-          toDate: params.toDate,
-          animalStatus: params.animalStatus,
-        }),
-        dashboardService.getStatsV2(),
-      ]);
-
-      setStats({
-        totalWeighings: weightStats.totalWeighings,
-        uniqueAnimals: weightStats.uniqueAnimals,
-        latestAvgWeight: weightStats.weights?.latestAvg ?? 0,
-        avgDailyGain: weightStats.growth?.avgDailyGain ?? 0,
+      const data = await weighingsService.getStats({
+        fromDate: filters.fromDate,
+        toDate: filters.toDate,
       });
-
-      setDashboardStats({
-        weighingsThisMonth: dashboard.weights.weighingsThisMonth,
-        avgDailyGainTrend: dashboard.weights.avgDailyGainTrend,
-      });
-    } catch (err) {
-      handleApiError(err, 'weighings.fetchStats', toast);
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
     } finally {
       setStatsLoading(false);
     }
-  }, [params.fromDate, params.toDate, params.animalStatus, toast]);
+  }, [filters.fromDate, filters.toDate]);
 
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
 
-  // Refresh all data after CRUD operations
-  const refreshAll = useCallback(async () => {
-    await Promise.all([refetch(), fetchStats()]);
-  }, [refetch, fetchStats]);
+  // Refresh stats after CRUD operations
+  const refreshAll = async () => {
+    await Promise.all([refresh(), fetchStats()]);
+  };
 
-  // Client-side search filtering
+  // Client-side search filtering (filters current page only)
   const filteredWeighings = useMemo(() => {
-    if (!params.search) return weighings;
-    const search = params.search.toLowerCase();
+    if (!filters.search) return weighings;
+    const search = filters.search.toLowerCase();
     return weighings.filter((w) => {
       const animal = w.animal;
       return (
@@ -168,7 +96,13 @@ export default function WeighingsPage() {
         w.animalId.toLowerCase().includes(search)
       );
     });
-  }, [weighings, params.search]);
+  }, [weighings, filters.search]);
+
+  // Reset page when filters change
+  const handleFilterChange = (newFilters: QueryWeightDto & { search?: string }) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
 
   // Handlers
   const handleView = (weighing: Weighing) => {
@@ -194,37 +128,39 @@ export default function WeighingsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = useCallback(async (data: CreateWeightDto | UpdateWeightDto) => {
+  const handleSubmit = async (data: CreateWeightDto | UpdateWeightDto) => {
     setIsSubmitting(true);
     try {
       if (dialogMode === 'create') {
         await weighingsService.create(data as CreateWeightDto);
-        toast.success(tc('messages.success'), t('messages.createSuccess'));
+        toast.success(t('messages.createSuccess'));
       } else if (dialogMode === 'edit' && selectedWeighing) {
         await weighingsService.update(selectedWeighing.id, data as UpdateWeightDto);
-        toast.success(tc('messages.success'), t('messages.updateSuccess'));
+        toast.success(t('messages.updateSuccess'));
       }
       setDialogOpen(false);
       refreshAll();
-    } catch (err) {
-      handleApiError(err, 'weighings.submit', toast);
+    } catch (error) {
+      console.error('Error submitting weighing:', error);
+      toast.error(dialogMode === 'create' ? t('messages.createError') : t('messages.updateError'));
     } finally {
       setIsSubmitting(false);
     }
-  }, [dialogMode, selectedWeighing, refreshAll, toast, tc, t]);
+  };
 
-  const confirmDelete = useCallback(async () => {
+  const confirmDelete = async () => {
     if (!weighingToDelete) return;
     try {
       await weighingsService.delete(weighingToDelete.id);
-      toast.success(tc('messages.success'), t('messages.deleteSuccess'));
+      toast.success(t('messages.deleteSuccess'));
       setIsDeleteDialogOpen(false);
       setWeighingToDelete(null);
       refreshAll();
-    } catch (err) {
-      handleApiError(err, 'weighings.delete', toast);
+    } catch (error) {
+      console.error('Error deleting weighing:', error);
+      toast.error(t('messages.deleteError'));
     }
-  }, [weighingToDelete, refreshAll, toast, tc, t]);
+  };
 
   const handleNavigate = (direction: 'prev' | 'next') => {
     if (!selectedWeighing) return;
@@ -235,53 +171,11 @@ export default function WeighingsPage() {
     }
   };
 
-  // Handlers pour la pagination et les filtres (règle 7.7)
-  const handlePageChange = useCallback((page: number) => {
-    setParams(prev => ({ ...prev, page }));
-  }, [setParams]);
-
-  const handleLimitChange = useCallback((limit: number) => {
-    setParams(prev => ({ ...prev, limit, page: 1 }));
-  }, [setParams]);
-
-  const handleSearchChange = useCallback((search: string) => {
-    setParams(prev => ({ ...prev, search: search || undefined, page: 1 }));
-  }, [setParams]);
-
-  const handleSourceChange = useCallback((source: string) => {
-    setParams(prev => ({ ...prev, source: source === 'all' ? undefined : source as WeightSource, page: 1 }));
-  }, [setParams]);
-
-  const handleFromDateChange = useCallback((fromDate: string) => {
-    setParams(prev => ({ ...prev, fromDate: fromDate || undefined, page: 1 }));
-  }, [setParams]);
-
-  const handleToDateChange = useCallback((toDate: string) => {
-    setParams(prev => ({ ...prev, toDate: toDate || undefined, page: 1 }));
-  }, [setParams]);
-
-  const handleAnimalStatusChange = useCallback((status: string) => {
-    setParams(prev => ({ ...prev, animalStatus: status === 'all' ? undefined : status as AnimalStatus, page: 1 }));
-  }, [setParams]);
-
-  // Export function
-  const handleExport = useCallback(() => {
-    exportToCSV(weighings, t);
-  }, [weighings, t]);
-
-  // Trend icon component
-  const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'stable' }) => {
-    if (trend === 'up') return <TrendingUp className="h-4 w-4 text-green-600" />;
-    if (trend === 'down') return <TrendingDown className="h-4 w-4 text-red-600" />;
-    return <Minus className="h-4 w-4 text-muted-foreground" />;
-  };
-
   // Table columns
   const columns: ColumnDef<Weighing>[] = [
     {
       key: 'animal',
       header: t('labels.animal'),
-      sortable: true,
       render: (weighing: Weighing) => (
         <span className="font-mono text-sm">
           {weighing.animal?.officialNumber || weighing.animal?.visualId || weighing.animalId.slice(0, 8)}
@@ -291,7 +185,6 @@ export default function WeighingsPage() {
     {
       key: 'weight',
       header: t('fields.weight'),
-      sortable: true,
       render: (weighing: Weighing) => (
         <span className="text-sm font-medium">{weighing.weight} kg</span>
       ),
@@ -299,30 +192,22 @@ export default function WeighingsPage() {
     {
       key: 'weightDate',
       header: t('fields.weightDate'),
-      sortable: true,
       render: (weighing: Weighing) => (
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">
-            {new Date(weighing.weightDate).toLocaleDateString('fr-FR')}
-          </span>
-        </div>
+        <span className="text-sm">
+          {new Date(weighing.weightDate).toLocaleDateString('fr-FR')}
+        </span>
       ),
     },
     {
       key: 'source',
       header: t('fields.source'),
-      sortable: true,
       render: (weighing: Weighing) => (
-        <Badge variant={getSourceVariant(weighing.source)}>
-          {t(`source.${weighing.source || 'undefined'}`)}
-        </Badge>
+        <Badge variant="secondary">{t(`source.${weighing.source || 'undefined'}`)}</Badge>
       ),
     },
     {
       key: 'dailyGain',
       header: t('labels.rate'),
-      sortable: true,
       render: (weighing: Weighing) => {
         if (weighing.dailyGain === null || weighing.dailyGain === undefined) {
           return <span className="text-muted-foreground">-</span>;
@@ -336,87 +221,39 @@ export default function WeighingsPage() {
         );
       },
     },
+    {
+      key: 'actions',
+      header: tc('table.actions'),
+      align: 'right',
+      render: (weighing: Weighing) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(weighing); }}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="sm" className="text-destructive" onClick={(e) => { e.stopPropagation(); handleDeleteClick(weighing); }}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
   ];
-
-  // Filtres personnalisés
-  const filtersComponent = (
-    <div className="flex flex-wrap gap-2 items-end">
-      {/* Filtre par statut animal */}
-      <Select value={params.animalStatus || 'all'} onValueChange={handleAnimalStatusChange}>
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder={t('filters.allStatuses')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
-          {ANIMAL_STATUSES.map((status) => (
-            <SelectItem key={status} value={status}>
-              {t(`animalStatus.${status}`)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Filtre par source */}
-      <Select value={params.source || 'all'} onValueChange={handleSourceChange}>
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder={t('source.all')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('source.all')}</SelectItem>
-          {WEIGHT_SOURCES.map((source) => (
-            <SelectItem key={source} value={source}>
-              {t(`source.${source}`)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Filtre par date de début */}
-      <div className="flex flex-col gap-1">
-        <Label className="text-xs text-muted-foreground">{t('filters.fromDate')}</Label>
-        <Input
-          type="date"
-          value={params.fromDate || ''}
-          onChange={(e) => handleFromDateChange(e.target.value)}
-          className="w-[150px]"
-        />
-      </div>
-
-      {/* Filtre par date de fin */}
-      <div className="flex flex-col gap-1">
-        <Label className="text-xs text-muted-foreground">{t('filters.toDate')}</Label>
-        <Input
-          type="date"
-          value={params.toDate || ''}
-          onChange={(e) => handleToDateChange(e.target.value)}
-          className="w-[150px]"
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport} disabled={weighings.length === 0}>
-            <Download className="mr-2 h-4 w-4" />
-            {tc('actions.export')}
-          </Button>
-          <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('newWeighing')}
-          </Button>
-        </div>
+        <Button onClick={handleCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('newWeighing')}
+        </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center gap-2">
             <Scale className="h-5 w-5 text-muted-foreground" />
@@ -425,15 +262,6 @@ export default function WeighingsPage() {
             </span>
           </div>
           <p className="text-xs text-muted-foreground">{t('stats.total')}</p>
-        </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-muted-foreground" />
-            <span className="text-2xl font-bold text-blue-600">
-              {statsLoading ? '-' : dashboardStats?.weighingsThisMonth ?? 0}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground">{t('stats.thisMonth')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center gap-2">
@@ -446,43 +274,110 @@ export default function WeighingsPage() {
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="text-2xl font-bold">
-            {statsLoading ? '-' : `${stats?.latestAvgWeight?.toFixed(1) ?? 0} kg`}
+            {statsLoading ? '-' : `${stats?.weights?.latestAvg?.toFixed(1) ?? 0} kg`}
           </div>
           <p className="text-xs text-muted-foreground">{t('stats.latestAvgWeight')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center gap-2">
-            {!statsLoading && dashboardStats && (
-              <TrendIcon trend={dashboardStats.avgDailyGainTrend} />
-            )}
+            <TrendingUp className="h-5 w-5 text-green-600" />
             <span className="text-2xl font-bold text-green-600">
-              {statsLoading ? '-' : `${stats?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
+              {statsLoading ? '-' : `${stats?.growth?.avgDailyGain?.toFixed(2) ?? 0} kg/j`}
             </span>
           </div>
           <p className="text-xs text-muted-foreground">{t('stats.avgDailyGain')}</p>
         </div>
       </div>
 
-      {/* DataTable avec pagination serveur (règle 7.7) */}
-      <DataTable<Weighing>
-        data={filteredWeighings}
-        columns={columns}
-        totalItems={params.search ? filteredWeighings.length : total}
-        page={params.page || 1}
-        limit={params.limit || 25}
-        onPageChange={handlePageChange}
-        onLimitChange={handleLimitChange}
-        loading={loading}
-        error={error}
-        searchValue={params.search || ''}
-        onSearchChange={handleSearchChange}
-        searchPlaceholder={t('searchPlaceholder')}
-        onRowClick={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
-        emptyMessage={t('messages.noWeighings')}
-        filters={filtersComponent}
-      />
+      {/* Filters */}
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.title')}</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t('searchPlaceholder')}
+                value={filters.search || ''}
+                onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('fields.source')}</label>
+            <Select
+              value={filters.source || 'all'}
+              onValueChange={(value) => handleFilterChange({
+                ...filters,
+                source: value === 'all' ? undefined : value as WeightSource
+              })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('source.all')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('source.all')}</SelectItem>
+                {WEIGHT_SOURCES.map((source) => (
+                  <SelectItem key={source} value={source}>
+                    {t(`source.${source}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
+            <Input
+              type="date"
+              value={filters.fromDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.toDate')}</label>
+            <Input
+              type="date"
+              value={filters.toDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : meta.total === 0 ? (
+        <div className="rounded-lg border bg-card p-12 text-center">
+          <Scale className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">{t('messages.noWeighings')}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{t('messages.noWeighingsDescription')}</p>
+          <Button className="mt-4" onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newWeighing')}
+          </Button>
+        </div>
+      ) : (
+        <DataTable
+          data={filteredWeighings}
+          columns={columns}
+          totalItems={filters.search ? filteredWeighings.length : meta.total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
+          onRowClick={handleView}
+        />
+      )}
 
       {/* Weight Dialog */}
       <WeightDialog

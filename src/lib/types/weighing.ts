@@ -1,7 +1,6 @@
 // Types pour les pesées basés sur l'API backend
 
-// Sources de pesée disponibles dans le backend
-export type WeightSource = 'manual' | 'scale' | 'estimated';
+export type WeightSource = 'manual' | 'scale' | 'estimated' | 'automatic' | 'weighbridge';
 
 export interface Weighing {
   id: string;
@@ -25,7 +24,6 @@ export interface Weighing {
     visualId?: string;
     officialNumber?: string;
     currentEid?: string;
-    status?: 'alive' | 'sold' | 'dead' | 'slaughtered' | 'draft';
   };
 
   // Traçabilité
@@ -66,7 +64,6 @@ export interface WeightStats {
 
 export interface QueryWeightDto {
   animalId?: string;
-  animalStatus?: 'alive' | 'sold' | 'dead' | 'slaughtered' | 'draft';
   source?: WeightSource;
   fromDate?: string;
   toDate?: string;
@@ -104,6 +101,8 @@ export const WEIGHT_SOURCE_LABELS: Record<WeightSource, string> = {
   manual: 'Manuel',
   scale: 'Balance',
   estimated: 'Estimé',
+  automatic: 'Automatique',
+  weighbridge: 'Pont-bascule',
 };
 
 // Legacy aliases for compatibility

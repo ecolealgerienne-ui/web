@@ -57,11 +57,22 @@ class FarmAlertsService {
         ? `${this.getBasePath(farmId)}?${queryParams}`
         : this.getBasePath(farmId)
 
-      const response = await apiClient.get<FarmAlertsResponse>(url)
-      logger.info('Farm alerts fetched', { farmId, count: response.data?.length || 0 })
+      // API may return 'pages' or 'totalPages' depending on version
+      const response = await apiClient.get<{
+        data: FarmAlert[]
+        meta: { total: number; page: number; limit: number; pages?: number; totalPages?: number }
+      }>(url)
+
+      logger.info('Farm alerts fetched', { farmId, count: response.data?.length || 0, meta: response.meta })
+
       return {
         data: response.data || [],
-        meta: response.meta || { total: 0, page: 1, limit: 20, totalPages: 0 },
+        meta: {
+          total: response.meta?.total ?? 0,
+          page: response.meta?.page ?? 1,
+          limit: response.meta?.limit ?? 20,
+          totalPages: response.meta?.totalPages ?? response.meta?.pages ?? 0,
+        },
       }
     } catch (error: unknown) {
       const err = error as { status?: number }
@@ -95,7 +106,8 @@ class FarmAlertsService {
     }
 
     try {
-      const response = await apiClient.get<FarmAlertsSummary>(
+      // API may return unreadCount instead of unread
+      const response = await apiClient.get<FarmAlertsSummary & { unreadCount?: number }>(
         `${this.getBasePath(farmId)}/summary`
       )
 
@@ -106,7 +118,15 @@ class FarmAlertsService {
       }
 
       logger.info('Farm alerts summary fetched', { farmId, total: response.total })
-      return response
+
+      // Map API response to expected format
+      return {
+        total: response.total,
+        unread: response.unread ?? response.unreadCount ?? 0,
+        byStatus: { ...defaultSummary.byStatus, ...response.byStatus },
+        byPriority: { ...defaultSummary.byPriority, ...response.byPriority },
+        byCategory: { ...defaultSummary.byCategory, ...response.byCategory },
+      }
     } catch (error: unknown) {
       const err = error as { status?: number }
       // En cas de 404, retourner un summary vide

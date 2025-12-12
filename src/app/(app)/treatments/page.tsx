@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
@@ -16,88 +15,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Syringe, Download, Calendar, AlertTriangle } from 'lucide-react';
+import { Plus, Search, Loader2, Eye, Edit, Trash2, Syringe } from 'lucide-react';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
 import { TreatmentDialog } from '@/components/treatments/treatment-dialog';
 import { useTreatments } from '@/lib/hooks/useTreatments';
 import { useToast } from '@/contexts/toast-context';
-import { Treatment, TreatmentType, TreatmentStatus, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
+import { Treatment, TreatmentFilters, TreatmentType, TreatmentStatus, CreateTreatmentDto, UpdateTreatmentDto } from '@/lib/types/treatment';
 import { treatmentsService } from '@/lib/services/treatments.service';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
-import { handleApiError } from '@/lib/utils/api-error-handler';
 
 const TREATMENT_TYPES: TreatmentType[] = ['treatment', 'vaccination'];
 const TREATMENT_STATUSES: TreatmentStatus[] = ['scheduled', 'in_progress', 'completed', 'cancelled'];
-
-/**
- * Retourne la variante de badge selon le statut
- */
-function getStatusVariant(status: TreatmentStatus): 'default' | 'secondary' | 'destructive' | 'warning' | 'success' {
-  switch (status) {
-    case 'completed': return 'success';
-    case 'in_progress': return 'warning';
-    case 'scheduled': return 'secondary';
-    case 'cancelled': return 'destructive';
-    default: return 'secondary';
-  }
-}
-
-/**
- * Retourne la variante de badge selon le type
- */
-function getTypeVariant(type: TreatmentType): 'default' | 'secondary' | 'destructive' | 'warning' | 'success' {
-  switch (type) {
-    case 'vaccination': return 'success';
-    case 'treatment': return 'default';
-    default: return 'secondary';
-  }
-}
-
-/**
- * Exporte les traitements en CSV
- */
-function exportToCSV(treatments: Treatment[], t: (key: string) => string, tc: (key: string) => string): void {
-  const headers = [
-    t('table.animal'),
-    t('table.type'),
-    t('table.product'),
-    t('table.date'),
-    t('table.veterinarian'),
-    t('table.status'),
-    t('fields.withdrawalEndDate'),
-  ];
-
-  const rows = treatments.map(treatment => [
-    treatment.animal?.officialNumber || treatment.animal?.visualId || '-',
-    t(`type.${treatment.type}`),
-    treatment.productName || '-',
-    new Date(treatment.treatmentDate).toLocaleDateString('fr-FR'),
-    treatment.veterinarian ? `Dr. ${treatment.veterinarian.lastName}` : treatment.veterinarianName || '-',
-    t(`status.${treatment.status}`),
-    treatment.withdrawalEndDate ? new Date(treatment.withdrawalEndDate).toLocaleDateString('fr-FR') : '-',
-  ]);
-
-  const csvContent = [
-    headers.join(';'),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
-  ].join('\n');
-
-  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `traitements_${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
-}
 
 export default function TreatmentsPage() {
   const t = useTranslations('treatments');
   const tc = useCommonTranslations();
   const toast = useToast();
 
-  // Hook avec params/setParams pour la pagination (règle 7.7)
-  const { treatments, total, loading, error, params, setParams, refetch } = useTreatments();
+  // Filters state
+  const [filters, setFilters] = useState<TreatmentFilters>({
+    search: '',
+    type: 'all',
+    status: 'all',
+  });
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -109,20 +49,38 @@ export default function TreatmentsPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [treatmentToDelete, setTreatmentToDelete] = useState<Treatment | null>(null);
 
-  // Stats calculées à partir des données affichées
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  // Fetch treatments
+  const { treatments, loading, refresh } = useTreatments(filters);
+
+  // Paginated data
+  const paginatedTreatments = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    return treatments.slice(startIndex, startIndex + limit);
+  }, [treatments, page, limit]);
+
+  // Reset page when filters change
+  const handleFilterChange = (newFilters: TreatmentFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  // Stats
   const stats = useMemo(() => {
-    const activeWithdrawals = treatments.filter(tr => {
-      if (!tr.withdrawalEndDate) return false;
-      return new Date(tr.withdrawalEndDate) > new Date();
-    }).length;
+    const totalCost = treatments
+      .filter((tr) => tr.cost)
+      .reduce((sum, tr) => sum + (tr.cost || 0), 0);
 
     return {
-      total,
+      total: treatments.length,
       inProgress: treatments.filter((tr) => tr.status === 'in_progress').length,
       completed: treatments.filter((tr) => tr.status === 'completed').length,
-      activeWithdrawals,
+      cost: totalCost,
     };
-  }, [treatments, total]);
+  }, [treatments]);
 
   // Actions
   const handleView = (treatment: Treatment) => {
@@ -148,7 +106,7 @@ export default function TreatmentsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = useCallback(async (data: CreateTreatmentDto | UpdateTreatmentDto) => {
+  const handleSubmit = async (data: CreateTreatmentDto | UpdateTreatmentDto) => {
     setIsSubmitting(true);
     try {
       if (selectedTreatment) {
@@ -159,26 +117,26 @@ export default function TreatmentsPage() {
         toast.success(tc('messages.success'), t('messages.created'));
       }
       setDialogOpen(false);
-      refetch();
-    } catch (error) {
-      handleApiError(error, 'treatments.submit', toast);
+      refresh();
+    } catch (err) {
+      toast.error(tc('messages.error'), selectedTreatment ? t('messages.updateError') : t('messages.createError'));
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedTreatment, refetch, toast, tc, t]);
+  };
 
-  const confirmDelete = useCallback(async () => {
+  const confirmDelete = async () => {
     if (!treatmentToDelete) return;
     try {
       await treatmentsService.delete(treatmentToDelete.id);
       toast.success(tc('messages.success'), t('messages.deleted'));
       setIsDeleteDialogOpen(false);
       setTreatmentToDelete(null);
-      refetch();
-    } catch (error) {
-      handleApiError(error, 'treatments.delete', toast);
+      refresh();
+    } catch (err) {
+      toast.error(tc('messages.error'), t('messages.deleteError'));
     }
-  }, [treatmentToDelete, refetch, toast, tc, t]);
+  };
 
   // Navigation in dialog
   const handleNavigate = (direction: 'prev' | 'next') => {
@@ -190,46 +148,21 @@ export default function TreatmentsPage() {
     }
   };
 
-  // Handlers pour la pagination et les filtres (règle 7.7)
-  const handlePageChange = useCallback((page: number) => {
-    setParams(prev => ({ ...prev, page }));
-  }, [setParams]);
-
-  const handleLimitChange = useCallback((limit: number) => {
-    setParams(prev => ({ ...prev, limit, page: 1 }));
-  }, [setParams]);
-
-  const handleSearchChange = useCallback((search: string) => {
-    setParams(prev => ({ ...prev, search: search || undefined, page: 1 }));
-  }, [setParams]);
-
-  const handleTypeChange = useCallback((type: string) => {
-    setParams(prev => ({ ...prev, type: type === 'all' ? undefined : type, page: 1 }));
-  }, [setParams]);
-
-  const handleStatusChange = useCallback((status: string) => {
-    setParams(prev => ({ ...prev, status: status === 'all' ? undefined : status, page: 1 }));
-  }, [setParams]);
-
-  const handleFromDateChange = useCallback((fromDate: string) => {
-    setParams(prev => ({ ...prev, fromDate: fromDate || undefined, page: 1 }));
-  }, [setParams]);
-
-  const handleToDateChange = useCallback((toDate: string) => {
-    setParams(prev => ({ ...prev, toDate: toDate || undefined, page: 1 }));
-  }, [setParams]);
-
-  // Fonction d'export
-  const handleExport = useCallback(() => {
-    exportToCSV(treatments, t, tc);
-  }, [treatments, t, tc]);
+  const getStatusVariant = (status: TreatmentStatus): 'default' | 'secondary' | 'destructive' | 'warning' | 'success' => {
+    switch (status) {
+      case 'completed': return 'success';
+      case 'in_progress': return 'warning';
+      case 'scheduled': return 'secondary';
+      case 'cancelled': return 'destructive';
+      default: return 'secondary';
+    }
+  };
 
   // Table columns
   const columns: ColumnDef<Treatment>[] = [
     {
       key: 'animal',
       header: t('table.animal'),
-      sortable: true,
       render: (treatment: Treatment) => (
         <span className="font-mono text-sm">
           {treatment.animal?.officialNumber || treatment.animal?.visualId || treatment.animalId.slice(0, 8)}
@@ -239,17 +172,13 @@ export default function TreatmentsPage() {
     {
       key: 'type',
       header: t('table.type'),
-      sortable: true,
       render: (treatment: Treatment) => (
-        <Badge variant={getTypeVariant(treatment.type)}>
-          {t(`type.${treatment.type}`)}
-        </Badge>
+        <Badge variant="secondary">{t(`type.${treatment.type}`)}</Badge>
       ),
     },
     {
       key: 'productName',
       header: t('table.product'),
-      sortable: true,
       render: (treatment: Treatment) => (
         <span className="text-sm">{treatment.productName || '-'}</span>
       ),
@@ -257,20 +186,15 @@ export default function TreatmentsPage() {
     {
       key: 'treatmentDate',
       header: t('table.date'),
-      sortable: true,
       render: (treatment: Treatment) => (
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">
-            {new Date(treatment.treatmentDate).toLocaleDateString('fr-FR')}
-          </span>
-        </div>
+        <span className="text-sm">
+          {new Date(treatment.treatmentDate).toLocaleDateString('fr-FR')}
+        </span>
       ),
     },
     {
       key: 'veterinarian',
       header: t('table.veterinarian'),
-      sortable: false,
       render: (treatment: Treatment) => (
         <span className="text-sm">
           {treatment.veterinarian
@@ -280,90 +204,33 @@ export default function TreatmentsPage() {
       ),
     },
     {
-      key: 'withdrawalEndDate',
-      header: t('fields.withdrawalEndDate'),
-      sortable: true,
-      render: (treatment: Treatment) => {
-        if (!treatment.withdrawalEndDate) return <span className="text-muted-foreground">-</span>;
-        const isActive = new Date(treatment.withdrawalEndDate) > new Date();
-        return (
-          <div className="flex items-center gap-1">
-            {isActive && <AlertTriangle className="h-4 w-4 text-orange-500" />}
-            <span className={isActive ? 'text-orange-600 font-medium' : 'text-muted-foreground'}>
-              {new Date(treatment.withdrawalEndDate).toLocaleDateString('fr-FR')}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
       key: 'status',
       header: t('table.status'),
-      sortable: true,
       render: (treatment: Treatment) => (
         <Badge variant={getStatusVariant(treatment.status)}>
           {t(`status.${treatment.status}`)}
         </Badge>
       ),
     },
+    {
+      key: 'actions',
+      header: tc('table.actions'),
+      align: 'right',
+      render: (treatment: Treatment) => (
+        <div className="flex items-center justify-end gap-1">
+          <Button variant="ghost" size="sm" onClick={() => handleView(treatment)}>
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => handleEdit(treatment)}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(treatment)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
   ];
-
-  // Filtres personnalisés
-  const filtersComponent = (
-    <div className="flex flex-wrap gap-2 items-end">
-      {/* Filtre par type */}
-      <Select value={params.type || 'all'} onValueChange={handleTypeChange}>
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder={t('filters.allTypes')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
-          {TREATMENT_TYPES.map((type) => (
-            <SelectItem key={type} value={type}>
-              {t(`type.${type}`)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Filtre par statut */}
-      <Select value={params.status || 'all'} onValueChange={handleStatusChange}>
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder={t('filters.allStatuses')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
-          {TREATMENT_STATUSES.map((status) => (
-            <SelectItem key={status} value={status}>
-              {t(`status.${status}`)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Filtre par date de début */}
-      <div className="flex flex-col gap-1">
-        <Label className="text-xs text-muted-foreground">{t('filters.fromDate')}</Label>
-        <Input
-          type="date"
-          value={params.fromDate || ''}
-          onChange={(e) => handleFromDateChange(e.target.value)}
-          className="w-[150px]"
-        />
-      </div>
-
-      {/* Filtre par date de fin */}
-      <div className="flex flex-col gap-1">
-        <Label className="text-xs text-muted-foreground">{t('filters.toDate')}</Label>
-        <Input
-          type="date"
-          value={params.toDate || ''}
-          onChange={(e) => handleToDateChange(e.target.value)}
-          className="w-[150px]"
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -373,16 +240,10 @@ export default function TreatmentsPage() {
           <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport} disabled={treatments.length === 0}>
-            <Download className="mr-2 h-4 w-4" />
-            {tc('actions.export')}
-          </Button>
-          <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('newTreatment')}
-          </Button>
-        </div>
+        <Button onClick={handleCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('newTreatment')}
+        </Button>
       </div>
 
       {/* Stats */}
@@ -403,34 +264,119 @@ export default function TreatmentsPage() {
           <p className="text-xs text-muted-foreground">{t('stats.completed')}</p>
         </div>
         <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-2">
-            {stats.activeWithdrawals > 0 && <AlertTriangle className="h-5 w-5 text-orange-500" />}
-            <span className="text-2xl font-bold text-orange-600">{stats.activeWithdrawals}</span>
-          </div>
-          <p className="text-xs text-muted-foreground">{t('stats.activeWithdrawals')}</p>
+          <div className="text-2xl font-bold">{stats.cost.toLocaleString()} DA</div>
+          <p className="text-xs text-muted-foreground">{t('stats.totalCost')}</p>
         </div>
       </div>
 
-      {/* DataTable avec pagination serveur (règle 7.7) */}
-      <DataTable<Treatment>
-        data={treatments}
-        columns={columns}
-        totalItems={total}
-        page={params.page || 1}
-        limit={params.limit || 25}
-        onPageChange={handlePageChange}
-        onLimitChange={handleLimitChange}
-        loading={loading}
-        error={error}
-        searchValue={params.search || ''}
-        onSearchChange={handleSearchChange}
-        searchPlaceholder={t('filters.searchPlaceholder')}
-        onRowClick={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
-        emptyMessage={t('noTreatments')}
-        filters={filtersComponent}
-      />
+      {/* Filters */}
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.search')}</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t('filters.searchPlaceholder')}
+                value={filters.search || ''}
+                onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.type')}</label>
+            <Select
+              value={filters.type || 'all'}
+              onValueChange={(value) => handleFilterChange({ ...filters, type: value as TreatmentType | 'all' })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('filters.allTypes')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
+                {TREATMENT_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {t(`type.${type}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.status')}</label>
+            <Select
+              value={filters.status || 'all'}
+              onValueChange={(value) => handleFilterChange({ ...filters, status: value as TreatmentStatus | 'all' })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('filters.allStatuses')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
+                {TREATMENT_STATUSES.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {t(`status.${status}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Date filters */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.fromDate')}</label>
+            <Input
+              type="date"
+              value={filters.fromDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, fromDate: e.target.value || undefined })}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('filters.toDate')}</label>
+            <Input
+              type="date"
+              value={filters.toDate || ''}
+              onChange={(e) => handleFilterChange({ ...filters, toDate: e.target.value || undefined })}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : treatments.length === 0 ? (
+        <div className="rounded-lg border bg-card p-12 text-center">
+          <Syringe className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">{t('noTreatments')}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{t('messages.noTreatmentsDescription')}</p>
+          <Button className="mt-4" onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('newTreatment')}
+          </Button>
+        </div>
+      ) : (
+        <DataTable
+          data={paginatedTreatments}
+          columns={columns}
+          totalItems={treatments.length}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
+          onRowClick={handleView}
+        />
+      )}
 
       {/* Treatment Dialog */}
       <TreatmentDialog

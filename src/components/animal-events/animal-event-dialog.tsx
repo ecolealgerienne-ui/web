@@ -162,10 +162,10 @@ export function AnimalEventDialog({
 
     try {
       // Rechercher par numéro officiel
-      const response = await animalsService.getAll({ search: officialId, limit: 10 });
+      const animals = await animalsService.getAll({ search: officialId, limit: 10 });
 
       // Trouver l'animal avec le numéro officiel exact ou le plus proche
-      const exactMatch = response.data.find(a =>
+      const exactMatch = animals.find(a =>
         a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
         a.visualId?.toLowerCase() === officialId.toLowerCase() ||
         a.currentEid?.toLowerCase() === officialId.toLowerCase()
@@ -179,9 +179,9 @@ export function AnimalEventDialog({
         } else {
           setSearchResult(exactMatch);
         }
-      } else if (response.data.length > 0) {
+      } else if (animals.length > 0) {
         // Prendre le premier résultat si pas de correspondance exacte
-        const firstResult = response.data[0];
+        const firstResult = animals[0];
         const alreadyInList = movementAnimals.some(a => a.id === firstResult.id);
         if (alreadyInList) {
           setSearchError(t('messages.animalAlreadyInList'));
@@ -332,11 +332,11 @@ export function AnimalEventDialog({
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">{animal.officialNumber || animal.visualId || animal.currentEid || animal.id}</span>
-                            {animal.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                            {animal.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {animal.species.nameFr}</span>
                             )}
-                            {animal.breed?.name && (
-                              <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                            {animal.breed?.nameFr && (
+                              <span className="text-muted-foreground"> ({animal.breed.nameFr})</span>
                             )}
                           </div>
                           <Badge variant="secondary" className="flex-shrink-0">
@@ -389,8 +389,8 @@ export function AnimalEventDialog({
                           <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-medium">{searchResult.officialNumber || searchResult.visualId || searchResult.currentEid}</span>
-                            {searchResult.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {searchResult.species.name}</span>
+                            {searchResult.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {searchResult.species.nameFr}</span>
                             )}
                           </div>
                           <Button type="button" size="sm" onClick={handleAddAnimal}>
@@ -640,11 +640,11 @@ export function AnimalEventDialog({
                         <PawPrint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <span className="font-medium">{animal.officialNumber || animal.visualId || animal.currentEid || animal.id}</span>
-                          {animal.species?.name && (
-                            <span className="text-muted-foreground ml-2">• {animal.species.name}</span>
+                          {animal.species?.nameFr && (
+                            <span className="text-muted-foreground ml-2">• {animal.species.nameFr}</span>
                           )}
-                          {animal.breed?.name && (
-                            <span className="text-muted-foreground"> ({animal.breed.name})</span>
+                          {animal.breed?.nameFr && (
+                            <span className="text-muted-foreground"> ({animal.breed.nameFr})</span>
                           )}
                         </div>
                         <Badge variant="secondary" className="flex-shrink-0">

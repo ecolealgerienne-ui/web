@@ -11,6 +11,7 @@ import { TEMP_FARM_ID } from '@/lib/auth/config'
 interface Breed {
   id: string
   name: string
+  nameFr?: string
   speciesId: string
 }
 
@@ -41,6 +42,7 @@ export function useBreeds(speciesId?: string): UseBreedsResult {
         .map(p => ({
           id: p.breedId,
           name: p.breed?.nameFr || p.breed?.nameEn || p.breedId,
+          nameFr: p.breed?.nameFr,
           speciesId: p.breed?.speciesId || '',
         }))
       setAllBreeds(breedsList)

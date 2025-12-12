@@ -3,21 +3,13 @@
  * Endpoint: POST/PUT /api/v1/farms/{farmId}/lots
  */
 
+// Types acceptés par le backend
 export type LotType =
-  | 'treatment'
-  | 'vaccination'
-  | 'sale'
-  | 'slaughter'
-  | 'purchase'
-  | 'breeding'
   | 'reproduction'
   | 'fattening'    // Engraissement
-  | 'quarantine'   // Quarantaine
   | 'weaning'      // Sevrage
-  | 'gestation'    // Gestation
-  | 'lactation'    // Lactation
-  | 'birth'        // Naissance
-  | 'production'   // Production
+  | 'quarantine'   // Quarantaine
+  | 'sale'         // Vente
   | 'other';       // Autre
 
 export type LotStatus = 'open' | 'closed' | 'archived' | 'completed';
@@ -39,12 +31,6 @@ export interface Lot {
   _count?: {
     lotAnimals: number;
   };
-
-  // Stats de performance (retournées avec includeStats=true)
-  stats?: LotStats;
-
-  // Poids cible du lot
-  targetWeight?: number | null;
 
   // Traitement/Vaccination
   productId?: string | null;
@@ -81,11 +67,15 @@ export interface LotAnimal {
   status: string;
   breed?: {
     id: string;
-    name: string;
+    nameFr: string;
+    nameEn?: string;
+    nameAr?: string;
   } | null;
   species?: {
     id: string;
-    name: string;
+    nameFr: string;
+    nameEn?: string;
+    nameAr?: string;
   } | null;
   joinedAt: string;
 }
@@ -149,20 +139,4 @@ export interface LotFilters {
   type?: LotType | 'all';
   status?: LotStatus | 'all';
   isActive?: boolean;
-  page?: number;
-  limit?: number;
-  includeStats?: boolean;
-}
-
-/**
- * Stats de performance d'un lot (retournées par le backend avec includeStats=true)
- */
-export interface LotStats {
-  avgWeight?: number;
-  avgDailyGain?: number;
-  minWeight?: number;
-  maxWeight?: number;
-  progress?: number;
-  estimatedDaysToTarget?: number;
-  targetWeight?: number;
 }
