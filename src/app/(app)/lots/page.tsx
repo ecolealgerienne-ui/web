@@ -1,17 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Package, Calendar } from 'lucide-react';
+import { Plus, Package, Calendar, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useLots } from '@/lib/hooks/useLots';
 import { Lot, CreateLotDto, UpdateLotDto, LotFilters } from '@/lib/types/lot';
 import { lotsService } from '@/lib/services/lots.service';
 import { LotDialog } from '@/components/lots/lot-dialog';
+import { LotsSummaryCards } from '@/components/lots/LotsSummaryCards';
 import { useToast } from '@/contexts/toast-context';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { DataTable, ColumnDef } from '@/components/data/common/DataTable';
+import { cn } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +25,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+// GMQ status badge variants
+const gmqBadgeVariants: Record<string, 'success' | 'default' | 'warning' | 'destructive'> = {
+  excellent: 'success',
+  good: 'default',
+  warning: 'warning',
+  critical: 'destructive',
+};
 
 export default function LotsPage() {
   const t = useTranslations('lots');
@@ -37,7 +48,10 @@ export default function LotsPage() {
     status: statusFilter !== 'all' ? statusFilter as LotFilters['status'] : undefined,
   };
 
-  const { lots, loading, error, refresh } = useLots(filters);
+  const { lots, lotsStats, statsSummary, loading, error, refresh, getStatsForLot } = useLots(
+    filters,
+    { includeStats: true }
+  );
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
@@ -148,20 +162,87 @@ export default function LotsPage() {
       header: t('fields.animals'),
       render: (lot) => (
         <span className="text-muted-foreground">
-          {lot._count?.lotAnimals || 0} {tc('labels.animals')}
+          {lot._count?.lotAnimals || 0}
         </span>
       ),
     },
     {
-      key: 'createdAt',
-      header: t('fields.createdAt'),
-      sortable: true,
-      render: (lot) => (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span>{lot.createdAt ? new Date(lot.createdAt).toLocaleDateString() : '-'}</span>
-        </div>
-      ),
+      key: 'avgWeight',
+      header: t('fields.avgWeight'),
+      render: (lot) => {
+        const stats = getStatsForLot(lot.id);
+        if (!stats || !stats.weights.avgWeight) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return (
+          <span className="font-medium">
+            {stats.weights.avgWeight.toFixed(0)} kg
+          </span>
+        );
+      },
+    },
+    {
+      key: 'gmq',
+      header: t('fields.gmq'),
+      render: (lot) => {
+        const stats = getStatsForLot(lot.id);
+        if (!stats || stats.growth.avgDailyGain <= 0) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const status = stats.growth.status;
+        const variant = gmqBadgeVariants[status] || 'default';
+        return (
+          <div className="flex items-center gap-1">
+            <Badge variant={variant}>
+              {stats.growth.avgDailyGain.toFixed(2)} kg/j
+            </Badge>
+            {status === 'excellent' && <TrendingUp className="h-3 w-3 text-green-600" />}
+            {status === 'critical' && <TrendingDown className="h-3 w-3 text-red-600" />}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'progress',
+      header: t('fields.progress'),
+      render: (lot) => {
+        const stats = getStatsForLot(lot.id);
+        if (!stats || !stats.weights.targetWeight) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const percent = Math.min(
+          100,
+          (stats.weights.avgWeight / stats.weights.targetWeight) * 100
+        );
+        return (
+          <div className="flex items-center gap-2 min-w-[100px]">
+            <Progress value={percent} className="h-2 w-16" />
+            <span className="text-xs text-muted-foreground">
+              {percent.toFixed(0)}%
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'daysToTarget',
+      header: t('fields.daysToTarget'),
+      render: (lot) => {
+        const stats = getStatsForLot(lot.id);
+        if (!stats?.predictions.estimatedDaysToTarget) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        const days = stats.predictions.estimatedDaysToTarget;
+        return (
+          <span className={cn(
+            'font-medium',
+            days <= 7 && 'text-green-600',
+            days > 7 && days <= 30 && 'text-orange-600',
+          )}>
+            {days}j
+          </span>
+        );
+      },
     },
   ];
 
@@ -215,6 +296,13 @@ export default function LotsPage() {
           {t('newLot')}
         </Button>
       </div>
+
+      {/* Summary Cards */}
+      <LotsSummaryCards
+        summary={statsSummary}
+        lotsStats={lotsStats}
+        loading={loading}
+      />
 
       {/* DataTable */}
       <DataTable<Lot>

@@ -2048,7 +2048,24 @@
       "priceTotal": "Montant total",
       "animals": "Animaux",
       "animalsInLot": "Animaux dans ce lot",
-      "createdAt": "Date de création"
+      "createdAt": "Date de création",
+      "gmq": "GMQ",
+      "avgWeight": "Poids moyen",
+      "progress": "Progression",
+      "daysToTarget": "Jours restants",
+      "targetWeight": "Poids cible"
+    },
+    "summary": {
+      "activeLots": "Lots actifs",
+      "totalAnimals": "Animaux en lots",
+      "avgGmq": "GMQ moyen",
+      "readyForSale": "Prêts pour vente"
+    },
+    "gmqStatus": {
+      "excellent": "Excellent",
+      "good": "Bon",
+      "warning": "À surveiller",
+      "critical": "Critique"
     },
     "placeholders": {
       "name": "Ex: Traitement antiparasitaire Mars 2025",

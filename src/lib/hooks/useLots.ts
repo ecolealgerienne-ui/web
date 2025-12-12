@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { lotsService, CreateLotDto, UpdateLotDto } from '@/lib/services/lots.service';
+import { dashboardService, LotStats, LotsStatsResponse } from '@/lib/services/dashboard.service';
 import { Lot, LotFilters, LotAnimal } from '@/lib/types/lot';
 import { logger } from '@/lib/utils/logger';
 
-export function useLots(filters?: Partial<LotFilters>) {
+export function useLots(filters?: Partial<LotFilters>, options?: { includeStats?: boolean }) {
   const [lots, setLots] = useState<Lot[]>([]);
+  const [lotsStats, setLotsStats] = useState<LotStats[]>([]);
+  const [statsSummary, setStatsSummary] = useState<LotsStatsResponse['summary'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -13,6 +16,7 @@ export function useLots(filters?: Partial<LotFilters>) {
   const filterType = filters?.type;
   const filterStatus = filters?.status;
   const filterIsActive = filters?.isActive;
+  const includeStats = options?.includeStats ?? false;
 
   const memoizedFilters = useMemo(() => ({
     search: filterSearch,
@@ -25,8 +29,26 @@ export function useLots(filters?: Partial<LotFilters>) {
     try {
       setLoading(true);
       setError(null);
-      const data = await lotsService.getAll(memoizedFilters);
-      setLots(data);
+
+      // Fetch lots and optionally stats in parallel
+      if (includeStats) {
+        const [lotsData, statsData] = await Promise.all([
+          lotsService.getAll(memoizedFilters),
+          dashboardService.getLotsStats({
+            isActive: filterIsActive,
+            type: filterType !== 'all' ? filterType : undefined,
+          }).catch((err) => {
+            logger.warn('Failed to fetch lots stats', { error: err });
+            return { lots: [], summary: { totalLots: 0, totalAnimals: 0, overallAvgDailyGain: 0 } };
+          }),
+        ]);
+        setLots(lotsData);
+        setLotsStats(statsData.lots);
+        setStatsSummary(statsData.summary);
+      } else {
+        const lotsData = await lotsService.getAll(memoizedFilters);
+        setLots(lotsData);
+      }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch lots');
       setError(error);
@@ -34,7 +56,7 @@ export function useLots(filters?: Partial<LotFilters>) {
     } finally {
       setLoading(false);
     }
-  }, [memoizedFilters]);
+  }, [memoizedFilters, includeStats, filterIsActive, filterType]);
 
   useEffect(() => {
     fetchLots();
@@ -67,8 +89,15 @@ export function useLots(filters?: Partial<LotFilters>) {
     await fetchLots(); // Refresh list
   };
 
+  // Helper to get stats for a specific lot
+  const getStatsForLot = useCallback((lotId: string): LotStats | undefined => {
+    return lotsStats.find((s) => s.lotId === lotId);
+  }, [lotsStats]);
+
   return {
     lots,
+    lotsStats,
+    statsSummary,
     loading,
     error,
     refresh: fetchLots,
@@ -77,6 +106,7 @@ export function useLots(filters?: Partial<LotFilters>) {
     deleteLot,
     addAnimal,
     removeAnimal,
+    getStatsForLot,
   };
 }
 
