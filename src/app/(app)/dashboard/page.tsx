@@ -64,6 +64,57 @@ import {
 } from '@/lib/services/dashboard.service';
 import { logger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
+import { AlertBanner } from '@/components/dashboard/alert-banner';
+import { AlertKpiCard } from '@/components/dashboard/alert-kpi-card';
+
+/**
+ * Sanitize action URLs from backend to match existing frontend routes
+ * Some backend URLs may not have corresponding frontend pages yet
+ */
+const sanitizeActionUrl = (url: string): string => {
+  // Map non-existent routes to existing ones
+  const urlMappings: Record<string, string> = {
+    '/weights/new': '/animals?notWeighedDays=30&status=alive', // Animals that need weighing (only alive)
+    '/weights': '/weighings',
+  };
+
+  // Check for exact match first
+  if (urlMappings[url]) {
+    return urlMappings[url];
+  }
+
+  // Handle dynamic routes that don't exist
+  // /animals/{id} → /animals (no detail page)
+  if (url.match(/^\/animals\/[a-f0-9-]+$/i)) {
+    return '/animals';
+  }
+
+  // /lots/{id} → /lots (no detail page)
+  if (url.match(/^\/lots\/[a-f0-9-]+$/i)) {
+    return '/lots';
+  }
+
+  // Filter to only supported query params for /animals
+  if (url.startsWith('/animals?')) {
+    const supportedParams = ['action', 'search', 'status', 'notWeighedDays', 'minWeight', 'maxWeight'];
+    const urlObj = new URL(url, 'http://localhost');
+    const params = new URLSearchParams();
+
+    supportedParams.forEach(param => {
+      const value = urlObj.searchParams.get(param);
+      if (value) params.set(param, value);
+    });
+
+    // For minWeight filter (ready for sale), automatically add status=alive if not specified
+    if (params.has('minWeight') && !params.has('status')) {
+      params.set('status', 'alive');
+    }
+
+    return params.toString() ? `/animals?${params.toString()}` : '/animals';
+  }
+
+  return url;
+};
 
 interface DashboardData {
   stats: DashboardStatsV2;
@@ -329,7 +380,7 @@ export default function DashboardPage() {
           colors.bg,
           colors.border
         )}
-        onClick={() => router.push(action.actionUrl)}
+        onClick={() => router.push(sanitizeActionUrl(action.actionUrl))}
       >
         <div className="flex items-center gap-3">
           <Icon className="h-5 w-5" />
@@ -380,8 +431,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Urgent Alerts Banner */}
+      <AlertBanner />
+
       {/* KPI Cards - Row 1: Herd & Movements */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
         {/* Total Animals */}
         <Card>
           <CardContent className="p-6">
@@ -539,6 +593,9 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Alerts KPI */}
+        <AlertKpiCard />
       </div>
 
       {/* Row 2: Actions Center + GMQ Trends Chart */}
@@ -613,7 +670,9 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg">{t('trends.title')}</CardTitle>
-                <CardDescription>{t('trends.subtitle')}</CardDescription>
+                <CardDescription>
+                  {t('trends.subtitlePrefix')} {t(`period.${selectedPeriod}`)}
+                </CardDescription>
               </div>
               {trends.summary && (
                 <Badge variant={
@@ -726,8 +785,6 @@ export default function DashboardPage() {
                   return (
                     <TableRow
                       key={lot.lotId}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => router.push(`/lots/${lot.lotId}`)}
                     >
                       <TableCell>
                         <div>
@@ -785,15 +842,14 @@ export default function DashboardPage() {
                 {(rankings?.top || []).map((animal, index) => (
                   <div
                     key={animal.animalId}
-                    className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
-                    onClick={() => router.push(`/animals/${animal.animalId}`)}
+                    className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-sm font-medium">{animal.officialNumber || animal.visualId}</p>
                         <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
                       </div>
                     </div>
@@ -823,15 +879,14 @@ export default function DashboardPage() {
                 {(rankings?.bottom || []).map((animal, index) => (
                   <div
                     key={animal.animalId}
-                    className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors"
-                    onClick={() => router.push(`/animals/${animal.animalId}`)}
+                    className="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-950"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white font-bold text-sm">
                         {(rankings?.bottom?.length || 0) - index}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{animal.visualId || animal.officialNumber}</p>
+                        <p className="text-sm font-medium">{animal.officialNumber || animal.visualId}</p>
                         <p className="text-xs text-muted-foreground">{animal.lotName || '-'}</p>
                       </div>
                     </div>
@@ -863,7 +918,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950">
                 <p className="text-2xl font-bold text-green-600">{stats.health.vaccinationsUpToDatePercentage.toFixed(0)}%</p>
                 <p className="text-sm text-muted-foreground">{t('health.vaccinationsUpToDate')}</p>
@@ -875,10 +930,6 @@ export default function DashboardPage() {
               <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950">
                 <p className="text-2xl font-bold text-blue-600">{stats.health.treatmentsThisMonth}</p>
                 <p className="text-sm text-muted-foreground">{t('health.treatmentsThisMonth')}</p>
-              </div>
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold">{stats.health.treatmentsCost.toLocaleString('fr-FR')} DA</p>
-                <p className="text-sm text-muted-foreground">{t('health.treatmentsCost')}</p>
               </div>
             </div>
           </CardContent>

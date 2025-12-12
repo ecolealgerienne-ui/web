@@ -37,7 +37,7 @@ interface LotDialogProps {
 }
 
 const LOT_TYPES: LotType[] = [
-  'treatment', 'vaccination', 'fattening', 'quarantine', 'weaning', 'gestation', 'lactation', 'birth', 'production', 'sale', 'slaughter', 'purchase', 'breeding', 'reproduction', 'other'
+  'reproduction', 'fattening', 'weaning', 'quarantine', 'sale', 'other'
 ];
 
 const LOT_STATUSES: LotStatus[] = ['open', 'closed', 'archived', 'completed'];
@@ -75,7 +75,7 @@ export function LotDialog({
   // Form data
   const [formData, setFormData] = useState<CreateLotDto>({
     name: '',
-    type: 'treatment',
+    type: 'fattening',
     status: 'open',
     description: '',
     notes: '',
@@ -106,7 +106,7 @@ export function LotDialog({
     } else {
       setFormData({
         name: '',
-        type: 'treatment',
+        type: 'fattening',
         status: 'open',
         description: '',
         notes: '',
@@ -156,9 +156,9 @@ export function LotDialog({
     setSearchResult(null);
 
     try {
-      const response = await animalsService.getAll({ search: officialId, limit: 10 });
+      const animals = await animalsService.getAll({ search: officialId, limit: 10 });
 
-      const exactMatch = response.data.find(a =>
+      const exactMatch = animals.find(a =>
         a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
         a.visualId?.toLowerCase() === officialId.toLowerCase() ||
         a.currentEid?.toLowerCase() === officialId.toLowerCase()
@@ -171,8 +171,8 @@ export function LotDialog({
         } else {
           setSearchResult(exactMatch);
         }
-      } else if (response.data.length > 0) {
-        const firstResult = response.data[0];
+      } else if (animals.length > 0) {
+        const firstResult = animals[0];
         const alreadyInList = lotAnimals.some(la => la.id === firstResult.id);
         if (alreadyInList) {
           setSearchError(t('messages.animalAlreadyInList'));
@@ -292,9 +292,8 @@ export function LotDialog({
     });
   };
 
-  const showTreatmentFields = formData.type === 'treatment' || formData.type === 'vaccination';
-  const showSaleFields = formData.type === 'sale' || formData.type === 'slaughter';
-  const showPurchaseFields = formData.type === 'purchase';
+  // Show sale-related fields only for 'sale' type
+  const showSaleFields = formData.type === 'sale';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -402,49 +401,6 @@ export function LotDialog({
                 </div>
               </div>
 
-              {/* Section: Treatment/Vaccination Fields */}
-              {showTreatmentFields && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium border-b pb-2">{t('sections.treatment')}</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>{t('fields.productName')}</Label>
-                      <Input
-                        value={formData.productName || ''}
-                        onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-                        placeholder={t('placeholders.productName')}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>{t('fields.veterinarianName')}</Label>
-                      <Input
-                        value={formData.veterinarianName || ''}
-                        onChange={(e) => setFormData({ ...formData, veterinarianName: e.target.value })}
-                        placeholder={t('placeholders.veterinarianName')}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>{t('fields.treatmentDate')}</Label>
-                      <Input
-                        type="date"
-                        value={formData.treatmentDate || ''}
-                        onChange={(e) => setFormData({ ...formData, treatmentDate: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>{t('fields.withdrawalEndDate')}</Label>
-                      <Input
-                        type="date"
-                        value={formData.withdrawalEndDate || ''}
-                        onChange={(e) => setFormData({ ...formData, withdrawalEndDate: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Section: Sale Fields */}
               {showSaleFields && (
                 <div className="space-y-4">
@@ -456,36 +412,6 @@ export function LotDialog({
                         value={formData.buyerName || ''}
                         onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })}
                         placeholder={t('placeholders.buyerName')}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>{t('fields.priceTotal')}</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="number"
-                          value={formData.priceTotal?.toString() || ''}
-                          onChange={(e) => setFormData({ ...formData, priceTotal: e.target.value ? parseFloat(e.target.value) : undefined })}
-                          step="0.01"
-                          className="flex-1"
-                        />
-                        <span className="text-sm font-medium text-muted-foreground">DA</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Section: Purchase Fields */}
-              {showPurchaseFields && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium border-b pb-2">{t('sections.purchase')}</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>{t('fields.sellerName')}</Label>
-                      <Input
-                        value={formData.sellerName || ''}
-                        onChange={(e) => setFormData({ ...formData, sellerName: e.target.value })}
-                        placeholder={t('placeholders.sellerName')}
                       />
                     </div>
                     <div className="space-y-2">
@@ -530,8 +456,8 @@ export function LotDialog({
                             {la.visualId && (
                               <span className="text-muted-foreground ml-2">({la.visualId})</span>
                             )}
-                            {la.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {la.species.name}</span>
+                            {la.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {la.species.nameFr}</span>
                             )}
                           </div>
                           <Badge variant="secondary" className="flex-shrink-0">
@@ -586,8 +512,8 @@ export function LotDialog({
                             <span className="font-medium">
                               {searchResult.officialNumber || searchResult.visualId || searchResult.currentEid}
                             </span>
-                            {searchResult.species?.name && (
-                              <span className="text-muted-foreground ml-2">• {searchResult.species.name}</span>
+                            {searchResult.species?.nameFr && (
+                              <span className="text-muted-foreground ml-2">• {searchResult.species.nameFr}</span>
                             )}
                           </div>
                           <Button type="button" size="sm" onClick={handleAddAnimal}>
@@ -681,58 +607,14 @@ export function LotDialog({
               </div>
             </div>
 
-            {/* Treatment/Vaccination view */}
-            {(lot?.type === 'treatment' || lot?.type === 'vaccination') && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium border-b pb-2">{t('sections.treatment')}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('fields.productName')}</p>
-                    <p className="text-sm">{lot?.productName || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('fields.veterinarianName')}</p>
-                    <p className="text-sm">{lot?.veterinarianName || '-'}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('fields.treatmentDate')}</p>
-                    <p className="text-sm">{lot?.treatmentDate ? formatDate(lot.treatmentDate) : '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('fields.withdrawalEndDate')}</p>
-                    <p className="text-sm">{lot?.withdrawalEndDate ? formatDate(lot.withdrawalEndDate) : '-'}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Sale view */}
-            {(lot?.type === 'sale' || lot?.type === 'slaughter') && (
+            {lot?.type === 'sale' && (
               <div className="space-y-4">
                 <h3 className="text-sm font-medium border-b pb-2">{t('sections.sale')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-muted-foreground">{t('fields.buyerName')}</p>
                     <p className="text-sm">{lot?.buyerName || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('fields.priceTotal')}</p>
-                    <p className="text-sm">{lot?.priceTotal ? `${lot.priceTotal} DA` : '-'}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Purchase view */}
-            {lot?.type === 'purchase' && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium border-b pb-2">{t('sections.purchase')}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('fields.sellerName')}</p>
-                    <p className="text-sm">{lot?.sellerName || '-'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">{t('fields.priceTotal')}</p>
@@ -767,8 +649,8 @@ export function LotDialog({
                           {la.visualId && (
                             <span className="text-muted-foreground ml-2">({la.visualId})</span>
                           )}
-                          {la.species?.name && (
-                            <span className="text-muted-foreground ml-2">• {la.species.name}</span>
+                          {la.species?.nameFr && (
+                            <span className="text-muted-foreground ml-2">• {la.species.nameFr}</span>
                           )}
                         </div>
                         <Badge variant="secondary" className="flex-shrink-0">

@@ -16,25 +16,59 @@ import {
 } from '@/lib/types/animal-event';
 import { Animal } from '@/lib/types/animal';
 import { logger } from '@/lib/utils/logger';
-import type { PaginatedResponse } from '@/lib/types/common/api';
 
 /**
- * Paramètres de filtre pour la liste des événements d'animaux
+ * Filter parameters for movements list
  */
-export interface AnimalEventFilterParams {
-  page?: number;
-  limit?: number;
-  animalId?: string;
-  eventType?: string;
-  fromDate?: string;
-  toDate?: string;
+export interface MovementsFilterParams {
+  animalId?: string
+  movementType?: string
+  fromDate?: string
+  toDate?: string
+  limit?: number
+  page?: number
+}
+
+/**
+ * Pagination metadata
+ */
+export interface PaginationMeta {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+/**
+ * Paginated response
+ */
+export interface PaginatedMovementsResponse {
+  events: AnimalEvent[]
+  meta: PaginationMeta
 }
 
 // Type pour la réponse du backend (movements)
+interface BackendMovementAnimal {
+  animal: {
+    id: string;
+    visualId?: string;
+    currentEid?: string;
+    officialNumber?: string;
+    sex?: string;
+  };
+}
+
 interface BackendMovement {
   id: string;
   farmId: string;
+  // Backend returns movementAnimals array and _count
+  movementAnimals?: BackendMovementAnimal[];
+  _count?: {
+    movementAnimals: number;
+  };
+  // Legacy fields (keep for compatibility)
   animalIds?: string[];
+  animalCount?: number;
   lotId?: string;
   movementType: string;
   movementDate: string;
@@ -77,37 +111,26 @@ interface BackendMovement {
   // Metadata
   createdAt?: string;
   updatedAt?: string;
-
-  // Relations from backend
-  movementAnimals?: Array<{
-    id: string;
-    movementId: string;
-    animalId: string;
-    animal?: {
-      id: string;
-      visualId?: string;
-      currentEid?: string;
-      officialNumber?: string;
-      sex?: string;
-    };
-  }>;
-  _count?: {
-    movementAnimals: number;
-  };
 }
 
 // Mapping backend movement -> frontend AnimalEvent
 function mapMovementToEvent(movement: BackendMovement): AnimalEvent {
-  // Extract animal IDs from movementAnimals relation or use animalIds if available
+  // Extract animal IDs from movementAnimals or use legacy animalIds
   const animalIds = movement.movementAnimals
-    ? movement.movementAnimals.map(ma => ma.animalId)
+    ? movement.movementAnimals.map(ma => ma.animal.id)
     : (movement.animalIds || []);
+
+  // Get count from _count or movementAnimals length or legacy animalCount
+  const animalCount = movement._count?.movementAnimals
+    ?? movement.movementAnimals?.length
+    ?? movement.animalCount
+    ?? animalIds.length;
 
   return {
     id: movement.id,
     farmId: movement.farmId,
     animalIds,
-    animalCount: movement._count?.movementAnimals ?? animalIds.length,
+    animalCount,
     movementType: movement.movementType as AnimalEventType,
     movementDate: movement.movementDate,
     lotId: movement.lotId,
@@ -205,84 +228,98 @@ class AnimalEventsService {
     return `/api/v1/farms/${TEMP_FARM_ID}/movements`;
   }
 
-  /**
-   * Récupère la liste paginée des événements d'animaux
-   */
-  async getAll(params: AnimalEventFilterParams = {}): Promise<PaginatedResponse<AnimalEvent>> {
+  async getAll(filters?: {
+    animalId?: string;
+    eventType?: string;
+    fromDate?: string;
+    toDate?: string;
+  }): Promise<AnimalEvent[]> {
     try {
-      const queryParams = new URLSearchParams();
-
-      // Pagination
-      const page = params.page || 1;
-      const limit = Math.min(params.limit || 25, 100); // Max 100
-      queryParams.append('page', String(page));
-      queryParams.append('limit', String(limit));
-
-      // Filtres
-      if (params.animalId) queryParams.append('animalId', params.animalId);
+      const params = new URLSearchParams();
+      if (filters?.animalId) params.append('animalId', filters.animalId);
       // Map eventType to movementType for API compatibility
-      if (params.eventType && params.eventType !== 'all')
-        queryParams.append('movementType', params.eventType);
-      if (params.fromDate) queryParams.append('fromDate', params.fromDate);
-      if (params.toDate) queryParams.append('toDate', params.toDate);
+      if (filters?.eventType && filters.eventType !== 'all')
+        params.append('movementType', filters.eventType);
+      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters?.toDate) params.append('toDate', filters.toDate);
 
-      const url = `${this.getBasePath()}?${queryParams.toString()}`;
-      const response = await apiClient.get<PaginatedResponse<BackendMovement> | BackendMovement[]>(url);
+      const url = params.toString()
+        ? `${this.getBasePath()}?${params}`
+        : this.getBasePath();
+      // API returns paginated response: { data: [...], meta: {...} }
+      // apiClient unwraps { success, data } -> { data: [...], meta }
+      const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(url);
 
-      // Handle both paginated and non-paginated responses from backend
-      let movements: BackendMovement[];
-      let meta: { total: number; page: number; limit: number; totalPages: number };
-
-      if (Array.isArray(response)) {
-        // Backend returns array (non-paginated fallback)
-        movements = response;
-        meta = {
-          total: movements.length,
-          page,
-          limit,
-          totalPages: Math.ceil(movements.length / limit)
-        };
-      } else if (response && 'data' in response && Array.isArray(response.data)) {
-        // Backend returns paginated response
-        movements = response.data;
-        meta = response.meta || {
-          total: movements.length,
-          page,
-          limit,
-          totalPages: Math.ceil(movements.length / limit)
-        };
-      } else {
-        // Fallback for unexpected format
-        movements = [];
-        meta = { total: 0, page, limit, totalPages: 0 };
-      }
+      // Extract movements array from paginated response
+      const movements = response?.data || [];
 
       // Map backend movements to frontend AnimalEvent format
       const events = movements.map(mapMovementToEvent);
 
       logger.info('Animal events (movements) fetched', {
-        total: meta.total,
-        page: meta.page,
-        limit: meta.limit
+        count: events.length,
       });
-
-      return { data: events, meta };
+      return events;
     } catch (error: unknown) {
       const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No movements found (404)');
-        return {
-          data: [],
-          meta: {
-            total: 0,
-            page: params.page || 1,
-            limit: params.limit || 25,
-            totalPages: 0
-          }
-        };
+      if (err.status === 404 || err.status === 500) {
+        logger.info('No movements found or endpoint unavailable', { status: err.status });
+        return [];
       }
-      logger.error('Failed to fetch movements', { error });
-      throw error;
+      // Return empty array instead of throwing to avoid breaking UI
+      logger.warn('Failed to fetch movements, returning empty array', { error });
+      return [];
+    }
+  }
+
+  /**
+   * Get all movements with pagination metadata
+   */
+  async getAllPaginated(filters?: MovementsFilterParams): Promise<PaginatedMovementsResponse> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.animalId) params.append('animalId', filters.animalId);
+      // Map eventType to movementType for API compatibility
+      if (filters?.movementType && filters.movementType !== 'all')
+        params.append('movementType', filters.movementType);
+      if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters?.toDate) params.append('toDate', filters.toDate);
+
+      // Pagination
+      const limit = filters?.limit || 10;
+      const page = filters?.page || 1;
+      params.append('limit', String(limit));
+      params.append('page', String(page));
+
+      const url = params.toString() ? `${this.getBasePath()}?${params}` : this.getBasePath();
+      console.log('[animal-events] Fetching movements:', url);
+      const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(url);
+      console.log('[animal-events] Backend response:', JSON.stringify(response, null, 2));
+
+      const movements = response?.data || [];
+      const meta = response?.meta || {};
+
+      const events = movements.map(mapMovementToEvent);
+
+      logger.info('Movements fetched (paginated)', { count: events.length, page, total: meta.total });
+
+      return {
+        events,
+        meta: {
+          total: meta.total || events.length,
+          page: meta.page || page,
+          limit: meta.limit || limit,
+          totalPages: meta.totalPages || Math.ceil((meta.total || events.length) / limit),
+        },
+      };
+    } catch (error: unknown) {
+      const err = error as { status?: number };
+      if (err.status === 404 || err.status === 500) {
+        logger.info('No movements found (paginated)', { status: err.status });
+        return { events: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+      }
+      logger.warn('Failed to fetch movements (paginated)', { error });
+      return { events: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
     }
   }
 
@@ -306,10 +343,11 @@ class AnimalEventsService {
 
   async getByAnimalId(animalId: string): Promise<AnimalEvent[]> {
     try {
-      const movements = await apiClient.get<BackendMovement[]>(
+      const response = await apiClient.get<{ data: BackendMovement[]; meta?: any }>(
         `${this.getBasePath()}?animalId=${animalId}`
       );
-      const events = (movements || []).map(mapMovementToEvent);
+      const movements = response?.data || [];
+      const events = movements.map(mapMovementToEvent);
       logger.info('Movements fetched for animal', {
         animalId,
         count: events.length,
@@ -317,12 +355,9 @@ class AnimalEventsService {
       return events;
     } catch (error: unknown) {
       const err = error as { status?: number };
-      if (err.status === 404) {
-        logger.info('No movements found for animal (404)', { animalId });
-        return [];
-      }
-      logger.error('Failed to fetch movements for animal', { error, animalId });
-      throw error;
+      // Return empty array for any error to avoid breaking UI
+      logger.warn('Failed to fetch movements for animal, returning empty', { animalId, status: err.status });
+      return [];
     }
   }
 

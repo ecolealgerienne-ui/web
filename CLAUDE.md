@@ -2,6 +2,35 @@
 
 Ce fichier est lu automatiquement au début de chaque session.
 
+## Contexte Marché
+
+**Marché cible prioritaire : France 🇫🇷**
+- Réglementation : normes françaises et européennes (identification bovine, traçabilité)
+- Langue principale : Français
+- Unités : système métrique (kg, hectares)
+
+**Marché secondaire : Europe 🇪🇺**
+- Conformité aux réglementations européennes
+- Standards d'élevage UE
+
+> ⚠️ **Note importante** : Ce produit n'est PAS destiné au marché algérien. Toutes les décisions de conception, UX et fonctionnalités doivent être orientées vers les besoins des éleveurs français et européens.
+
+## Stratégie Produit
+
+**Cible : 80% des éleveurs** avec un outil simple et efficace.
+
+**Fonctionnalités "Nice to have" (NON prioritaires) :**
+- ❌ Gestion des pâturages / cartographie
+- ❌ Rotation des parcelles
+- ❌ Traçabilité réglementaire avancée (IPG, EDE)
+- ❌ Coût de production détaillé
+
+**Focus : fonctionnalités essentielles bien faites**
+- ✅ Gestion du troupeau (animaux, lots)
+- ✅ Suivi des poids et croissance (GMQ)
+- ✅ Traitements et vaccinations
+- ✅ KPIs simples et actionnables
+
 ## Règles Critiques
 
 ### 1. Création de branche - TOUJOURS depuis main distant

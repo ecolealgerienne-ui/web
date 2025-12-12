@@ -18,15 +18,111 @@ import {
 } from '@/components/ui/dialog';
 import { Animal, CreateAnimalDto, UpdateAnimalDto } from '@/lib/types/animal';
 import { Treatment } from '@/lib/types/treatment';
-import { WeightHistory } from '@/lib/types/weighing';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { useBreeds } from '@/lib/hooks/useBreeds';
 import { useSpecies } from '@/lib/hooks/useSpecies';
 import { treatmentsService } from '@/lib/services/treatments.service';
-import { weighingsService } from '@/lib/services/weighings.service';
-import { Pill, Syringe, Scale, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { AnimalSearchDialog } from './animal-search-dialog';
+import { Pill, Syringe, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 type DialogMode = 'view' | 'edit' | 'create';
+
+// Field component defined outside to prevent re-creation on every render
+interface FieldProps {
+  label: string;
+  value: string;
+  type?: 'text' | 'date' | 'select' | 'textarea';
+  placeholder?: string;
+  onChange?: (value: string) => void;
+  required?: boolean;
+  maxLength?: number;
+  options?: { value: string; label: string }[];
+  disabled?: boolean;
+  isEditable: boolean;
+}
+
+const Field = React.memo(function Field({
+  label,
+  value,
+  type = 'text',
+  placeholder,
+  onChange,
+  required,
+  maxLength,
+  options,
+  disabled,
+  isEditable,
+}: FieldProps) {
+  if (!isEditable) {
+    // Mode lecture
+    if (type === 'select' && options) {
+      const selectedOption = options.find(o => o.value === value);
+      return (
+        <div className="space-y-1">
+          <span className="text-sm text-muted-foreground">{label}</span>
+          <p className="font-medium">{selectedOption?.label || value || '-'}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-1">
+        <span className="text-sm text-muted-foreground">{label}</span>
+        <p className="font-medium">{value || '-'}</p>
+      </div>
+    );
+  }
+
+  // Mode édition
+  if (type === 'select' && options) {
+    return (
+      <div className="space-y-2">
+        <Label>{label}{required && ' *'}</Label>
+        <Select value={value} onValueChange={onChange || (() => {})} disabled={disabled}>
+          <SelectTrigger>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  if (type === 'textarea') {
+    return (
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <Textarea
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder={placeholder}
+          rows={3}
+          maxLength={maxLength}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}{required && ' *'}</Label>
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        placeholder={placeholder}
+        required={required}
+        maxLength={maxLength}
+      />
+    </div>
+  );
+});
 
 interface AnimalDialogProps {
   open: boolean;
@@ -63,6 +159,8 @@ export function AnimalDialog({
     visualId: '',
     speciesId: '',
     breedId: '',
+    motherId: '',
+    fatherId: '',
     status: 'alive',
     notes: '',
   });
@@ -75,9 +173,9 @@ export function AnimalDialog({
   const [allTreatments, setAllTreatments] = useState<Treatment[]>([]);
   const [loadingCare, setLoadingCare] = useState(false);
 
-  // Weight history data
-  const [weightHistory, setWeightHistory] = useState<WeightHistory[]>([]);
-  const [loadingWeights, setLoadingWeights] = useState(false);
+  // Parent search dialogs
+  const [motherSearchOpen, setMotherSearchOpen] = useState(false);
+  const [fatherSearchOpen, setFatherSearchOpen] = useState(false);
 
   const treatments = allTreatments.filter(t => t.type !== 'vaccination');
   const vaccinations = allTreatments.filter(t => t.type === 'vaccination');
@@ -101,6 +199,8 @@ export function AnimalDialog({
         visualId: animal.visualId || '',
         speciesId: animal.speciesId || '',
         breedId: animal.breedId || '',
+        motherId: animal.motherId || '',
+        fatherId: animal.fatherId || '',
         status: animal.status,
         notes: animal.notes || '',
       });
@@ -114,6 +214,8 @@ export function AnimalDialog({
         visualId: '',
         speciesId: '',
         breedId: '',
+        motherId: '',
+        fatherId: '',
         status: 'alive',
         notes: '',
       });
@@ -135,33 +237,43 @@ export function AnimalDialog({
     }
   }, [animal]);
 
-  const loadWeightHistory = React.useCallback(async () => {
-    if (!animal) return;
-    setLoadingWeights(true);
-    try {
-      const history = await weighingsService.getAnimalHistory(animal.id);
-      setWeightHistory(history);
-    } catch (error) {
-      console.error('Failed to load weight history:', error);
-    } finally {
-      setLoadingWeights(false);
-    }
-  }, [animal]);
-
+  // Load care data when animal changes (not when tab changes)
   useEffect(() => {
-    if (animal && activeTab === 'care') {
+    if (animal) {
       loadCareData();
+    } else {
+      setAllTreatments([]);
     }
-    if (animal && activeTab === 'weights') {
-      loadWeightHistory();
-    }
-  }, [animal, activeTab, loadCareData, loadWeightHistory]);
+  }, [animal, loadCareData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!onSubmit) return;
     try {
-      await onSubmit(formData);
+      // Clean up form data - remove empty optional fields to avoid validation errors
+      const cleanedData: Record<string, any> = {
+        birthDate: formData.birthDate,
+        sex: formData.sex,
+        speciesId: formData.speciesId,
+        status: formData.status,
+      };
+
+      // Generate UUID for new animals (create mode)
+      if (mode === 'create') {
+        cleanedData.id = uuidv4();
+      }
+
+      // Only include optional fields if they have values
+      if (formData.currentEid) cleanedData.currentEid = formData.currentEid;
+      if (formData.officialNumber) cleanedData.officialNumber = formData.officialNumber;
+      if (formData.visualId) cleanedData.visualId = formData.visualId;
+      if (formData.breedId) cleanedData.breedId = formData.breedId;
+      if (formData.motherId) cleanedData.motherId = formData.motherId;
+      if (formData.fatherId) cleanedData.fatherId = formData.fatherId;
+      if (formData.notes) cleanedData.notes = formData.notes;
+
+      console.log('Submitting animal data:', JSON.stringify(cleanedData, null, 2));
+      await onSubmit(cleanedData as CreateAnimalDto);
       onOpenChange(false);
     } catch (error) {
       console.error('Form submission error:', error);
@@ -197,99 +309,7 @@ export function AnimalDialog({
   const getDialogDescription = () => {
     if (mode === 'create') return t('messages.addDescription');
     if (mode === 'edit') return t('messages.editDescription');
-    return animal?.breed?.name || '';
-  };
-
-  // Composant pour afficher un champ (lecture ou édition)
-  const Field = ({
-    label,
-    value,
-    type = 'text',
-    placeholder,
-    onChange,
-    required,
-    maxLength,
-    options,
-    disabled,
-  }: {
-    label: string;
-    value: string;
-    type?: 'text' | 'date' | 'select' | 'textarea';
-    placeholder?: string;
-    onChange?: (value: string) => void;
-    required?: boolean;
-    maxLength?: number;
-    options?: { value: string; label: string }[];
-    disabled?: boolean;
-  }) => {
-    if (!isEditable) {
-      // Mode lecture
-      if (type === 'select' && options) {
-        const selectedOption = options.find(o => o.value === value);
-        return (
-          <div className="space-y-1">
-            <span className="text-sm text-muted-foreground">{label}</span>
-            <p className="font-medium">{selectedOption?.label || value || '-'}</p>
-          </div>
-        );
-      }
-      return (
-        <div className="space-y-1">
-          <span className="text-sm text-muted-foreground">{label}</span>
-          <p className="font-medium">{value || '-'}</p>
-        </div>
-      );
-    }
-
-    // Mode édition
-    if (type === 'select' && options) {
-      return (
-        <div className="space-y-2">
-          <Label>{label}{required && ' *'}</Label>
-          <Select value={value} onValueChange={onChange || (() => {})} disabled={disabled}>
-            <SelectTrigger>
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      );
-    }
-
-    if (type === 'textarea') {
-      return (
-        <div className="space-y-2">
-          <Label>{label}</Label>
-          <Textarea
-            value={value}
-            onChange={(e) => onChange?.(e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-            maxLength={maxLength}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        <Label>{label}{required && ' *'}</Label>
-        <Input
-          type={type}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-          placeholder={placeholder}
-          required={required}
-          maxLength={maxLength}
-        />
-      </div>
-    );
+    return animal?.breed?.nameFr || '';
   };
 
   // Composant pour afficher le statut
@@ -328,7 +348,8 @@ export function AnimalDialog({
     );
   };
 
-  const FormContent = () => (
+  // Use JSX variable instead of component function to prevent focus loss on re-render
+  const formContent = (
     <div className="space-y-6 py-4">
       {/* Section: Identification */}
       <div className="space-y-4">
@@ -340,18 +361,21 @@ export function AnimalDialog({
             placeholder="Ex: 250268001234567"
             maxLength={15}
             onChange={(v) => setFormData({ ...formData, currentEid: v })}
+            isEditable={isEditable}
           />
           <Field
             label={t('fields.officialNumber')}
             value={isEditable ? (formData.officialNumber || '') : (animal?.officialNumber || '')}
             placeholder="Ex: DZ-2024-001"
             onChange={(v) => setFormData({ ...formData, officialNumber: v })}
+            isEditable={isEditable}
           />
           <Field
             label={t('fields.visualId')}
             value={isEditable ? (formData.visualId || '') : (animal?.visualId || '')}
             placeholder="Ex: A-001"
             onChange={(v) => setFormData({ ...formData, visualId: v })}
+            isEditable={isEditable}
           />
         </div>
       </div>
@@ -370,6 +394,7 @@ export function AnimalDialog({
               { value: 'male', label: t('sex.male') },
             ]}
             onChange={(v) => setFormData({ ...formData, sex: v as 'male' | 'female' })}
+            isEditable={isEditable}
           />
           {isEditable ? (
             <Field
@@ -378,6 +403,7 @@ export function AnimalDialog({
               type="date"
               required
               onChange={(v) => setFormData({ ...formData, birthDate: v })}
+              isEditable={isEditable}
             />
           ) : (
             <div className="space-y-1">
@@ -413,7 +439,7 @@ export function AnimalDialog({
                   <SelectContent>
                     {species.map((sp) => (
                       <SelectItem key={sp.id} value={sp.id}>
-                        {sp.name}
+                        {sp.nameFr || sp.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -440,7 +466,7 @@ export function AnimalDialog({
                   <SelectContent>
                     {breeds.map((breed) => (
                       <SelectItem key={breed.id} value={breed.id}>
-                        {breed.name}
+                        {breed.nameFr || breed.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -452,13 +478,118 @@ export function AnimalDialog({
               <div className="space-y-1">
                 <span className="text-sm text-muted-foreground">{t('fields.speciesId')}</span>
                 <p className="font-medium">
-                  {animal?.species?.name || species.find(s => s.id === animal?.speciesId)?.name || '-'}
+                  {animal?.species?.nameFr || '-'}
                 </p>
               </div>
               <div className="space-y-1">
                 <span className="text-sm text-muted-foreground">{t('fields.breedId')}</span>
                 <p className="font-medium">
-                  {animal?.breed?.name || breeds.find(b => b.id === animal?.breedId)?.name || '-'}
+                  {animal?.breed?.nameFr || '-'}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Section: Parents */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium border-b pb-2">Parents</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {isEditable ? (
+            <>
+              {/* Mother selection */}
+              <div className="space-y-2">
+                <Label>{t('fields.motherId')}</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 justify-start font-normal"
+                    onClick={() => setMotherSearchOpen(true)}
+                  >
+                    <Search className="h-4 w-4 mr-2 text-muted-foreground" />
+                    {formData.motherId ? (
+                      (() => {
+                        const mother = animals.find(a => a.id === formData.motherId);
+                        return mother?.officialNumber || mother?.visualId || mother?.currentEid || formData.motherId.substring(0, 8);
+                      })()
+                    ) : (
+                      <span className="text-muted-foreground">Rechercher la mère...</span>
+                    )}
+                  </Button>
+                  {formData.motherId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, motherId: '' })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Father selection */}
+              <div className="space-y-2">
+                <Label>{t('fields.fatherId')}</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 justify-start font-normal"
+                    onClick={() => setFatherSearchOpen(true)}
+                  >
+                    <Search className="h-4 w-4 mr-2 text-muted-foreground" />
+                    {formData.fatherId ? (
+                      (() => {
+                        const father = animals.find(a => a.id === formData.fatherId);
+                        return father?.officialNumber || father?.visualId || father?.currentEid || formData.fatherId.substring(0, 8);
+                      })()
+                    ) : (
+                      <span className="text-muted-foreground">Rechercher le père...</span>
+                    )}
+                  </Button>
+                  {formData.fatherId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setFormData({ ...formData, fatherId: '' })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1">
+                <span className="text-sm text-muted-foreground">{t('fields.motherId')}</span>
+                <p className="font-medium">
+                  {animal?.mother
+                    ? (animal.mother.officialNumber || animal.mother.visualId || animal.mother.currentEid || '-')
+                    : animal?.motherId
+                      ? animals.find(a => a.id === animal.motherId)?.officialNumber ||
+                        animals.find(a => a.id === animal.motherId)?.visualId ||
+                        animal.motherId.substring(0, 8)
+                      : '-'
+                  }
+                </p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-sm text-muted-foreground">{t('fields.fatherId')}</span>
+                <p className="font-medium">
+                  {animal?.father
+                    ? (animal.father.officialNumber || animal.father.visualId || animal.father.currentEid || '-')
+                    : animal?.fatherId
+                      ? animals.find(a => a.id === animal.fatherId)?.officialNumber ||
+                        animals.find(a => a.id === animal.fatherId)?.visualId ||
+                        animal.fatherId.substring(0, 8)
+                      : '-'
+                  }
                 </p>
               </div>
             </>
@@ -505,7 +636,8 @@ export function AnimalDialog({
     </div>
   );
 
-  const CareContent = () => (
+  // Use JSX variable instead of component function to prevent focus loss on re-render
+  const careContent = (
     <div className="space-y-6 py-4">
       {loadingCare ? (
         <div className="text-center py-8 text-muted-foreground">Chargement...</div>
@@ -613,77 +745,8 @@ export function AnimalDialog({
     </div>
   );
 
-  // Fonction pour afficher l'indicateur de gain
-  const getGainIndicator = (dailyGain: number | undefined) => {
-    if (dailyGain === undefined || dailyGain === null) return null;
-    if (dailyGain > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (dailyGain < 0) return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <Minus className="h-4 w-4 text-gray-400" />;
-  };
-
-  const WeightsContent = () => (
-    <div className="space-y-6 py-4">
-      {loadingWeights ? (
-        <div className="text-center py-8 text-muted-foreground">Chargement...</div>
-      ) : (
-        <>
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Scale className="h-5 w-5" />
-              <h3 className="text-sm font-semibold">Historique des pesées</h3>
-              <Badge variant="default" className="ml-auto">
-                {weightHistory.length}
-              </Badge>
-            </div>
-            {weightHistory.length === 0 ? (
-              <div className="text-sm text-muted-foreground border rounded-lg p-4 text-center">
-                Aucune pesée enregistrée
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {[...weightHistory]
-                  .sort((a, b) => new Date(b.weightDate).getTime() - new Date(a.weightDate).getTime())
-                  .map((weight) => (
-                  <div key={weight.id} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="text-2xl font-bold">{weight.weight} kg</div>
-                        {weight.dailyGain !== undefined && weight.dailyGain !== null && (
-                          <div className="flex items-center gap-1 text-sm">
-                            {getGainIndicator(weight.dailyGain)}
-                            <span className={weight.dailyGain > 0 ? 'text-green-600' : weight.dailyGain < 0 ? 'text-red-600' : 'text-gray-500'}>
-                              {weight.dailyGain > 0 ? '+' : ''}{(weight.dailyGain * 1000).toFixed(0)} g/j
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">{new Date(weight.weightDate).toLocaleDateString()}</p>
-                        {weight.source && (
-                          <p className="text-xs text-muted-foreground capitalize">{weight.source}</p>
-                        )}
-                      </div>
-                    </div>
-                    {weight.notes && (
-                      <p className="text-sm text-muted-foreground mt-2 italic">{weight.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {isEditable && (
-            <div className="text-sm text-muted-foreground text-center pt-4 border-t">
-              Pour ajouter des pesées, utilisez l&apos;écran dédié.
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -718,16 +781,8 @@ export function AnimalDialog({
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="info">Informations</TabsTrigger>
-            <TabsTrigger value="weights" disabled={mode === 'create'}>
-              Pesées
-              {weightHistory.length > 0 && (
-                <span className="ml-2 bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
-                  {weightHistory.length}
-                </span>
-              )}
-            </TabsTrigger>
             <TabsTrigger value="care" disabled={mode === 'create'}>
               Soins
               {(treatments.length > 0 || vaccinations.length > 0) && (
@@ -741,7 +796,7 @@ export function AnimalDialog({
           <TabsContent value="info">
             {isEditable ? (
               <form onSubmit={handleSubmit}>
-                <FormContent />
+                {formContent}
                 <DialogFooter className="mt-6">
                   <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
                     {tc('actions.cancel')}
@@ -752,19 +807,44 @@ export function AnimalDialog({
                 </DialogFooter>
               </form>
             ) : (
-              <FormContent />
+              formContent
             )}
           </TabsContent>
 
-          <TabsContent value="weights">
-            <WeightsContent />
-          </TabsContent>
-
           <TabsContent value="care">
-            <CareContent />
+            {careContent}
           </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>
+
+    {/* Mother search dialog */}
+    <AnimalSearchDialog
+      open={motherSearchOpen}
+      onOpenChange={setMotherSearchOpen}
+      onSelect={(selectedAnimal) => {
+        setFormData({ ...formData, motherId: selectedAnimal?.id || '' });
+      }}
+      title="Sélectionner la mère"
+      filterSex="female"
+      filterSpeciesId={formData.speciesId || animal?.speciesId || undefined}
+      excludeId={animal?.id}
+      selectedId={formData.motherId || null}
+    />
+
+    {/* Father search dialog */}
+    <AnimalSearchDialog
+      open={fatherSearchOpen}
+      onOpenChange={setFatherSearchOpen}
+      onSelect={(selectedAnimal) => {
+        setFormData({ ...formData, fatherId: selectedAnimal?.id || '' });
+      }}
+      title="Sélectionner le père"
+      filterSex="male"
+      filterSpeciesId={formData.speciesId || animal?.speciesId || undefined}
+      excludeId={animal?.id}
+      selectedId={formData.fatherId || null}
+    />
+    </>
   );
 }

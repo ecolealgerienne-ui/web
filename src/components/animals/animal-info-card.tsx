@@ -44,13 +44,13 @@ export function AnimalInfoCard({ animal }: AnimalInfoCardProps) {
           {animal.speciesId && (
             <div>
               <p className="text-sm text-muted-foreground">Espèce</p>
-              <p className="font-medium">{animal.species?.name || speciesLabels[animal.speciesId] || animal.speciesId}</p>
+              <p className="font-medium">{animal.species?.nameFr || speciesLabels[animal.speciesId] || animal.speciesId}</p>
             </div>
           )}
           {animal.breedId && (
             <div>
               <p className="text-sm text-muted-foreground">Race</p>
-              <p className="font-medium">{animal.breed?.name || animal.breedId}</p>
+              <p className="font-medium">{animal.breed?.nameFr || animal.breedId}</p>
             </div>
           )}
           <div>

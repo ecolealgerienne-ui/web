@@ -47,7 +47,7 @@ interface WeightDialogProps {
   onNavigate?: (direction: 'prev' | 'next') => void;
 }
 
-const SOURCES: WeightSource[] = ['manual', 'scale', 'estimated'];
+const SOURCES: WeightSource[] = ['manual', 'scale', 'estimated', 'automatic', 'weighbridge'];
 
 export function WeightDialog({
   open,
@@ -184,8 +184,8 @@ export function WeightDialog({
 
     setIsSearching(true);
     try {
-      const response = await animalsService.getAll({ search: query, limit: 5 });
-      setAnimalSearchResults(response.data.map((a) => ({
+      const results = await animalsService.getAll({ search: query, limit: 5 });
+      setAnimalSearchResults(results.map((a) => ({
         id: a.id,
         officialNumber: a.officialNumber || undefined,
         visualId: a.visualId || undefined,

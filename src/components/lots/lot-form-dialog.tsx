@@ -27,7 +27,7 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
   const [formData, setFormData] = useState<Partial<Lot>>(
     lot || {
       name: '',
-      type: 'treatment',
+      type: 'fattening',
       status: 'open',
       description: '',
       productName: '',
@@ -81,12 +81,12 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="treatment">Traitement</SelectItem>
-                  <SelectItem value="vaccination">Vaccination</SelectItem>
+                  <SelectItem value="reproduction">Reproduction</SelectItem>
+                  <SelectItem value="fattening">Engraissement</SelectItem>
+                  <SelectItem value="weaning">Sevrage</SelectItem>
+                  <SelectItem value="quarantine">Quarantaine</SelectItem>
                   <SelectItem value="sale">Vente</SelectItem>
-                  <SelectItem value="slaughter">Abattage</SelectItem>
-                  <SelectItem value="purchase">Achat</SelectItem>
-                  <SelectItem value="breeding">Reproduction</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -122,51 +122,8 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
             />
           </div>
 
-          {/* Produit (si traitement/vaccination) */}
-          {(formData.type === 'treatment' || formData.type === 'vaccination') && (
-            <div>
-              <Label htmlFor="productName">Produit utilisé</Label>
-              <Input
-                id="productName"
-                placeholder="Nom du produit..."
-                value={formData.productName || ''}
-                onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-              />
-            </div>
-          )}
-
-          {/* Vétérinaire */}
-          {(formData.type === 'treatment' || formData.type === 'vaccination') && (
-            <div>
-              <Label htmlFor="veterinarianName">Vétérinaire</Label>
-              <Input
-                id="veterinarianName"
-                placeholder="Dr. Karim Benali"
-                value={formData.veterinarianName || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, veterinarianName: e.target.value })
-                }
-              />
-            </div>
-          )}
-
-          {/* Date de traitement */}
-          {(formData.type === 'treatment' || formData.type === 'vaccination') && (
-            <div>
-              <Label htmlFor="treatmentDate">Date d&apos;intervention</Label>
-              <Input
-                id="treatmentDate"
-                type="date"
-                value={formData.treatmentDate?.split('T')[0] || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, treatmentDate: e.target.value + 'T00:00:00Z' })
-                }
-              />
-            </div>
-          )}
-
-          {/* Prix (si vente/achat) */}
-          {(formData.type === 'sale' || formData.type === 'purchase') && (
+          {/* Prix et acheteur (si vente) */}
+          {formData.type === 'sale' && (
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="priceTotal">Montant total (DA)</Label>
@@ -181,20 +138,13 @@ export function LotFormDialog({ open, onOpenChange, lot, onSave }: LotFormDialog
                 />
               </div>
               <div>
-                <Label htmlFor="buyer">
-                  {formData.type === 'sale' ? 'Acheteur' : 'Vendeur'}
-                </Label>
+                <Label htmlFor="buyer">Acheteur</Label>
                 <Input
                   id="buyer"
                   placeholder="Nom..."
-                  value={(formData.type === 'sale' ? formData.buyerName : formData.sellerName) || ''}
+                  value={formData.buyerName || ''}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      ...(formData.type === 'sale'
-                        ? { buyerName: e.target.value }
-                        : { sellerName: e.target.value }),
-                    })
+                    setFormData({ ...formData, buyerName: e.target.value })
                   }
                 />
               </div>

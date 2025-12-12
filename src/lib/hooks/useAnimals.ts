@@ -1,69 +1,74 @@
 /**
  * Hook React pour la gestion des animaux
- *
- * Conforme aux normes DEVELOPMENT_STANDARDS.md (règle 7.7)
- * - Utilise params/setParams pour la gestion d'état
- * - Retourne total pour la pagination
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Animal } from '@/lib/types/animal'
-import { animalsService, AnimalFilterParams } from '@/lib/services/animals.service'
+import { animalsService, AnimalsFilterParams, PaginationMeta } from '@/lib/services/animals.service'
 import { logger } from '@/lib/utils/logger'
 
 interface UseAnimalsResult {
-  /** Liste des animaux */
   animals: Animal[]
-  /** Nombre total d'animaux (pour pagination) */
-  total: number
-  /** État de chargement */
+  meta: PaginationMeta
   loading: boolean
-  /** Erreur éventuelle */
   error: Error | null
-  /** Paramètres de filtre actuels */
-  params: AnimalFilterParams
-  /** Mettre à jour les paramètres de filtre */
-  setParams: React.Dispatch<React.SetStateAction<AnimalFilterParams>>
-  /** Recharger les données */
   refetch: () => Promise<void>
 }
 
-const DEFAULT_PARAMS: AnimalFilterParams = {
+const defaultMeta: PaginationMeta = {
+  total: 0,
   page: 1,
-  limit: 25,
-  status: 'all',
-  search: '',
-  // Note: Le tri n'est pas encore supporté par le backend
-  // sortBy: 'createdAt',
-  // sortOrder: 'desc',
+  limit: 10,
+  totalPages: 0,
 }
 
-export function useAnimals(initialParams?: Partial<AnimalFilterParams>): UseAnimalsResult {
+export function useAnimals(filters?: AnimalsFilterParams): UseAnimalsResult {
   const [animals, setAnimals] = useState<Animal[]>([])
-  const [total, setTotal] = useState(0)
+  const [meta, setMeta] = useState<PaginationMeta>(defaultMeta)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-  const [params, setParams] = useState<AnimalFilterParams>({
-    ...DEFAULT_PARAMS,
-    ...initialParams,
-  })
+
+  // Extraire les valeurs des filtres pour éviter les re-renders inutiles
+  const filterStatus = filters?.status
+  const filterSpeciesId = filters?.speciesId
+  const filterBreedId = filters?.breedId
+  const filterSex = filters?.sex
+  const filterSearch = filters?.search
+  const filterLimit = filters?.limit
+  const filterPage = filters?.page
+  const filterNotWeighedDays = filters?.notWeighedDays
+  const filterMinWeight = filters?.minWeight
+  const filterMaxWeight = filters?.maxWeight
+
+  const memoizedFilters = useMemo(() => ({
+    status: filterStatus,
+    speciesId: filterSpeciesId,
+    breedId: filterBreedId,
+    sex: filterSex,
+    search: filterSearch,
+    limit: filterLimit,
+    page: filterPage,
+    notWeighedDays: filterNotWeighedDays,
+    minWeight: filterMinWeight,
+    maxWeight: filterMaxWeight,
+  }), [filterStatus, filterSpeciesId, filterBreedId, filterSex, filterSearch, filterLimit, filterPage, filterNotWeighedDays, filterMinWeight, filterMaxWeight])
 
   const fetchAnimals = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const response = await animalsService.getAll(params)
-      setAnimals(response.data)
-      setTotal(response.meta.total)
+      const result = await animalsService.getAllPaginated(memoizedFilters)
+      setAnimals(result.animals)
+      setMeta(result.meta)
     } catch (err) {
       const error = err as Error
       setError(error)
-      logger.error('Failed to fetch animals in hook', { error, params })
+      logger.error('Failed to fetch animals in hook', { error })
     } finally {
       setLoading(false)
     }
-  }, [params])
+  }, [memoizedFilters])
 
   useEffect(() => {
     fetchAnimals()
@@ -71,11 +76,9 @@ export function useAnimals(initialParams?: Partial<AnimalFilterParams>): UseAnim
 
   return {
     animals,
-    total,
+    meta,
     loading,
     error,
-    params,
-    setParams,
     refetch: fetchAnimals,
   }
 }
