@@ -111,13 +111,13 @@ export default function WeighingsPage() {
     limit,
   });
 
-  // Fetch stats based on period
-  const fetchStats = useCallback(async () => {
+  // Fetch stats based on date range
+  const fetchStats = useCallback(async (fromDate?: string, toDate?: string) => {
     setStatsLoading(true);
     try {
       const data = await weighingsService.getStats({
-        fromDate: dateRange.fromDate,
-        toDate: dateRange.toDate,
+        fromDate,
+        toDate,
       });
       setStats(data);
     } catch (error) {
@@ -125,15 +125,16 @@ export default function WeighingsPage() {
     } finally {
       setStatsLoading(false);
     }
-  }, [dateRange.fromDate, dateRange.toDate]);
+  }, []);
 
+  // Re-fetch stats when date range changes
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    fetchStats(dateRange.fromDate, dateRange.toDate);
+  }, [dateRange.fromDate, dateRange.toDate, fetchStats]);
 
   // Refresh stats after CRUD operations
   const refreshAll = async () => {
-    await Promise.all([refresh(), fetchStats()]);
+    await Promise.all([refresh(), fetchStats(dateRange.fromDate, dateRange.toDate)]);
   };
 
   // Client-side search filtering (filters current page only)
