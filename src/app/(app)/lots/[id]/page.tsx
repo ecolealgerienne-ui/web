@@ -313,7 +313,7 @@ export default function LotDetailPage() {
             <CardTitle className="text-lg">
               {t('detail.animalsInLot')} ({animals.length})
             </CardTitle>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => router.push(`/lots?edit=${lot.id}`)}>
               {t('detail.addAnimal')}
             </Button>
           </div>
