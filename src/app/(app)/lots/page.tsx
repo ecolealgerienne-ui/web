@@ -243,6 +243,7 @@ export default function LotsPage() {
         isLoading={isSubmitting}
         lots={lots}
         onNavigate={handleNavigate}
+        onRefresh={refresh}
       />
 
       {/* Delete confirmation dialog */}
