@@ -40,24 +40,36 @@ git checkout -b feature/ma-feature origin/main
 ```
 ❌ Ne jamais créer une branche depuis le main local (risque de code obsolète)
 
-### 2. Build obligatoire avant commit
+### 2. Récupération des modifications des sessions précédentes
+À chaque nouvelle session, **avant de commencer le travail** :
+1. Lister toutes les branches `claude/*` distantes
+2. Identifier les branches avec des commits non mergés dans main
+3. Merger ces branches dans la nouvelle branche de travail
+```bash
+git fetch --all
+git branch -a | grep "remotes/origin/claude/"
+git merge origin/claude/<branch-precedente> --no-edit
+```
+⚠️ Résoudre les conflits si nécessaire et valider le JSON/TypeScript après merge
+
+### 3. Build obligatoire avant commit
 ```bash
 npm run build  # ou npx tsc --noEmit
 ```
 ❌ Ne jamais commiter si le build échoue
 
-### 3. Lire DEVELOPMENT_STANDARDS.md
+### 4. Lire DEVELOPMENT_STANDARDS.md
 Avant de développer une nouvelle fonctionnalité, consulter `/DEVELOPMENT_STANDARDS.md` pour :
 - Architecture et organisation des fichiers
 - Composants génériques (admin vs transactionnel)
 - Patterns de services API
 - Conventions de nommage
 
-### 4. Traductions
+### 5. Traductions
 - Créer uniquement les fichiers `_fr.json` (pas en, ar)
 - Utiliser `@/lib/i18n` pour les pages transactionnelles
 - Utiliser `next-intl` pour les pages admin
 
-### 5. Endpoints API
+### 6. Endpoints API
 - Tous les endpoints farm-scoped utilisent le préfixe `/api/v1/`
 - Pattern : `/api/v1/farms/{farmId}/<resource>`
