@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   ArrowLeft,
   Package,
@@ -14,11 +14,16 @@ import {
   Calendar,
   Loader2,
   AlertTriangle,
+  Plus,
+  Search,
+  X,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -38,10 +43,13 @@ import {
 } from 'recharts';
 import { useLot } from '@/lib/hooks/useLots';
 import { dashboardService, WeightTrendsResponse } from '@/lib/services/dashboard.service';
+import { animalsService } from '@/lib/services/animals.service';
+import { lotsService } from '@/lib/services/lots.service';
 import { LotTimeline } from '@/components/lots/LotTimeline';
 import { useTranslations, useCommonTranslations } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
+import { Animal } from '@/lib/types/animal';
 
 // GMQ status colors
 const gmqStatusColors: Record<string, { bg: string; text: string; badge: string }> = {
@@ -59,8 +67,108 @@ export default function LotDetailPage() {
   const tc = useCommonTranslations();
 
   // Hook now includes stats and events
-  const { lot, animals, stats, events, loading, error } = useLot(lotId);
+  const { lot, animals, stats, events, loading, error, refresh } = useLot(lotId);
   const [weightTrends, setWeightTrends] = useState<WeightTrendsResponse | null>(null);
+
+  // Animal search state
+  const [showAddAnimal, setShowAddAnimal] = useState(false);
+  const [searchOfficialId, setSearchOfficialId] = useState('');
+  const [searchResult, setSearchResult] = useState<Animal | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchingAnimal, setSearchingAnimal] = useState(false);
+  const [addingAnimal, setAddingAnimal] = useState(false);
+  const [removingAnimalId, setRemovingAnimalId] = useState<string | null>(null);
+
+  // Search animal by official ID
+  const searchAnimalByOfficialId = useCallback(async (officialId: string) => {
+    if (!officialId.trim()) {
+      setSearchResult(null);
+      setSearchError(null);
+      return;
+    }
+
+    setSearchingAnimal(true);
+    setSearchError(null);
+    setSearchResult(null);
+
+    try {
+      const foundAnimals = await animalsService.getAll({ search: officialId, limit: 10 });
+
+      const exactMatch = foundAnimals.find(a =>
+        a.officialNumber?.toLowerCase() === officialId.toLowerCase() ||
+        a.visualId?.toLowerCase() === officialId.toLowerCase() ||
+        a.currentEid?.toLowerCase() === officialId.toLowerCase()
+      );
+
+      if (exactMatch) {
+        const alreadyInList = animals.some(la => la.id === exactMatch.id);
+        if (alreadyInList) {
+          setSearchError(t('messages.animalAlreadyInList'));
+        } else {
+          setSearchResult(exactMatch);
+        }
+      } else if (foundAnimals.length > 0) {
+        const firstResult = foundAnimals[0];
+        const alreadyInList = animals.some(la => la.id === firstResult.id);
+        if (alreadyInList) {
+          setSearchError(t('messages.animalAlreadyInList'));
+        } else {
+          setSearchResult(firstResult);
+        }
+      } else {
+        setSearchError(t('messages.animalNotFound'));
+      }
+    } catch (err) {
+      logger.error('Failed to search animal:', { error: err });
+      setSearchError(t('messages.searchError'));
+    } finally {
+      setSearchingAnimal(false);
+    }
+  }, [animals, t]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchOfficialId) {
+        searchAnimalByOfficialId(searchOfficialId);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchOfficialId, searchAnimalByOfficialId]);
+
+  // Add animal to lot via API
+  const handleAddAnimalToLot = async () => {
+    if (!searchResult || !lotId) return;
+
+    setAddingAnimal(true);
+    try {
+      await lotsService.addAnimal(lotId, searchResult.id);
+      setSearchOfficialId('');
+      setSearchResult(null);
+      setShowAddAnimal(false);
+      refresh();
+    } catch (err) {
+      logger.error('Failed to add animal to lot:', { error: err });
+      setSearchError(t('messages.addAnimalError'));
+    } finally {
+      setAddingAnimal(false);
+    }
+  };
+
+  // Remove animal from lot via API
+  const handleRemoveAnimalFromLot = async (animalId: string) => {
+    if (!lotId) return;
+
+    setRemovingAnimalId(animalId);
+    try {
+      await lotsService.removeAnimal(lotId, animalId);
+      refresh();
+    } catch (err) {
+      logger.error('Failed to remove animal from lot:', { error: err });
+    } finally {
+      setRemovingAnimalId(null);
+    }
+  };
 
   // Fetch weight trends for chart
   useEffect(() => {
@@ -313,12 +421,87 @@ export default function LotDetailPage() {
             <CardTitle className="text-lg">
               {t('detail.animalsInLot')} ({animals.length})
             </CardTitle>
-            <Button variant="outline" size="sm" onClick={() => router.push(`/lots?edit=${lot.id}`)}>
-              {t('detail.addAnimal')}
+            <Button
+              variant={showAddAnimal ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setShowAddAnimal(!showAddAnimal);
+                if (showAddAnimal) {
+                  setSearchOfficialId('');
+                  setSearchResult(null);
+                  setSearchError(null);
+                }
+              }}
+            >
+              {showAddAnimal ? (
+                <>
+                  <X className="h-4 w-4 mr-2" />
+                  {tc('actions.cancel')}
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('detail.addAnimal')}
+                </>
+              )}
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Animal Search Form */}
+          {showAddAnimal && (
+            <div className="p-4 border rounded-lg bg-muted/50 space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={t('placeholders.officialId')}
+                    value={searchOfficialId}
+                    onChange={(e) => setSearchOfficialId(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                {searchingAnimal && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
+
+              {/* Search Result */}
+              {searchResult && (
+                <div className="flex items-center justify-between p-3 border rounded-lg bg-background">
+                  <div>
+                    <p className="font-medium font-mono">
+                      {searchResult.officialNumber || searchResult.visualId}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {searchResult.species?.nameFr} · {searchResult.sex === 'male' ? 'M' : searchResult.sex === 'female' ? 'F' : '-'}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleAddAnimalToLot}
+                    disabled={addingAnimal}
+                  >
+                    {addingAnimal ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 mr-1" />
+                        {tc('actions.add')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {/* Search Error */}
+              {searchError && (
+                <p className="text-sm text-destructive">{searchError}</p>
+              )}
+            </div>
+          )}
+
+          {/* Animals Table */}
           {animals.length > 0 ? (
             <Table>
               <TableHeader>
@@ -353,13 +536,28 @@ export default function LotDetailPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push(`/animals?search=${animal.officialNumber || animal.id}`)}
-                      >
-                        {tc('actions.view')}
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => router.push(`/animals?search=${animal.officialNumber || animal.id}`)}
+                        >
+                          {tc('actions.view')}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() => handleRemoveAnimalFromLot(animal.id)}
+                          disabled={removingAnimalId === animal.id}
+                        >
+                          {removingAnimalId === animal.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
