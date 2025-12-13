@@ -314,14 +314,14 @@ export default function ProductsPage() {
             ) : '-'
           },
           {
-            key: 'withdrawalPeriodMeat',
-            label: t('fields.withdrawalPeriodMeat'),
+            key: 'withdrawalMeatDays',
+            label: t('fields.withdrawalMeatDays'),
             render: (value) => value ? `${value} ${t('fields.days')}` : '-'
           },
           {
-            key: 'withdrawalPeriodMilk',
-            label: t('fields.withdrawalPeriodMilk'),
-            render: (value) => value ? `${value} ${t('fields.days')}` : '-'
+            key: 'withdrawalMilkHours',
+            label: t('fields.withdrawalMilkHours'),
+            render: (value) => value ? `${value}h` : '-'
           },
           {
             key: 'isVeterinaryPrescriptionRequired',

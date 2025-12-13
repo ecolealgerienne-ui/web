@@ -424,6 +424,8 @@
       "storageConditions": "Storage Conditions",
       "withdrawalPeriodMeat": "Withdrawal Period Meat",
       "withdrawalPeriodMilk": "Withdrawal Period Milk",
+      "withdrawalMeatDays": "Meat Withdrawal Period",
+      "withdrawalMilkHours": "Milk Withdrawal Period",
       "days": "days",
       "isVeterinaryPrescriptionRequired": "Veterinary Prescription Required",
       "isActive": "Active"

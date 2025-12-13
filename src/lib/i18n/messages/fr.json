@@ -436,6 +436,8 @@
       "storageConditions": "Conditions de Stockage",
       "withdrawalPeriodMeat": "Délai d'attente Viande",
       "withdrawalPeriodMilk": "Délai d'attente Lait",
+      "withdrawalMeatDays": "Délai d'attente Viande",
+      "withdrawalMilkHours": "Délai d'attente Lait",
       "days": "jours",
       "isVeterinaryPrescriptionRequired": "Prescription Vétérinaire Obligatoire",
       "isActive": "Actif"
