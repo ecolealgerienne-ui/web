@@ -1,6 +1,6 @@
 # Spécification IHM - Module Pharmacie Simplifié
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2025-12-13
 **Statut:** Draft
 
@@ -9,19 +9,24 @@
 ## 1. Contexte et Objectifs
 
 ### 1.1 Problématique actuelle
-Le système actuel de gestion des médicaments est trop complexe avec 8+ tables de référentiels :
+Le système actuel de gestion des médicaments est trop complexe avec 8+ tables de référentiels admin :
 - Substances actives
 - Voies d'administration
 - Catégories de produits
 - Conditionnements
 - Indications thérapeutiques
 - Unités
-- Produits
 
 Cette complexité rend la maintenance difficile et n'apporte pas de valeur ajoutée pour les petites/moyennes fermes (<200 têtes).
 
-### 1.2 Objectif
-Simplifier radicalement le module pharmacie en s'inspirant des concurrents (Herdwatch, Troup'O) qui utilisent une approche "un achat = une entrée".
+### 1.2 Structures existantes à conserver
+
+| Table/Entité | Rôle | Statut |
+|--------------|------|--------|
+| `Product` | Référentiel produits (global) | ✅ GARDER - simplifier |
+| `FarmProductPreference` | Produits sélectionnés par ferme + config custom | ✅ GARDER - adapter |
+| `FarmerProductLot` | Lots/Batches (stock réel) | ✅ GARDER |
+| `Treatment` | Traitements administrés | ✅ GARDER (déjà complet) |
 
 ### 1.3 Benchmark concurrence
 | Application | Approche |
@@ -32,18 +37,19 @@ Simplifier radicalement le module pharmacie en s'inspirant des concurrents (Herd
 
 ---
 
-## 2. Pages à Supprimer
+## 2. Pages à Supprimer (Admin)
 
 ### 2.1 Liste des pages admin à supprimer
+
+Ces pages gèrent des référentiels trop granulaires qui ne sont pas utilisés directement par les fermiers.
 
 | Page | Chemin | Raison |
 |------|--------|--------|
 | Substances actives | `/admin/active-substances` | Référentiel inutile - info dans ANMV |
 | Voies d'administration | `/admin/administration-routes` | Trop granulaire - champ texte suffit |
-| Catégories produits | `/admin/product-categories` | Non utilisé par fermiers |
-| Conditionnements | `/admin/product-packagings` | Intégré dans table Product |
+| Catégories produits | `/admin/product-categories` | Simplifier en enum |
+| Conditionnements | `/admin/product-packagings` | Intégrer dans table Product |
 | Indications thérapeutiques | `/admin/therapeutic-indications` | Non utilisé par fermiers |
-| Produits (ancien) | `/admin/products` | Remplacé par nouveau système |
 
 ### 2.2 Fichiers à supprimer
 
@@ -57,123 +63,104 @@ src/app/(app)/admin/
 │   └── page.tsx                    ❌ SUPPRIMER
 ├── product-packagings/
 │   └── page.tsx                    ❌ SUPPRIMER
-├── therapeutic-indications/
-│   └── page.tsx                    ❌ SUPPRIMER
-└── products/
-    └── page.tsx                    ❌ SUPPRIMER (remplacer)
+└── therapeutic-indications/
+    └── page.tsx                    ❌ SUPPRIMER
 
 src/components/admin/
 ├── active-substances/              ❌ SUPPRIMER dossier
 ├── administration-routes/          ❌ SUPPRIMER dossier
 ├── product-categories/             ❌ SUPPRIMER dossier
 ├── product-packagings/             ❌ SUPPRIMER dossier
-├── therapeutic-indications/        ❌ SUPPRIMER dossier
-└── products/                       ❌ SUPPRIMER dossier (remplacer)
+└── therapeutic-indications/        ❌ SUPPRIMER dossier
 
 src/lib/types/admin/
 ├── active-substance.ts             ❌ SUPPRIMER
 ├── administration-route.ts         ❌ SUPPRIMER
 ├── product-category.ts             ❌ SUPPRIMER
 ├── product-packaging.ts            ❌ SUPPRIMER
-├── therapeutic-indication.ts       ❌ SUPPRIMER
-└── product.ts                      ❌ SUPPRIMER (remplacer)
+└── therapeutic-indication.ts       ❌ SUPPRIMER
 
 src/lib/services/admin/
 ├── active-substances.ts            ❌ SUPPRIMER
 ├── administration-routes.ts        ❌ SUPPRIMER
 ├── product-categories.ts           ❌ SUPPRIMER
 ├── product-packagings.ts           ❌ SUPPRIMER
-├── therapeutic-indications.ts      ❌ SUPPRIMER
-└── products.ts                     ❌ SUPPRIMER (remplacer)
+└── therapeutic-indications.ts      ❌ SUPPRIMER
 ```
 
-### 2.3 Hooks à supprimer
+### 2.3 Page Products (Admin) - À ADAPTER
 
-```
-src/lib/hooks/admin/
-├── useActiveSubstances.ts          ❌ SUPPRIMER
-├── useAdministrationRoutes.ts      ❌ SUPPRIMER
-├── useProductCategories.ts         ❌ SUPPRIMER
-├── useProductPackagings.ts         ❌ SUPPRIMER
-├── useTherapeuticIndications.ts    ❌ SUPPRIMER
-└── useProducts.ts                  ❌ SUPPRIMER (remplacer)
+La page `/admin/products` doit être **simplifiée** (pas supprimée) pour :
+- Permettre l'import ANMV
+- Afficher les produits globaux
+- Simplifier le formulaire (moins de champs)
+
+---
+
+## 3. Pages Existantes à Conserver
+
+### 3.1 Page Traitements (`/treatments`)
+
+✅ **GARDER TELLE QUELLE** - Déjà fonctionnelle avec :
+- Liste des traitements avec filtres
+- CRUD complet
+- Lien avec animaux et lots
+- Délais d'attente calculés
+- Support vaccination
+
+### 3.2 Types existants (treatment.ts)
+
+La structure `Treatment` existante supporte déjà :
+```typescript
+interface Treatment {
+  // Animal ou Lot
+  animalId: string;
+  lotId?: string;
+  farmerLotId?: string;  // Lien vers FarmerProductLot (stock)
+
+  // Produit
+  productId?: string;
+  packagingId?: string;
+  productName?: string;
+
+  // Dosage
+  quantityAdministered?: number;
+  dose?: number;
+  dosageUnit?: string;
+
+  // Délais calculés
+  computedWithdrawalMeatDate?: string;
+  computedWithdrawalMilkDate?: string;
+
+  // Vétérinaire
+  veterinarianId?: string;
+  veterinarianName?: string;
+  // ...
+}
 ```
 
 ---
 
-## 3. Nouvelles Interfaces
+## 4. Nouvelles Interfaces
 
-### 3.1 Architecture des pages
+### 4.1 Architecture des pages
 
 ```
 src/app/(app)/
-├── data/
-│   └── medications/
-│       └── page.tsx                ✅ GARDER (adapter)
-└── pharmacy/                       ✅ NOUVEAU
-    ├── page.tsx                    # Stock de la ferme
-    ├── [stockId]/
-    │   └── page.tsx                # Détail d'un stock
-    └── treatments/
-        └── page.tsx                # Historique traitements
+├── treatments/
+│   └── page.tsx                    ✅ EXISTANT (garder)
+├── pharmacy/                       ✅ NOUVEAU (ou adapter existant)
+│   ├── page.tsx                    # Vue stock de la ferme
+│   └── products/
+│       └── page.tsx                # Sélection produits (catalogue)
+└── admin/
+    └── products/
+        └── page.tsx                ✅ ADAPTER (simplifier)
 ```
 
-### 3.2 Page: Catalogue Produits (`/data/medications`)
+### 4.2 Page: Stock Pharmacie (`/pharmacy`)
 
-**But:** Permettre au fermier de rechercher et ajouter des produits à ses favoris.
-
-#### Maquette
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ Catalogue Produits                              [+ Créer local] │
-├─────────────────────────────────────────────────────────────────┤
-│ 🔍 [Rechercher un produit...                    ] [Scope ▼]     │
-│                                                                 │
-│ Filtres: [Catégorie ▼] [Espèce cible ▼] [Voie admin ▼]         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ AMOXIVAL 500mg Injectable                        ⭐ Global  │ │
-│ │ Virbac • Antibiotique • Bovins, Ovins                       │ │
-│ │ Délai viande: 28j | Délai lait: 4j                          │ │
-│ │                                        [Ajouter au stock →] │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ Mon produit custom                               🏠 Local   │ │
-│ │ - • Antiparasitaire • Bovins                                │ │
-│ │ Délai viande: 14j | Délai lait: 2j                          │ │
-│ │                            [✏️ Modifier] [Ajouter au stock →]│ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│ Affichage 1-10 sur 156                    [< 1 2 3 4 5 ... >]  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-#### Composants
-
-| Composant | Description |
-|-----------|-------------|
-| `ProductSearchBar` | Recherche full-text + filtres |
-| `ProductCard` | Carte produit avec infos essentielles |
-| `ProductScopeBadge` | Badge Global/Local |
-| `AddToStockButton` | Ouvre dialog d'ajout au stock |
-| `CreateLocalProductDialog` | Formulaire création produit local |
-
-#### Actions utilisateur
-
-1. **Rechercher** : Full-text sur nom, laboratoire, composition
-2. **Filtrer** : Par scope, catégorie, espèce cible
-3. **Créer local** : Ajouter un produit personnalisé (scope=local)
-4. **Modifier local** : Éditer ses propres produits uniquement
-5. **Ajouter au stock** : Créer une entrée de stock
-
----
-
-### 3.3 Page: Stock Pharmacie (`/pharmacy`)
-
-**But:** Gérer le stock réel de médicaments de la ferme.
+**But:** Afficher le stock réel de la ferme basé sur `FarmerProductLot`.
 
 #### Maquette
 
@@ -189,199 +176,167 @@ src/app/(app)/
 │ 🔍 [Rechercher...          ] [Statut ▼] [Catégorie ▼]          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
+│ AMOXIVAL 500mg - Virbac                              [Config ⚙️]│
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 🟢 AMOXIVAL 500mg               Lot: ABC123   Exp: 15/06/26 │ │
-│ │    Stock: 450ml / 500ml                                     │ │
-│ │    ████████████████░░░░ 90%                                 │ │
-│ │                           [Utiliser] [Ajuster] [Historique] │ │
+│ │ 🟢 Lot ABC123                          Exp: 15/06/26        │ │
+│ │    Acheté: 01/12/2024                                       │ │
+│ │                                   [Traiter] [Voir détails]  │ │
 │ └─────────────────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ 🟡 Lot DEF456                          Exp: 01/03/25        │ │
+│ │    Acheté: 15/09/2024                  ⚠️ Expire bientôt    │ │
+│ │                                   [Traiter] [Voir détails]  │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│ [+ Ajouter un lot]                                              │
 │                                                                 │
+│ IVOMEC Injectable - Merial                           [Config ⚙️]│
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 🟡 IVOMEC Injectable            Lot: XYZ789   Exp: 01/03/25 │ │
-│ │    Stock: 20ml / 250ml          ⚠️ Stock bas                │ │
-│ │    ██░░░░░░░░░░░░░░░░░░ 8%                                  │ │
-│ │                           [Utiliser] [Ajuster] [Historique] │ │
+│ │ 🟢 Lot XYZ789                          Exp: 01/12/25        │ │
+│ │    Acheté: 10/11/2024                                       │ │
+│ │                                   [Traiter] [Voir détails]  │ │
 │ └─────────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 🔴 VETRIMOXIN LA               Lot: DEF456   Exp: 15/01/25  │ │
-│ │    Stock: 100ml / 100ml         ❌ Périmé                   │ │
-│ │    ████████████████████ 100%                                │ │
-│ │                           [Éliminer] [Historique]           │ │
-│ └─────────────────────────────────────────────────────────────┘ │
+│ [+ Ajouter un lot]                                              │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+#### Structure des données
+
+Utilise les entités existantes :
+- `FarmProductPreference` → Produit sélectionné par la ferme
+- `FarmerProductLot` → Lots en stock
 
 #### Composants
 
 | Composant | Description |
 |-----------|-------------|
-| `PharmacyKPICards` | KPIs: nb produits, stock bas, périmés, valeur |
-| `StockCard` | Carte avec barre progression + statut |
-| `StockStatusIndicator` | Indicateur couleur (vert/jaune/rouge) |
-| `AddPurchaseDialog` | Formulaire nouvel achat |
-| `UseStockDialog` | Utilisation rapide (sans traitement) |
-| `AdjustStockDialog` | Ajustement manuel (perte, casse) |
+| `PharmacyKPICards` | KPIs: nb produits, lots expirant, valeur |
+| `ProductPreferenceCard` | Groupe les lots par produit |
+| `FarmerLotCard` | Carte d'un lot avec statut |
+| `LotStatusIndicator` | Indicateur expiration (vert/jaune/rouge) |
+| `AddLotDialog` | Formulaire ajout lot (utilise API existante) |
+| `ProductConfigDialog` | Config custom (dose, délais) |
 
 #### Actions utilisateur
 
-1. **Nouvel achat** : Ajouter un lot acheté
-2. **Utiliser** : Décrémenter stock rapidement
-3. **Ajuster** : Correction manuelle du stock
-4. **Éliminer** : Marquer un lot périmé comme éliminé
-5. **Historique** : Voir les utilisations d'un lot
+1. **Ajouter produit** : Sélectionner depuis catalogue → crée `FarmProductPreference`
+2. **Ajouter lot** : Saisir lot pour un produit → crée `FarmerProductLot`
+3. **Configurer** : Personnaliser dose/délais → update `FarmProductPreference`
+4. **Traiter** : Ouvre dialog traitement pré-rempli → crée `Treatment`
 
 ---
 
-### 3.4 Dialog: Nouvel Achat
+### 4.3 Page: Sélection Produits (`/pharmacy/products`)
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ Nouvel Achat                                              [X]  │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│ Produit *                                                       │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 🔍 Rechercher ou scanner...                                 │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│ ou [Créer un nouveau produit]                                   │
-│                                                                 │
-│ ─────────────────────────────────────────────────────────────── │
-│                                                                 │
-│ N° Lot *                          Date péremption *             │
-│ ┌───────────────────┐             ┌───────────────────┐         │
-│ │ ABC123            │             │ 📅 15/06/2026     │         │
-│ └───────────────────┘             └───────────────────┘         │
-│                                                                 │
-│ Quantité achetée *                Unité *                       │
-│ ┌───────────────────┐             ┌───────────────────┐         │
-│ │ 500               │             │ ml            ▼   │         │
-│ └───────────────────┘             └───────────────────┘         │
-│                                                                 │
-│ Date d'achat                      Prix (€)                      │
-│ ┌───────────────────┐             ┌───────────────────┐         │
-│ │ 📅 13/12/2024     │             │ 45.00             │         │
-│ └───────────────────┘             └───────────────────┘         │
-│                                                                 │
-│ Fournisseur                                                     │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ Coopérative agricole                                        │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│                                    [Annuler]  [✓ Enregistrer]  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-### 3.5 Page: Traitements (`/pharmacy/treatments`)
-
-**But:** Historique des traitements administrés avec calcul automatique des délais d'attente.
+**But:** Permettre au fermier de sélectionner les produits qu'il utilise.
 
 #### Maquette
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ 💉 Traitements                              [+ Nouveau traitement]│
+│ Catalogue Produits                                              │
 ├─────────────────────────────────────────────────────────────────┤
-│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐            │
-│ │    45    │ │    8     │ │    3     │ │    12    │            │
-│ │ Ce mois  │ │ En délai │ │ Urgent   │ │ Animaux  │            │
-│ │          │ │ viande   │ │ (<7j)    │ │ traités  │            │
-│ └──────────┘ └──────────┘ └──────────┘ └──────────┘            │
-├─────────────────────────────────────────────────────────────────┤
-│ 🔍 [Rechercher...] [Animal ▼] [Produit ▼] [Période ▼]          │
+│ 🔍 [Rechercher un produit...                    ] [Catégorie ▼] │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│ Aujourd'hui - 13 décembre 2024                                  │
+│ Mes produits sélectionnés (5)                                   │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 09:30  FR1234567890  •  AMOXIVAL 500mg  •  15ml             │ │
-│ │        Bovin #45 "Marguerite"                               │ │
-│ │        🥩 Délai viande: 10/01/2025 (28j)                    │ │
-│ │        🥛 Délai lait: 17/12/2024 (4j)                       │ │
-│ │        Motif: Mammite                                        │ │
+│ │ ☑️ AMOXIVAL 500mg Injectable                      [Retirer] │ │
+│ │    Virbac • Antibiotique                                    │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ ☑️ IVOMEC Injectable                              [Retirer] │ │
+│ │    Merial • Antiparasitaire                                 │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 │                                                                 │
+│ ─────────────────────────────────────────────────────────────── │
+│                                                                 │
+│ Catalogue complet                                               │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 08:15  Lot "Génisses 2024"  •  IVOMEC  •  Dose: 1ml/50kg   │ │
-│ │        12 animaux traités                                   │ │
-│ │        🥩 Délai viande: 27/12/2024 (14j)                    │ │
-│ │        Motif: Traitement préventif parasites                │ │
+│ │ ☐ BORGAL 24%                                     [Ajouter]  │ │
+│ │    Virbac • Antibiotique                                    │ │
+│ │    Délai viande: 10j | Délai lait: 48h                      │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ ☐ METACAM 20mg/ml                                [Ajouter]  │ │
+│ │    Boehringer • Anti-inflammatoire                          │ │
+│ │    Délai viande: 15j | Délai lait: 5j                       │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 │                                                                 │
-│ Hier - 12 décembre 2024                                         │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 14:00  FR9876543210  •  METACAM  •  20ml                    │ │
-│ │        Bovin #78 "Tornado"                                  │ │
-│ │        🥩 Délai viande: 26/12/2024 (14j)                    │ │
-│ │        Motif: Boiterie                                       │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│                                                                 │
+│ Affichage 1-10 sur 156                    [< 1 2 3 4 5 ... >]  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### Composants
+#### Flux
 
-| Composant | Description |
-|-----------|-------------|
-| `TreatmentKPICards` | KPIs traitements |
-| `TreatmentTimeline` | Liste chronologique |
-| `TreatmentCard` | Carte traitement avec délais |
-| `WithdrawalCountdown` | Compte à rebours délai attente |
-| `NewTreatmentDialog` | Formulaire nouveau traitement |
+1. Rechercher dans le catalogue global (`Product`)
+2. Ajouter à "mes produits" → crée `FarmProductPreference`
+3. Retirer → supprime `FarmProductPreference`
 
 ---
 
-### 3.6 Dialog: Nouveau Traitement
+### 4.4 Dialog: Nouveau Lot
+
+Utilise l'API existante : `POST /farms/:farmId/product-configs/:configId/lots`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ Nouveau Traitement                                        [X]  │
+│ Nouveau Lot - AMOXIVAL 500mg                              [X]  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│ Type de traitement                                              │
-│ ┌────────────────┐  ┌────────────────┐                         │
-│ │ ○ Animal seul  │  │ ● Lot entier   │                         │
-│ └────────────────┘  └────────────────┘                         │
-│                                                                 │
-│ Sélectionner le lot *                                           │
+│ Surnom du lot *                                                 │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ Génisses 2024 (12 animaux)                              ▼   │ │
+│ │ Lot Décembre 2024                                           │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 │                                                                 │
-│ Produit utilisé *                                               │
+│ N° de lot officiel *                                            │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ 🔍 IVOMEC Injectable - Lot XYZ789 (Stock: 230ml)        ▼   │ │
+│ │ ABC123-9A                                                   │ │
 │ └─────────────────────────────────────────────────────────────┘ │
-│ ℹ️ Dosage recommandé: 1ml / 50kg                                │
 │                                                                 │
-│ ─────────────────────────────────────────────────────────────── │
+│ Date de péremption *                                            │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ 📅 15/06/2026                                               │ │
+│ └─────────────────────────────────────────────────────────────┘ │
 │                                                                 │
-│ Dose administrée *                Unité                         │
+│                                    [Annuler]  [✓ Enregistrer]  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Note:** L'API existante `FarmerProductLot` ne gère pas la quantité/stock. Si nécessaire, ajouter ces champs.
+
+---
+
+### 4.5 Dialog: Configuration Produit
+
+Utilise l'API existante : `PUT /farms/:farmId/product-preferences/:id/config`
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Configuration - AMOXIVAL 500mg                            [X]  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ ℹ️ Ces valeurs remplacent les valeurs par défaut du produit    │
+│                                                                 │
+│ Dose personnalisée                                              │
 │ ┌───────────────────┐             ┌───────────────────┐         │
-│ │ 24                │             │ ml                │         │
+│ │ 1.5               │             │ ml/kg         ▼   │         │
 │ └───────────────────┘             └───────────────────┘         │
-│ ⚠️ Dose totale pour 12 animaux (2ml/animal)                     │
+│ (Défaut: 1 ml/10kg)                                             │
 │                                                                 │
-│ Date du traitement *              Heure                         │
-│ ┌───────────────────┐             ┌───────────────────┐         │
-│ │ 📅 13/12/2024     │             │ 09:30             │         │
-│ └───────────────────┘             └───────────────────┘         │
-│                                                                 │
-│ Motif du traitement                                             │
+│ Délai d'attente viande (jours)                                  │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ Traitement préventif parasites d'hiver                      │ │
+│ │ 28                                                          │ │
 │ └─────────────────────────────────────────────────────────────┘ │
+│ (Défaut: 28 jours)                                              │
 │                                                                 │
-│ ─────────────────────────────────────────────────────────────── │
-│ 📋 Délais d'attente calculés:                                   │
-│    🥩 Viande: jusqu'au 27/12/2024 (14 jours)                   │
-│    🥛 Lait: N/A                                                 │
+│ Délai d'attente lait (heures)                                   │
+│ ┌─────────────────────────────────────────────────────────────┐ │
+│ │ 96                                                          │ │
+│ └─────────────────────────────────────────────────────────────┘ │
+│ (Défaut: 96 heures)                                             │
 │                                                                 │
-│ □ Traitement sur ordonnance                                     │
-│   N° ordonnance: [________________]                             │
-│   Vétérinaire: [________________]                               │
+│ [Réinitialiser aux valeurs par défaut]                          │
 │                                                                 │
 │                                    [Annuler]  [✓ Enregistrer]  │
 └─────────────────────────────────────────────────────────────────┘
@@ -389,163 +344,178 @@ src/app/(app)/
 
 ---
 
-## 4. Navigation et Menu
+## 5. Navigation et Menu
 
-### 4.1 Mise à jour du menu latéral
+### 5.1 Mise à jour du menu latéral
 
 **Avant (menu admin complexe):**
 ```
 Données de référence
-├── Substances actives      ❌
-├── Voies d'administration  ❌
-├── Catégories produits     ❌
-├── Conditionnements        ❌
-├── Indications             ❌
-└── Produits                ❌
+├── Substances actives      ❌ SUPPRIMER
+├── Voies d'administration  ❌ SUPPRIMER
+├── Catégories produits     ❌ SUPPRIMER
+├── Conditionnements        ❌ SUPPRIMER
+├── Indications             ❌ SUPPRIMER
+└── Produits                ⚠️ SIMPLIFIER
 ```
 
 **Après (simplifié):**
 ```
-Données
-└── Catalogue produits      ✅ /data/medications
+Administration
+└── Produits                ✅ /admin/products (simplifié)
 
 Ferme
-├── ...
-└── Pharmacie               ✅ /pharmacy
-    ├── Stock               ✅ /pharmacy
-    └── Traitements         ✅ /pharmacy/treatments
+├── Traitements             ✅ /treatments (existant)
+└── Pharmacie               ✅ /pharmacy (nouveau)
+    └── Catalogue           ✅ /pharmacy/products
 ```
 
 ---
 
-## 5. Flux Utilisateur
+## 6. Flux Utilisateur
 
-### 5.1 Flux: Premier achat d'un médicament
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  Pharmacie  │ ──► │ + Nouvel    │ ──► │ Recherche   │
-│  (vide)     │     │   achat     │     │ produit     │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                               │
-                    ┌──────────────────────────┤
-                    ▼                          ▼
-            ┌─────────────┐            ┌─────────────┐
-            │ Produit     │            │ Créer       │
-            │ trouvé      │            │ local       │
-            └─────────────┘            └─────────────┘
-                    │                          │
-                    └──────────────────────────┘
-                                │
-                                ▼
-                    ┌─────────────────────┐
-                    │ Saisie infos lot:   │
-                    │ - N° lot            │
-                    │ - Date péremption   │
-                    │ - Quantité          │
-                    │ - Prix (optionnel)  │
-                    └─────────────────────┘
-                                │
-                                ▼
-                    ┌─────────────────────┐
-                    │ Stock créé ✓        │
-                    │ Retour pharmacie    │
-                    └─────────────────────┘
-```
-
-### 5.2 Flux: Traitement d'un lot
+### 6.1 Flux: Configuration initiale pharmacie
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│ Traitements │ ──► │ + Nouveau   │ ──► │ Type: Lot   │
-│             │     │ traitement  │     │             │
+│  Pharmacie  │ ──► │ Catalogue   │ ──► │ Recherche   │
+│  (vide)     │     │ produits    │     │ produit     │
 └─────────────┘     └─────────────┘     └─────────────┘
                                                │
                                                ▼
                                    ┌─────────────────────┐
-                                   │ Sélection lot       │
-                                   │ (ex: Génisses 2024) │
+                                   │ Ajouter à mes       │
+                                   │ produits            │
+                                   │ (FarmProductPref)   │
                                    └─────────────────────┘
                                                │
                                                ▼
                                    ┌─────────────────────┐
-                                   │ Sélection produit   │
-                                   │ depuis stock ferme  │
+                                   │ Retour pharmacie    │
+                                   │ Produit visible     │
+                                   └─────────────────────┘
+```
+
+### 6.2 Flux: Ajout d'un lot
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Pharmacie  │ ──► │ + Ajouter   │ ──► │ Formulaire  │
+│             │     │   lot       │     │ lot         │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                               │
+                                               ▼
+                                   ┌─────────────────────┐
+                                   │ Saisie:             │
+                                   │ - Surnom            │
+                                   │ - N° lot officiel   │
+                                   │ - Date péremption   │
                                    └─────────────────────┘
                                                │
                                                ▼
                                    ┌─────────────────────┐
-                                   │ Saisie dose MANUELLE│
-                                   │ (info dosage affichée)│
+                                   │ FarmerProductLot    │
+                                   │ créé ✓              │
+                                   └─────────────────────┘
+```
+
+### 6.3 Flux: Traitement depuis pharmacie
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Pharmacie  │ ──► │ [Traiter]   │ ──► │ Dialog      │
+│  Lot ABC123 │     │ sur un lot  │     │ Traitement  │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                               │
+                                               ▼
+                                   ┌─────────────────────┐
+                                   │ Pré-rempli:         │
+                                   │ - Produit           │
+                                   │ - Lot (farmerLotId) │
+                                   │ - Dose (si config)  │
                                    └─────────────────────┘
                                                │
                                                ▼
                                    ┌─────────────────────┐
-                                   │ Confirmation avec   │
-                                   │ délais calculés     │
+                                   │ Saisie:             │
+                                   │ - Animal(s)         │
+                                   │ - Quantité          │
+                                   │ - Date              │
                                    └─────────────────────┘
                                                │
                                                ▼
                                    ┌─────────────────────┐
-                                   │ ✓ Traitement créé   │
-                                   │ ✓ Stock décrémenté  │
-                                   │ ✓ Délais appliqués  │
+                                   │ Treatment créé ✓    │
+                                   │ (délais calculés)   │
                                    └─────────────────────┘
 ```
 
 ---
 
-## 6. Responsive Design
+## 7. Évolutions futures suggérées
 
-### 6.1 Mobile (< 640px)
+### 7.1 Ajouter gestion du stock quantitatif
+
+L'entité `FarmerProductLot` actuelle ne gère pas :
+- `initialQuantity` (quantité achetée)
+- `currentStock` (stock restant)
+- `stockUnit` (ml, comprimés, etc.)
+
+**Option A:** Ajouter ces champs à `FarmerProductLot`
+**Option B:** Créer une nouvelle entité `FarmMedicineStock`
+
+### 7.2 Import ANMV automatique
+
+- Import hebdomadaire de la base ANMV
+- Produits avec `scope: 'global'`
+- Code GTIN pour scan code-barres
+
+### 7.3 Alertes stock
+
+- Notification produits périmés
+- Notification stock bas
+- Dashboard avec KPIs pharmacie
+
+---
+
+## 8. Responsive Design
+
+### 8.1 Mobile (< 640px)
 
 - Cards en full-width
-- Tableau pharmacie → Liste cards
 - Actions dans menu contextuel (...)
 - Dialog en plein écran
 
-### 6.2 Tablet (640px - 1024px)
+### 8.2 Tablet (640px - 1024px)
 
 - Grille 2 colonnes pour KPIs
-- Tableau avec colonnes essentielles
-- Dialog modal standard
+- Cards produits en full-width
 
-### 6.3 Desktop (> 1024px)
+### 8.3 Desktop (> 1024px)
 
 - Grille 4 colonnes pour KPIs
-- Tableau complet avec toutes colonnes
-- Dialog modal centré
+- Sidebar catalogue / détail
 
 ---
 
-## 7. Accessibilité
-
-- Labels sur tous les champs de formulaire
-- Focus visible sur éléments interactifs
-- Messages d'erreur associés aux champs
-- Contraste couleurs WCAG AA
-- Navigation clavier complète
-
----
-
-## 8. Priorité d'implémentation
+## 9. Priorité d'implémentation
 
 | Phase | Fonctionnalité | Priorité |
 |-------|----------------|----------|
-| 1 | Suppression anciennes pages | Haute |
-| 1 | Page Stock Pharmacie | Haute |
-| 1 | Dialog Nouvel Achat | Haute |
-| 2 | Page Traitements | Haute |
-| 2 | Dialog Nouveau Traitement | Haute |
-| 3 | Page Catalogue (adapter) | Moyenne |
-| 3 | Dialog Créer Produit Local | Moyenne |
+| 1 | Suppression pages admin inutiles | Haute |
+| 1 | Page Pharmacie (vue stock par produit) | Haute |
+| 1 | Dialog ajout lot | Haute |
+| 2 | Page catalogue produits | Haute |
+| 2 | Dialog configuration produit | Moyenne |
+| 3 | Simplification page admin/products | Moyenne |
+| 3 | Lien "Traiter" → dialog traitement | Moyenne |
 | 4 | KPIs et alertes | Basse |
-| 4 | Export données | Basse |
+| 4 | Gestion stock quantitatif | Basse |
 
 ---
 
-## 9. Questions ouvertes
+## 10. Questions ouvertes
 
-1. **Scan code-barres** : Intégrer scanner GTIN sur mobile ? (Phase future)
-2. **Import ANMV** : Fréquence de mise à jour du catalogue global ?
-3. **Multi-ferme** : Partage de produits locaux entre fermes du même groupe ?
+1. **Stock quantitatif** : Ajouter `currentStock` à `FarmerProductLot` ?
+2. **Scan code-barres** : Priorité pour la V1 mobile ?
+3. **Prix achat** : Tracker le coût des lots ?
