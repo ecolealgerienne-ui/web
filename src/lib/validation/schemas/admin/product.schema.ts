@@ -44,10 +44,11 @@ export const productSchema = z.object({
     .min(1, 'product.validation.packaging.required')
     .max(200, 'product.validation.packaging.maxLength'),
 
-  activeSubstanceIds: z
-    .array(z.string().uuid('product.validation.activeSubstanceIds.invalidUuid'))
-    .min(1, 'product.validation.activeSubstanceIds.required')
-    .max(10, 'product.validation.activeSubstanceIds.maxLength'),
+  composition: z
+    .string()
+    .max(1000, 'product.validation.composition.maxLength')
+    .optional()
+    .or(z.literal('')),
 
   description: z
     .string()

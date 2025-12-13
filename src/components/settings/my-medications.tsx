@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTranslations } from 'next-intl'
 import { useGlobalProducts } from '@/lib/hooks/useGlobalProducts'
-import { useProductCategories } from '@/lib/hooks/useProductCategories'
 import { useProductPreferences } from '@/lib/hooks/useProductPreferences'
 import { useAuth } from '@/contexts/auth-context'
 import { Product } from '@/lib/types/admin/product'
@@ -49,8 +48,8 @@ function productToTransferItem(product: Product): TransferListItem {
       therapeuticForm: product.therapeuticForm,
       dosage: product.dosage,
       packaging: product.packaging,
-      categoryId: product.categoryId,
-      categoryName: product.category?.name,
+      category: product.category,
+      composition: product.composition,
       description: product.description,
       usageInstructions: product.usageInstructions,
       contraindications: product.contraindications,
@@ -79,8 +78,7 @@ function apiProductToTransferItem(product: ApiProductInPreference): TransferList
       laboratoryName: product.laboratoryName,
       therapeuticForm: product.therapeuticForm,
       dosage: product.dosage,
-      categoryId: product.categoryId,
-      categoryName: product.category?.name,
+      category: product.category,
       scope: 'global',
     },
   }
@@ -94,15 +92,7 @@ export function MyMedications() {
   const { user } = useAuth()
 
   // Filtres
-  const [activeCategoryId, setActiveCategoryId] = useState<string>('all')
   const [activeTherapeuticForm, setActiveTherapeuticForm] = useState<string>('all')
-
-  // Charger les catégories depuis l'API
-  const {
-    categories,
-    loading: loadingCategories,
-    error: errorCategories,
-  } = useProductCategories()
 
   // Charger les produits globaux depuis l'API
   const {
@@ -121,18 +111,8 @@ export function MyMedications() {
     refetch: refetchPreferences,
   } = useProductPreferences(user?.farmId)
 
-  const loading = loadingCategories || loadingProducts || loadingPrefs
-  const error = errorProducts || errorPrefs || errorCategories
-
-  // Debug: Afficher dans la console ce qui est chargé
-  console.log('MyMedications - Debug:', {
-    categoriesCount: categories.length,
-    productsCount: globalProducts.length,
-    preferencesCount: preferences.length,
-    therapeuticFormsFound: globalProducts.map(p => p.therapeuticForm).filter(Boolean),
-    categoryIdsFound: globalProducts.map(p => p.categoryId).filter(Boolean),
-    errors: { errorProducts, errorPrefs, errorCategories },
-  })
+  const loading = loadingProducts || loadingPrefs
+  const error = errorProducts || errorPrefs
 
   // Extraire les formes thérapeutiques uniques des produits
   const therapeuticForms = useMemo(() => {
@@ -148,15 +128,9 @@ export function MyMedications() {
     return globalProducts.map(productToTransferItem)
   }, [globalProducts])
 
-  // Filtrer par catégorie et forme thérapeutique (côté client)
+  // Filtrer par forme thérapeutique (côté client)
   const filteredAvailableItems = useMemo(() => {
     return availableItems.filter(item => {
-      // Filtrer par catégorie
-      if (activeCategoryId !== 'all') {
-        if (item.metadata?.categoryId !== activeCategoryId) {
-          return false
-        }
-      }
       // Filtrer par forme thérapeutique
       if (activeTherapeuticForm !== 'all') {
         if (item.metadata?.therapeuticForm !== activeTherapeuticForm) {
@@ -165,7 +139,7 @@ export function MyMedications() {
       }
       return true
     })
-  }, [availableItems, activeCategoryId, activeTherapeuticForm])
+  }, [availableItems, activeTherapeuticForm])
 
   // Items sélectionnés (initialisés depuis les préférences)
   const [selectedItems, setSelectedItems] = useState<TransferListItem[]>([])
@@ -281,22 +255,8 @@ export function MyMedications() {
   }
 
   // Composant de filtres
-  const categoryFilters = (
+  const therapeuticFormFilters = (
     <div className="flex flex-wrap items-center gap-2">
-      <Select value={activeCategoryId} onValueChange={setActiveCategoryId}>
-        <SelectTrigger className="w-[180px] h-8">
-          <SelectValue placeholder={t('filters.allCategories')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('filters.allCategories')}</SelectItem>
-          {categories.map((cat) => (
-            <SelectItem key={cat.id} value={cat.id}>
-              {cat.nameFr}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
       <Select value={activeTherapeuticForm} onValueChange={setActiveTherapeuticForm}>
         <SelectTrigger className="w-[180px] h-8">
           <SelectValue placeholder={t('filters.allForms')} />
@@ -332,7 +292,7 @@ export function MyMedications() {
         emptySelectedMessage={t('emptySelected')}
         emptyAvailableMessage={t('emptyAvailable')}
         isLoading={loading}
-        filters={categoryFilters}
+        filters={therapeuticFormFilters}
         showCreateLocal={false}
       />
 
@@ -409,11 +369,11 @@ export function MyMedications() {
               )}
 
               {/* Catégorie */}
-              {!!selectedProduct.metadata?.categoryName && (
+              {!!selectedProduct.metadata?.category && (
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">{t('details.category')}</span>
                   <p>
-                    <Badge>{String(selectedProduct.metadata.categoryName)}</Badge>
+                    <Badge>{String(selectedProduct.metadata.category)}</Badge>
                   </p>
                 </div>
               )}
