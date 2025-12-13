@@ -2,7 +2,7 @@
  * Types pour les préférences de produits par ferme
  */
 
-import { Product } from './admin/product'
+import type { FarmerProductLot } from './farmer-product-lot'
 
 /**
  * Structure du produit retourné par l'API dans les préférences
@@ -14,12 +14,8 @@ export interface ApiProductInPreference {
   laboratoryName?: string
   therapeuticForm?: string
   dosage?: string
-  categoryId?: string
-  category?: {
-    id: string
-    code: string
-    name: string
-  }
+  /** Catégorie en texte libre (simplifié) */
+  category?: string
 }
 
 export interface ProductPreference {
@@ -36,6 +32,8 @@ export interface ProductPreference {
   createdAt: string
   updatedAt: string
   product: ApiProductInPreference
+  /** Lots associés à cette préférence */
+  farmerLots?: FarmerProductLot[]
 }
 
 export interface CreateProductPreferenceDto {

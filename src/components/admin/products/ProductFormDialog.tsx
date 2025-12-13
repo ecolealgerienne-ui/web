@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -29,7 +29,6 @@ import {
 } from '@/lib/validation/schemas/admin/product.schema'
 import type { Product } from '@/lib/types/admin/product'
 import { useTranslations } from 'next-intl'
-import { useActiveSubstances } from '@/lib/hooks/admin/useActiveSubstances'
 
 interface ProductFormDialogProps {
   open: boolean
@@ -73,15 +72,6 @@ export function ProductFormDialog({
 
   const isEditMode = Boolean(product)
 
-  // Charge la liste des substances actives disponibles
-  const { data: activeSubstances, loading: loadingSubstances } =
-    useActiveSubstances({ page: 1, limit: 1000 })
-
-  // State local pour les substances sélectionnées
-  const [selectedSubstanceIds, setSelectedSubstanceIds] = useState<string[]>(
-    []
-  )
-
   // Utilise le schéma approprié selon le mode (création/édition)
   const {
     register,
@@ -101,7 +91,7 @@ export function ProductFormDialog({
       therapeuticForm: '',
       dosage: '',
       packaging: '',
-      activeSubstanceIds: [],
+      composition: '',
       description: '',
       usageInstructions: '',
       contraindications: '',
@@ -114,9 +104,6 @@ export function ProductFormDialog({
   // Charge les données en mode édition
   useEffect(() => {
     if (product && open) {
-      const substanceIds = product.activeSubstances?.map((s) => s.id) || []
-      setSelectedSubstanceIds(substanceIds)
-
       reset({
         code: product.code,
         commercialName: product.commercialName,
@@ -124,7 +111,7 @@ export function ProductFormDialog({
         therapeuticForm: product.therapeuticForm,
         dosage: product.dosage,
         packaging: product.packaging,
-        activeSubstanceIds: substanceIds,
+        composition: product.composition || '',
         description: product.description || '',
         usageInstructions: product.usageInstructions || '',
         contraindications: product.contraindications || '',
@@ -136,7 +123,6 @@ export function ProductFormDialog({
       } as UpdateProductFormData)
     } else if (!product && open) {
       // Réinitialise en mode création
-      setSelectedSubstanceIds([])
       reset({
         code: '',
         commercialName: '',
@@ -144,7 +130,7 @@ export function ProductFormDialog({
         therapeuticForm: '',
         dosage: '',
         packaging: '',
-        activeSubstanceIds: [],
+        composition: '',
         description: '',
         usageInstructions: '',
         contraindications: '',
@@ -155,23 +141,10 @@ export function ProductFormDialog({
     }
   }, [product, open, reset, isEditMode])
 
-  // Synchronise selectedSubstanceIds avec react-hook-form
-  useEffect(() => {
-    setValue('activeSubstanceIds', selectedSubstanceIds)
-  }, [selectedSubstanceIds, setValue])
-
   const handleFormSubmission = async (
     data: ProductFormData | UpdateProductFormData
   ) => {
     await onSubmit(data)
-  }
-
-  const toggleSubstance = (id: string) => {
-    setSelectedSubstanceIds((prev) =>
-      prev.includes(id)
-        ? prev.filter((sid) => sid !== id)
-        : [...prev, id]
-    )
   }
 
   // Liste des formes thérapeutiques disponibles
@@ -348,62 +321,28 @@ export function ProductFormDialog({
             </div>
           </div>
 
-          {/* Section : Substances actives */}
+          {/* Composition */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold border-b pb-2">
-              {t('fields.activeSubstances')}{' '}
-              <span className="text-destructive">*</span>
+              {t('fields.composition')}
             </h3>
 
-            <div
-              className={`border rounded-md p-4 max-h-48 overflow-y-auto ${
-                errors.activeSubstanceIds ? 'border-destructive' : ''
-              }`}
-            >
-              {loadingSubstances ? (
-                <p className="text-sm text-muted-foreground">
-                  {tc('loading')}...
+            <div>
+              <textarea
+                id="composition"
+                {...register('composition')}
+                className={`flex min-h-[80px] w-full rounded-md border ${
+                  errors.composition ? 'border-destructive' : 'border-input'
+                } bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
+                placeholder="Amoxicilline trihydratée 500mg/ml, Acide clavulanique 125mg/ml..."
+                disabled={loading}
+              />
+              {errors.composition && (
+                <p className="text-sm text-destructive mt-1">
+                  {t(errors.composition.message as string)}
                 </p>
-              ) : activeSubstances.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  {tc('messages.noData')}
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {activeSubstances.map((substance) => (
-                    <div
-                      key={substance.id}
-                      className="flex items-center space-x-2"
-                    >
-                      <input
-                        type="checkbox"
-                        id={`substance-${substance.id}`}
-                        checked={selectedSubstanceIds.includes(substance.id)}
-                        onChange={() => toggleSubstance(substance.id)}
-                        className="h-4 w-4 rounded border-input"
-                        disabled={loading}
-                      />
-                      <Label
-                        htmlFor={`substance-${substance.id}`}
-                        className="cursor-pointer font-normal"
-                      >
-                        {substance.name} ({substance.code})
-                      </Label>
-                    </div>
-                  ))}
-                </div>
               )}
             </div>
-            {errors.activeSubstanceIds && (
-              <p className="text-sm text-destructive mt-1">
-                {t(errors.activeSubstanceIds.message as string)}
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {tc('messages.selectedCount', {
-                count: selectedSubstanceIds.length,
-              })}
-            </p>
           </div>
 
           {/* Section : Informations complémentaires */}
@@ -556,7 +495,7 @@ export function ProductFormDialog({
             >
               {tc('actions.cancel')}
             </Button>
-            <Button type="submit" disabled={loading || loadingSubstances}>
+            <Button type="submit" disabled={loading}>
               {loading
                 ? tc('actions.saving')
                 : isEditMode

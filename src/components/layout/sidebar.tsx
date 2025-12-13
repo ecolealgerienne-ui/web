@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Beef, Package, Pill, BarChart3, Settings, Calendar, Scale, Shield, TestTube2, PackageOpen, Layers, Ruler, Bird, Globe, Activity, Stethoscope, Megaphone, Bell, Building2, CalendarClock, Dog, Boxes, Link2 } from "lucide-react";
+import { Home, Beef, Package, Pill, BarChart3, Settings, Calendar, Scale, Shield, PackageOpen, Ruler, Bird, Globe, Stethoscope, Megaphone, Bell, Building2, CalendarClock, Dog, Boxes, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { canAccessAdmin } from "@/lib/utils/permissions";
@@ -15,14 +15,12 @@ const menuItems = [
   { icon: Package, key: "lots", href: "/lots" },
   { icon: Pill, key: "treatments", href: "/treatments" },
   { icon: Scale, key: "weighings", href: "/weighings" },
+  { icon: Boxes, key: "pharmacy", href: "/pharmacy" },
 ];
 
 // Menu Données de référence (référentiels globaux - super admin uniquement)
 const adminMenuItems = [
-  { icon: TestTube2, key: "activeSubstances", href: "/admin/active-substances" },
-  { icon: Layers, key: "productCategories", href: "/admin/product-categories" },
   { icon: Ruler, key: "units", href: "/admin/units" },
-  { icon: Activity, key: "administrationRoutes", href: "/admin/administration-routes" },
   { icon: Bird, key: "species", href: "/admin/species" },
   { icon: Dog, key: "breeds", href: "/admin/breeds" },
   { icon: CalendarClock, key: "ageCategories", href: "/admin/age-categories" },
@@ -31,8 +29,6 @@ const adminMenuItems = [
   { icon: Megaphone, key: "nationalCampaigns", href: "/admin/national-campaigns" },
   { icon: Bell, key: "alertTemplates", href: "/admin/alert-templates" },
   { icon: PackageOpen, key: "products", href: "/admin/products" },
-  { icon: Boxes, key: "productPackagings", href: "/admin/product-packagings" },
-  { icon: Pill, key: "therapeuticIndications", href: "/admin/therapeutic-indications" },
   { icon: Link2, key: "breedCountries", href: "/admin/breed-countries" },
   { icon: Link2, key: "campaignCountries", href: "/admin/campaign-countries" },
 ];

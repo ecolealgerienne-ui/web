@@ -141,9 +141,9 @@ export default function ProductsPage() {
               {substance.code}
             </Badge>
           ))}
-          {product.activeSubstances?.length > 2 && (
+          {(product.activeSubstances?.length ?? 0) > 2 && (
             <Badge variant="default" className="text-xs">
-              +{product.activeSubstances.length - 2}
+              +{(product.activeSubstances?.length ?? 0) - 2}
             </Badge>
           )}
         </div>

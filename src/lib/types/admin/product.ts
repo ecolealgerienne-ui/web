@@ -1,32 +1,19 @@
 import type { BaseEntity } from '../common/api'
-import type { ActiveSubstance } from './active-substance'
+
+/**
+ * Substance active simplifiée (inline)
+ */
+export interface ProductActiveSubstance {
+  id: string
+  code: string
+  name: string
+  description?: string
+}
 
 /**
  * Produit vétérinaire (médicament)
  *
- * Un produit contient une ou plusieurs substances actives et représente
- * un médicament vétérinaire commercialisé.
- *
  * ✅ RÈGLE #4 : Étend BaseEntity (Phase 1)
- *
- * @example
- * ```typescript
- * const product: Product = {
- *   id: '123',
- *   code: 'AMOX-500-INJ',
- *   commercialName: 'Amoxival 500',
- *   laboratoryName: 'Virbac',
- *   therapeuticForm: 'injectable',
- *   dosage: '500mg/ml',
- *   packaging: 'Flacon 100ml',
- *   activeSubstances: [{ id: '1', code: 'AMOX', name: 'Amoxicilline', ... }],
- *   isVeterinaryPrescriptionRequired: true,
- *   isActive: true,
- *   version: 1,
- *   createdAt: new Date(),
- *   updatedAt: new Date(),
- * }
- * ```
  */
 export interface Product extends BaseEntity {
   /** Code produit unique (ex: AMOX-500-INJ) */
@@ -47,18 +34,14 @@ export interface Product extends BaseEntity {
   /** Conditionnement (ex: Flacon 100ml, Boîte 20 comprimés) */
   packaging: string
 
-  /** Liste des substances actives (relation many-to-many) */
-  activeSubstances: ActiveSubstance[]
+  /** Liste des substances actives (simplifié) */
+  activeSubstances?: ProductActiveSubstance[]
 
-  /** ID de la catégorie (ex: Antibiotiques, Antiparasitaires) */
-  categoryId?: string
+  /** Composition en texte libre */
+  composition?: string
 
-  /** Catégorie avec détails */
-  category?: {
-    id: string
-    code: string
-    name: string
-  }
+  /** Catégorie (simplifié - string au lieu de FK) */
+  category?: string
 
   /** Description détaillée du produit */
   description?: string
@@ -74,13 +57,16 @@ export interface Product extends BaseEntity {
 
   /** Prescription vétérinaire obligatoire */
   isVeterinaryPrescriptionRequired: boolean
+
+  /** Délai d'attente viande (jours) */
+  withdrawalMeatDays?: number
+
+  /** Délai d'attente lait (heures) */
+  withdrawalMilkHours?: number
 }
 
 /**
  * DTO pour créer un nouveau produit
- *
- * ⚠️ Utilise activeSubstanceIds au lieu de activeSubstances[]
- * car on envoie seulement les IDs au backend
  */
 export interface CreateProductDto {
   /** Code produit unique */
@@ -101,8 +87,8 @@ export interface CreateProductDto {
   /** Conditionnement */
   packaging: string
 
-  /** IDs des substances actives */
-  activeSubstanceIds: string[]
+  /** Composition (texte libre) */
+  composition?: string
 
   /** Description (optionnel) */
   description?: string
@@ -147,8 +133,8 @@ export interface UpdateProductDto {
   /** Conditionnement */
   packaging?: string
 
-  /** IDs des substances actives */
-  activeSubstanceIds?: string[]
+  /** Composition (texte libre) */
+  composition?: string
 
   /** Description */
   description?: string

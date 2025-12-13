@@ -115,9 +115,11 @@
       "vaccinations": "Vaccinations",
       "treatments": "Treatments",
       "weighings": "Weighings",
+      "pharmacy": "Pharmacy",
       "data": "Data",
       "reports": "Reports",
-      "settings": "Settings"
+      "settings": "Settings",
+      "farms": "Farms"
     },
     "data": {
       "title": "Data",
@@ -133,16 +135,89 @@
     },
     "admin": {
       "title": "Administration",
-      "activeSubstances": "Active Substances",
-      "productCategories": "Product Categories",
       "units": "Units of Measure",
-      "administrationRoutes": "Administration Routes",
       "species": "Species",
+      "breeds": "Breeds",
+      "ageCategories": "Age Categories",
       "countries": "Countries",
       "veterinarians": "Veterinarians",
       "nationalCampaigns": "National Campaigns",
       "alertTemplates": "Alert Templates",
-      "products": "Veterinary Products"
+      "products": "Veterinary Products",
+      "breedCountries": "Breeds by Country",
+      "campaignCountries": "Campaigns by Country"
+    }
+  },
+  "pharmacy": {
+    "title": "Pharmacy",
+    "subtitle": "Medication stock management",
+    "kpis": {
+      "totalProducts": "Products",
+      "lowStock": "Low stock",
+      "expired": "Expired",
+      "expiringWithin30Days": "Expiring within 30 days",
+      "totalValue": "Total value"
+    },
+    "actions": {
+      "addProduct": "Add product",
+      "addLot": "Add lot",
+      "configure": "Configure",
+      "treat": "Treat",
+      "viewDetails": "View details"
+    },
+    "lot": {
+      "title": "New lot",
+      "editTitle": "Edit lot",
+      "nickname": "Lot nickname",
+      "nicknamePlaceholder": "e.g., December 2024 Lot",
+      "officialNumber": "Official lot number",
+      "officialNumberPlaceholder": "e.g., ABC123-9A",
+      "expiryDate": "Expiry date",
+      "expiresSoon": "Expires soon",
+      "expired": "Expired",
+      "active": "Active",
+      "purchaseDate": "Purchase date",
+      "emptyState": "No lots registered for this product"
+    },
+    "config": {
+      "title": "Configuration",
+      "subtitle": "These values override the product defaults",
+      "customDose": "Custom dose",
+      "doseUnit": "Unit",
+      "withdrawalMeat": "Meat withdrawal period (days)",
+      "withdrawalMilk": "Milk withdrawal period (hours)",
+      "resetDefaults": "Reset to defaults",
+      "defaultValue": "Default: {value}"
+    },
+    "catalog": {
+      "title": "Product Catalog",
+      "subtitle": "Select the products you use",
+      "myProducts": "My selected products",
+      "myProductsCount": "{count} product(s) selected",
+      "allProducts": "Full catalog",
+      "add": "Add",
+      "remove": "Remove",
+      "search": "Search for a product...",
+      "noResults": "No products found"
+    },
+    "empty": {
+      "title": "No products selected",
+      "description": "Start by selecting the products you use.",
+      "action": "Browse catalog"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "expiringSoon": "Expiring soon",
+      "expired": "Expired"
+    },
+    "messages": {
+      "lotCreated": "Lot added successfully",
+      "lotUpdated": "Lot updated successfully",
+      "lotDeleted": "Lot deleted",
+      "configSaved": "Configuration saved",
+      "productAdded": "Product added to your pharmacy",
+      "productRemoved": "Product removed from your pharmacy"
     }
   },
   "breeds": {
