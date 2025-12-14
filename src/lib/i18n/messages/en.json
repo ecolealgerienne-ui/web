@@ -417,6 +417,7 @@
       "therapeuticForm": "Therapeutic Form",
       "dosage": "Dosage",
       "packaging": "Packaging",
+      "composition": "Composition",
       "activeSubstances": "Active Substances",
       "description": "Description",
       "usageInstructions": "Usage Instructions",
