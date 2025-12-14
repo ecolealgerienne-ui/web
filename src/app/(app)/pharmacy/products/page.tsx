@@ -1,22 +1,86 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { ArrowLeft, Plus, Minus, Search, Loader2 } from 'lucide-react'
+import { ArrowLeft, Plus, Minus, Search, Loader2, Filter, X, Pill } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { useGlobalProducts } from '@/lib/hooks/useGlobalProducts'
 import { useProductPreferences } from '@/lib/hooks/useProductPreferences'
 import { productPreferencesService } from '@/lib/services/product-preferences.service'
 import { useAuth } from '@/contexts/auth-context'
 import { useToast } from '@/lib/hooks/useToast'
 import { handleApiError } from '@/lib/utils/api-error-handler'
-import type { Product } from '@/lib/types/admin/product'
+import type { Product, ProductType } from '@/lib/types/admin/product'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+
+// Debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
+// Types de produits disponibles pour le filtre
+const PRODUCT_TYPES: (ProductType | 'all')[] = [
+  'all',
+  'antibiotic',
+  'vaccine',
+  'antiparasitic',
+  'anti_inflammatory',
+  'vitamin',
+  'other',
+]
+
+// Formes thérapeutiques disponibles
+const THERAPEUTIC_FORMS = [
+  'all',
+  'injectable',
+  'oral',
+  'topical',
+  'intramammary',
+  'pour-on',
+  'bolus',
+  'powder',
+  'suspension',
+  'tablet',
+]
+
+// Mapping des couleurs par type de produit
+const TYPE_COLORS: Record<string, string> = {
+  antibiotic: 'bg-orange-100 text-orange-800 border-orange-200',
+  vaccine: 'bg-blue-100 text-blue-800 border-blue-200',
+  antiparasitic: 'bg-green-100 text-green-800 border-green-200',
+  anti_inflammatory: 'bg-purple-100 text-purple-800 border-purple-200',
+  vitamin: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  other: 'bg-gray-100 text-gray-800 border-gray-200',
+}
 
 /**
  * Page Catalogue - Sélection des produits pour la pharmacie
@@ -30,8 +94,16 @@ export default function CatalogPage() {
   const toast = useToast()
   const { user } = useAuth()
 
+  // États de recherche et filtres
   const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState<ProductType | 'all'>('all')
+  const [formFilter, setFormFilter] = useState<string>('all')
+  const [rxFilter, setRxFilter] = useState<'all' | 'required' | 'notRequired'>('all')
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null)
+
+  // Debounce la recherche pour éviter trop de filtrage
+  const debouncedSearch = useDebounce(searchQuery, 300)
 
   // Charger les produits globaux
   const { products: globalProducts, loading: loadingProducts } = useGlobalProducts()
@@ -50,24 +122,57 @@ export default function CatalogPage() {
     return new Set(preferences.map((p) => p.productId))
   }, [preferences])
 
-  // Filtrer les produits par recherche
+  // Compter le nombre de filtres actifs
+  const activeFiltersCount = useMemo(() => {
+    let count = 0
+    if (typeFilter !== 'all') count++
+    if (formFilter !== 'all') count++
+    if (rxFilter !== 'all') count++
+    return count
+  }, [typeFilter, formFilter, rxFilter])
+
+  // Filtrer les produits par recherche et filtres
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return globalProducts
-    const query = searchQuery.toLowerCase()
-    return globalProducts.filter(
-      (p) =>
-        (p.commercialName || p.nameFr).toLowerCase().includes(query) ||
-        (p.code || '').toLowerCase().includes(query) ||
-        (p.manufacturer || '').toLowerCase().includes(query)
-    )
-  }, [globalProducts, searchQuery])
+    return globalProducts.filter((p) => {
+      // Filtre par recherche textuelle
+      if (debouncedSearch.trim()) {
+        const query = debouncedSearch.toLowerCase()
+        const matchesSearch =
+          (p.commercialName || p.nameFr).toLowerCase().includes(query) ||
+          (p.code || '').toLowerCase().includes(query) ||
+          (p.manufacturer || '').toLowerCase().includes(query) ||
+          (p.composition || '').toLowerCase().includes(query)
+        if (!matchesSearch) return false
+      }
+
+      // Filtre par type de produit
+      if (typeFilter !== 'all' && p.type !== typeFilter) {
+        return false
+      }
+
+      // Filtre par forme thérapeutique
+      if (formFilter !== 'all' && p.therapeuticForm !== formFilter) {
+        return false
+      }
+
+      // Filtre par prescription
+      if (rxFilter === 'required' && !p.prescriptionRequired) {
+        return false
+      }
+      if (rxFilter === 'notRequired' && p.prescriptionRequired) {
+        return false
+      }
+
+      return true
+    })
+  }, [globalProducts, debouncedSearch, typeFilter, formFilter, rxFilter])
 
   // Produits sélectionnés (avec infos complètes)
   const selectedProducts = useMemo(() => {
     return preferences
-      .map((pref) => globalProducts.find((p) => p.id === pref.productId))
+      .map((pref) => filteredProducts.find((p) => p.id === pref.productId))
       .filter(Boolean) as Product[]
-  }, [preferences, globalProducts])
+  }, [preferences, filteredProducts])
 
   // Produits non sélectionnés
   const availableProducts = useMemo(() => {
@@ -113,6 +218,12 @@ export default function CatalogPage() {
     [user?.farmId, preferences, refetchPreferences, toast, tc, t]
   )
 
+  const clearFilters = () => {
+    setTypeFilter('all')
+    setFormFilter('all')
+    setRxFilter('all')
+  }
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
@@ -129,16 +240,104 @@ export default function CatalogPage() {
         </div>
       </div>
 
-      {/* Barre de recherche */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder={t('catalog.search')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
+      {/* Barre de recherche + Bouton filtres */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t('catalog.search')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Filter className="h-4 w-4" />
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="h-5 px-1.5">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </Button>
+          </CollapsibleTrigger>
+        </Collapsible>
       </div>
+
+      {/* Panneau de filtres */}
+      <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <CollapsibleContent>
+          <Card>
+            <CardContent className="pt-4 pb-4">
+              <div className="flex flex-wrap gap-4 items-end">
+                {/* Filtre par type */}
+                <div className="flex-1 min-w-[150px]">
+                  <label className="text-sm font-medium mb-1.5 block">Type</label>
+                  <Select
+                    value={typeFilter}
+                    onValueChange={(v) => setTypeFilter(v as ProductType | 'all')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRODUCT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {t(`catalog.productTypes.${type}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Filtre par forme */}
+                <div className="flex-1 min-w-[150px]">
+                  <label className="text-sm font-medium mb-1.5 block">Forme</label>
+                  <Select value={formFilter} onValueChange={setFormFilter}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {THERAPEUTIC_FORMS.map((form) => (
+                        <SelectItem key={form} value={form}>
+                          {t(`catalog.therapeuticForms.${form}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Filtre Rx */}
+                <div className="flex-1 min-w-[120px]">
+                  <label className="text-sm font-medium mb-1.5 block">Prescription</label>
+                  <Select
+                    value={rxFilter}
+                    onValueChange={(v) => setRxFilter(v as 'all' | 'required' | 'notRequired')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('catalog.prescriptionFilter.all')}</SelectItem>
+                      <SelectItem value="required">{t('catalog.prescriptionFilter.required')}</SelectItem>
+                      <SelectItem value="notRequired">{t('catalog.prescriptionFilter.notRequired')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Bouton effacer */}
+                {activeFiltersCount > 0 && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+                    <X className="h-4 w-4" />
+                    {t('catalog.clearFilters')}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </CollapsibleContent>
+      </Collapsible>
 
       {loading ? (
         <div className="space-y-4">
@@ -184,7 +383,9 @@ export default function CatalogPage() {
             <CardContent className="space-y-2">
               {availableProducts.length === 0 ? (
                 <p className="text-center py-4 text-muted-foreground text-sm">
-                  {searchQuery ? t('catalog.noResults') : tc('messages.noData')}
+                  {debouncedSearch || activeFiltersCount > 0
+                    ? t('catalog.noResults')
+                    : tc('messages.noData')}
                 </p>
               ) : (
                 availableProducts.map((product) => (
@@ -215,14 +416,32 @@ interface ProductItemProps {
 }
 
 function ProductItem({ product, isSelected, isLoading, onAction, t }: ProductItemProps) {
+  const typeColor = product.type ? TYPE_COLORS[product.type] || TYPE_COLORS.other : null
+
   return (
     <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm truncate">{product.commercialName || product.nameFr}</p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="font-medium text-sm truncate">
+            {product.commercialName || product.nameFr}
+          </p>
+          {/* Badge Type */}
+          {typeColor && (
+            <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium shrink-0', typeColor)}>
+              {t(`catalog.productTypes.${product.type}`)}
+            </span>
+          )}
+          {/* Badge Rx */}
+          {product.prescriptionRequired && (
+            <Badge variant="destructive" className="text-xs shrink-0 px-1.5">
+              Rx
+            </Badge>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground truncate">
           {product.manufacturer || '-'}
           {product.dosage && ` • ${product.dosage}`}
-          {product.therapeuticForm && ` • ${product.therapeuticForm}`}
+          {product.therapeuticForm && ` • ${t(`catalog.therapeuticForms.${product.therapeuticForm}` as any) || product.therapeuticForm}`}
         </p>
         {(product.withdrawalMeatDays || product.withdrawalMilkHours) && (
           <p className="text-xs text-muted-foreground mt-1">
@@ -237,6 +456,7 @@ function ProductItem({ product, isSelected, isLoading, onAction, t }: ProductIte
         size="sm"
         onClick={onAction}
         disabled={isLoading}
+        className="shrink-0 ml-2"
       >
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />

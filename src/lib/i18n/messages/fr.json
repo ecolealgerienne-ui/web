@@ -210,7 +210,35 @@
       "add": "Ajouter",
       "remove": "Retirer",
       "search": "Rechercher un produit...",
-      "noResults": "Aucun produit trouvé"
+      "noResults": "Aucun produit trouvé",
+      "clearFilters": "Effacer les filtres",
+      "filtersActive": "{count} filtre(s) actif(s)",
+      "productTypes": {
+        "all": "Tous les types",
+        "antibiotic": "Antibiotiques",
+        "vaccine": "Vaccins",
+        "antiparasitic": "Antiparasitaires",
+        "anti_inflammatory": "Anti-inflammatoires",
+        "vitamin": "Vitamines",
+        "other": "Autres"
+      },
+      "therapeuticForms": {
+        "all": "Toutes les formes",
+        "injectable": "Injectable",
+        "oral": "Oral",
+        "topical": "Topique",
+        "intramammary": "Intramammaire",
+        "pour-on": "Pour-On",
+        "bolus": "Bolus",
+        "powder": "Poudre",
+        "suspension": "Suspension",
+        "tablet": "Comprimé"
+      },
+      "prescriptionFilter": {
+        "all": "Tous",
+        "required": "Rx requis",
+        "notRequired": "Sans Rx"
+      }
     },
     "empty": {
       "title": "Aucun produit sélectionné",
