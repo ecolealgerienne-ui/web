@@ -2,7 +2,7 @@
  * Hook React pour le catalogue produits avec filtres côté serveur
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Product, CatalogFilters } from '@/lib/types/admin/product'
 import { catalogService } from '@/lib/services/catalog.service'
 import { logger } from '@/lib/utils/logger'
@@ -34,6 +34,9 @@ export function useCatalogProducts(
 
   // Track if we're loading more (pagination) vs initial load
   const isLoadingMore = useRef(false)
+
+  // Serialize filters for stable comparison
+  const filtersKey = useMemo(() => JSON.stringify(filters || {}), [filters])
 
   const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
     if (!farmId) {
@@ -78,20 +81,21 @@ export function useCatalogProducts(
     }
   }, [farmId, filters])
 
-  // Reset and fetch when filters change
+  // Reset and fetch when farmId or filters change
   useEffect(() => {
     setPage(1)
     setProducts([])
     fetchProducts(1, false)
-  }, [fetchProducts])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [farmId, filtersKey])
 
   const loadMore = useCallback(() => {
-    if (isLoadingMore.current || page >= totalPages) return
+    if (isLoadingMore.current || loading || page >= totalPages) return
 
     isLoadingMore.current = true
     const nextPage = page + 1
     fetchProducts(nextPage, true)
-  }, [page, totalPages, fetchProducts])
+  }, [page, totalPages, loading, fetchProducts])
 
   const refetch = useCallback(async () => {
     setPage(1)
