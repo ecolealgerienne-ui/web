@@ -238,6 +238,31 @@
         "all": "Tous",
         "required": "Rx requis",
         "notRequired": "Sans Rx"
+      },
+      "speciesFilter": {
+        "all": "Toutes espèces",
+        "cattle": "Bovins",
+        "sheep": "Ovins",
+        "goat": "Caprins",
+        "poultry": "Volailles",
+        "swine": "Porcins"
+      },
+      "withdrawalFilter": {
+        "all": "Tous délais",
+        "noMilk": "Sans délai lait",
+        "shortMeat": "Délai viande court (<7j)",
+        "none": "Sans délai"
+      },
+      "quickFilters": {
+        "favorites": "Favoris",
+        "noWithdrawal": "Sans délai",
+        "noMilkWithdrawal": "OK lait"
+      },
+      "favorites": {
+        "add": "Ajouter aux favoris",
+        "remove": "Retirer des favoris",
+        "empty": "Aucun favori",
+        "emptyHint": "Cliquez sur ⭐ pour ajouter un produit aux favoris"
       }
     },
     "empty": {
