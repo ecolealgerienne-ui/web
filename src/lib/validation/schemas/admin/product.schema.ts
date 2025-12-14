@@ -6,47 +6,51 @@ import { z } from 'zod'
  * ✅ RÈGLE #1 : Tous les messages d'erreur sont des clés i18n
  * ✅ RÈGLE #6 : i18n complet (product.validation.xxx)
  *
- * Utilisé avec react-hook-form via zodResolver
+ * Correspond au CreateProductDto du backend
  */
 
 /**
- * Schéma de création de produit
+ * Schéma de création de produit (local)
  */
 export const productSchema = z.object({
-  code: z
+  nameFr: z
     .string()
-    .min(1, 'product.validation.code.required')
-    .max(50, 'product.validation.code.maxLength')
-    .regex(/^[A-Z0-9_-]+$/, 'product.validation.code.pattern'),
+    .min(1, 'product.validation.nameFr.required')
+    .max(500, 'product.validation.nameFr.maxLength'),
 
   commercialName: z
     .string()
-    .min(1, 'product.validation.commercialName.required')
-    .max(200, 'product.validation.commercialName.maxLength'),
+    .max(500, 'product.validation.commercialName.maxLength')
+    .optional()
+    .or(z.literal('')),
 
-  laboratoryName: z
+  manufacturer: z
     .string()
-    .min(1, 'product.validation.laboratoryName.required')
-    .max(200, 'product.validation.laboratoryName.maxLength'),
+    .max(200, 'product.validation.manufacturer.maxLength')
+    .optional()
+    .or(z.literal('')),
 
   therapeuticForm: z
     .string()
-    .min(1, 'product.validation.therapeuticForm.required')
-    .max(100, 'product.validation.therapeuticForm.maxLength'),
+    .max(200, 'product.validation.therapeuticForm.maxLength')
+    .optional()
+    .or(z.literal('')),
 
   dosage: z
     .string()
-    .min(1, 'product.validation.dosage.required')
-    .max(100, 'product.validation.dosage.maxLength'),
-
-  packaging: z
-    .string()
-    .min(1, 'product.validation.packaging.required')
-    .max(200, 'product.validation.packaging.maxLength'),
+    .max(100, 'product.validation.dosage.maxLength')
+    .optional()
+    .or(z.literal('')),
 
   composition: z
     .string()
-    .max(1000, 'product.validation.composition.maxLength')
+    .max(2000, 'product.validation.composition.maxLength')
+    .optional()
+    .or(z.literal('')),
+
+  administrationRoute: z
+    .string()
+    .max(200, 'product.validation.administrationRoute.maxLength')
     .optional()
     .or(z.literal('')),
 
@@ -56,25 +60,21 @@ export const productSchema = z.object({
     .optional()
     .or(z.literal('')),
 
-  usageInstructions: z
-    .string()
-    .max(2000, 'product.validation.usageInstructions.maxLength')
+  withdrawalMeatDays: z
+    .number()
+    .int()
+    .min(0)
     .optional()
     .or(z.literal('')),
 
-  contraindications: z
-    .string()
-    .max(1000, 'product.validation.contraindications.maxLength')
+  withdrawalMilkHours: z
+    .number()
+    .int()
+    .min(0)
     .optional()
     .or(z.literal('')),
 
-  storageConditions: z
-    .string()
-    .max(500, 'product.validation.storageConditions.maxLength')
-    .optional()
-    .or(z.literal('')),
-
-  isVeterinaryPrescriptionRequired: z.boolean().optional(),
+  prescriptionRequired: z.boolean().optional(),
 
   isActive: z.boolean().optional(),
 })

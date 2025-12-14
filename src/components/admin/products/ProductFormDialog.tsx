@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
@@ -14,13 +14,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   productSchema,
   updateProductSchema,
@@ -41,24 +34,9 @@ interface ProductFormDialogProps {
 }
 
 /**
- * Formulaire de création/édition de produit vétérinaire
+ * Formulaire de création/édition de produit vétérinaire (local)
  *
- * ✅ RÈGLE #1 : Aucune valeur en dur (i18n)
- * ✅ RÈGLE #6 : i18n complet
- * ✅ RÈGLE #3 : Utilise composants génériques (Dialog, Input, Select)
- *
- * Utilise react-hook-form + Zod pour la validation côté client
- *
- * @example
- * ```tsx
- * <ProductFormDialog
- *   open={formOpen}
- *   onOpenChange={setFormOpen}
- *   product={editingProduct}
- *   onSubmit={handleSubmit}
- *   loading={loading}
- * />
- * ```
+ * Note: Les produits globaux (ANMV) sont en lecture seule
  */
 export function ProductFormDialog({
   open,
@@ -72,31 +50,25 @@ export function ProductFormDialog({
 
   const isEditMode = Boolean(product)
 
-  // Utilise le schéma approprié selon le mode (création/édition)
   const {
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors },
     reset,
-    control,
-    setValue,
   } = useForm<ProductFormData | UpdateProductFormData>({
     resolver: zodResolver(
       isEditMode ? updateProductSchema : productSchema
     ),
     defaultValues: {
-      code: '',
+      nameFr: '',
       commercialName: '',
-      laboratoryName: '',
+      manufacturer: '',
       therapeuticForm: '',
       dosage: '',
-      packaging: '',
       composition: '',
+      administrationRoute: '',
       description: '',
-      usageInstructions: '',
-      contraindications: '',
-      storageConditions: '',
-      isVeterinaryPrescriptionRequired: false,
+      prescriptionRequired: false,
       isActive: true,
     },
   })
@@ -105,37 +77,29 @@ export function ProductFormDialog({
   useEffect(() => {
     if (product && open) {
       reset({
-        code: product.code,
-        commercialName: product.commercialName,
-        laboratoryName: product.laboratoryName,
-        therapeuticForm: product.therapeuticForm,
-        dosage: product.dosage,
-        packaging: product.packaging,
+        nameFr: product.nameFr || '',
+        commercialName: product.commercialName || '',
+        manufacturer: product.manufacturer || '',
+        therapeuticForm: product.therapeuticForm || '',
+        dosage: product.dosage || '',
         composition: product.composition || '',
+        administrationRoute: product.administrationRoute || '',
         description: product.description || '',
-        usageInstructions: product.usageInstructions || '',
-        contraindications: product.contraindications || '',
-        storageConditions: product.storageConditions || '',
-        isVeterinaryPrescriptionRequired:
-          product.isVeterinaryPrescriptionRequired ?? false,
+        prescriptionRequired: product.prescriptionRequired ?? false,
         isActive: product.isActive ?? true,
         ...(isEditMode && { version: product.version || 1 }),
       } as UpdateProductFormData)
     } else if (!product && open) {
-      // Réinitialise en mode création
       reset({
-        code: '',
+        nameFr: '',
         commercialName: '',
-        laboratoryName: '',
+        manufacturer: '',
         therapeuticForm: '',
         dosage: '',
-        packaging: '',
         composition: '',
+        administrationRoute: '',
         description: '',
-        usageInstructions: '',
-        contraindications: '',
-        storageConditions: '',
-        isVeterinaryPrescriptionRequired: false,
+        prescriptionRequired: false,
         isActive: true,
       })
     }
@@ -147,22 +111,9 @@ export function ProductFormDialog({
     await onSubmit(data)
   }
 
-  // Liste des formes thérapeutiques disponibles
-  const therapeuticForms = [
-    'injectable',
-    'oral',
-    'topical',
-    'intramammary',
-    'pour-on',
-    'bolus',
-    'powder',
-    'suspension',
-    'tablet',
-  ]
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogClose onClose={() => onOpenChange(false)} />
         <DialogHeader>
           <DialogTitle>
@@ -181,142 +132,79 @@ export function ProductFormDialog({
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Code */}
-              <div>
-                <Label htmlFor="code">
-                  {t('fields.code')} <span className="text-destructive">*</span>
+              {/* Nom (FR) */}
+              <div className="col-span-2">
+                <Label htmlFor="nameFr">
+                  {t('fields.commercialName')} <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="code"
-                  {...register('code')}
-                  placeholder="AMOX-500-INJ"
-                  className={errors.code ? 'border-destructive' : ''}
+                  id="nameFr"
+                  {...register('nameFr')}
+                  placeholder="AMOXIVAL 500 SUSPENSION INJECTABLE"
+                  className={errors.nameFr ? 'border-destructive' : ''}
                   disabled={loading}
                 />
-                {errors.code && (
+                {errors.nameFr && (
                   <p className="text-sm text-destructive mt-1">
-                    {t(errors.code.message as string)}
+                    {t(errors.nameFr.message as string)}
                   </p>
                 )}
               </div>
 
-              {/* Nom commercial */}
+              {/* Fabricant */}
               <div>
-                <Label htmlFor="commercialName">
-                  {t('fields.commercialName')}{' '}
-                  <span className="text-destructive">*</span>
+                <Label htmlFor="manufacturer">
+                  {t('fields.manufacturer')}
                 </Label>
                 <Input
-                  id="commercialName"
-                  {...register('commercialName')}
-                  placeholder="Amoxival 500"
-                  className={errors.commercialName ? 'border-destructive' : ''}
+                  id="manufacturer"
+                  {...register('manufacturer')}
+                  placeholder="VIRBAC"
+                  className={errors.manufacturer ? 'border-destructive' : ''}
                   disabled={loading}
                 />
-                {errors.commercialName && (
-                  <p className="text-sm text-destructive mt-1">
-                    {t(errors.commercialName.message as string)}
-                  </p>
-                )}
-              </div>
-
-              {/* Laboratoire */}
-              <div>
-                <Label htmlFor="laboratoryName">
-                  {t('fields.laboratoryName')}{' '}
-                  <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="laboratoryName"
-                  {...register('laboratoryName')}
-                  placeholder="Virbac"
-                  className={errors.laboratoryName ? 'border-destructive' : ''}
-                  disabled={loading}
-                />
-                {errors.laboratoryName && (
-                  <p className="text-sm text-destructive mt-1">
-                    {t(errors.laboratoryName.message as string)}
-                  </p>
-                )}
               </div>
 
               {/* Forme thérapeutique */}
               <div>
                 <Label htmlFor="therapeuticForm">
-                  {t('fields.therapeuticForm')}{' '}
-                  <span className="text-destructive">*</span>
+                  {t('fields.therapeuticForm')}
                 </Label>
-                <Controller
-                  name="therapeuticForm"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={loading}
-                    >
-                      <SelectTrigger
-                        className={
-                          errors.therapeuticForm ? 'border-destructive' : ''
-                        }
-                      >
-                        <SelectValue placeholder={tc('placeholders.select')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {therapeuticForms.map((form) => (
-                          <SelectItem key={form} value={form}>
-                            {t(`therapeuticForms.${form}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                <Input
+                  id="therapeuticForm"
+                  {...register('therapeuticForm')}
+                  placeholder="suspension injectable"
+                  className={errors.therapeuticForm ? 'border-destructive' : ''}
+                  disabled={loading}
                 />
-                {errors.therapeuticForm && (
-                  <p className="text-sm text-destructive mt-1">
-                    {t(errors.therapeuticForm.message as string)}
-                  </p>
-                )}
               </div>
 
               {/* Dosage */}
               <div>
                 <Label htmlFor="dosage">
-                  {t('fields.dosage')}{' '}
-                  <span className="text-destructive">*</span>
+                  {t('fields.dosage')}
                 </Label>
                 <Input
                   id="dosage"
                   {...register('dosage')}
-                  placeholder="500mg/ml"
+                  placeholder="100 mg/ml"
                   className={errors.dosage ? 'border-destructive' : ''}
                   disabled={loading}
                 />
-                {errors.dosage && (
-                  <p className="text-sm text-destructive mt-1">
-                    {t(errors.dosage.message as string)}
-                  </p>
-                )}
               </div>
 
-              {/* Conditionnement */}
+              {/* Voie d'administration */}
               <div>
-                <Label htmlFor="packaging">
-                  {t('fields.packaging')}{' '}
-                  <span className="text-destructive">*</span>
+                <Label htmlFor="administrationRoute">
+                  {t('fields.administrationRoute')}
                 </Label>
                 <Input
-                  id="packaging"
-                  {...register('packaging')}
-                  placeholder="Flacon 100ml"
-                  className={errors.packaging ? 'border-destructive' : ''}
+                  id="administrationRoute"
+                  {...register('administrationRoute')}
+                  placeholder="intramusculaire, sous-cutanée"
+                  className={errors.administrationRoute ? 'border-destructive' : ''}
                   disabled={loading}
                 />
-                {errors.packaging && (
-                  <p className="text-sm text-destructive mt-1">
-                    {t(errors.packaging.message as string)}
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -334,26 +222,19 @@ export function ProductFormDialog({
                 className={`flex min-h-[80px] w-full rounded-md border ${
                   errors.composition ? 'border-destructive' : 'border-input'
                 } bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
-                placeholder="Amoxicilline trihydratée 500mg/ml, Acide clavulanique 125mg/ml..."
+                placeholder="Amoxicilline trihydratée, Acide clavulanique..."
                 disabled={loading}
               />
-              {errors.composition && (
-                <p className="text-sm text-destructive mt-1">
-                  {t(errors.composition.message as string)}
-                </p>
-              )}
             </div>
           </div>
 
-          {/* Section : Informations complémentaires */}
+          {/* Description */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold border-b pb-2">
-              {tc('sections.additionalInfo')}
+              {t('fields.description')}
             </h3>
 
-            {/* Description */}
             <div>
-              <Label htmlFor="description">{t('fields.description')}</Label>
               <textarea
                 id="description"
                 {...register('description')}
@@ -363,80 +244,6 @@ export function ProductFormDialog({
                 placeholder={tc('placeholders.optional')}
                 disabled={loading}
               />
-              {errors.description && (
-                <p className="text-sm text-destructive mt-1">
-                  {t(errors.description.message as string)}
-                </p>
-              )}
-            </div>
-
-            {/* Instructions d'utilisation */}
-            <div>
-              <Label htmlFor="usageInstructions">
-                {t('fields.usageInstructions')}
-              </Label>
-              <textarea
-                id="usageInstructions"
-                {...register('usageInstructions')}
-                className={`flex min-h-[80px] w-full rounded-md border ${
-                  errors.usageInstructions
-                    ? 'border-destructive'
-                    : 'border-input'
-                } bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
-                placeholder={tc('placeholders.optional')}
-                disabled={loading}
-              />
-              {errors.usageInstructions && (
-                <p className="text-sm text-destructive mt-1">
-                  {t(errors.usageInstructions.message as string)}
-                </p>
-              )}
-            </div>
-
-            {/* Contre-indications */}
-            <div>
-              <Label htmlFor="contraindications">
-                {t('fields.contraindications')}
-              </Label>
-              <textarea
-                id="contraindications"
-                {...register('contraindications')}
-                className={`flex min-h-[60px] w-full rounded-md border ${
-                  errors.contraindications
-                    ? 'border-destructive'
-                    : 'border-input'
-                } bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
-                placeholder={tc('placeholders.optional')}
-                disabled={loading}
-              />
-              {errors.contraindications && (
-                <p className="text-sm text-destructive mt-1">
-                  {t(errors.contraindications.message as string)}
-                </p>
-              )}
-            </div>
-
-            {/* Conditions de stockage */}
-            <div>
-              <Label htmlFor="storageConditions">
-                {t('fields.storageConditions')}
-              </Label>
-              <textarea
-                id="storageConditions"
-                {...register('storageConditions')}
-                className={`flex min-h-[60px] w-full rounded-md border ${
-                  errors.storageConditions
-                    ? 'border-destructive'
-                    : 'border-input'
-                } bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
-                placeholder={tc('placeholders.optional')}
-                disabled={loading}
-              />
-              {errors.storageConditions && (
-                <p className="text-sm text-destructive mt-1">
-                  {t(errors.storageConditions.message as string)}
-                </p>
-              )}
             </div>
           </div>
 
@@ -451,16 +258,16 @@ export function ProductFormDialog({
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="isVeterinaryPrescriptionRequired"
-                  {...register('isVeterinaryPrescriptionRequired')}
+                  id="prescriptionRequired"
+                  {...register('prescriptionRequired')}
                   className="h-4 w-4 rounded border-input"
                   disabled={loading}
                 />
                 <Label
-                  htmlFor="isVeterinaryPrescriptionRequired"
+                  htmlFor="prescriptionRequired"
                   className="cursor-pointer font-normal"
                 >
-                  {t('fields.isVeterinaryPrescriptionRequired')}
+                  {t('fields.prescriptionRequired')}
                 </Label>
               </div>
 

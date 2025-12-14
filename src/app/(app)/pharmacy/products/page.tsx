@@ -56,9 +56,9 @@ export default function CatalogPage() {
     const query = searchQuery.toLowerCase()
     return globalProducts.filter(
       (p) =>
-        p.commercialName.toLowerCase().includes(query) ||
-        p.code.toLowerCase().includes(query) ||
-        p.laboratoryName.toLowerCase().includes(query)
+        (p.commercialName || p.nameFr).toLowerCase().includes(query) ||
+        (p.code || '').toLowerCase().includes(query) ||
+        (p.manufacturer || '').toLowerCase().includes(query)
     )
   }, [globalProducts, searchQuery])
 
@@ -218,9 +218,9 @@ function ProductItem({ product, isSelected, isLoading, onAction, t }: ProductIte
   return (
     <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm truncate">{product.commercialName}</p>
+        <p className="font-medium text-sm truncate">{product.commercialName || product.nameFr}</p>
         <p className="text-xs text-muted-foreground truncate">
-          {product.laboratoryName}
+          {product.manufacturer || '-'}
           {product.dosage && ` • ${product.dosage}`}
           {product.therapeuticForm && ` • ${product.therapeuticForm}`}
         </p>

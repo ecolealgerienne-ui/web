@@ -123,7 +123,7 @@ class ProductsService
    */
   async create(data: CreateProductDto): Promise<Product> {
     try {
-      logger.info('Creating product', { code: data.code })
+      logger.info('Creating product', { nameFr: data.nameFr })
 
       const product = await apiClient.post<Product>(this.baseUrl, data)
 

@@ -182,9 +182,9 @@ function ProductCard({ preference }: ProductCardProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg">{product.commercialName}</CardTitle>
+            <CardTitle className="text-lg">{product.commercialName || product.nameFr}</CardTitle>
             <p className="text-sm text-muted-foreground">
-              {product.laboratoryName}
+              {product.manufacturer || '-'}
               {product.dosage && ` • ${product.dosage}`}
               {product.therapeuticForm && ` • ${product.therapeuticForm}`}
             </p>

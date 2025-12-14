@@ -6,16 +6,23 @@ import type { FarmerProductLot } from './farmer-product-lot'
 
 /**
  * Structure du produit retourné par l'API dans les préférences
+ * Correspond au ProductResponseDto simplifié
  */
 export interface ApiProductInPreference {
   id: string
-  code: string
-  commercialName: string
-  laboratoryName?: string
-  therapeuticForm?: string
-  dosage?: string
-  /** Catégorie en texte libre (simplifié) */
-  category?: string
+  code: string | null
+  nameFr: string
+  commercialName: string | null
+  manufacturer?: string | null
+  therapeuticForm?: string | null
+  dosage?: string | null
+  composition?: string | null
+  administrationRoute?: string | null
+  targetSpecies?: string[]
+  withdrawalMeatDays?: number | null
+  withdrawalMilkHours?: number | null
+  prescriptionRequired?: boolean
+  categoryCode?: string | null
 }
 
 export interface ProductPreference {

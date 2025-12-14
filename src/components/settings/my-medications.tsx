@@ -33,29 +33,28 @@ import {
 // Convertir un Product global en TransferListItem
 function productToTransferItem(product: Product): TransferListItem {
   const parts = [
-    product.laboratoryName,
+    product.manufacturer,
     product.dosage,
     product.therapeuticForm,
   ].filter(Boolean)
 
   return {
     id: product.id,
-    name: product.commercialName,
+    name: product.commercialName || product.nameFr,
     description: parts.join(' | '),
     metadata: {
       code: product.code,
-      laboratoryName: product.laboratoryName,
+      manufacturer: product.manufacturer,
       therapeuticForm: product.therapeuticForm,
       dosage: product.dosage,
-      packaging: product.packaging,
-      category: product.category,
+      category: product.categoryCode,
       composition: product.composition,
       description: product.description,
-      usageInstructions: product.usageInstructions,
-      contraindications: product.contraindications,
-      storageConditions: product.storageConditions,
-      isVeterinaryPrescriptionRequired: product.isVeterinaryPrescriptionRequired,
-      activeSubstances: product.activeSubstances,
+      administrationRoute: product.administrationRoute,
+      targetSpecies: product.targetSpecies,
+      withdrawalMeatDays: product.withdrawalMeatDays,
+      withdrawalMilkHours: product.withdrawalMilkHours,
+      prescriptionRequired: product.prescriptionRequired,
       scope: 'global',
     },
   }
@@ -64,21 +63,21 @@ function productToTransferItem(product: Product): TransferListItem {
 // Convertir un ApiProductInPreference en TransferListItem
 function apiProductToTransferItem(product: ApiProductInPreference): TransferListItem {
   const parts = [
-    product.laboratoryName,
+    product.manufacturer,
     product.dosage,
     product.therapeuticForm,
   ].filter(Boolean)
 
   return {
     id: product.id,
-    name: product.commercialName,
+    name: product.commercialName || product.nameFr,
     description: parts.join(' | '),
     metadata: {
       code: product.code,
-      laboratoryName: product.laboratoryName,
+      manufacturer: product.manufacturer,
       therapeuticForm: product.therapeuticForm,
       dosage: product.dosage,
-      category: product.category,
+      category: product.categoryCode,
       scope: 'global',
     },
   }

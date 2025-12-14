@@ -86,9 +86,9 @@ export default function ProductsPage() {
       sortable: true,
       render: (product: Product) => (
         <div>
-          <span className="font-medium">{product.commercialName}</span>
+          <span className="font-medium">{product.commercialName || product.nameFr}</span>
           <p className="text-xs text-muted-foreground">
-            {product.laboratoryName}
+            {product.manufacturer || '-'}
           </p>
         </div>
       ),
@@ -128,32 +128,19 @@ export default function ProductsPage() {
       ),
     },
     {
-      key: 'activeSubstances',
-      header: t('fields.activeSubstances'),
+      key: 'composition',
+      header: t('fields.composition'),
       render: (product: Product) => (
-        <div className="flex flex-wrap gap-1">
-          {product.activeSubstances?.slice(0, 2).map((substance) => (
-            <Badge
-              key={substance.id}
-              variant="default"
-              className="text-xs"
-            >
-              {substance.code}
-            </Badge>
-          ))}
-          {(product.activeSubstances?.length ?? 0) > 2 && (
-            <Badge variant="default" className="text-xs">
-              +{(product.activeSubstances?.length ?? 0) - 2}
-            </Badge>
-          )}
-        </div>
+        <span className="text-sm text-muted-foreground truncate max-w-[200px] block">
+          {product.composition || '-'}
+        </span>
       ),
     },
     {
-      key: 'isVeterinaryPrescriptionRequired',
+      key: 'prescriptionRequired',
       header: 'Rx',
       render: (product: Product) =>
-        product.isVeterinaryPrescriptionRequired ? (
+        product.prescriptionRequired ? (
           <Badge variant="destructive" className="text-xs">
             Rx
           </Badge>
@@ -285,11 +272,15 @@ export default function ProductsPage() {
         onOpenChange={setDetailOpen}
         item={selectedProduct}
         title={t('title.singular')}
-        description={selectedProduct?.commercialName}
+        description={selectedProduct?.commercialName || selectedProduct?.nameFr}
         fields={[
           { key: 'code', label: t('fields.code') },
-          { key: 'commercialName', label: t('fields.commercialName') },
-          { key: 'laboratoryName', label: t('fields.laboratoryName') },
+          {
+            key: 'commercialName',
+            label: t('fields.commercialName'),
+            render: (value: string | null) => value || '-'
+          },
+          { key: 'manufacturer', label: t('fields.manufacturer') },
           {
             key: 'therapeuticForm',
             label: t('fields.therapeuticForm'),
@@ -300,14 +291,16 @@ export default function ProductsPage() {
             ) : '-'
           },
           { key: 'dosage', label: t('fields.dosage') },
+          { key: 'composition', label: t('fields.composition') },
+          { key: 'administrationRoute', label: t('fields.administrationRoute') },
           {
-            key: 'activeSubstances',
-            label: t('fields.activeSubstances'),
+            key: 'targetSpecies',
+            label: t('fields.targetSpecies'),
             render: (value) => value && value.length > 0 ? (
               <div className="flex flex-wrap gap-1">
-                {value.map((substance: any) => (
-                  <Badge key={substance.id} variant="default" className="text-xs">
-                    {substance.code} - {substance.name}
+                {value.map((species: string) => (
+                  <Badge key={species} variant="secondary" className="text-xs">
+                    {species}
                   </Badge>
                 ))}
               </div>
@@ -324,8 +317,8 @@ export default function ProductsPage() {
             render: (value) => value ? `${value}h` : '-'
           },
           {
-            key: 'isVeterinaryPrescriptionRequired',
-            label: t('fields.isVeterinaryPrescriptionRequired'),
+            key: 'prescriptionRequired',
+            label: t('fields.prescriptionRequired'),
             render: (value) => value ? (
               <Badge variant="destructive">Rx</Badge>
             ) : (

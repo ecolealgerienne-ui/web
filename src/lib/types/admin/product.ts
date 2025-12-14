@@ -1,128 +1,153 @@
 import type { BaseEntity } from '../common/api'
 
 /**
- * Substance active simplifiée (inline)
+ * Type de produit vétérinaire
  */
-export interface ProductActiveSubstance {
+export type ProductType =
+  | 'antibiotic'
+  | 'vaccine'
+  | 'antiparasitic'
+  | 'anti_inflammatory'
+  | 'vitamin'
+  | 'other'
+
+/**
+ * Scope du produit (global = catalogue ANMV, local = créé par la ferme)
+ */
+export type ProductScope = 'global' | 'local'
+
+/**
+ * Info catégorie simplifiée (incluse dans la réponse)
+ */
+export interface ProductCategoryInfo {
   id: string
   code: string
-  name: string
-  description?: string
+  nameFr: string
+}
+
+/**
+ * Info substance active simplifiée (incluse dans la réponse)
+ */
+export interface ActiveSubstanceInfo {
+  id: string
+  code: string
+  nameFr: string
 }
 
 /**
  * Produit vétérinaire (médicament)
  *
+ * Correspond à ProductResponseDto du backend
  * ✅ RÈGLE #4 : Étend BaseEntity (Phase 1)
  */
 export interface Product extends BaseEntity {
-  /** Code produit unique (ex: AMOX-500-INJ) */
-  code: string
+  /** Scope: global (ANMV) ou local (ferme) */
+  scope: ProductScope
 
-  /** Nom commercial du produit */
-  commercialName: string
+  /** ID de la ferme (null si global) */
+  farmId: string | null
 
-  /** Nom du laboratoire pharmaceutique */
-  laboratoryName: string
+  /** Code produit (ex: amm_468) */
+  code: string | null
 
-  /** Forme thérapeutique (injectable, oral, topique, etc.) */
-  therapeuticForm: string
+  // === Identification ===
+  /** Nom en français (principal) */
+  nameFr: string
 
-  /** Dosage (ex: 500mg/ml, 10%, etc.) */
-  dosage: string
+  /** Nom en anglais */
+  nameEn: string | null
 
-  /** Conditionnement (ex: Flacon 100ml, Boîte 20 comprimés) */
-  packaging: string
+  /** Nom en arabe */
+  nameAr: string | null
 
-  /** Liste des substances actives (simplifié) */
-  activeSubstances?: ProductActiveSubstance[]
+  /** Nom commercial */
+  commercialName: string | null
 
-  /** Composition en texte libre */
-  composition?: string
+  /** Description */
+  description: string | null
 
-  /** Catégorie (simplifié - string au lieu de FK) */
-  category?: string
+  // === Classification ===
+  /** Type de produit */
+  type: ProductType | null
 
-  /** Description détaillée du produit */
-  description?: string
+  /** ID catégorie */
+  categoryId: string | null
 
-  /** Instructions d'utilisation */
-  usageInstructions?: string
+  /** ID substance active principale */
+  substanceId: string | null
 
-  /** Contre-indications */
-  contraindications?: string
+  /** Code ATC vétérinaire */
+  atcVetCode: string | null
 
-  /** Conditions de stockage */
-  storageConditions?: string
+  // === Données AMM enrichies ===
+  /** Code catégorie simplifié (ex: "antibiotics") */
+  categoryCode: string | null
 
-  /** Prescription vétérinaire obligatoire */
-  isVeterinaryPrescriptionRequired: boolean
+  /** Composition / Substances actives (texte) */
+  composition: string | null
+
+  /** Forme thérapeutique (ex: "suspension injectable") */
+  therapeuticForm: string | null
+
+  /** Dosage (ex: "100 mg/ml") */
+  dosage: string | null
+
+  /** Voie d'administration (ex: "intramusculaire, sous-cutanée") */
+  administrationRoute: string | null
+
+  /** Espèces cibles */
+  targetSpecies: string[]
 
   /** Délai d'attente viande (jours) */
-  withdrawalMeatDays?: number
+  withdrawalMeatDays: number | null
 
   /** Délai d'attente lait (heures) */
-  withdrawalMilkHours?: number
+  withdrawalMilkHours: number | null
+
+  /** Prescription vétérinaire obligatoire */
+  prescriptionRequired: boolean
+
+  // === Fabrication ===
+  /** Fabricant (ex: "VIRBAC") */
+  manufacturer: string | null
+
+  /** Forme (legacy - utiliser therapeuticForm) */
+  form: string | null
+
+  // === Vaccins ===
+  /** Maladie ciblée (pour vaccins) */
+  targetDisease: string | null
+
+  /** Durée d'immunité en jours (pour vaccins) */
+  immunityDurationDays: number | null
+
+  // === Métadonnées ===
+  /** Notes (contient lien RCP si disponible) */
+  notes: string | null
+
+  // === Relations incluses ===
+  /** Catégorie (si incluse) */
+  category?: ProductCategoryInfo | null
+
+  /** Substance active (si incluse) */
+  substance?: ActiveSubstanceInfo | null
 }
 
 /**
- * DTO pour créer un nouveau produit
+ * DTO pour créer un nouveau produit (local)
  */
 export interface CreateProductDto {
-  /** Code produit unique */
-  code: string
+  /** Nom en français */
+  nameFr: string
 
-  /** Nom commercial */
-  commercialName: string
+  /** Nom commercial (optionnel) */
+  commercialName?: string
 
-  /** Laboratoire */
-  laboratoryName: string
-
-  /** Forme thérapeutique */
-  therapeuticForm: string
-
-  /** Dosage */
-  dosage: string
-
-  /** Conditionnement */
-  packaging: string
+  /** Type de produit */
+  type?: ProductType
 
   /** Composition (texte libre) */
   composition?: string
-
-  /** Description (optionnel) */
-  description?: string
-
-  /** Instructions (optionnel) */
-  usageInstructions?: string
-
-  /** Contre-indications (optionnel) */
-  contraindications?: string
-
-  /** Stockage (optionnel) */
-  storageConditions?: string
-
-  /** Prescription obligatoire */
-  isVeterinaryPrescriptionRequired?: boolean
-
-  /** Actif (défaut: true) */
-  isActive?: boolean
-}
-
-/**
- * DTO pour mettre à jour un produit
- *
- * ✅ RÈGLE #4 : Inclut version pour optimistic locking
- */
-export interface UpdateProductDto {
-  /** Code produit */
-  code?: string
-
-  /** Nom commercial */
-  commercialName?: string
-
-  /** Laboratoire */
-  laboratoryName?: string
 
   /** Forme thérapeutique */
   therapeuticForm?: string
@@ -130,34 +155,54 @@ export interface UpdateProductDto {
   /** Dosage */
   dosage?: string
 
-  /** Conditionnement */
-  packaging?: string
+  /** Voie d'administration */
+  administrationRoute?: string
 
-  /** Composition (texte libre) */
-  composition?: string
+  /** Espèces cibles */
+  targetSpecies?: string[]
+
+  /** Fabricant */
+  manufacturer?: string
+
+  /** Délai viande (jours) */
+  withdrawalMeatDays?: number
+
+  /** Délai lait (heures) */
+  withdrawalMilkHours?: number
+
+  /** Prescription obligatoire */
+  prescriptionRequired?: boolean
 
   /** Description */
   description?: string
 
-  /** Instructions */
-  usageInstructions?: string
+  /** Notes */
+  notes?: string
+}
 
-  /** Contre-indications */
-  contraindications?: string
-
-  /** Stockage */
-  storageConditions?: string
-
-  /** Prescription obligatoire */
-  isVeterinaryPrescriptionRequired?: boolean
-
-  /** Actif */
+/**
+ * DTO pour mettre à jour un produit (local uniquement)
+ *
+ * ✅ RÈGLE #4 : Inclut version pour optimistic locking
+ */
+export interface UpdateProductDto {
+  nameFr?: string
+  commercialName?: string
+  type?: ProductType
+  composition?: string
+  therapeuticForm?: string
+  dosage?: string
+  administrationRoute?: string
+  targetSpecies?: string[]
+  manufacturer?: string
+  withdrawalMeatDays?: number
+  withdrawalMilkHours?: number
+  prescriptionRequired?: boolean
+  description?: string
+  notes?: string
   isActive?: boolean
 
-  /**
-   * Version pour optimistic locking (obligatoire)
-   * Le backend retourne 409 Conflict si mismatch
-   */
+  /** Version pour optimistic locking (obligatoire) */
   version: number
 }
 
@@ -165,21 +210,37 @@ export interface UpdateProductDto {
  * Filtres de recherche pour les produits
  */
 export interface ProductFilters {
-  /** Recherche dans code, nom commercial, laboratoire */
+  /** Recherche dans les noms */
   search?: string
 
-  /** Filtrer par laboratoire */
-  laboratoryName?: string
+  /** Filtrer par scope */
+  scope?: 'global' | 'local' | 'all'
 
-  /** Filtrer par forme thérapeutique */
-  therapeuticForm?: string
+  /** Filtrer par type */
+  type?: ProductType
 
-  /** Filtrer par substance active (ID) */
-  activeSubstanceId?: string
+  /** Filtrer par catégorie (ID) */
+  categoryId?: string
 
-  /** Prescription requise uniquement */
-  prescriptionRequired?: boolean
+  /** Filtrer vaccins uniquement */
+  vaccinesOnly?: boolean
 
-  /** Inclure les inactifs */
-  includeInactive?: boolean
+  /** Filtrer par statut actif */
+  isActive?: boolean
+}
+
+// === Helpers pour la rétrocompatibilité ===
+
+/**
+ * Obtient le nom d'affichage d'un produit
+ */
+export function getProductDisplayName(product: Product): string {
+  return product.commercialName || product.nameFr
+}
+
+/**
+ * Obtient le nom du fabricant (alias pour manufacturer)
+ */
+export function getProductManufacturer(product: Product): string | null {
+  return product.manufacturer
 }
