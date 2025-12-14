@@ -1,5 +1,3 @@
 export { MyVeterinarians } from './my-veterinarians'
 export { MyBreeds } from './my-breeds'
-export { MyVaccines } from './my-vaccines'
-export { MyMedications } from './my-medications'
 export { MyAlerts } from './my-alerts'

@@ -17,8 +17,6 @@ import {
   Save,
   Stethoscope,
   Dna,
-  Syringe,
-  Pill,
   Bell,
   Settings,
   PawPrint,
@@ -28,8 +26,6 @@ import {
 import { MyVeterinarians } from '@/components/settings/my-veterinarians'
 import { MySpecies } from '@/components/settings/my-species'
 import { MyBreeds } from '@/components/settings/my-breeds'
-import { MyVaccines } from '@/components/settings/my-vaccines'
-import { MyMedications } from '@/components/settings/my-medications'
 import { MyAlerts } from '@/components/settings/my-alerts'
 
 // Import pour les paramètres généraux
@@ -59,8 +55,6 @@ type SectionId =
   | 'my-veterinarians'
   | 'my-species'
   | 'my-breeds'
-  | 'my-vaccines'
-  | 'my-medications'
   | 'my-alerts'
   | 'language'
   | 'security'
@@ -85,8 +79,6 @@ const sections: Section[] = [
   { id: 'my-veterinarians', labelKey: 'myVeterinarians', icon: Stethoscope, group: 'my-data' },
   { id: 'my-species', labelKey: 'mySpecies', icon: PawPrint, group: 'my-data' },
   { id: 'my-breeds', labelKey: 'myBreeds', icon: Dna, group: 'my-data' },
-  { id: 'my-vaccines', labelKey: 'myVaccines', icon: Syringe, group: 'my-data' },
-  { id: 'my-medications', labelKey: 'myMedications', icon: Pill, group: 'my-data' },
   { id: 'my-alerts', labelKey: 'myAlerts', icon: Bell, group: 'my-data' },
 
   // Préférences
@@ -172,10 +164,6 @@ export default function SettingsPage() {
         return <MySpecies />
       case 'my-breeds':
         return <MyBreeds />
-      case 'my-vaccines':
-        return <MyVaccines />
-      case 'my-medications':
-        return <MyMedications />
       case 'my-alerts':
         return <MyAlerts />
       case 'language':
