@@ -418,6 +418,17 @@ interface ProductItemProps {
 function ProductItem({ product, isSelected, isLoading, onAction, t }: ProductItemProps) {
   const typeColor = product.type ? TYPE_COLORS[product.type] || TYPE_COLORS.other : null
 
+  // Helper to get therapeutic form display - use translation if available, else raw value
+  const getTherapeuticFormDisplay = (form: string | null | undefined) => {
+    if (!form) return null
+    // Only translate if it's one of our predefined forms
+    if (THERAPEUTIC_FORMS.includes(form)) {
+      return t(`catalog.therapeuticForms.${form}`)
+    }
+    // Otherwise return raw value (backend sends full text descriptions)
+    return form
+  }
+
   return (
     <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
       <div className="flex-1 min-w-0">
@@ -441,7 +452,7 @@ function ProductItem({ product, isSelected, isLoading, onAction, t }: ProductIte
         <p className="text-xs text-muted-foreground truncate">
           {product.manufacturer || '-'}
           {product.dosage && ` • ${product.dosage}`}
-          {product.therapeuticForm && ` • ${t(`catalog.therapeuticForms.${product.therapeuticForm}` as any) || product.therapeuticForm}`}
+          {product.therapeuticForm && ` • ${getTherapeuticFormDisplay(product.therapeuticForm)}`}
         </p>
         {(product.withdrawalMeatDays || product.withdrawalMilkHours) && (
           <p className="text-xs text-muted-foreground mt-1">
