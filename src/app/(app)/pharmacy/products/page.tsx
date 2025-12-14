@@ -40,14 +40,14 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet'
-import { useGlobalProducts } from '@/lib/hooks/useGlobalProducts'
+import { useCatalogProducts } from '@/lib/hooks/useCatalogProducts'
 import { useProductPreferences } from '@/lib/hooks/useProductPreferences'
 import { useSpeciesPreferences } from '@/lib/hooks/useSpeciesPreferences'
 import { productPreferencesService } from '@/lib/services/product-preferences.service'
 import { useAuth } from '@/contexts/auth-context'
 import { useToast } from '@/lib/hooks/useToast'
 import { handleApiError } from '@/lib/utils/api-error-handler'
-import type { Product, ProductType } from '@/lib/types/admin/product'
+import type { Product, ProductType, CatalogFilters, WithdrawalFilterType } from '@/lib/types/admin/product'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
@@ -156,7 +156,6 @@ const ITEMS_PER_PAGE = 50
 
 // === Types ===
 
-type WithdrawalFilter = 'all' | 'noMilk' | 'shortMeat' | 'none'
 type QuickFilter = 'favorites' | 'noMilk' | 'antibiotics' | 'vaccines'
 
 // === Helper functions ===
@@ -218,28 +217,73 @@ export default function CatalogPage() {
   const [formFilter, setFormFilter] = useState<string>('all')
   const [rxFilter, setRxFilter] = useState<'all' | 'required' | 'notRequired'>('all')
   const [speciesFilter, setSpeciesFilter] = useState<string>('all')
-  const [withdrawalFilter, setWithdrawalFilter] = useState<WithdrawalFilter>('all')
+  const [withdrawalFilter, setWithdrawalFilter] = useState<WithdrawalFilterType>('all')
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null)
 
-  // Pagination
-  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE)
-
-  // Quick filters
+  // Quick filters (client-side only: favorites)
   const [activeQuickFilters, setActiveQuickFilters] = useState<Set<QuickFilter>>(new Set())
 
-  // Favoris
+  // Favoris (localStorage)
   const [favorites, toggleFavorite] = useFavorites('pharmacy-favorites')
 
   // Detail sheet
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
 
-  // Debounce
+  // Debounce search
   const debouncedSearch = useDebounce(searchQuery, 300)
 
+  // Build filters for API
+  const catalogFilters = useMemo((): CatalogFilters => {
+    const filters: CatalogFilters = {
+      limit: ITEMS_PER_PAGE,
+    }
+
+    if (debouncedSearch.trim()) {
+      filters.search = debouncedSearch.trim()
+    }
+
+    if (speciesFilter !== 'all') {
+      filters.species = speciesFilter
+    }
+
+    // Quick filter: antibiotics -> type filter
+    if (activeQuickFilters.has('antibiotics')) {
+      filters.type = 'antibiotic'
+    } else if (activeQuickFilters.has('vaccines')) {
+      filters.type = 'vaccine'
+    } else if (typeFilter !== 'all') {
+      filters.type = typeFilter
+    }
+
+    if (formFilter !== 'all') {
+      filters.therapeuticForm = formFilter
+    }
+
+    if (rxFilter !== 'all') {
+      filters.prescription = rxFilter
+    }
+
+    // Quick filter: noMilk -> withdrawal filter
+    if (activeQuickFilters.has('noMilk')) {
+      filters.withdrawal = 'noMilk'
+    } else if (withdrawalFilter !== 'all') {
+      filters.withdrawal = withdrawalFilter
+    }
+
+    return filters
+  }, [debouncedSearch, speciesFilter, typeFilter, formFilter, rxFilter, withdrawalFilter, activeQuickFilters])
+
   // === Data fetching ===
-  const { products: globalProducts, loading: loadingProducts } = useGlobalProducts()
+  const {
+    products: catalogProducts,
+    loading: loadingProducts,
+    total: totalProducts,
+    hasMore,
+    loadMore,
+  } = useCatalogProducts(user?.farmId, catalogFilters)
+
   const {
     preferences,
     loading: loadingPrefs,
@@ -265,8 +309,6 @@ export default function CatalogPage() {
       }
       return next
     })
-    // Reset pagination when filter changes
-    setDisplayCount(ITEMS_PER_PAGE)
   }
 
   // === Filtering logic ===
@@ -280,136 +322,25 @@ export default function CatalogPage() {
     return count
   }, [typeFilter, formFilter, rxFilter, speciesFilter, withdrawalFilter])
 
-  const matchesSpecies = useCallback(
-    (product: Product, speciesId: string): boolean => {
-      if (speciesId === 'all') return true
-      if (!product.targetSpecies || product.targetSpecies.length === 0) return true // Pas d'info = tous
-
-      const selectedSpecies = speciesPrefs.find((sp) => sp.speciesId === speciesId)
-      if (!selectedSpecies) return true
-
-      const speciesName = selectedSpecies.species.nameFr.toLowerCase()
-      const targetSpeciesLower = product.targetSpecies.map((s) => s.toLowerCase())
-
-      return targetSpeciesLower.some(
-        (ts) => ts.includes(speciesName) || speciesName.includes(ts.split(' ')[0])
-      )
-    },
-    [speciesPrefs]
-  )
-
-  const matchesWithdrawal = useCallback((product: Product, filter: WithdrawalFilter): boolean => {
-    switch (filter) {
-      case 'all':
-        return true
-      case 'noMilk':
-        return !product.withdrawalMilkHours || product.withdrawalMilkHours === 0
-      case 'shortMeat':
-        return !product.withdrawalMeatDays || product.withdrawalMeatDays < 7
-      case 'none':
-        return (
-          (!product.withdrawalMeatDays || product.withdrawalMeatDays === 0) &&
-          (!product.withdrawalMilkHours || product.withdrawalMilkHours === 0)
-        )
-      default:
-        return true
-    }
-  }, [])
-
-  // Main filter function
+  // Products filtered by favorites (client-side only, rest is server-side)
   const filteredProducts = useMemo(() => {
-    return globalProducts.filter((p) => {
-      // Quick filter: favorites only
-      if (activeQuickFilters.has('favorites') && !favorites.has(p.id)) {
-        return false
-      }
-
-      // Quick filter: no milk withdrawal
-      if (activeQuickFilters.has('noMilk')) {
-        if (p.withdrawalMilkHours && p.withdrawalMilkHours > 0) return false
-      }
-
-      // Quick filter: antibiotics (using helper function)
-      if (activeQuickFilters.has('antibiotics') && !isAntibiotic(p)) {
-        return false
-      }
-
-      // Quick filter: vaccines (using helper function)
-      if (activeQuickFilters.has('vaccines') && !isVaccine(p)) {
-        return false
-      }
-
-      // Text search
-      if (debouncedSearch.trim()) {
-        const query = debouncedSearch.toLowerCase()
-        const matchesSearch =
-          (p.commercialName || p.nameFr).toLowerCase().includes(query) ||
-          (p.code || '').toLowerCase().includes(query) ||
-          (p.manufacturer || '').toLowerCase().includes(query) ||
-          (p.composition || '').toLowerCase().includes(query)
-        if (!matchesSearch) return false
-      }
-
-      // Type filter
-      if (typeFilter !== 'all') {
-        const productType = getProductType(p)
-        if (productType !== typeFilter) return false
-      }
-
-      // Form filter
-      if (formFilter !== 'all' && p.therapeuticForm !== formFilter) return false
-
-      // Rx filter
-      if (rxFilter === 'required' && !p.prescriptionRequired) return false
-      if (rxFilter === 'notRequired' && p.prescriptionRequired) return false
-
-      // Species filter
-      if (!matchesSpecies(p, speciesFilter)) return false
-
-      // Withdrawal filter
-      if (!matchesWithdrawal(p, withdrawalFilter)) return false
-
-      return true
-    })
-  }, [
-    globalProducts,
-    debouncedSearch,
-    typeFilter,
-    formFilter,
-    rxFilter,
-    speciesFilter,
-    withdrawalFilter,
-    activeQuickFilters,
-    favorites,
-    matchesSpecies,
-    matchesWithdrawal,
-  ])
-
-  // Stats for quick filters
-  const filterStats = useMemo(() => {
-    return {
-      antibiotics: globalProducts.filter(isAntibiotic).length,
-      vaccines: globalProducts.filter(isVaccine).length,
+    if (activeQuickFilters.has('favorites')) {
+      return catalogProducts.filter((p) => favorites.has(p.id))
     }
-  }, [globalProducts])
+    return catalogProducts
+  }, [catalogProducts, activeQuickFilters, favorites])
 
-  // Selected products
+  // Selected products (from preferences, matched with current products)
   const selectedProducts = useMemo(() => {
     return preferences
-      .map((pref) => filteredProducts.find((p) => p.id === pref.productId))
+      .map((pref) => catalogProducts.find((p) => p.id === pref.productId))
       .filter(Boolean) as Product[]
-  }, [preferences, filteredProducts])
+  }, [preferences, catalogProducts])
 
-  // Available products (paginated)
+  // Available products (not already selected)
   const availableProducts = useMemo(() => {
     return filteredProducts.filter((p) => !selectedProductIds.has(p.id))
   }, [filteredProducts, selectedProductIds])
-
-  const displayedProducts = useMemo(() => {
-    return availableProducts.slice(0, displayCount)
-  }, [availableProducts, displayCount])
-
-  const hasMore = displayCount < availableProducts.length
 
   // === Handlers ===
   const handleAddProduct = useCallback(
@@ -463,11 +394,6 @@ export default function CatalogPage() {
     setSpeciesFilter('all')
     setWithdrawalFilter('all')
     setActiveQuickFilters(new Set())
-    setDisplayCount(ITEMS_PER_PAGE)
-  }
-
-  const loadMore = () => {
-    setDisplayCount((prev) => prev + ITEMS_PER_PAGE)
   }
 
   // === Render ===
@@ -481,7 +407,7 @@ export default function CatalogPage() {
         <div>
           <h1 className="text-2xl font-bold">{t('catalog.title')}</h1>
           <p className="text-muted-foreground">
-            {t('catalog.subtitle')} • {globalProducts.length} produits disponibles
+            {t('catalog.subtitle')} • {totalProducts} produits disponibles
           </p>
         </div>
       </div>
@@ -527,7 +453,6 @@ export default function CatalogPage() {
           )}
         >
           {t('catalog.productTypes.antibiotic')}
-          <span className="text-xs opacity-70">({filterStats.antibiotics})</span>
         </button>
 
         <button
@@ -540,7 +465,6 @@ export default function CatalogPage() {
           )}
         >
           {t('catalog.productTypes.vaccine')}
-          <span className="text-xs opacity-70">({filterStats.vaccines})</span>
         </button>
       </div>
 
@@ -551,10 +475,7 @@ export default function CatalogPage() {
           <Input
             placeholder={t('catalog.search')}
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setDisplayCount(ITEMS_PER_PAGE)
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -672,7 +593,7 @@ export default function CatalogPage() {
                   </label>
                   <Select
                     value={withdrawalFilter}
-                    onValueChange={(v) => setWithdrawalFilter(v as WithdrawalFilter)}
+                    onValueChange={(v) => setWithdrawalFilter(v as WithdrawalFilterType)}
                   >
                     <SelectTrigger className="h-9">
                       <SelectValue />
@@ -753,7 +674,7 @@ export default function CatalogPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {displayedProducts.length === 0 ? (
+              {availableProducts.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   {activeQuickFilters.has('favorites') && favorites.size === 0 ? (
                     <div className="space-y-2">
@@ -769,7 +690,7 @@ export default function CatalogPage() {
                 </div>
               ) : (
                 <>
-                  {displayedProducts.map((product) => (
+                  {availableProducts.map((product) => (
                     <ProductItem
                       key={product.id}
                       product={product}
@@ -788,7 +709,7 @@ export default function CatalogPage() {
                     <div className="pt-4 text-center">
                       <Button variant="outline" onClick={loadMore} className="gap-2">
                         <ChevronDown className="h-4 w-4" />
-                        Afficher plus ({availableProducts.length - displayCount} restants)
+                        {t('catalog.loadMore')}
                       </Button>
                     </div>
                   )}

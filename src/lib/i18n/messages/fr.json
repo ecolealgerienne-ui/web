@@ -263,7 +263,8 @@
         "remove": "Retirer des favoris",
         "empty": "Aucun favori",
         "emptyHint": "Cliquez sur ⭐ pour ajouter un produit aux favoris"
-      }
+      },
+      "loadMore": "Afficher plus"
     },
     "empty": {
       "title": "Aucun produit sélectionné",

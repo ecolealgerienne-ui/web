@@ -229,6 +229,40 @@ export interface ProductFilters {
   isActive?: boolean
 }
 
+/**
+ * Type de filtre délai d'attente
+ */
+export type WithdrawalFilterType = 'all' | 'noMilk' | 'shortMeat' | 'none'
+
+/**
+ * Filtres pour le catalogue produits (endpoint farm-scoped)
+ */
+export interface CatalogFilters {
+  /** Recherche textuelle */
+  search?: string
+
+  /** Filtrer par espèce cible */
+  species?: string
+
+  /** Filtrer par type de produit */
+  type?: ProductType | 'all'
+
+  /** Filtrer par forme thérapeutique */
+  therapeuticForm?: string
+
+  /** Filtrer par prescription */
+  prescription?: 'required' | 'notRequired' | 'all'
+
+  /** Filtrer par délai d'attente */
+  withdrawal?: WithdrawalFilterType
+
+  /** Page */
+  page?: number
+
+  /** Limite par page */
+  limit?: number
+}
+
 // === Helpers pour la rétrocompatibilité ===
 
 /**
