@@ -219,7 +219,7 @@ export default function CatalogPage() {
   const [rxFilter, setRxFilter] = useState<'all' | 'required' | 'notRequired'>('all')
   const [speciesFilter, setSpeciesFilter] = useState<string>('all')
   const [withdrawalFilter, setWithdrawalFilter] = useState<WithdrawalFilter>('all')
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(true)
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null)
 
   // Pagination
@@ -247,14 +247,6 @@ export default function CatalogPage() {
   } = useProductPreferences(user?.farmId)
 
   const { preferences: speciesPrefs, loading: loadingSpecies } = useSpeciesPreferences(user?.farmId)
-
-  // DEBUG: Vérifier les données espèces
-  console.log('[Catalogue] Species debug:', {
-    farmId: user?.farmId,
-    speciesPrefs,
-    speciesPrefsLength: speciesPrefs?.length,
-    loadingSpecies,
-  })
 
   const loading = loadingProducts || loadingPrefs || loadingSpecies
 
