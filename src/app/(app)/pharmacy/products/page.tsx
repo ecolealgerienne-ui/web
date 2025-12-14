@@ -248,6 +248,14 @@ export default function CatalogPage() {
 
   const { preferences: speciesPrefs, loading: loadingSpecies } = useSpeciesPreferences(user?.farmId)
 
+  // DEBUG: Vérifier les données espèces
+  console.log('[Catalogue] Species debug:', {
+    farmId: user?.farmId,
+    speciesPrefs,
+    speciesPrefsLength: speciesPrefs?.length,
+    loadingSpecies,
+  })
+
   const loading = loadingProducts || loadingPrefs || loadingSpecies
 
   const selectedProductIds = useMemo(() => {
