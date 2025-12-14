@@ -2,7 +2,20 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { ArrowLeft, Plus, Minus, Search, Loader2, Filter, X, Star, Milk, Beef } from 'lucide-react'
+import {
+  ArrowLeft,
+  Plus,
+  Minus,
+  Search,
+  Loader2,
+  Filter,
+  X,
+  Star,
+  Milk,
+  Beef,
+  ChevronDown,
+  Info,
+} from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +33,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
 import { useGlobalProducts } from '@/lib/hooks/useGlobalProducts'
 import { useProductPreferences } from '@/lib/hooks/useProductPreferences'
 import { useSpeciesPreferences } from '@/lib/hooks/useSpeciesPreferences'
@@ -33,7 +53,6 @@ import { cn } from '@/lib/utils'
 
 // === Hooks ===
 
-// Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
@@ -47,7 +66,6 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// LocalStorage hook for favorites
 function useFavorites(key: string): [Set<string>, (id: string) => void] {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
 
@@ -58,26 +76,29 @@ function useFavorites(key: string): [Set<string>, (id: string) => void] {
         setFavorites(new Set(JSON.parse(stored)))
       }
     } catch {
-      // Ignore localStorage errors
+      // Ignore
     }
   }, [key])
 
-  const toggleFavorite = useCallback((id: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      try {
-        localStorage.setItem(key, JSON.stringify([...next]))
-      } catch {
-        // Ignore localStorage errors
-      }
-      return next
-    })
-  }, [key])
+  const toggleFavorite = useCallback(
+    (id: string) => {
+      setFavorites((prev) => {
+        const next = new Set(prev)
+        if (next.has(id)) {
+          next.delete(id)
+        } else {
+          next.add(id)
+        }
+        try {
+          localStorage.setItem(key, JSON.stringify([...next]))
+        } catch {
+          // Ignore
+        }
+        return next
+      })
+    },
+    [key]
+  )
 
   return [favorites, toggleFavorite]
 }
@@ -116,10 +137,70 @@ const TYPE_COLORS: Record<string, string> = {
   other: 'bg-gray-100 text-gray-800 border-gray-200',
 }
 
+// Mapping categoryCode -> type pour les quick filters
+const CATEGORY_CODE_TO_TYPE: Record<string, ProductType> = {
+  antibiotics: 'antibiotic',
+  antibiotiques: 'antibiotic',
+  vaccines: 'vaccine',
+  vaccins: 'vaccine',
+  antiparasitics: 'antiparasitic',
+  antiparasitaires: 'antiparasitic',
+  'anti-inflammatoires': 'anti_inflammatory',
+  'anti_inflammatory': 'anti_inflammatory',
+  vitamins: 'vitamin',
+  vitamines: 'vitamin',
+}
+
+// Nombre de produits par page
+const ITEMS_PER_PAGE = 50
+
 // === Types ===
 
 type WithdrawalFilter = 'all' | 'noMilk' | 'shortMeat' | 'none'
 type QuickFilter = 'favorites' | 'noMilk' | 'antibiotics' | 'vaccines'
+
+// === Helper functions ===
+
+function getProductType(product: Product): ProductType | null {
+  // D'abord utiliser le type si défini
+  if (product.type) return product.type
+
+  // Sinon déduire du categoryCode
+  if (product.categoryCode) {
+    const code = product.categoryCode.toLowerCase()
+    return CATEGORY_CODE_TO_TYPE[code] || null
+  }
+
+  return null
+}
+
+function isAntibiotic(product: Product): boolean {
+  const type = getProductType(product)
+  if (type === 'antibiotic') return true
+
+  // Fallback: chercher dans le nom ou la composition
+  const searchText = `${product.nameFr} ${product.commercialName || ''} ${product.categoryCode || ''} ${product.composition || ''}`.toLowerCase()
+  return (
+    searchText.includes('antibioti') ||
+    searchText.includes('antimicrobi') ||
+    searchText.includes('amoxicil') ||
+    searchText.includes('pénicil') ||
+    searchText.includes('oxytétracycl')
+  )
+}
+
+function isVaccine(product: Product): boolean {
+  const type = getProductType(product)
+  if (type === 'vaccine') return true
+
+  // Fallback: chercher dans le nom ou la composition
+  const searchText = `${product.nameFr} ${product.commercialName || ''} ${product.categoryCode || ''}`.toLowerCase()
+  return (
+    searchText.includes('vaccin') ||
+    searchText.includes('vaccine') ||
+    searchText.includes('lyophilisat')
+  )
+}
 
 /**
  * Page Catalogue - Sélection des produits pour la pharmacie
@@ -127,6 +208,7 @@ type QuickFilter = 'favorites' | 'noMilk' | 'antibiotics' | 'vaccines'
 export default function CatalogPage() {
   const t = useTranslations('pharmacy')
   const tc = useTranslations('common')
+  const tp = useTranslations('product')
   const toast = useToast()
   const { user } = useAuth()
 
@@ -135,18 +217,25 @@ export default function CatalogPage() {
   const [typeFilter, setTypeFilter] = useState<ProductType | 'all'>('all')
   const [formFilter, setFormFilter] = useState<string>('all')
   const [rxFilter, setRxFilter] = useState<'all' | 'required' | 'notRequired'>('all')
-  const [speciesFilter, setSpeciesFilter] = useState<string>('all') // 'all' ou speciesId
+  const [speciesFilter, setSpeciesFilter] = useState<string>('all')
   const [withdrawalFilter, setWithdrawalFilter] = useState<WithdrawalFilter>('all')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null)
 
-  // Quick filters (chips)
+  // Pagination
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE)
+
+  // Quick filters
   const [activeQuickFilters, setActiveQuickFilters] = useState<Set<QuickFilter>>(new Set())
 
-  // Favoris (persistés en localStorage)
+  // Favoris
   const [favorites, toggleFavorite] = useFavorites('pharmacy-favorites')
 
-  // Debounce la recherche
+  // Detail sheet
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+
+  // Debounce
   const debouncedSearch = useDebounce(searchQuery, 300)
 
   // === Data fetching ===
@@ -157,12 +246,10 @@ export default function CatalogPage() {
     refetch: refetchPreferences,
   } = useProductPreferences(user?.farmId)
 
-  // Espèces configurées par le fermier
   const { preferences: speciesPrefs, loading: loadingSpecies } = useSpeciesPreferences(user?.farmId)
 
   const loading = loadingProducts || loadingPrefs || loadingSpecies
 
-  // IDs des produits déjà sélectionnés
   const selectedProductIds = useMemo(() => {
     return new Set(preferences.map((p) => p.productId))
   }, [preferences])
@@ -178,6 +265,8 @@ export default function CatalogPage() {
       }
       return next
     })
+    // Reset pagination when filter changes
+    setDisplayCount(ITEMS_PER_PAGE)
   }
 
   // === Filtering logic ===
@@ -191,25 +280,24 @@ export default function CatalogPage() {
     return count
   }, [typeFilter, formFilter, rxFilter, speciesFilter, withdrawalFilter])
 
-  // Helper: check if product matches species filter
-  const matchesSpecies = useCallback((product: Product, speciesId: string): boolean => {
-    if (speciesId === 'all') return true
+  const matchesSpecies = useCallback(
+    (product: Product, speciesId: string): boolean => {
+      if (speciesId === 'all') return true
+      if (!product.targetSpecies || product.targetSpecies.length === 0) return true // Pas d'info = tous
 
-    // Trouver l'espèce sélectionnée dans les préférences
-    const selectedSpecies = speciesPrefs.find((sp) => sp.speciesId === speciesId)
-    if (!selectedSpecies) return true
+      const selectedSpecies = speciesPrefs.find((sp) => sp.speciesId === speciesId)
+      if (!selectedSpecies) return true
 
-    // Vérifier si le produit cible cette espèce
-    // On cherche le nom de l'espèce dans targetSpecies du produit
-    const speciesName = selectedSpecies.species.nameFr.toLowerCase()
-    const targetSpeciesLower = product.targetSpecies.map((s) => s.toLowerCase())
+      const speciesName = selectedSpecies.species.nameFr.toLowerCase()
+      const targetSpeciesLower = product.targetSpecies.map((s) => s.toLowerCase())
 
-    return targetSpeciesLower.some((ts) =>
-      ts.includes(speciesName) || speciesName.includes(ts)
-    )
-  }, [speciesPrefs])
+      return targetSpeciesLower.some(
+        (ts) => ts.includes(speciesName) || speciesName.includes(ts.split(' ')[0])
+      )
+    },
+    [speciesPrefs]
+  )
 
-  // Helper: check if product matches withdrawal filter
   const matchesWithdrawal = useCallback((product: Product, filter: WithdrawalFilter): boolean => {
     switch (filter) {
       case 'all':
@@ -241,13 +329,13 @@ export default function CatalogPage() {
         if (p.withdrawalMilkHours && p.withdrawalMilkHours > 0) return false
       }
 
-      // Quick filter: antibiotics
-      if (activeQuickFilters.has('antibiotics') && p.type !== 'antibiotic') {
+      // Quick filter: antibiotics (using helper function)
+      if (activeQuickFilters.has('antibiotics') && !isAntibiotic(p)) {
         return false
       }
 
-      // Quick filter: vaccines
-      if (activeQuickFilters.has('vaccines') && p.type !== 'vaccine') {
+      // Quick filter: vaccines (using helper function)
+      if (activeQuickFilters.has('vaccines') && !isVaccine(p)) {
         return false
       }
 
@@ -263,7 +351,10 @@ export default function CatalogPage() {
       }
 
       // Type filter
-      if (typeFilter !== 'all' && p.type !== typeFilter) return false
+      if (typeFilter !== 'all') {
+        const productType = getProductType(p)
+        if (productType !== typeFilter) return false
+      }
 
       // Form filter
       if (formFilter !== 'all' && p.therapeuticForm !== formFilter) return false
@@ -294,17 +385,31 @@ export default function CatalogPage() {
     matchesWithdrawal,
   ])
 
-  // Selected products (with full info)
+  // Stats for quick filters
+  const filterStats = useMemo(() => {
+    return {
+      antibiotics: globalProducts.filter(isAntibiotic).length,
+      vaccines: globalProducts.filter(isVaccine).length,
+    }
+  }, [globalProducts])
+
+  // Selected products
   const selectedProducts = useMemo(() => {
     return preferences
       .map((pref) => filteredProducts.find((p) => p.id === pref.productId))
       .filter(Boolean) as Product[]
   }, [preferences, filteredProducts])
 
-  // Available products (not selected)
+  // Available products (paginated)
   const availableProducts = useMemo(() => {
     return filteredProducts.filter((p) => !selectedProductIds.has(p.id))
   }, [filteredProducts, selectedProductIds])
+
+  const displayedProducts = useMemo(() => {
+    return availableProducts.slice(0, displayCount)
+  }, [availableProducts, displayCount])
+
+  const hasMore = displayCount < availableProducts.length
 
   // === Handlers ===
   const handleAddProduct = useCallback(
@@ -346,6 +451,11 @@ export default function CatalogPage() {
     [user?.farmId, preferences, refetchPreferences, toast, tc, t]
   )
 
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product)
+    setDetailOpen(true)
+  }
+
   const clearFilters = () => {
     setTypeFilter('all')
     setFormFilter('all')
@@ -353,6 +463,11 @@ export default function CatalogPage() {
     setSpeciesFilter('all')
     setWithdrawalFilter('all')
     setActiveQuickFilters(new Set())
+    setDisplayCount(ITEMS_PER_PAGE)
+  }
+
+  const loadMore = () => {
+    setDisplayCount((prev) => prev + ITEMS_PER_PAGE)
   }
 
   // === Render ===
@@ -360,15 +475,14 @@ export default function CatalogPage() {
     <div className="container mx-auto py-6 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link
-          href="/pharmacy"
-          className={cn(buttonVariants('ghost', 'icon'), 'h-10 w-10')}
-        >
+        <Link href="/pharmacy" className={cn(buttonVariants('ghost', 'icon'), 'h-10 w-10')}>
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
           <h1 className="text-2xl font-bold">{t('catalog.title')}</h1>
-          <p className="text-muted-foreground">{t('catalog.subtitle')}</p>
+          <p className="text-muted-foreground">
+            {t('catalog.subtitle')} • {globalProducts.length} produits disponibles
+          </p>
         </div>
       </div>
 
@@ -383,11 +497,11 @@ export default function CatalogPage() {
               : 'bg-muted text-muted-foreground hover:bg-muted/80'
           )}
         >
-          <Star className={cn('h-3.5 w-3.5', activeQuickFilters.has('favorites') && 'fill-yellow-500')} />
+          <Star
+            className={cn('h-3.5 w-3.5', activeQuickFilters.has('favorites') && 'fill-yellow-500')}
+          />
           {t('catalog.quickFilters.favorites')}
-          {favorites.size > 0 && (
-            <span className="text-xs opacity-70">({favorites.size})</span>
-          )}
+          {favorites.size > 0 && <span className="text-xs opacity-70">({favorites.size})</span>}
         </button>
 
         <button
@@ -413,6 +527,7 @@ export default function CatalogPage() {
           )}
         >
           {t('catalog.productTypes.antibiotic')}
+          <span className="text-xs opacity-70">({filterStats.antibiotics})</span>
         </button>
 
         <button
@@ -425,6 +540,7 @@ export default function CatalogPage() {
           )}
         >
           {t('catalog.productTypes.vaccine')}
+          <span className="text-xs opacity-70">({filterStats.vaccines})</span>
         </button>
       </div>
 
@@ -435,7 +551,10 @@ export default function CatalogPage() {
           <Input
             placeholder={t('catalog.search')}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setDisplayCount(ITEMS_PER_PAGE)
+            }}
             className="pl-9"
           />
         </div>
@@ -460,29 +579,32 @@ export default function CatalogPage() {
             <CardContent className="pt-4 pb-4">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {/* Species filter */}
-                <div>
-                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Espèce</label>
-                  <Select
-                    value={speciesFilter}
-                    onValueChange={setSpeciesFilter}
-                  >
-                    <SelectTrigger className="h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('catalog.speciesFilter.all')}</SelectItem>
-                      {speciesPrefs.map((sp) => (
-                        <SelectItem key={sp.speciesId} value={sp.speciesId}>
-                          {sp.species.nameFr}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {speciesPrefs.length > 0 && (
+                  <div>
+                    <label className="text-xs font-medium mb-1 block text-muted-foreground">
+                      Espèce
+                    </label>
+                    <Select value={speciesFilter} onValueChange={setSpeciesFilter}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t('catalog.speciesFilter.all')}</SelectItem>
+                        {speciesPrefs.map((sp) => (
+                          <SelectItem key={sp.speciesId} value={sp.speciesId}>
+                            {sp.species.nameFr}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 {/* Type filter */}
                 <div>
-                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Type</label>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">
+                    Type
+                  </label>
                   <Select
                     value={typeFilter}
                     onValueChange={(v) => setTypeFilter(v as ProductType | 'all')}
@@ -502,7 +624,9 @@ export default function CatalogPage() {
 
                 {/* Form filter */}
                 <div>
-                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Forme</label>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">
+                    Forme
+                  </label>
                   <Select value={formFilter} onValueChange={setFormFilter}>
                     <SelectTrigger className="h-9">
                       <SelectValue />
@@ -519,7 +643,9 @@ export default function CatalogPage() {
 
                 {/* Rx filter */}
                 <div>
-                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Prescription</label>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">
+                    Prescription
+                  </label>
                   <Select
                     value={rxFilter}
                     onValueChange={(v) => setRxFilter(v as 'all' | 'required' | 'notRequired')}
@@ -529,15 +655,21 @@ export default function CatalogPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{t('catalog.prescriptionFilter.all')}</SelectItem>
-                      <SelectItem value="required">{t('catalog.prescriptionFilter.required')}</SelectItem>
-                      <SelectItem value="notRequired">{t('catalog.prescriptionFilter.notRequired')}</SelectItem>
+                      <SelectItem value="required">
+                        {t('catalog.prescriptionFilter.required')}
+                      </SelectItem>
+                      <SelectItem value="notRequired">
+                        {t('catalog.prescriptionFilter.notRequired')}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Withdrawal filter */}
                 <div>
-                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Délais</label>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">
+                    Délais
+                  </label>
                   <Select
                     value={withdrawalFilter}
                     onValueChange={(v) => setWithdrawalFilter(v as WithdrawalFilter)}
@@ -548,7 +680,9 @@ export default function CatalogPage() {
                     <SelectContent>
                       <SelectItem value="all">{t('catalog.withdrawalFilter.all')}</SelectItem>
                       <SelectItem value="noMilk">{t('catalog.withdrawalFilter.noMilk')}</SelectItem>
-                      <SelectItem value="shortMeat">{t('catalog.withdrawalFilter.shortMeat')}</SelectItem>
+                      <SelectItem value="shortMeat">
+                        {t('catalog.withdrawalFilter.shortMeat')}
+                      </SelectItem>
                       <SelectItem value="none">{t('catalog.withdrawalFilter.none')}</SelectItem>
                     </SelectContent>
                   </Select>
@@ -557,7 +691,12 @@ export default function CatalogPage() {
                 {/* Clear button */}
                 <div className="flex items-end">
                   {(activeFiltersCount > 0 || activeQuickFilters.size > 0) && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 gap-1 w-full">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-9 gap-1 w-full"
+                    >
                       <X className="h-4 w-4" />
                       {t('catalog.clearFilters')}
                     </Button>
@@ -597,6 +736,7 @@ export default function CatalogPage() {
                     isLoading={loadingProductId === product.id}
                     onAction={() => handleRemoveProduct(product.id)}
                     onToggleFavorite={() => toggleFavorite(product.id)}
+                    onClick={() => handleProductClick(product)}
                     t={t}
                   />
                 ))}
@@ -613,7 +753,7 @@ export default function CatalogPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {availableProducts.length === 0 ? (
+              {displayedProducts.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   {activeQuickFilters.has('favorites') && favorites.size === 0 ? (
                     <div className="space-y-2">
@@ -628,23 +768,51 @@ export default function CatalogPage() {
                   )}
                 </div>
               ) : (
-                availableProducts.map((product) => (
-                  <ProductItem
-                    key={product.id}
-                    product={product}
-                    isSelected={false}
-                    isFavorite={favorites.has(product.id)}
-                    isLoading={loadingProductId === product.id}
-                    onAction={() => handleAddProduct(product.id)}
-                    onToggleFavorite={() => toggleFavorite(product.id)}
-                    t={t}
-                  />
-                ))
+                <>
+                  {displayedProducts.map((product) => (
+                    <ProductItem
+                      key={product.id}
+                      product={product}
+                      isSelected={false}
+                      isFavorite={favorites.has(product.id)}
+                      isLoading={loadingProductId === product.id}
+                      onAction={() => handleAddProduct(product.id)}
+                      onToggleFavorite={() => toggleFavorite(product.id)}
+                      onClick={() => handleProductClick(product)}
+                      t={t}
+                    />
+                  ))}
+
+                  {/* Load more button */}
+                  {hasMore && (
+                    <div className="pt-4 text-center">
+                      <Button variant="outline" onClick={loadMore} className="gap-2">
+                        <ChevronDown className="h-4 w-4" />
+                        Afficher plus ({availableProducts.length - displayCount} restants)
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
         </>
       )}
+
+      {/* Product Detail Sheet */}
+      <ProductDetailSheet
+        product={selectedProduct}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        isFavorite={selectedProduct ? favorites.has(selectedProduct.id) : false}
+        isSelected={selectedProduct ? selectedProductIds.has(selectedProduct.id) : false}
+        onToggleFavorite={() => selectedProduct && toggleFavorite(selectedProduct.id)}
+        onAdd={() => selectedProduct && handleAddProduct(selectedProduct.id)}
+        onRemove={() => selectedProduct && handleRemoveProduct(selectedProduct.id)}
+        loading={loadingProductId === selectedProduct?.id}
+        t={t}
+        tp={tp}
+      />
     </div>
   )
 }
@@ -658,6 +826,7 @@ interface ProductItemProps {
   isLoading: boolean
   onAction: () => void
   onToggleFavorite: () => void
+  onClick: () => void
   t: ReturnType<typeof useTranslations<'pharmacy'>>
 }
 
@@ -668,9 +837,11 @@ function ProductItem({
   isLoading,
   onAction,
   onToggleFavorite,
+  onClick,
   t,
 }: ProductItemProps) {
-  const typeColor = product.type ? TYPE_COLORS[product.type] || TYPE_COLORS.other : null
+  const productType = getProductType(product)
+  const typeColor = productType ? TYPE_COLORS[productType] || TYPE_COLORS.other : null
 
   const getTherapeuticFormDisplay = (form: string | null | undefined) => {
     if (!form) return null
@@ -681,7 +852,10 @@ function ProductItem({
   }
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border bg-card gap-2">
+    <div
+      className="flex items-center justify-between p-3 rounded-lg border bg-card gap-2 hover:bg-muted/50 cursor-pointer transition-colors"
+      onClick={onClick}
+    >
       {/* Favorite button */}
       <button
         onClick={(e) => {
@@ -702,9 +876,7 @@ function ProductItem({
       {/* Product info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <p className="font-medium text-sm truncate">
-            {product.commercialName || product.nameFr}
-          </p>
+          <p className="font-medium text-sm truncate">{product.commercialName || product.nameFr}</p>
           {typeColor && (
             <span
               className={cn(
@@ -712,7 +884,7 @@ function ProductItem({
                 typeColor
               )}
             >
-              {t(`catalog.productTypes.${product.type}`)}
+              {t(`catalog.productTypes.${productType}`)}
             </span>
           )}
           {product.prescriptionRequired && (
@@ -748,7 +920,10 @@ function ProductItem({
       <Button
         variant={isSelected ? 'destructive' : 'default'}
         size="sm"
-        onClick={onAction}
+        onClick={(e) => {
+          e.stopPropagation()
+          onAction()
+        }}
         disabled={isLoading}
         className="shrink-0"
       >
@@ -767,5 +942,191 @@ function ProductItem({
         )}
       </Button>
     </div>
+  )
+}
+
+// === Product Detail Sheet Component ===
+
+interface ProductDetailSheetProps {
+  product: Product | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  isFavorite: boolean
+  isSelected: boolean
+  onToggleFavorite: () => void
+  onAdd: () => void
+  onRemove: () => void
+  loading: boolean
+  t: ReturnType<typeof useTranslations<'pharmacy'>>
+  tp: ReturnType<typeof useTranslations<'product'>>
+}
+
+function ProductDetailSheet({
+  product,
+  open,
+  onOpenChange,
+  isFavorite,
+  isSelected,
+  onToggleFavorite,
+  onAdd,
+  onRemove,
+  loading,
+  t,
+  tp,
+}: ProductDetailSheetProps) {
+  if (!product) return null
+
+  const productType = getProductType(product)
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="overflow-y-auto">
+        <SheetHeader>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1">
+              <SheetTitle className="text-left">
+                {product.commercialName || product.nameFr}
+              </SheetTitle>
+              {product.code && (
+                <SheetDescription className="text-left font-mono">{product.code}</SheetDescription>
+              )}
+            </div>
+            <button
+              onClick={onToggleFavorite}
+              className="shrink-0 p-2 hover:bg-muted rounded-full transition-colors"
+            >
+              <Star
+                className={cn(
+                  'h-5 w-5',
+                  isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'
+                )}
+              />
+            </button>
+          </div>
+        </SheetHeader>
+
+        <div className="mt-6 space-y-6">
+          {/* Badges */}
+          <div className="flex flex-wrap gap-2">
+            {productType && (
+              <Badge
+                className={cn(
+                  TYPE_COLORS[productType] || TYPE_COLORS.other,
+                  'border'
+                )}
+              >
+                {t(`catalog.productTypes.${productType}`)}
+              </Badge>
+            )}
+            {product.prescriptionRequired && <Badge variant="destructive">Rx requis</Badge>}
+            {product.therapeuticForm && <Badge variant="secondary">{product.therapeuticForm}</Badge>}
+          </div>
+
+          {/* Info sections */}
+          <div className="space-y-4">
+            {/* Fabricant & Dosage */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground">{tp('fields.manufacturer')}</p>
+                <p className="text-sm font-medium">{product.manufacturer || '-'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{tp('fields.dosage')}</p>
+                <p className="text-sm font-medium">{product.dosage || '-'}</p>
+              </div>
+            </div>
+
+            {/* Composition */}
+            {product.composition && (
+              <div>
+                <p className="text-xs text-muted-foreground">{tp('fields.composition')}</p>
+                <p className="text-sm">{product.composition}</p>
+              </div>
+            )}
+
+            {/* Voie d'administration */}
+            {product.administrationRoute && (
+              <div>
+                <p className="text-xs text-muted-foreground">{tp('fields.administrationRoute')}</p>
+                <p className="text-sm">{product.administrationRoute}</p>
+              </div>
+            )}
+
+            {/* Espèces cibles */}
+            {product.targetSpecies && product.targetSpecies.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground">{tp('fields.targetSpecies')}</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {product.targetSpecies.map((species, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {species}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Délais d'attente */}
+            {(product.withdrawalMeatDays || product.withdrawalMilkHours) && (
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-xs text-muted-foreground mb-2 font-medium">Délais d'attente</p>
+                <div className="flex gap-4">
+                  {product.withdrawalMeatDays !== null && (
+                    <div className="flex items-center gap-2">
+                      <Beef className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{product.withdrawalMeatDays} jours</p>
+                        <p className="text-xs text-muted-foreground">Viande</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.withdrawalMilkHours !== null && (
+                    <div className="flex items-center gap-2">
+                      <Milk className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{product.withdrawalMilkHours} heures</p>
+                        <p className="text-xs text-muted-foreground">Lait</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Notes */}
+            {product.notes && (
+              <div>
+                <p className="text-xs text-muted-foreground">Notes</p>
+                <p className="text-sm whitespace-pre-wrap">{product.notes}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Action button */}
+          <div className="pt-4 border-t">
+            <Button
+              variant={isSelected ? 'destructive' : 'default'}
+              className="w-full"
+              onClick={isSelected ? onRemove : onAdd}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : isSelected ? (
+                <>
+                  <Minus className="h-4 w-4 mr-2" />
+                  {t('catalog.remove')}
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('catalog.add')}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

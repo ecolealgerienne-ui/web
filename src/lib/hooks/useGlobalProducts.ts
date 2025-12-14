@@ -31,10 +31,10 @@ export function useGlobalProducts(params?: UseGlobalProductsParams): UseGlobalPr
     setError(null)
 
     try {
-      // Récupérer tous les produits actifs
+      // Récupérer tous les produits actifs (limit élevé pour avoir tous les produits)
       const response = await productsService.getAll({
         page: 1,
-        limit: 200, // Récupérer plus de produits pour le TransferList
+        limit: 1000, // Augmenté pour récupérer tous les produits du catalogue ANMV
         search: params?.search,
       })
 
