@@ -990,7 +990,7 @@ function ProductDetailSheet({
             {/* Délais d'attente */}
             {(product.withdrawalMeatDays || product.withdrawalMilkHours) && (
               <div className="p-3 bg-muted rounded-lg">
-                <p className="text-xs text-muted-foreground mb-2 font-medium">Délais d'attente</p>
+                <p className="text-xs text-muted-foreground mb-2 font-medium">Délais d&apos;attente</p>
                 <div className="flex gap-4">
                   {product.withdrawalMeatDays !== null && (
                     <div className="flex items-center gap-2">
